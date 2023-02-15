@@ -3,11 +3,10 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use App\Models\Diplom;
+use App\Models\Diploma;
 use App\Models\Lector;
 use App\Models\Lecture;
 use App\Models\User;
-use Database\Factories\DiplomFactory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -22,9 +21,9 @@ class DatabaseSeeder extends Seeder
         User::factory(20)->create();
         $this->call(TestUserSeeder::class);
         Lector::factory(5)->create();
-        Lecture::factory(50)->create();
-        Diplom::factory(30)->create();
+        Diploma::factory(30)->create();
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
+        Lecture::factory(50)->create();
     }
 }

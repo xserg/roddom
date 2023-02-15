@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('lectures', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('lector_id')->unsigned();
+            $table->bigInteger('category_id')->unsigned();
             $table->string('title');
             $table->text('description')->nullable();
             $table->string('preview_picture')->nullable();
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('lector_id')->references('id')->on('lectors');
+            $table->foreign('category_id')->references('id')->on('lecture_categories');
         });
     }
 

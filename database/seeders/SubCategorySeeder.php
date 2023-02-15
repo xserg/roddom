@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
+use App\Models\LectureCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -12,7 +12,7 @@ class SubCategorySeeder extends Seeder
     {
         for ($i = 0; $i < 5; $i++) {
             $category = [
-                'parent_id' => Category::all()
+                'parent_id' => LectureCategory::all()
                     ->where('parent_id', '=', 0)
                     ->random()
                     ->id,
