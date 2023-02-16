@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class TestUserSeeder extends Seeder
@@ -25,7 +26,7 @@ class TestUserSeeder extends Seeder
         $user = [
             'name' => 'test',
             'email' => 'test@test.test',
-            'password' => 'test',
+            'password' => Hash::make('test'),
             'birthdate' => Carbon::today()->subYears(rand(20, 35)),
             'phone' => $this->faker->phoneNumber,
             'mother' => rand(0, 1),
