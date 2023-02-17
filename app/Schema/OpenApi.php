@@ -14,13 +14,13 @@ use OpenApi\Attributes as OA;
 #[OA\Server(
     url: "https://мамы.online/api/v1/",
 )]
-//#[OA\SecurityScheme(
-//    securityScheme: "api key",
-//    type: "Bearer token",
-//    description: "Authorization: Bearer {#api key}",
-//    name: "Bearer token",
-//    in: "headers"
-//)]
+#[OA\SecurityScheme(
+    securityScheme: "api key",
+    type: "Bearer token",
+    description: "Authorization: Bearer {#api key}",
+    name: "Bearer token",
+    in: "headers"
+)]
 ///**
 // * @OA\SecurityScheme(
 // *      securityScheme="xsrf",
