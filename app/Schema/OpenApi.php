@@ -16,10 +16,10 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\SecurityScheme(
     securityScheme: "api key",
-    type: "Bearer token",
+    type: "apiKey",
     description: "Authorization: Bearer {#api key}",
     name: "Bearer token",
-    in: "headers"
+    in: "header"
 )]
 ///**
 // * @OA\SecurityScheme(
