@@ -3,14 +3,20 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
 
-#[OA\Post(path: '/register')]
+#[OA\Post(
+    path: '/register',
+    description: "Регистрация нового юзера с помощью почты и пароля",
+    summary: "Регистрация нового юзера",
+    tags: ["Auth"])
+]
 #[OA\RequestBody (
-    description: "Login credentials",
+    description: "Register credentials",
     required: true,
     content: [new OA\JsonContent(
         properties: [
@@ -34,8 +40,13 @@ use OpenApi\Attributes as OA;
         ]
     )]
 )]
-#[OA\Response(response: 200, description: 'AOK')]
-#[OA\Response(response: 401, description: 'Not allowed')]
+#[OA\Response(response: 201, description: 'OK',
+    content: [new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/UserResource'))],
+)]
+#[OA\Response(response: 422, description: 'Validation exception',
+    content: [new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
+)]
+#[OA\Response(response: 500, description: 'Server Error')]
 class RegisterController
 {
     public function __construct(
@@ -57,7 +68,7 @@ class RegisterController
 
         return response()->json(
             [
-                'user' => $user,
+                'user' => new UserResource($user),
                 'access_token' => $token,
                 'token_type' => 'Bearer'
             ], Response::HTTP_CREATED);

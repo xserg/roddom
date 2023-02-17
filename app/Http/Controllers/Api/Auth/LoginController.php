@@ -7,7 +7,51 @@ use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
+use OpenApi\Attributes as OA;
 
+
+#[OA\Post(
+    path: '/login',
+    description: "Логин юзера с помощью почты и пароля",
+    summary: "Логин юзера",
+    tags: ["Auth"])
+]
+#[OA\RequestBody (
+    description: "Login credentials",
+    required: true,
+    content: [new OA\JsonContent(
+        properties: [
+            new OA\Property(
+                property: "email",
+                description: "Email пользователя",
+                type: "string"
+            ),
+            new OA\Property(
+                property: "password",
+                description: "Пароль пользователя",
+                type: "string",
+                maxLength: 255,
+                minLength: 6
+            )
+        ]
+    )]
+)]
+#[OA\Response(response: 200, description: 'OK',
+    content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
+        new OA\Property(property: 'access_token', type: 'string', example: '2|bNyLNAS0eqriGpH3O2z9bViYtBOtBk1bQKDIEifD'),
+        new OA\Property(property: 'token_type', type: 'string', example: 'Bearer'),
+    ])
+)]
+#[OA\Response(
+    response: 422,
+    description: 'Validation exception',
+    content: [
+        new OA\MediaType(
+            mediaType: 'application/json',
+            schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
+)]
+#[OA\Response(response: 500, description: 'Server Error')]
 class LoginController
 {
     public function __construct(
@@ -22,7 +66,7 @@ class LoginController
             $request->only(['email', 'password'])
         );
 
-        if (! $authenticated) {
+        if (!$authenticated) {
             $errors = [
                 'message' => 'Email or password is invalid',
                 'errors' => [

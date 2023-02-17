@@ -19,13 +19,15 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => fake()->firstNameFemale,
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'name' => fake()->firstNameFemale,
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'remember_token' => Str::random(10),
             'birthdate' => Carbon::today()->subYears(rand(20, 35)),
-            'mother' => rand(0, 1),
+            'is_mother' => rand(0, 1),
+            'pregnancy_start' => Carbon::today()->subMonths(rand(3, 12)),
+            'baby_born' => Carbon::today()->subMonths(rand(1, 2)),
             'phone' => fake()->phoneNumber,
             'photo' => fake()->imageUrl
         ];

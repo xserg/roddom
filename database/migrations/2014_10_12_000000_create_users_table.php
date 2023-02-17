@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->date('birthdate')->nullable()->default(null);
             $table->string('phone', 20)->nullable()->default(null);
-            $table->boolean('mother')->default(0);
+            $table->boolean('is_mother')->default(0);
             $table->date('pregnancy_start')->nullable()->default(null);
             $table->date('baby_born')->nullable()->default(null);
             $table->string('photo')->nullable()->default(null);

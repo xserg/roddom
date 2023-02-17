@@ -29,7 +29,7 @@ class TestUserSeeder extends Seeder
             'password' => Hash::make('test'),
             'birthdate' => Carbon::today()->subYears(rand(20, 35)),
             'phone' => $this->faker->phoneNumber,
-            'mother' => rand(0, 1),
+            'is_mother' => rand(0, 1),
             'remember_token' => Str::random(10),
         ];
 
