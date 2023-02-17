@@ -9,7 +9,7 @@ class UserService
 {
     public function create(array $attributes): User
     {
-        $user = new User(...$attributes);
+        $user = new User($attributes);
 
         if (! $user->save()) {
             abort(
