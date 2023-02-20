@@ -15,7 +15,9 @@ use OpenApi\Attributes as OA;
     path: '/lectors',
     description: "Получение ресурсов лекторов",
     summary: "Получение ресурсов лекторов",
-    tags: ["Lectors"])
+    security: ["bearerAuth"],
+    tags: ["Lectors"]
+),
 ]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [

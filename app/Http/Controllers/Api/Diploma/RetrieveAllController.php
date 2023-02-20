@@ -11,6 +11,7 @@ use OpenApi\Attributes as OA;
     path: '/diplomas',
     description: "Получение ресурсов дипломов",
     summary: "Получение ресурсов дипломов",
+    security: ["bearerAuth"],
     tags: ["Diplomas"])
 ]
 #[OA\Response(response: 200, description: 'OK',
