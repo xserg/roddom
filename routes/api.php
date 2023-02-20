@@ -25,10 +25,10 @@ Route::prefix('v1')
     ->name('v1')
     ->group(function () {
 
-        Route::post('/register', RegisterController::class)
+        Route::post('/user/register', RegisterController::class)
             ->name('register');
 
-        Route::post('/login', LoginController::class)
+        Route::post('/user/login', LoginController::class)
             ->name('login');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
