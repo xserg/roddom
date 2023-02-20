@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('diplomas', function (Blueprint $table) {
             $table->id();
-            $table->string('picture');
+            $table->string('preview_picture');
             $table->bigInteger('lector_id')->unsigned();
 
             $table->timestamps();

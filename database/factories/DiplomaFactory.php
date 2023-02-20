@@ -18,7 +18,7 @@ class DiplomaFactory extends Factory
     public function definition()
     {
         return [
-            'picture' => fake()->imageUrl,
+            'preview_picture' => fake()->imageUrl,
             'lector_id' => Lector::all()->random()
         ];
     }

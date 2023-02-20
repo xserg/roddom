@@ -28,7 +28,7 @@ class LectureFactory extends Factory
                 ->id,
             'description' => $this->faker->text(100),
             'preview_picture' => $this->faker->imageUrl,
-            'video' => $this->faker->url
+            'video_id' => $this->faker->randomNumber(9, true)
         ];
     }
 }

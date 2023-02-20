@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
 #[OA\SecurityScheme(
     securityScheme: "bearerAuth",
     type: "http",
-    description: "Authorization: Bearer {#api key}",
+    description: "Authorization: Bearer {#api key here}",
     name: "bearerAuth",
     in: "header",
     scheme: "bearer",

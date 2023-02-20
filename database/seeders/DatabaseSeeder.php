@@ -20,10 +20,10 @@ class DatabaseSeeder extends Seeder
     {
         User::factory(20)->create();
         $this->call(TestUserSeeder::class);
-        Lector::factory(5)->create();
-        Diploma::factory(30)->create();
+        Lector::factory(25)->create();
+        Diploma::factory(50)->create();
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
-        Lecture::factory(50)->create();
+        Lecture::factory(150)->create();
     }
 }
