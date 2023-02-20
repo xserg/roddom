@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
     path: '/user/{id}',
     description: "Может сделать только залогиненный юзер",
     summary: "Подать заявку на удаление",
-    security: ["bearerAuth"],
+    security: [["bearerAuth" => []]],
     tags: ["user"]
 )]
 #[OA\Parameter(

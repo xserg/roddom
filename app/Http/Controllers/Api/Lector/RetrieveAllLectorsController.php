@@ -15,7 +15,7 @@ use OpenApi\Attributes as OA;
     path: '/lectors',
     description: "Получение ресурсов лекторов",
     summary: "Получение ресурсов лекторов",
-    security: ["bearerAuth"],
+    security: [["bearerAuth" => []]],
     tags: ["lectors"]
 ),
 ]

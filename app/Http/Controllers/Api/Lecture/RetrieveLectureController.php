@@ -14,7 +14,7 @@ use OpenApi\Attributes as OA;
     path: '/lecture/{id}',
     description: "Получение ресурса лекции",
     summary: "Получение ресурса лекции",
-    security: ["bearerAuth"],
+    security: [["bearerAuth" => []]],
     tags: ["lectures"])
 ]
 #[OA\Parameter(
