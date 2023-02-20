@@ -17,6 +17,12 @@ use OpenApi\Attributes as OA;
     security: ["bearerAuth"],
     tags: ["lectures"])
 ]
+#[OA\Parameter(
+    parameter: 'id',
+    name: 'lecture id',
+    required: true,
+    schema: new OA\Schema(type: 'integer')
+)]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),

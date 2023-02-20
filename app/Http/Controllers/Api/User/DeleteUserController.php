@@ -20,7 +20,7 @@ use OpenApi\Attributes as OA;
     parameter: 'id',
     name: 'user id',
     required: true,
-    schema: new OA\Schema(type: 'string')
+    schema: new OA\Schema(type: 'integer')
 )]
 #[OA\Response(
     response: Response::HTTP_OK,
