@@ -25,9 +25,6 @@ Route::prefix('v1')
         Route::post('/login', LoginController::class)
             ->name('login');
 
-        Route::delete('/logout', LogoutController::class)
-            ->name('login');
-
         Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/check', \App\Http\Controllers\Api\User\RetrieveAllController::class)
                 ->name('check');
