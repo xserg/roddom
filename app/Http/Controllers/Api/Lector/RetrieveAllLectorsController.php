@@ -16,7 +16,7 @@ use OpenApi\Attributes as OA;
     description: "Получение ресурсов лекторов",
     summary: "Получение ресурсов лекторов",
     security: ["bearerAuth"],
-    tags: ["Lectors"]
+    tags: ["lectors"]
 ),
 ]
 #[OA\Response(response: 200, description: 'OK',
@@ -25,7 +25,7 @@ use OpenApi\Attributes as OA;
     ])
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
-class RetrieveAllController
+class RetrieveAllLectorsController
 {
     public function __invoke(Request $req)
     {

@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\LoginRequest;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 
 #[OA\Post(
-    path: '/login',
+    path: '/user/login',
     description: "Логин юзера с помощью почты и пароля",
     summary: "Логин юзера",
-    tags: ["Auth"])
+    tags: ["user"])
 ]
 #[OA\RequestBody (
     description: "Login credentials",

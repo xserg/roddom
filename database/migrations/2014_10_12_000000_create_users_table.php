@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('pregnancy_start')->nullable()->default(null);
             $table->date('baby_born')->nullable()->default(null);
             $table->string('photo')->nullable()->default(null);
+            $table->boolean('to_delete')->default(false);
 
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

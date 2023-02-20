@@ -1,7 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Diploma\RetrieveAllDiplomasController;
+use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
+use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
+use App\Http\Controllers\Api\User\DeleteUserController;
+use App\Http\Controllers\Api\User\LoginController;
+use App\Http\Controllers\Api\User\RegisterController;
+use App\Http\Controllers\Api\User\RetrieveAllUsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,16 +31,19 @@ Route::prefix('v1')
             ->name('login');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
-            Route::get('/check', \App\Http\Controllers\Api\User\RetrieveAllController::class)
+            Route::get('/check', RetrieveAllUsersController::class)
                 ->name('check');
 
-            Route::get('/lectors', \App\Http\Controllers\Api\Lector\RetrieveAllController::class)
+            Route::delete('/user/{id}', DeleteUserController::class)
+                ->name('delete');
+
+            Route::get('/lectors', RetrieveAllLectorsController::class)
                 ->name('lectors');
 
-            Route::get('/lectures', \App\Http\Controllers\Api\Lecture\RetrieveAllController::class)
+            Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');
 
-            Route::get('/diplomas', \App\Http\Controllers\Api\Diploma\RetrieveAllController::class)
+            Route::get('/diplomas', RetrieveAllDiplomasController::class)
                 ->name('diplomas');
         });
     });

@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
     description: "Получение ресурсов дипломов",
     summary: "Получение ресурсов дипломов",
     security: ["bearerAuth"],
-    tags: ["Diplomas"])
+    tags: ["diplomas"])
 ]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
@@ -20,7 +20,7 @@ use OpenApi\Attributes as OA;
     ])
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
-class RetrieveAllController
+class RetrieveAllDiplomasController
 {
     public function __invoke()
     {

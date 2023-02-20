@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
-    path: '/register',
+    path: '/user/register',
     description: "Регистрация нового юзера с помощью почты и пароля",
     summary: "Регистрация нового юзера",
-    tags: ["Auth"])
+    tags: ["user"])
 ]
 #[OA\RequestBody (
     description: "Register credentials",
@@ -62,7 +62,13 @@ class RegisterController
             'password' => $request->input('password')
         ];
 
-        $user = $this->service->create($attributes);
+        try {
+            $user = $this->service->create($attributes);
+        } catch (\Exception $exception) {
+            return response()->json(
+                ['message' => $exception->getMessage()],
+                Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
