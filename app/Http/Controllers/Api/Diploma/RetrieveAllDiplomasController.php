@@ -20,10 +20,13 @@ use OpenApi\Attributes as OA;
     ])
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
+
 class RetrieveAllDiplomasController
 {
-    public function __invoke()
+    public function __invoke(): ResourceCollection
     {
-        return DiplomaResource::collection(Diploma::all());
+        return DiplomaResource::collection(
+            Diploma::all()
+        );
     }
 }

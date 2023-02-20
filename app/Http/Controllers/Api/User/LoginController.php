@@ -52,6 +52,7 @@ use Symfony\Component\HttpFoundation\Response;
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
+
 class LoginController
 {
     public function __construct(

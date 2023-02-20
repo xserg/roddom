@@ -20,10 +20,13 @@ use OpenApi\Attributes as OA;
     ])
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
+
 class RetrieveAllLecturesController
 {
-    public function __invoke()
+    public function __invoke(): ResourceCollection
     {
-        return LectureResource::collection(Lecture::all());
+        return LectureResource::collection(
+            Lecture::all()
+        );
     }
 }

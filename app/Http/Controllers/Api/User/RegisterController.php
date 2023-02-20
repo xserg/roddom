@@ -47,6 +47,7 @@ use Symfony\Component\HttpFoundation\Response;
     content: [new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
+
 class RegisterController
 {
     public function __construct(

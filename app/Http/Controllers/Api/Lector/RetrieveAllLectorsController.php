@@ -25,10 +25,13 @@ use OpenApi\Attributes as OA;
     ])
 )]
 #[OA\Response(response: 500, description: 'Server Error')]
+
 class RetrieveAllLectorsController
 {
-    public function __invoke(Request $req)
+    public function __invoke(): ResourceCollection
     {
-        return LectorResource::collection(Lector::with('diplomas')->get());
+        return LectorResource::collection(
+            Lector::all()
+        );
     }
 }
