@@ -18,6 +18,12 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'title', description: 'заголовок лекции', type: 'string')]
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку лекции', type: 'string')]
     #[OA\Property(property: 'video_id', description: 'id видео в kinescope.io, будет ссылка типа https://kinescope.io/123456789', type: 'integer')]
+    #[OA\Property(
+        property: 'lector',
+        ref: '#/components/schemas/LectorResource',
+        description: 'Лектор лекции. Будет только когда запрашиваем конкретную лекцию /lecture/{id}',
+        type: 'object')]
+
     public function toArray(Request $request): array
     {
         return [
@@ -27,7 +33,8 @@ class LectureResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
-            'video_id' => $this->video_id
+            'video_id' => $this->video_id,
+            'lector' => LectorResource::make($this->whenLoaded('lector')),
         ];
     }
 }

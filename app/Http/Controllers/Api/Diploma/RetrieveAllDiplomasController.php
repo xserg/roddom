@@ -12,7 +12,7 @@ use OpenApi\Attributes as OA;
     description: "Получение ресурсов дипломов",
     summary: "Получение ресурсов дипломов",
     security: [["bearerAuth" => []]],
-    tags: ["diplomas"])
+    tags: ["diploma"])
 ]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [

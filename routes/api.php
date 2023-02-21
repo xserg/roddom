@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Diploma\RetrieveAllDiplomasController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
+use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
 use App\Http\Controllers\Api\User\DeleteUserController;
@@ -40,6 +41,8 @@ Route::prefix('v1')
 
             Route::get('/lectors', RetrieveAllLectorsController::class)
                 ->name('lectors');
+            Route::get('/lector/{id}', RetrieveLectorController::class)
+                ->name('lector');
 
             Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');

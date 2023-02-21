@@ -15,7 +15,7 @@ use OpenApi\Attributes as OA;
     description: "Получение ресурса лекции",
     summary: "Получение ресурса лекции",
     security: [["bearerAuth" => []]],
-    tags: ["lectures"])
+    tags: ["lecture"])
 ]
 #[OA\Parameter(
     parameter: 'id',
@@ -49,7 +49,10 @@ class RetrieveLectureController
 {
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
-        $lecture = Lecture::query()->where(['id' => $id])->first();
+        $lecture = Lecture::query()
+            ->with('lector')
+            ->where(['id' => $id])
+            ->first();
 
         if(! $lecture){
             return response()->json([

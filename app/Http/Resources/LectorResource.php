@@ -16,6 +16,12 @@ class LectorResource extends JsonResource
     #[OA\Property(property: 'name', description: 'имя лектора', type: 'string')]
     #[OA\Property(property: 'career_start', description: 'дата начала карьеры', type: 'date')]
     #[OA\Property(property: 'photo', description: 'ссылка на фото лектора', type: 'string')]
+    #[OA\Property(
+        property: 'diplomas',
+        description: 'Дипломы и сертификаты лектора. лектор лекции. Будет только когда запрашиваем конкретного лектора /lector/{id}',
+        type: 'array',
+        items: new OA\Items(ref: '#/components/schemas/DiplomaResource'),
+    )]
     public function toArray(Request $request): array
     {
         return [
@@ -23,7 +29,7 @@ class LectorResource extends JsonResource
             'name' => $this->name,
             'career_start' => $this->career_start,
             'photo' => $this->photo,
-            'diplomas' => DiplomaResource::collection($this->diplomas)
+            'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas'))
         ];
     }
 }
