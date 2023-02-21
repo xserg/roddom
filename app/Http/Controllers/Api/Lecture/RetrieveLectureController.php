@@ -20,6 +20,7 @@ use OpenApi\Attributes as OA;
 #[OA\Parameter(
     name: 'id',
     description: 'id лекции, которую хотим получить',
+    in: 'path',
     required: true,
     schema: new OA\Schema(type: 'integer')
 )]
