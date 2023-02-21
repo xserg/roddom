@@ -18,8 +18,8 @@ use OpenApi\Attributes as OA;
     tags: ["lecture"])
 ]
 #[OA\Parameter(
-    parameter: 'id',
-    name: 'lecture id',
+    name: 'id',
+    description: 'id лекции, которую хотим получить',
     required: true,
     schema: new OA\Schema(type: 'integer')
 )]

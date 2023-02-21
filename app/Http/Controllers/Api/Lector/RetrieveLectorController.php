@@ -18,7 +18,8 @@ use OpenApi\Attributes as OA;
     tags: ["lector"])
 ]
 #[OA\Parameter(
-    name: 'lector id',
+    name: 'id',
+    description: 'id лектора, которого хотим получить',
     in: 'path',
     required: true,
     schema: new OA\Schema(type: 'integer')
@@ -41,7 +42,7 @@ class RetrieveLectorController
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
         $lector = Lector::query()
-            ->with(['diplomas:lector_id'])
+            ->with(['diplomas'])
             ->where(['id' => $id])
             ->first();
 
