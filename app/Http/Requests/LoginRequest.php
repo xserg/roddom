@@ -4,15 +4,16 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use OpenApi\Attributes as OA;
 
+#[OA\Schema(
+    schema: 'LoginRequest',
+    title: 'LoginRequest'
+)]
 class LoginRequest extends FormRequest
 {
-
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, Rule|array|string>
-     */
+    #[OA\Property(property: 'email', description: 'email юзера', type: 'string')]
+    #[OA\Property(property: 'password', description: 'пароль юзера', type: 'string')]
     public function rules(): array
     {
         return [

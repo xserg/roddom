@@ -18,27 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
 #[OA\RequestBody (
     description: "Register credentials",
     required: true,
-    content: [new OA\JsonContent(
-        properties: [
-            new OA\Property(
-                property: "email",
-                description: "Email пользователя",
-                type: "string"
-            ),
-            new OA\Property(
-                property: "password",
-                description: "Пароль пользователя",
-                type: "string",
-                maxLength: 255,
-                minLength: 6
-            ),
-            new OA\Property(
-                property: "password_confirmation",
-                description: "Подтверждение пароля",
-                type: "string"
-            ),
-        ]
-    )]
+    content: [
+        new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/RegisterRequest')),
+        new OA\MediaType(mediaType: 'application/x-www-form-urlencoded', schema: new OA\Schema(ref: '#/components/schemas/RegisterRequest')),
+    ]
 )]
 #[OA\Response(response: 201, description: 'OK',
     content: [new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/UserResource'))],

@@ -19,22 +19,10 @@ use Symfony\Component\HttpFoundation\Response;
 #[OA\RequestBody (
     description: "Login credentials",
     required: true,
-    content: [new OA\JsonContent(
-        properties: [
-            new OA\Property(
-                property: "email",
-                description: "Email пользователя",
-                type: "string"
-            ),
-            new OA\Property(
-                property: "password",
-                description: "Пароль пользователя",
-                type: "string",
-                maxLength: 255,
-                minLength: 6
-            )
-        ]
-    )]
+    content: [
+        new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/LoginRequest')),
+        new OA\MediaType(mediaType: 'application/x-www-form-urlencoded', schema: new OA\Schema(ref: '#/components/schemas/LoginRequest')),
+    ]
 )]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
