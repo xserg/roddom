@@ -10,17 +10,11 @@ use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
 #[OA\Delete(
-    path: '/user/{id}',
+    path: '/user',
     description: "Может сделать только залогиненный юзер",
     summary: "Подать заявку на удаление",
     security: [["bearerAuth" => []]],
     tags: ["user"]
-)]
-#[OA\Parameter(
-    parameter: 'id',
-    name: 'user id',
-    required: true,
-    schema: new OA\Schema(type: 'integer')
 )]
 #[OA\Response(
     response: Response::HTTP_OK,
@@ -46,10 +40,10 @@ class DeleteUserController
     {
     }
 
-    public function __invoke(Request $request, int $id): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         try {
-            $this->service->makeDeletionRequest($id);
+            $this->service->makeDeletionRequest(auth()->user());
         } catch (Exception $exception) {
             return response()->json([
                 'message' => 'Заявка на удаление аккаунта не зарегистрирована: ' . $exception->getMessage()

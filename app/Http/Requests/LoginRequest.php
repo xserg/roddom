@@ -12,8 +12,8 @@ use OpenApi\Attributes as OA;
 )]
 class LoginRequest extends FormRequest
 {
-    #[OA\Property(property: 'email', description: 'email юзера', type: 'string')]
-    #[OA\Property(property: 'password', description: 'пароль юзера', type: 'string')]
+    #[OA\Property(property: 'email', description: 'email пользователя', type: 'string')]
+    #[OA\Property(property: 'password', description: 'пароль пользователя', type: 'string')]
     public function rules(): array
     {
         return [

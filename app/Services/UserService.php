@@ -26,10 +26,8 @@ class UserService
     /**
      * @throws Exception
      */
-    public function makeDeletionRequest(int $id, User $currentUser): void
+    public function makeDeletionRequest(User $currentUser): void
     {
-        $this->userAuthorizedGuard($id, $currentUser);
-
         $currentUser->to_delete = true;
 
         $this->saveUserGuard($currentUser);

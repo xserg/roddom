@@ -12,6 +12,7 @@ use OpenApi\Attributes as OA;
     path: '/user/photo',
     description: "Обновление фото юзера",
     summary: "Загрузить фото юзера",
+    security: [["bearerAuth" => []]],
     tags: ["user"])
 ]
 #[OA\RequestBody (
