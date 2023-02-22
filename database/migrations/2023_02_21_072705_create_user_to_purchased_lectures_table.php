@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_to_purchased_lectures', function (Blueprint $table) {
+            $table->primary(['user_id', 'lecture_id']);
+
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('lecture_id')->unsigned();
             $table->dateTime('purchased_until');
