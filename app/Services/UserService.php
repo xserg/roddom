@@ -56,4 +56,52 @@ class UserService
             throw new Exception('This can only be done by the same user.');
         }
     }
+
+    public function addLectureToWatched(
+        int  $lectureId,
+        User $currentUser
+    ): void
+    {
+        /**
+         * @var $watchedLectures Collection
+         */
+        $watchedLectures = $currentUser->watchedLectures;
+        $lectureAlreadyInWatched = $watchedLectures->keyBy('id')->has($lectureId);
+
+        if ($lectureAlreadyInWatched) {
+            return;
+        }
+
+        $currentUser->watchedLectures()->attach($lectureId);
+    }
+
+    public function canUserWatchLecture(
+        int             $lectureId,
+        Authenticatable $currentUser
+    ): bool
+    {
+        return true;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function saveUsersPhoto(
+        Authenticatable $user,
+        UploadedFile    $file): string
+    {
+        $extension = $file->extension();
+        $filename = "$user->id.$extension";
+
+        // /app/public/images/{user-id}.{extension}
+        // linked folder -> /public/storage/images/{user-id}.{extension}
+        $path = 'storage/' . $file->storeAs('images', $filename);
+        $user->photo = $path;
+
+        if(! $user->save()){
+            throw new Exception('Could not save user in database');
+        }
+
+        return $path;
+    }
 }

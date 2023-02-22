@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
 use App\Http\Controllers\Api\User\DeleteUserController;
 use App\Http\Controllers\Api\User\LoginController;
+use App\Http\Controllers\Api\User\PhotoController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\RetrieveAllUsersController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::prefix('v1')
 
             Route::delete('/user/{id}', DeleteUserController::class)
                 ->name('delete');
+            Route::put('/user/profile', DeleteUserController::class)
+                ->name('profile');
+            Route::put('/user/photo', PhotoController::class)
+                ->name('photo');
 
             Route::get('/lectors', RetrieveAllLectorsController::class)
                 ->name('lectors');
