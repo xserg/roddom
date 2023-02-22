@@ -6,7 +6,8 @@ use OpenApi\Attributes as OA;
 
 #[OA\Info(
     version: "1.0.0",
-    title: "Mothers school API",
+    description: "bearer token for tests: 1|S5UQcrN2vnXSUfc8KoNh5xgEeipB2gyobh5Ms7IO",
+    title: "Mothers school API"
 )]
 #[OA\Contact(
     email: "vladimir.balin@bboom.pro"

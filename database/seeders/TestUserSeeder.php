@@ -2,12 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\Lecture;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\NewAccessToken;
 
 class TestUserSeeder extends Seeder
 {
@@ -34,5 +37,45 @@ class TestUserSeeder extends Seeder
         ];
 
         DB::table('users')->insert($user);
+
+        $user = User::first();
+
+        $token = $user->tokens()->create([
+            'name' => 'auth_token',
+            'token' => hash('sha256', $plainTextToken = 'S5UQcrN2vnXSUfc8KoNh5xgEeipB2gyobh5Ms7IO'),
+            'abilities' => '[*]',
+            'expires_at' => null,
+        ]);
+
+        $tokenPlain = new NewAccessToken($token, $user->id.'|'.$plainTextToken);
+
+        $lectures = Lecture
+            ::all()
+            ->random(50);
+
+        foreach ($lectures as $lecture) {
+            $rand = rand(0, 2);
+            switch ($rand) {
+                case 0:
+                {
+                    $user->watchedLectures()
+                        ->attach($lecture->id);
+                }
+                case 1:
+                {
+                    $user->savedLectures()
+                        ->attach($lecture->id);
+                }
+                case 2:
+                {
+                    $user->purchasedLectures()
+                        ->attach(
+                            $lecture->id,
+                            ['purchased_until' => Carbon::now()->addDays($rand)]
+                        );
+                }
+                default;
+            }
+        }
     }
 }

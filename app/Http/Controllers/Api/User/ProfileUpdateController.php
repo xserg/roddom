@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
     tags: ["user"])
 ]
 #[OA\RequestBody (
-    description: "Login credentials",
+    description: "Данные профиля",
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
