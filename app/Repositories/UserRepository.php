@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Lecture;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,5 +15,15 @@ class UserRepository
             ->firstOrFail();
 
         return $user;
+    }
+
+    public function getLectureById($id)
+    {
+        $lecture = Lecture::query()
+            ->with('lector')
+            ->where(['id' => $id])
+            ->first();
+
+        return $lecture;
     }
 }

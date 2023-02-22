@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureResource;
+use App\Jobs\WatchLecture;
 use App\Models\Lecture;
+use App\Repositories\UserRepository;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,18 +51,32 @@ use OpenApi\Attributes as OA;
 
 class RetrieveLectureController
 {
+    public function __construct(
+        private UserRepository $repository,
+        private UserService $service
+    )
+    {
+    }
+
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
-        $lecture = Lecture::query()
-            ->with('lector')
-            ->where(['id' => $id])
-            ->first();
+        $lecture = $this->repository->getLectureById($id);
+        $currentUser = auth()->user();
 
         if(! $lecture){
             return response()->json([
                 'message' => 'Lecture with id ' . $id . ' was not found'
             ], Response::HTTP_NOT_FOUND);
         }
+
+        $userCanWatch = $this->service->canUserWatchLecture($id, $currentUser);
+        if(! $userCanWatch){
+            return response()->json([
+                'message' => 'User cannot watch lecture with id ' . $id
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+        WatchLecture::dispatch($lecture->id, $currentUser);
 
         return LectureResource::make($lecture);
     }

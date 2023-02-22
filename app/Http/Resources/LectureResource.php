@@ -18,6 +18,7 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'title', description: 'заголовок лекции', type: 'string')]
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку лекции', type: 'string')]
     #[OA\Property(property: 'video_id', description: 'id видео в kinescope.io, будет ссылка типа https://kinescope.io/123456789', type: 'integer')]
+    #[OA\Property(property: 'is_free', description: 'бесплатная ли лекция', type: 'boolean')]
     #[OA\Property(
         property: 'lector',
         ref: '#/components/schemas/LectorResource',

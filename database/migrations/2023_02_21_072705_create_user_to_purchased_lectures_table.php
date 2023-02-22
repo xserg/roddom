@@ -8,16 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('user_to_watched_lectures', function (Blueprint $table) {
+        Schema::create('user_to_purchased_lectures', function (Blueprint $table) {
             $table->bigInteger('user_id')->unsigned();
             $table->bigInteger('lecture_id')->unsigned();
-
-            $table->timestamps();
+            $table->dateTime('purchased_until');
 
             $table->foreign('lecture_id')->references('id')->on('lectures');
             $table->foreign('user_id')->references('id')->on('users');
@@ -26,11 +23,9 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('user_to_watched_lectures');
+        Schema::dropIfExists('user_to_purchased_lectures');
     }
 };

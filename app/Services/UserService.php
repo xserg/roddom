@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Jobs\UserDeletionRequest;
 use App\Models\User;
 use Exception;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\UploadedFile;
 
 class UserService
 {
@@ -23,22 +26,21 @@ class UserService
     /**
      * @throws Exception
      */
-    public function makeDeletionRequest($id): void
+    public function makeDeletionRequest(int $id, User $currentUser): void
     {
-        $this->userAuthorizedGuard($id);
+        $this->userAuthorizedGuard($id, $currentUser);
 
-        $user = auth()->user();
-        $user->to_delete = true;
+        $currentUser->to_delete = true;
 
-        $this->saveUserGuard($user);
+        $this->saveUserGuard($currentUser);
 
-        UserDeletionRequest::dispatch();
+        UserDeletionRequest::dispatch($currentUser);
     }
 
     /**
      * @throws Exception
      */
-    private function saveUserGuard($user): void
+    private function saveUserGuard(User $user): void
     {
         if (!$user->save()) {
             throw new Exception('Couldn\'t save user to database');
@@ -48,11 +50,9 @@ class UserService
     /**
      * @throws Exception
      */
-    private function userAuthorizedGuard($id): void
+    private function userAuthorizedGuard(int $id, User $currentUser): void
     {
-        $user = auth()->user();
-
-        if ($user->id !== $id) {
+        if ($currentUser->id !== $id) {
             throw new Exception('This can only be done by the same user.');
         }
     }

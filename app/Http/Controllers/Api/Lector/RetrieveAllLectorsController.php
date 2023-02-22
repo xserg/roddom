@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lector;
 
 use App\Http\Resources\LectorCollection;
 use App\Models\Lector;
+use App\Repositories\LectorRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use OpenApi\Attributes as OA;
@@ -41,10 +42,19 @@ use OpenApi\Attributes as OA;
 #[OA\Response(response: 500, description: 'Server Error')]
 class RetrieveAllLectorsController
 {
+    public function __construct(
+        private LectorRepository $repository
+    )
+    {
+    }
+
     public function __invoke(Request $request): ResourceCollection
     {
-        return LectorResource::collection(
-            Lector::all()
+        $perPage = $request->per_page ?? 7;
+        $page = $request->page ?? 1;
+
+        return new LectorCollection(
+            $this->repository->getAllWithPaginator($perPage, $page)
         );
     }
 }

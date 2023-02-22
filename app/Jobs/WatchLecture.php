@@ -2,16 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Models\Lecture;
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class UserDeletionRequest implements ShouldQueue
+class WatchLecture implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -19,7 +20,8 @@ class UserDeletionRequest implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private User $user
+        private int $lectureId,
+        private User $currentUser
     )
     {
         //
@@ -28,8 +30,8 @@ class UserDeletionRequest implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(UserService $userService): void
     {
-        //
+        $userService->addLectureToWatched($this->lectureId, $this->currentUser);
     }
 }
