@@ -31,6 +31,7 @@ class LectureResource extends JsonResource
             'id' => $this->id,
             'lector_id' => $this->lector_id,
             'category_id' => $this->category_id,
+            'category_slug' => $this->category->slug,
             'title' => $this->title,
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,

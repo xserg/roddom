@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Lecture;
 use App\Http\Resources\LectureResource;
 use App\Jobs\WatchLecture;
 use App\Models\Lecture;
+use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -52,7 +53,7 @@ use OpenApi\Attributes as OA;
 class RetrieveLectureController
 {
     public function __construct(
-        private UserRepository $repository,
+        private LectureRepository $repository,
         private UserService $service
     )
     {

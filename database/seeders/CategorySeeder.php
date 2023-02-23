@@ -2,18 +2,29 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
     public function run()
     {
-        for ($i = 0; $i < 5; $i++) {
+        $categories = [
+            'Беременность',
+            'Роды',
+            'Грудное вскармливание',
+            'Уход за новорожденым',
+            'Гинекология',
+            'Онкопрофилактика',
+            'Психология',
+        ];
+
+        for ($i = 0; $i < 6; $i++) {
             $category = [
                 'parent_id' => 0,
-                'title' => fake()->word,
+                'title' => $categories[$i],
+                'slug' => Str::slug($categories[$i]),
                 'description' => fake()->text(150),
                 'info' => fake()->text(),
             ];

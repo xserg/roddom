@@ -7,8 +7,10 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class LectorRepository
 {
-
-    public function getAllWithPaginator(int $perPage, int $page): LengthAwarePaginator
+    public function getAllWithPaginator(
+        ?int $perPage,
+        ?int $page
+    ): LengthAwarePaginator
     {
         $lectors = Lector::query()
             ->paginate(perPage: $perPage, page: $page);

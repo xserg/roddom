@@ -22,7 +22,7 @@ class LectureFactory extends Factory
             'lector_id' => Lector::all()->random()->id,
             'title' => $this->faker->sentence(5),
             'category_id' => LectureCategory::query()
-                ->where('id', '!=', '0')
+                ->where('parent_id', '!=', '0')
                 ->get()
                 ->random()
                 ->id,

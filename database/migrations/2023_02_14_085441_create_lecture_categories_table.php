@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('parent_id')->unsigned()->default(1);
             $table->string('title');
+            $table->string('slug');
             $table->text('description')->nullable();
             $table->text('info')->nullable();
 

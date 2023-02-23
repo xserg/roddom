@@ -5,18 +5,20 @@ namespace Database\Seeders;
 use App\Models\LectureCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class SubCategorySeeder extends Seeder
 {
     public function run()
     {
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 1; $i < 26; $i++) {
             $category = [
                 'parent_id' => LectureCategory::all()
                     ->where('parent_id', '=', 0)
                     ->random()
                     ->id,
-                'title' => fake()->word,
+                'title' => 'Название подкатегории - ' . $i,
+                'slug' => Str::slug('Название подкатегории - ' . $i),
                 'description' => fake()->text(150),
                 'info' => fake()->text(),
             ];

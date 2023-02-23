@@ -17,13 +17,4 @@ class UserRepository
         return $user;
     }
 
-    public function getLectureById($id)
-    {
-        $lecture = Lecture::query()
-            ->with('lector')
-            ->where(['id' => $id])
-            ->first();
-
-        return $lecture;
-    }
 }
