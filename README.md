@@ -1,2 +1,2 @@
-Api docs: [https://мамы.онлайн/docs](https://xn--80axb4d.online/docs)
+Api docs: [https://api.мамы.онлайн/docs](https://api.xn--80axb4d.online/docs/)
 ![demo-gif](/uml-diagram.jpg)
