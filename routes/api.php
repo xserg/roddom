@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
+use App\Http\Controllers\Api\Category\RetrieveCategoryController;
 use App\Http\Controllers\Api\Diploma\RetrieveAllDiplomasController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
@@ -59,5 +61,10 @@ Route::prefix('v1')
 
             Route::get('/diplomas', RetrieveAllDiplomasController::class)
                 ->name('diplomas');
+
+            Route::get('/categories', RetrieveAllCategoriesController::class)
+                ->name('categories');
+            Route::get('/category/{slug}', RetrieveCategoryController::class)
+                ->name('subCategories');
         });
     });

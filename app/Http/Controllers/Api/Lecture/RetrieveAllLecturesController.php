@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[OA\Parameter(
     parameter: 'per_page',
     name: 'per_page',
-    description: 'количество лекций на странице(в одном json\'е)',
+    description: 'количество лекций на странице(в одном json\'е) 15 по дефолту',
     in: 'query',
     example: '15'
 )]
