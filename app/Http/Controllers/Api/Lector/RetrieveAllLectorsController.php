@@ -49,11 +49,11 @@ class RetrieveAllLectorsController
 
     public function __invoke(Request $request): ResourceCollection
     {
-        $perPage = $request->per_page;
-        $page = $request->page;
-
         return new LectorCollection(
-            $this->repository->getAllWithPaginator($perPage, $page)
+            $this->repository->getAllWithPaginator(
+                $request->per_page,
+                $request->page
+            )
         );
     }
 }

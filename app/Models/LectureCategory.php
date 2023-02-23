@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * App\Models\LectureCategory
@@ -28,6 +29,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereParentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereUpdatedAt($value)
+ * @property string $slug
+ * @method static Builder|LectureCategory mainCategories()
+ * @method static Builder|LectureCategory subCategories()
+ * @method static Builder|LectureCategory whereSlug($value)
  * @mixin \Eloquent
  */
 class LectureCategory extends Model
@@ -39,5 +44,25 @@ class LectureCategory extends Model
     public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * Только НЕ подкатегории
+     * @param Builder $query
+     * @return void
+     */
+    public function scopeMainCategories(Builder $query): void
+    {
+        $query->where('parent_id', '=', 0);
+    }
+
+    /**
+     * Только подкатегории
+     * @param Builder $query
+     * @return void
+     */
+    public function scopeSubCategories(Builder $query): void
+    {
+        $query->where('parent_id', '!=', 0);
     }
 }

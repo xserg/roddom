@@ -29,6 +29,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Lector whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lector wherePhoto($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lector whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Diploma> $diplomas
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $lectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Diploma> $diplomas
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $lectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Diploma> $diplomas
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $lectures
  * @mixin \Eloquent
  */
 class Lector extends Model

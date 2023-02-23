@@ -52,6 +52,25 @@ use Laravel\Sanctum\HasApiTokens;
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereToDelete($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
+ * @property string|null $free_lecture_watched
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $purchasedLectures
+ * @property-read int|null $purchased_lectures_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $savedLectures
+ * @property-read int|null $saved_lectures_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $watchedLectures
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereFreeLectureWatched($value)
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $purchasedLectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $savedLectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $watchedLectures
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $purchasedLectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $savedLectures
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Lecture> $watchedLectures
  * @mixin \Eloquent
  */
 class User extends Authenticatable

@@ -39,6 +39,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereVideoId($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
  * @mixin \Eloquent
  */
 class Lecture extends Model

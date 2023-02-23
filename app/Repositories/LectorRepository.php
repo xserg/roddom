@@ -13,7 +13,11 @@ class LectorRepository
     ): LengthAwarePaginator
     {
         $lectors = Lector::query()
-            ->paginate(perPage: $perPage, page: $page);
+            ->paginate(
+                perPage: $perPage,
+                page: $page
+            );
+
         return $lectors;
     }
 }

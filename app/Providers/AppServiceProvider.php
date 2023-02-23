@@ -21,13 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        DB::listen(function ($query) {
+//        DB::listen(function ($query) {
             // Print it, log it, whatever :)
-             Log::warning($query->sql);
-             Log::warning($query->time);
-             Log::warning('---------------------');
+//             Log::warning($query->sql);
+//             Log::warning($query->time);
+//             Log::warning('---------------------');
             // $query->bindings
             // $query->time
-        });
+//        });
     }
 }
