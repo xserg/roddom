@@ -22,7 +22,7 @@ use OpenApi\Attributes as OA;
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
-        new OA\MediaType(mediaType: 'application/x-www-form-urlencoded', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
+        new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
     ]
 )]
 #[OA\Response(response: 200, description: 'OK',
