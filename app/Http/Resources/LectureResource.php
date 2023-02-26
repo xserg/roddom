@@ -26,7 +26,7 @@ class LectureResource extends JsonResource
         type: 'object')]
     #[OA\Property(
         property: 'category',
-        ref: '#/components/schemas/LectureCategoryResource',
+        ref: '#/components/schemas/CategoryResource',
         description: 'Категория лекции',
         type: 'object')]
 
