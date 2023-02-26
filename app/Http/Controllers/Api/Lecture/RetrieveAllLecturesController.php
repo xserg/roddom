@@ -35,16 +35,37 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[OA\Parameter(
     parameter: 'category',
     name: 'category',
-    description: 'Slug категории лекций, которые мы хотим получить',
+    description: 'id категории лекций, которые мы хотим получить',
     in: 'query',
-    example: 'ginekologiia',
+    example: '32',
 )]
 #[OA\Parameter(
-    parameter: 'lector',
-    name: 'lector',
-    description: 'Id лектора, лекции которого мы хотим получить',
+    parameter: 'filter[lector_id]',
+    name: 'filter[lector_id]',
+    description: 'id лектора/ов, лекции которого мы хотим получить',
     in: 'query',
-    example: '12',
+    example: '12,25,1',
+)]
+#[OA\Parameter(
+    parameter: 'filter[category_id]',
+    name: 'filter[category_id]',
+    description: 'id категории/ий, лекции которых мы хотим получить',
+    in: 'query',
+    example: '21,11',
+)]
+#[OA\Parameter(
+    parameter: 'include',
+    name: 'include',
+    description: 'включаем в объект каждой лекции соответствующие объекты категории или лектора этой лекции или оба',
+    in: 'query',
+    example: 'category,lector',
+)]
+#[OA\Parameter(
+    parameter: 'sort',
+    name: 'sort',
+    description: 'сортировка по полю created_at. Возможные варианты sort=-created_at или sort=created_at',
+    in: 'query',
+    example: '-created_at',
 )]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
@@ -86,14 +107,12 @@ class RetrieveAllLecturesController
     {
     }
 
-    public function __invoke(Request $request): ResourceCollection|JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         try {
             $lectures = $this->repository->getAllWithPaginator(
                 $request->per_page,
                 $request->page,
-                $request->category,
-                $request->lector,
             );
         } catch (NotFoundHttpException $exception) {
             return response()->json(
@@ -102,6 +121,9 @@ class RetrieveAllLecturesController
             );
         }
 
-        return LectureCollection::make($lectures);
+        return response()->json(
+            new LectureCollection($lectures),
+            Response::HTTP_OK
+        );
     }
 }

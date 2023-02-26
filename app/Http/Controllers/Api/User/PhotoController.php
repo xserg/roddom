@@ -6,11 +6,12 @@ use App\Http\Requests\ProfilePhotoRequest;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Intervention\Image\ImageManager;
 use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/user/photo',
-    description: "Обновление фото юзера",
+    description: "Обновление фото юзера. Максимум 10 мб, форматы: jpeg,jpg,png",
     summary: "Загрузить фото юзера",
     security: [["bearerAuth" => []]],
     tags: ["user"])
@@ -23,7 +24,7 @@ use OpenApi\Attributes as OA;
             mediaType: 'multipart/form-data',
             schema: new OA\Schema(title: 'photo', type: 'string', format: 'binary')
         ),
-    ]
+    ],
 )]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
@@ -39,6 +40,7 @@ use OpenApi\Attributes as OA;
             mediaType: 'application/json',
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
+#[OA\Response(response: 401, description: 'Unauthenticated.')]
 #[OA\Response(response: 500, description: 'Server Error')]
 class PhotoController
 {

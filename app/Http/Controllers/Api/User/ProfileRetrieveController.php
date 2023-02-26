@@ -45,7 +45,7 @@ class ProfileRetrieveController
         $user = auth()->user();
 
         return response()->json([
-            'data' => UserResource::make($user),
+            'data' => new UserResource($user),
         ]);
     }
 }

@@ -66,7 +66,7 @@ class ProfileUpdateController
         $user->save();
 
         return response()->json([
-            'data' => UserResource::make($user),
+            'data' => new UserResource($user),
         ]);
     }
 }

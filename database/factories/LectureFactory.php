@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Lector;
-use App\Models\LectureCategory;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ class LectureFactory extends Factory
         return [
             'lector_id' => Lector::all()->random()->id,
             'title' => $this->faker->sentence(5),
-            'category_id' => LectureCategory::query()
+            'category_id' => Category::query()
                 ->where('parent_id', '!=', '0')
                 ->get()
                 ->random()

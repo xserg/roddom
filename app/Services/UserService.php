@@ -8,6 +8,9 @@ use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Image;
+use Intervention\Image\ImageManager;
 
 class UserService
 {
@@ -88,18 +91,27 @@ class UserService
         Authenticatable $user,
         UploadedFile    $file): string
     {
-        $extension = $file->extension();
-        $filename = "$user->id.$extension";
+        $manager = new ImageManager(['driver' => 'imagick']);
+        $image = $manager->make($file)->resize(300, 300);
 
+        $path = "$user->id.jpg";
+
+        $image = $image->save($path);
         // /app/public/images/{user-id}.{extension}
         // linked folder -> /public/storage/images/{user-id}.{extension}
-        $path = 'storage/' . $file->storeAs('images', $filename);
-        $user->photo = $path;
+//        if(! Storage::put('images/' . $filename, $file)){
+//            throw new Exception('Could not upload image');
+//        }
+//        if (!$image = $file->save('storage/images/' . $filename, format: 'jpg')) {
+//            throw new Exception('Could not upload image');
+//        }
 
-        if(! $user->save()){
+        $user->photo = $image->basePath();
+
+        if (!$user->save()) {
             throw new Exception('Could not save user in database');
         }
 
-        return $path;
+        return $user->photo;
     }
 }

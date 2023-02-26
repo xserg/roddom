@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\Lecture
@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $is_free
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\LectureCategory $category
+ * @property-read \App\Models\Category $category
  * @property-read \App\Models\Lector $lector
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
  * @property-read int|null $watched_users_count
@@ -39,9 +39,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Lecture whereVideoId($value)
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $watchedUsers
  * @mixin \Eloquent
  */
 class Lecture extends Model
@@ -50,7 +47,7 @@ class Lecture extends Model
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(LectureCategory::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function lector(): BelongsTo
@@ -67,4 +64,46 @@ class Lecture extends Model
             'user_id'
         );
     }
+
+    public function savedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_to_saved_lectures',
+            'lecture_id',
+            'user_id'
+        );
+    }
+
+    public function purchasedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_to_purchased_lectures',
+            'lecture_id',
+            'user_id'
+        );
+    }
+
+    public function scopeWatched(Builder $query): void
+    {
+        $watchedIds = auth()->user()->watchedLectures->pluck('id')->toArray();
+
+        $query->whereIn('id', $watchedIds);
+    }
+
+    public function scopePurchased(Builder $query): void
+    {
+        $purchasedIds = auth()->user()->purchasedLectures->pluck('id')->toArray();
+
+        $query->whereIn('id', $purchasedIds);
+    }
+
+    public function scopeSaved(Builder $query): void
+    {
+        $savedIds = auth()->user()->savedLectures->pluck('id')->toArray();
+
+        $query->whereIn('id', $savedIds);
+    }
+
 }

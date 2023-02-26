@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api\Category;
 
-use App\Models\LectureCategory;
+use App\Http\Resources\CategoryCollection;
+use App\Http\Resources\CategoryResource;
+use App\Models\Category;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/categories',
-    description: "Получение ресурсов категорий лекций",
-    summary: "Получение ресурсов категорий лекций",
+    description: "Получение ресурсов главных категорий лекций",
+    summary: "Получение ресурсов главных категорий лекций",
     security: [["bearerAuth" => []]],
     tags: ["lecture"])
 ]
@@ -40,8 +43,10 @@ class RetrieveAllCategoriesController
 {
     public function __invoke(): JsonResponse
     {
-        return response()->json([
-            'data' => LectureCategory::mainCategories()->get()
-        ]);
+        return response()->json(
+            new CategoryCollection(
+                Category::mainCategories()->get()
+            ), Response::HTTP_OK
+        );
     }
 }

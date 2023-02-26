@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api\Lector;
 
 use App\Http\Resources\LectorCollection;
 use App\Repositories\LectorRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 
@@ -34,6 +35,7 @@ use OpenApi\Attributes as OA;
                     "name" => "string",
                     "career_start" => "2023-02-21",
                     "photo" => "string",
+                    "diplomas" => []
                 ],
             ]
         ])
@@ -47,13 +49,15 @@ class RetrieveAllLectorsController
     {
     }
 
-    public function __invoke(Request $request): ResourceCollection
+    public function __invoke(Request $request): JsonResponse
     {
-        return new LectorCollection(
-            $this->repository->getAllWithPaginator(
-                $request->per_page,
-                $request->page
-            )
+        return response()->json(
+            new LectorCollection(
+                $this->repository->getAllWithPaginator(
+                    $request->per_page,
+                    $request->page
+                )
+            ), Response::HTTP_OK
         );
     }
 }

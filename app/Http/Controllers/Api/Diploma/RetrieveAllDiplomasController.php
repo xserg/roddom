@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api\Diploma;
 
+use App\Http\Resources\DiplomaCollection;
 use App\Http\Resources\DiplomaResource;
 use App\Models\Diploma;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -23,10 +26,12 @@ use OpenApi\Attributes as OA;
 
 class RetrieveAllDiplomasController
 {
-    public function __invoke(): ResourceCollection
+    public function __invoke(): JsonResponse
     {
-        return DiplomaResource::collection(
-            Diploma::all()
+        return response()->json(
+            new DiplomaCollection(
+                Diploma::all()
+            ), Response::HTTP_OK
         );
     }
 }

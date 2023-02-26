@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')
-    ->name('v1')
+    ->name('v1.')
     ->group(function () {
 
         Route::post('/user/register', RegisterController::class)
@@ -43,9 +43,9 @@ Route::prefix('v1')
             Route::delete('/user', DeleteUserController::class)
                 ->name('delete');
             Route::get('/user/profile', ProfileRetrieveController::class)
-                ->name('profileRetrieve');
+                ->name('profile.retrieve');
             Route::put('/user/profile', ProfileUpdateController::class)
-                ->name('profileUpdate');
+                ->name('profile.update');
             Route::put('/user/photo', PhotoController::class)
                 ->name('photo');
 
@@ -65,6 +65,6 @@ Route::prefix('v1')
             Route::get('/categories', RetrieveAllCategoriesController::class)
                 ->name('categories');
             Route::get('/category/{slug}', RetrieveCategoryController::class)
-                ->name('subCategories');
+                ->name('subcategories');
         });
     });

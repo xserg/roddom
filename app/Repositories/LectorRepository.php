@@ -13,6 +13,7 @@ class LectorRepository
     ): LengthAwarePaginator
     {
         $lectors = Lector::query()
+            ->with('diplomas')
             ->paginate(
                 perPage: $perPage,
                 page: $page

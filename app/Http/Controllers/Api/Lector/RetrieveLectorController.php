@@ -6,8 +6,8 @@ use App\Http\Resources\LectorResource;
 use App\Models\Lector;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -52,6 +52,9 @@ class RetrieveLectorController
             ], Response::HTTP_NOT_FOUND);
         }
 
-        return LectorResource::make($lector);
+        return response()->json(
+            new LectorResource($lector),
+            Response::HTTP_OK
+        );
     }
 }

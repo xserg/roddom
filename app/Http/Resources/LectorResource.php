@@ -18,7 +18,7 @@ class LectorResource extends JsonResource
     #[OA\Property(property: 'photo', description: 'ссылка на фото лектора', type: 'string')]
     #[OA\Property(
         property: 'diplomas',
-        description: 'Дипломы и сертификаты лектора. лектор лекции. Будет только когда запрашиваем конкретного лектора /lector/{id}',
+        description: 'Дипломы и сертификаты лектора',
         type: 'array',
         items: new OA\Items(ref: '#/components/schemas/DiplomaResource'),
     )]

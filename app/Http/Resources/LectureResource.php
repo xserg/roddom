@@ -22,7 +22,12 @@ class LectureResource extends JsonResource
     #[OA\Property(
         property: 'lector',
         ref: '#/components/schemas/LectorResource',
-        description: 'Лектор лекции. Будет только когда запрашиваем конкретную лекцию /lecture/{id}',
+        description: 'Лектор лекции',
+        type: 'object')]
+    #[OA\Property(
+        property: 'category',
+        ref: '#/components/schemas/LectureCategoryResource',
+        description: 'Категория лекции',
         type: 'object')]
 
     public function toArray(Request $request): array
@@ -31,12 +36,13 @@ class LectureResource extends JsonResource
             'id' => $this->id,
             'lector_id' => $this->lector_id,
             'category_id' => $this->category_id,
-            'category_slug' => $this->category->slug,
             'title' => $this->title,
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
             'video_id' => $this->video_id,
             'lector' => LectorResource::make($this->whenLoaded('lector')),
+            'category' => CategoryResource::make($this->whenLoaded('category')),
+            'created_at' => $this->created_at,
         ];
     }
 }

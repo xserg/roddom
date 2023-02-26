@@ -4,14 +4,12 @@ namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureResource;
 use App\Jobs\WatchLecture;
-use App\Models\Lecture;
 use App\Repositories\LectureRepository;
-use App\Repositories\UserRepository;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -71,6 +69,7 @@ class RetrieveLectureController
         }
 
         $userCanWatch = $this->service->canUserWatchLecture($id, $currentUser);
+
         if(! $userCanWatch){
             return response()->json([
                 'message' => 'User cannot watch lecture with id ' . $id
@@ -79,6 +78,9 @@ class RetrieveLectureController
 
         WatchLecture::dispatch($lecture->id, $currentUser);
 
-        return LectureResource::make($lecture);
+        return response()->json(
+            new LectureResource($lecture),
+            Response::HTTP_OK
+        );
     }
 }

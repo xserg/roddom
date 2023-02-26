@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * App\Models\LectureCategory
@@ -17,25 +18,25 @@ use Illuminate\Database\Eloquent\Builder;
  * @property string|null $info
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read LectureCategory|null $parentCategory
+ * @property-read Category|null $parentCategory
  * @method static \Database\Factories\LectureCategoryFactory factory($count = null, $state = [])
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory query()
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereInfo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereParentId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder|LectureCategory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Category newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Category query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereInfo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereParentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Category whereUpdatedAt($value)
  * @property string $slug
- * @method static Builder|LectureCategory mainCategories()
- * @method static Builder|LectureCategory subCategories()
- * @method static Builder|LectureCategory whereSlug($value)
+ * @method static Builder|Category mainCategories()
+ * @method static Builder|Category subCategories()
+ * @method static Builder|Category whereSlug($value)
  * @mixin \Eloquent
  */
-class LectureCategory extends Model
+class Category extends Model
 {
     use HasFactory;
 
@@ -44,6 +45,11 @@ class LectureCategory extends Model
     public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function lectures(): HasMany
+    {
+        return $this->hasMany(Lecture::class);
     }
 
     /**
