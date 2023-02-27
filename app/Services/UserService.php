@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Jobs\UserDeletionRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection;
@@ -121,5 +122,25 @@ class UserService
         }
 
         return [$user->photo, $user->photo_small];
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function saveProfile($user, array $profile)
+    {
+        $user->fill($profile);
+
+        if ($pregnancy_weeks = $profile['pregnancy_weeks']) {
+            $user->pregnancy_start = Carbon::now()
+                ->subWeeks($pregnancy_weeks)
+                ->toDateString();
+        }
+
+        if (!$user->save()) {
+            throw new Exception('Could not save user in database');
+        }
+
+        return $user;
     }
 }

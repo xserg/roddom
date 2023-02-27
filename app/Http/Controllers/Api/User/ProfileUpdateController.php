@@ -6,7 +6,7 @@ use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\UserService;
-use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
@@ -42,11 +42,14 @@ use OpenApi\Attributes as OA;
 class ProfileUpdateController
 {
     public function __construct(
-//        private UserService $service
+        private UserService $service
     )
     {
     }
 
+    /**
+     * @throws \Exception
+     */
     public function __invoke(
         ProfileRequest $request
     ): JsonResponse
@@ -55,15 +58,17 @@ class ProfileUpdateController
          * @var $user User
          */
         $user = auth()->user();
-        $user->fill($request->input());
 
-        if ($pregnancy_weeks = $request->pregnancy_weeks) {
-            $user->pregnancy_start = Carbon::now()
-                ->subWeeks($pregnancy_weeks)
-                ->toDateString();
+        try {
+            $user = $this
+                ->service
+                ->saveProfile($user, $request->input());
+        } catch (Exception $exception) {
+            return response()->json([
+                'data' => [],
+                'message' => $exception->getMessage()
+            ]);
         }
-
-        $user->save();
 
         return response()->json([
             'data' => new UserResource($user),
