@@ -28,7 +28,7 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'data', type: 'string'),
+        new OA\Property(property: 'data', description: 'массив с двумя url: на маленькую и большую фото пользователя', type: 'object'),
         new OA\Property(property: 'message', type: 'string'),
     ])
 )]
@@ -58,16 +58,16 @@ class PhotoController
         $file = $request->file('photo');
 
         try {
-            $path = $this->service->saveUsersPhoto($user, $file);
+            $paths = $this->service->saveUsersPhoto($user, $file);
         } catch (Exception $exception){
             return response()->json([
                 'data' => '',
                 'message' => 'Something went wrong: ' . $exception->getMessage(),
-            ]);
+            ], 500);
         }
 
         return response()->json([
-            'data' => $path,
+            'data' => $paths,
             'message' => 'Photo updated successfully',
         ]);
     }

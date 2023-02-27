@@ -89,29 +89,37 @@ class UserService
      */
     public function saveUsersPhoto(
         Authenticatable $user,
-        UploadedFile    $file): string
+        UploadedFile    $file): array
     {
+        // TODO: refactoring
         $manager = new ImageManager(['driver' => 'imagick']);
         $image = $manager->make($file)->resize(300, 300);
+        $imageSmall = $manager->make($file)->resize(150, 150);
 
-        $path = "$user->id.jpg";
+        $dirCreated = Storage::makeDirectory('images/' . $user->id);
 
-        $image = $image->save($path);
-        // /app/public/images/{user-id}.{extension}
-        // linked folder -> /public/storage/images/{user-id}.{extension}
-//        if(! Storage::put('images/' . $filename, $file)){
-//            throw new Exception('Could not upload image');
-//        }
-//        if (!$image = $file->save('storage/images/' . $filename, format: 'jpg')) {
-//            throw new Exception('Could not upload image');
-//        }
+        if (!$dirCreated) {
+            throw new Exception('Directory could not be created');
+        }
 
-        $user->photo = $image->basePath();
+        // /app/public/images/{user-id}/{user-id}.{extension}
+        // linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
+        // url . /storage/images/1/1.jpg
+        $path = "/images/$user->id/$user->id.jpg";
+        $smallImagePath = "/images/$user->id/$user->id-small.jpg";
+
+        if (!$image->save(storage_path('app/public' . $path), format: 'jpg') ||
+            !$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')) {
+            throw new Exception('Could not upload image');
+        }
+
+        $user->photo = env('APP_URL') . '/storage' . $path;
+        $user->photo_small = env('APP_URL') . '/storage' . $smallImagePath;
 
         if (!$user->save()) {
             throw new Exception('Could not save user in database');
         }
 
-        return $user->photo;
+        return [$user->photo, $user->photo_small];
     }
 }

@@ -90,6 +90,8 @@ class User extends Authenticatable
         'phone',
         'is_mother',
         'baby_born',
+        'photo',
+        'photo_small'
     ];
 
     /**
