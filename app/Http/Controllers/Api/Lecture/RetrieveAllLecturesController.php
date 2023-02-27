@@ -19,49 +19,42 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     tags: ["lecture"])
 ]
 #[OA\Parameter(
-    parameter: 'per_page',
     name: 'per_page',
     description: 'количество лекций на странице(в одном json\'е) 15 по дефолту',
     in: 'query',
     example: '15'
 )]
 #[OA\Parameter(
-    parameter: 'page',
     name: 'page',
     description: 'номер страницы, если их несколько',
     in: 'query',
     example: '2'
 )]
 #[OA\Parameter(
-    parameter: 'category',
     name: 'category',
     description: 'id категории лекций, которые мы хотим получить',
     in: 'query',
     example: '32',
 )]
 #[OA\Parameter(
-    parameter: 'filter[lector_id]',
     name: 'filter[lector_id]',
     description: 'id лектора/ов, лекции которого мы хотим получить',
     in: 'query',
     example: '12,25,1',
 )]
 #[OA\Parameter(
-    parameter: 'filter[category_id]',
     name: 'filter[category_id]',
     description: 'id категории/ий, лекции которых мы хотим получить',
     in: 'query',
     example: '21,11',
 )]
 #[OA\Parameter(
-    parameter: 'include',
     name: 'include',
     description: 'включаем в объект каждой лекции соответствующие объекты категории или лектора этой лекции или оба',
     in: 'query',
     example: 'category,lector',
 )]
 #[OA\Parameter(
-    parameter: 'sort',
     name: 'sort',
     description: 'сортировка по полю created_at. Возможные варианты sort=-created_at или sort=created_at',
     in: 'query',
