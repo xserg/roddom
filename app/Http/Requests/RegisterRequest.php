@@ -8,13 +8,14 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'RegisterRequest',
-    title: 'RegisterRequest'
+    title: 'RegisterRequest',
+    required: ['email', 'password', 'password_confirmation']
 )]
 
 class RegisterRequest extends FormRequest
 {
-    #[OA\Property(property: 'email', description: 'email юзера', type: 'string')]
-    #[OA\Property(property: 'password', description: 'пароль юзера', type: 'string')]
+    #[OA\Property(property: 'email', description: 'email юзера. Уникальный на приложение', type: 'string')]
+    #[OA\Property(property: 'password', description: 'пароль юзера', type: 'string', maxLength: 255, minLength: 6)]
     #[OA\Property(property: 'password_confirmation', description: 'подтверждение пароля юзера', type: 'string')]
     public function rules(): array
     {

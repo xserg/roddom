@@ -8,7 +8,8 @@ use OpenApi\Attributes as OA;
 
 #[OA\Schema(
     schema: 'LoginRequest',
-    title: 'LoginRequest'
+    title: 'LoginRequest',
+    required: ['email', 'password']
 )]
 class LoginRequest extends FormRequest
 {

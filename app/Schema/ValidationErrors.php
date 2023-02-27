@@ -32,7 +32,7 @@ class ValidationErrors
     #[OA\Property(
         property: 'errors',
         description: 'объект ошибок, где ключи - поля, в которых была ошибка, а значение - текст ошибки',
-        type: 'JsonType',
+        type: 'object',
         example: '{
             "email": [
                 "The email has already been taken."

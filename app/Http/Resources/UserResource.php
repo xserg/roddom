@@ -22,9 +22,9 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'baby_born', description: 'Дата рождения ребенка у юзера', type: 'string', example: '2022-12-17')]
     #[OA\Property(property: 'photo', description: 'Ссылка на фото юзера', type: 'string')]
     #[OA\Property(property: 'free_lecture_watched', description: 'Дата, когда последний раз пользователь смотрел бесплатную лекцию', type: 'datetime')]
-    #[OA\Property(property: 'watched_lectures_count', description: '', type: 'string')]
-    #[OA\Property(property: 'saved_lectures_count', description: '', type: 'string')]
-    #[OA\Property(property: 'purchased_lectures_count', description: '', type: 'string')]
+    #[OA\Property(property: 'watched_lectures_count', description: 'Количество просмотренных лекций', type: 'integer')]
+    #[OA\Property(property: 'saved_lectures_count', description: 'Количество сохраненных лекций', type: 'integer')]
+    #[OA\Property(property: 'purchased_lectures_count', description: 'Количество купленных лекций', type: 'integer')]
 
     public function toArray(Request $request): array
     {

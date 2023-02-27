@@ -18,7 +18,7 @@ class LectureRepository
     public function getLectureById($id)
     {
         $lecture = Lecture::query()
-            ->with('lector')
+            ->with('lector', 'lector.diplomas')
             ->where(['id' => $id])
             ->first();
 
