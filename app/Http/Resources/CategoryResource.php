@@ -14,6 +14,7 @@ use OpenApi\Attributes as OA;
 class CategoryResource extends JsonResource
 {
     #[OA\Property(property: 'id', description: 'id категории', type: 'integer')]
+    #[OA\Property(property: 'parent_id', description: 'id основной категории. 0 - если это уже основная категория', type: 'integer')]
     #[OA\Property(property: 'slug', description: 'slug категории', type: 'string')]
     #[OA\Property(property: 'description', description: 'описание категории', type: 'string')]
     #[OA\Property(property: 'info', description: 'инфо категории', type: 'string')]

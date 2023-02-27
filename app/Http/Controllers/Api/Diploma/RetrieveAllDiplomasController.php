@@ -10,13 +10,13 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
-#[OA\Get(
-    path: '/diplomas',
-    description: "Получение ресурсов дипломов",
-    summary: "Получение ресурсов дипломов",
-    security: [["bearerAuth" => []]],
-    tags: ["diploma"])
-]
+//#[OA\Get(
+//    path: '/diplomas',
+//    description: "Получение ресурсов дипломов",
+//    summary: "Получение ресурсов дипломов",
+//    security: [["bearerAuth" => []]],
+//    tags: ["diploma"])
+//]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', ref: '#/components/schemas/DiplomaResource'),

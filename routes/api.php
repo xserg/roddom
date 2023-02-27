@@ -59,8 +59,8 @@ Route::prefix('v1')
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->name('lecture');
 
-            Route::get('/diplomas', RetrieveAllDiplomasController::class)
-                ->name('diplomas');
+//            Route::get('/diplomas', RetrieveAllDiplomasController::class)
+//                ->name('diplomas');
 
             Route::get('/categories', RetrieveAllCategoriesController::class)
                 ->name('categories');

@@ -29,6 +29,12 @@ class LectureResource extends JsonResource
         ref: '#/components/schemas/CategoryResource',
         description: 'Категория лекции',
         type: 'object')]
+    #[OA\Property(
+        property: 'created_at',
+        description: 'Дата и время создания',
+        type: 'string',
+        format: 'datetime')
+    ]
 
     public function toArray(Request $request): array
     {
