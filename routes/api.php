@@ -42,10 +42,11 @@ Route::prefix('v1')
         Route::post('password/forgot',  ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
         Route::post('password/reset', ResetPasswordController::class);
+        Route::get('/check', RetrieveAllUsersController::class)
+            ->name('check');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
-            Route::get('/check', RetrieveAllUsersController::class)
-                ->name('check');
+
 
             Route::delete('/user', DeleteUserController::class)
                 ->name('delete');
