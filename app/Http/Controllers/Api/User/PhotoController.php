@@ -6,7 +6,6 @@ use App\Http\Requests\ProfilePhotoRequest;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Intervention\Image\ImageManager;
 use OpenApi\Attributes as OA;
 
 #[OA\Put(

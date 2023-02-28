@@ -2,24 +2,41 @@
 
 namespace App\Services;
 
+use App\Exceptions\FailedSaveUserException;
+use App\Exceptions\ResetCodeExpiredException;
 use App\Jobs\UserDeletionRequest;
+use App\Models\PasswordReset;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Repositories\PasswordResetRepository;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
 class UserService
 {
+    public function __construct(
+        private PasswordResetService    $passwordResetService,
+        private PasswordResetRepository $passwordResetRepository
+    )
+    {
+    }
+
+    public function getUserByEmail($email): User
+    {
+        return User::firstWhere('email', '=', $email);
+    }
+
     /**
-     * @throws Exception
+     * @throws FailedSaveUserException
      */
     public function create(array $attributes): User
     {
+        $attributes['password'] = Hash::make($attributes['password']);
+
         $user = new User($attributes);
 
         $this->saveUserGuard($user);
@@ -28,7 +45,7 @@ class UserService
     }
 
     /**
-     * @throws Exception
+     * @throws FailedSaveUserException
      */
     public function makeDeletionRequest(User $currentUser): void
     {
@@ -40,14 +57,54 @@ class UserService
     }
 
     /**
-     * @throws Exception
+     * @throws FailedSaveUserException
      */
     private function saveUserGuard(User $user): void
     {
         if (!$user->save()) {
-            throw new Exception('Couldn\'t save user to database');
+            throw new FailedSaveUserException();
         }
     }
+
+    /**
+     * @throws ResetCodeExpiredException|FailedSaveUserException
+     */
+    public function updateUsersPassword(
+        string $code,
+        string $password
+    ): User
+    {
+        $passwordReset = $this
+            ->passwordResetRepository
+            ->firstWhereCode($code);
+
+        try {
+            $this->passwordResetService
+                ->checkCodeIfExpired($passwordReset->code);
+
+        } catch (ResetCodeExpiredException) {
+
+            $this->passwordResetService
+                ->deleteCode($passwordReset);
+
+            throw new ResetCodeExpiredException();
+        }
+
+        $user = $this->getUserByEmail($passwordReset->email);
+
+        $user->password = Hash::make($password);
+        $this->saveUserGuard($user);
+
+        $passwordReset->delete();
+
+        return $user;
+    }
+
+    private function codeIsOlderThanHour($createdAt): bool
+    {
+        return now()->subHour() > $createdAt;
+    }
+
 
     /**
      * @throws Exception
@@ -64,11 +121,10 @@ class UserService
         User $currentUser
     ): void
     {
-        /**
-         * @var $watchedLectures Collection
-         */
         $watchedLectures = $currentUser->watchedLectures;
-        $lectureAlreadyInWatched = $watchedLectures->keyBy('id')->has($lectureId);
+        $lectureAlreadyInWatched = $watchedLectures
+            ->keyBy('id')
+            ->has($lectureId);
 
         if ($lectureAlreadyInWatched) {
             return;
@@ -137,9 +193,7 @@ class UserService
                 ->toDateString();
         }
 
-        if (!$user->save()) {
-            throw new Exception('Could not save user in database');
-        }
+        $this->saveUserGuard($user);
 
         return $user;
     }

@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
+use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
+use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
+use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
 use App\Http\Controllers\Api\User\DeleteUserController;
 use App\Http\Controllers\Api\User\LoginController;
 use App\Http\Controllers\Api\User\PhotoController;
@@ -35,6 +38,10 @@ Route::prefix('v1')
             ->name('register');
         Route::post('/user/login', LoginController::class)
             ->name('login');
+
+        Route::post('password/forgot',  ForgotPasswordController::class);
+        Route::post('password/check', CodeCheckController::class);
+        Route::post('password/reset', ResetPasswordController::class);
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/check', RetrieveAllUsersController::class)

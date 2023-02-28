@@ -41,13 +41,11 @@ class RegisterController
 
     public function __invoke(RegisterRequest $request): JsonResponse
     {
-        $attributes = [
-            'email' => $request->input('email'),
-            'password' => $request->input('password')
-        ];
+        $email = $request->email;
+        $password = $request->password;
 
         try {
-            $user = $this->service->create($attributes);
+            $user = $this->service->create(compact('email', 'password'));
         } catch (\Exception $exception) {
             return response()->json(
                 ['message' => $exception->getMessage()],
