@@ -10,17 +10,18 @@ use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
-    path: 'password/forgot',
-    description: "Первый шаг функционала 'восстановление пароля'",
-    summary: "Восстановление пароля, шаг первый, пользователь вводит свой email",
+    path: 'password/reset',
+    description: "Третий шаг функционала 'восстановление пароля'",
+    summary: "Восстановление пароля, шаг третий, пользователь вводит пароль, подтверждение,
+    еще нужен код (в скрытом поле)",
     tags: ["reset-password"])
 ]
 #[OA\RequestBody (
-    description: "Login credentials",
+    description: "код, пароль, подтверждение пароля",
     required: true,
     content: [
-        new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ForgotPasswordRequest')),
-        new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ForgotPasswordRequest')),
+        new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/UpdatePasswordRequest')),
+        new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/UpdatePasswordRequest')),
     ]
 )]
 class ResetPasswordController extends Controller
