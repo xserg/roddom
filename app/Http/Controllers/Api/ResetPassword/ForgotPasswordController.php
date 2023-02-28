@@ -11,7 +11,7 @@ use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
-    path: 'password/forgot',
+    path: '/password/forgot',
     description: "Первый шаг функционала 'восстановление пароля'. Пользователь вводит свой email, на него отправляется шестизначный код",
     summary: "Восстановление пароля, шаг первый, пользователь вводит свой email",
     tags: ["reset-password"])

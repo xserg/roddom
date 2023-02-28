@@ -39,6 +39,7 @@ class UserResource extends JsonResource
             'pregnancy_start' => $this->pregnancy_start,
             'baby_born' => $this->baby_born,
             'photo' => $this->photo,
+            'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
             'watched_lectures_count' => $this->watchedLectures->count(),
             'saved_lectures_count' => $this->savedLectures->count(),

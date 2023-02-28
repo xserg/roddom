@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
-    path: 'password/reset',
+    path: '/password/reset',
     description: "Восстановление пароля, шаг третий, пользователь вводит пароль, подтверждение,
     еще нужен код (в скрытом поле)",
     summary: "Третий шаг функционала 'восстановление пароля' ",
