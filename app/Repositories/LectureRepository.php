@@ -30,7 +30,8 @@ class LectureRepository
         ?int $page,
     ): LengthAwarePaginator
     {
-        $builder = Lecture::query();
+        $builder = Lecture::query()
+            ->with('lector.diplomas');
 
         $builder = QueryBuilder::for($builder)
             ->defaultSort('-created_at')

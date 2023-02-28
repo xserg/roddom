@@ -115,7 +115,7 @@ class RetrieveAllLecturesController
         }
 
         return response()->json(
-            new LectureCollection($lectures),
+            (new LectureCollection($lectures))->response()->getData(true),
             Response::HTTP_OK
         );
     }

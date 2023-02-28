@@ -52,12 +52,12 @@ class RetrieveAllLectorsController
     public function __invoke(Request $request): JsonResponse
     {
         return response()->json(
-            new LectorCollection(
+            (new LectorCollection(
                 $this->repository->getAllWithPaginator(
                     $request->per_page,
                     $request->page
                 )
-            ), Response::HTTP_OK
+            ))->response()->getData(true), Response::HTTP_OK
         );
     }
 }
