@@ -56,7 +56,7 @@ class RegisterController
 
         return response()->json(
             [
-                'user' => new UserResource($user),
+                'user' => new UserResource($user->loadCount(['watchedLectures', 'purchasedLectures', 'savedLectures'])),
                 'access_token' => $token,
                 'token_type' => 'Bearer'
             ], Response::HTTP_CREATED);
