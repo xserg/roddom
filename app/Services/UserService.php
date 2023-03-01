@@ -170,8 +170,8 @@ class UserService
             throw new Exception('Could not upload image');
         }
 
-        $user->photo = env('APP_URL') . '/storage' . $path;
-        $user->photo_small = env('APP_URL') . '/storage' . $smallImagePath;
+        $user->photo = config('app.url') . '/storage' . $path;
+        $user->photo_small = config('app.url') . '/storage' . $smallImagePath;
 
         if (!$user->save()) {
             throw new Exception('Could not save user in database');
