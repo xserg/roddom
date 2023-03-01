@@ -85,7 +85,7 @@ class UserService
         } catch (ResetCodeExpiredException) {
 
             $this->passwordResetService
-                ->deleteCode($passwordReset);
+                ->deleteCode($code);
 
             throw new ResetCodeExpiredException();
         }

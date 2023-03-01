@@ -54,8 +54,9 @@ class PasswordResetService
         return $passwordReset->code;
     }
 
-    public function deleteCode(PasswordReset $passwordReset): bool
+    public function deleteCode(string|int $code): bool
     {
+        $passwordReset = $this->repository->firstWhereCode($code);
         return $passwordReset->delete();
     }
 
