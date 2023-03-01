@@ -46,6 +46,7 @@ class LectureResource extends JsonResource
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
             'video_id' => $this->video_id,
+            'is_free' => $this->is_free,
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this->created_at,

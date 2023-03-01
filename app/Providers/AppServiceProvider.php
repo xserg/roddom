@@ -21,18 +21,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        DB::listen(function ($query) {
+//        DB::listen(function ($query) {
 //            $location = collect(debug_backtrace())->filter(function ($trace) {
 //                return !str_contains($trace['file'], 'vendor/');
 //            })->first(); // берем первый элемент не из каталога вендора
-            $bindings = implode(", ", $query->bindings); // форматируем привязку как строку
-            Log::info("
-               ------------
-               Sql: $query->sql
-               Bindings: $bindings
-               Time: $query->time
-               ------------
-            ");
-        });
+//            $bindings = implode(", ", $query->bindings); // форматируем привязку как строку
+//            Log::info("
+//               ------------
+//               Sql: $query->sql
+//               Bindings: $bindings
+//               Time: $query->time
+//               ------------
+//            ");
+//        });
     }
 }
