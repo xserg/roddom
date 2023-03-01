@@ -17,7 +17,9 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'category_id', description: 'id категории лекции', type: 'integer')]
     #[OA\Property(property: 'title', description: 'заголовок лекции', type: 'string')]
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку лекции', type: 'string')]
-    #[OA\Property(property: 'video_id', description: 'id видео в kinescope.io, будет ссылка типа https://kinescope.io/123456789', type: 'integer')]
+    #[OA\Property(property: 'video_id', description: 'id видео в kinescope.io, https://kinescope.io/{video_id}
+    скорее всего сделаем так: когда у юзера оплачена подписка или лекции бесплатная(is_free) - тогда отдаём фронту это значение,
+    в остальных случаях null', type: 'integer')]
     #[OA\Property(property: 'is_free', description: 'бесплатная ли лекция', type: 'boolean')]
     #[OA\Property(
         property: 'lector',
@@ -45,7 +47,7 @@ class LectureResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
-            'video_id' => $this->video_id,
+            'video_id' => $this->when($this->is_free, $this->video_id, null),
             'is_free' => $this->is_free,
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
