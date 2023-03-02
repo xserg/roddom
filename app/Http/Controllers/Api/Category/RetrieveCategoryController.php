@@ -37,6 +37,7 @@ use OpenApi\Attributes as OA;
                     "slug" => "nazvanie-podkategorii-17",
                     "description" => "In molestiae quae et recusandae nisi. Nihil eum non ut possimus voluptatum aut dolorem assumenda. Suscipit quis suscipit placeat qui provident.",
                     "info" => "Accusantium mollitia et itaque vero quia. Velit eos quis autem enim et. Neque voluptas mollitia maiores optio aperiam molestias.",
+                    "preview_picture" => "https://via.placeholder.com/640x480.png/009988?text=dolore"
                 ]
             ]
         ]),

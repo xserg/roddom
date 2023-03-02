@@ -30,8 +30,7 @@ use OpenApi\Attributes as OA;
                     "slug" => "ginekologiia",
                     "description" => "Nihil non eius eos ullam velit harum dolorem. Rerum explicabo quis ab non. Nulla hic nostrum ipsum nihil eum.",
                     "info" => "Expedita explicabo excepturi a expedita eos magni sit sapiente. Tempora molestiae ut nobis eum. Et molestiae ad ut et esse consequatur voluptatum. Excepturi et suscipit corporis nobis.",
-                    "created_at" => null,
-                    "updated_at" => null
+                    "preview_picture" => "https://via.placeholder.com/640x480.png/009988?text=dolore"
                 ]
             ]
         ]),
