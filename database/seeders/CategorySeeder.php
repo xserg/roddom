@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,16 +21,16 @@ class CategorySeeder extends Seeder
             'Психология',
         ];
 
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < count($categories); $i++) {
             $category = [
                 'parent_id' => 0,
                 'title' => $categories[$i],
                 'slug' => Str::slug($categories[$i]),
+                'preview_picture' => fake()->imageUrl,
                 'description' => fake()->text(150),
                 'info' => fake()->text(),
             ];
-
-            DB::table('lecture_categories')->insert($category);
+            (new Category($category))->save();
         }
     }
 }

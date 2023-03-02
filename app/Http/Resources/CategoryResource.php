@@ -18,6 +18,7 @@ class CategoryResource extends JsonResource
     #[OA\Property(property: 'slug', description: 'slug категории', type: 'string')]
     #[OA\Property(property: 'description', description: 'описание категории', type: 'string')]
     #[OA\Property(property: 'info', description: 'инфо категории', type: 'string')]
+    #[OA\Property(property: 'preview_picture', description: 'превью картинка категории', type: 'string')]
     public function toArray(Request $request): array
     {
         return [
@@ -27,6 +28,7 @@ class CategoryResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'info' => $this->info,
+            'preview_picture' => $this->preview_picture,
         ];
     }
 }
