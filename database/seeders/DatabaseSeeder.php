@@ -9,10 +9,6 @@ use App\Models\Lecture;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Laravel\Sanctum\NewAccessToken;
 
 class DatabaseSeeder extends Seeder
 {
@@ -30,6 +26,13 @@ class DatabaseSeeder extends Seeder
         Lecture::factory(150)->create();
         $this->call(TestUserSeeder::class);
         $this->createUsers(20);
+
+        $this->call(SubscriptionPeriodSeeder::class);
+        $this->call(PromoSeeder::class);
+        $this->call(PromoPackPricesSeeder::class);
+        $this->call(CategoryPricesSeeder::class);
+        $this->call(PromoLecturesPricesSeeder::class);
+        $this->call(SubscriptionSeeder::class);
     }
 
     private function createUsers(int $users)

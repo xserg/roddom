@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Category extends Model
 {
@@ -22,6 +23,16 @@ class Category extends Model
     public function lectures(): HasMany
     {
         return $this->hasMany(Lecture::class);
+    }
+
+    public function prices(): HasMany
+    {
+        return $this->hasMany(SubcategoryPrices::class);
+    }
+
+    public function subscriptions(): MorphMany
+    {
+        return $this->morphMany(Subscription::class, 'subscriptions');
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Lecture extends Model
 {
@@ -52,6 +53,21 @@ class Lecture extends Model
         );
     }
 
+    public function subscriptions(): MorphMany
+    {
+        return $this->morphMany(Subscription::class, 'subscriptions');
+    }
+
+    public function promos(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Promo::class,
+            'promo_lectures_prices',
+            'lecture_id',
+            'promo_id'
+        );
+    }
+
     public function scopeWatched(Builder $query): void
     {
         $watchedIds = auth()->user()->watchedLectures->pluck('id')->toArray();
@@ -71,6 +87,22 @@ class Lecture extends Model
         $savedIds = auth()->user()->savedLectures->pluck('id')->toArray();
 
         $query->whereIn('id', $savedIds);
+    }
+
+    public function isPurchasedByCurrentUser()
+    {
+        return auth()->user()->purchasedLectures->contains($this->id);
+    }
+
+    public function promoPrices(): array
+    {
+
+        return [];
+    }
+
+    public function setPromoted()
+    {
+        $this->is_promoted = 1;
     }
 
 }

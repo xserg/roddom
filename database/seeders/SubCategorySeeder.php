@@ -22,8 +22,7 @@ class SubCategorySeeder extends Seeder
                 'description' => fake()->text(150),
                 'info' => fake()->text(),
             ];
-
-            DB::table('lecture_categories')->insert($category);
+            (new Category($category))->save();
         }
     }
 }

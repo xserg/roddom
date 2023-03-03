@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\LectureService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -49,6 +50,7 @@ class LectureResource extends JsonResource
             'preview_picture' => $this->preview_picture,
             'video_id' => $this->when($this->is_free, $this->video_id, null),
             'is_free' => $this->is_free,
+            'is_promo' => $this->isPurchasedByCurrentUser(),
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this->created_at,

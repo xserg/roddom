@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('video_id')->unsigned()->unique();
             $table->bigInteger('lector_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
-            $table->boolean('is_free');
+            $table->boolean('is_free')->default(false);
 
             $table->timestamps();
 

@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Buy\BuyLectureController;
 use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
 use App\Http\Controllers\Api\Category\RetrieveCategoryController;
-use App\Http\Controllers\Api\Diploma\RetrieveAllDiplomasController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
@@ -66,6 +66,10 @@ Route::prefix('v1')
                 ->name('lectures');
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->name('lecture');
+            Route::post('/lecture/{id}/buy/{period}', BuyLectureController::class)
+                ->name('lecture.buy')
+                ->where('id', '[0-9]+')
+                ->where('period', '[0-9]+');
 
 //            Route::get('/diplomas', RetrieveAllDiplomasController::class)
 //                ->name('diplomas');

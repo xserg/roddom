@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\User;
 use Carbon\Carbon;
@@ -77,5 +78,9 @@ class TestUserSeeder extends Seeder
                 default;
             }
         }
+
+        $lectures = Lecture::all()->random(4);
+        $categories = Category::subCategories()->get()->random(2);
+
     }
 }
