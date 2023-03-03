@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/categories',
-    description: "Получение ресурсов главных категорий лекций",
-    summary: "Получение ресурсов главных категорий лекций",
+    description: "Получение главных категорий",
+    summary: "Получение главных категорий",
     security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    tags: ["category"])
 ]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(

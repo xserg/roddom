@@ -20,6 +20,22 @@ use OpenApi\Attributes as OA;
     security: [["bearerAuth" => []]],
     tags: ["lecture"])
 ]
+#[OA\Parameter(
+    name: 'id',
+    description: 'id лекции, которую хотим купить',
+    in: 'path',
+    required: true,
+    schema: new OA\Schema(type: 'integer'),
+    example: '137'
+)]
+#[OA\Parameter(
+    name: 'period',
+    description: 'на какой срок хотим купить лекцию. Есть три варианта: 1, 14, 30',
+    in: 'path',
+    required: true,
+    schema: new OA\Schema(type: 'integer'),
+    example: '14'
+)]
 class BuyLectureController extends Controller
 {
     public function __construct(

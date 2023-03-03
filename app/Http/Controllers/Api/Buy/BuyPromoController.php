@@ -19,6 +19,14 @@ use OpenApi\Attributes as OA;
     security: [["bearerAuth" => []]],
     tags: ["promo"])
 ]
+#[OA\Parameter(
+    name: 'period',
+    description: 'на какой срок хотим купить промо пак(и все его лекции соответсвенно). Есть три варианта: 1, 14, 30',
+    in: 'path',
+    required: true,
+    schema: new OA\Schema(type: 'integer'),
+    example: '30'
+)]
 class BuyPromoController extends Controller
 {
     public function __construct(

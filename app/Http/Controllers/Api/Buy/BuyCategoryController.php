@@ -19,6 +19,22 @@ use OpenApi\Attributes as OA;
     security: [["bearerAuth" => []]],
     tags: ["category"])
 ]
+#[OA\Parameter(
+    name: 'id',
+    description: 'id подкатегории, которую хотим купить',
+    in: 'path',
+    required: true,
+    schema: new OA\Schema(type: 'integer'),
+    example: '12'
+)]
+#[OA\Parameter(
+    name: 'period',
+    description: 'на какой срок хотим купить категорию(и все её лекции соответсвенно). Есть три варианта: 1, 14, 30',
+    in: 'path',
+    required: true,
+    schema: new OA\Schema(type: 'integer'),
+    example: '14'
+)]
 class BuyCategoryController extends Controller
 {
     public function __construct(

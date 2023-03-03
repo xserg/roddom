@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
     description: "Получение всех подкатегорий определенной категории лекций",
     summary: "Получение подкатегорий",
     security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    tags: ["category"])
 ]
 #[OA\Parameter(
     name: 'slug',
