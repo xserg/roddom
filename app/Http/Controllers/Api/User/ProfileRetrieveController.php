@@ -9,8 +9,8 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/user/profile',
-    description: "Получения данных профиля пользователя",
-    summary: "Получения данных профиля пользователя",
+    description: "Получение данных профиля залогиненного пользователя",
+    summary: "Получение данных профиля пользователя",
     security: [["bearerAuth" => []]],
     tags: ["user"])
 ]
