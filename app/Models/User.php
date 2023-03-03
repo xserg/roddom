@@ -91,4 +91,16 @@ class User extends Authenticatable
         return $this->subscriptions()
             ->where('subscriptionable_type', '=', Lecture::class);
     }
+
+    public function categorySubscriptions(): HasMany
+    {
+        return $this->subscriptions()
+            ->where('subscriptionable_type', '=', Category::class);
+    }
+
+    public function promoSubscriptions(): HasMany
+    {
+        return $this->subscriptions()
+            ->where('subscriptionable_type', '=', Promo::class);
+    }
 }

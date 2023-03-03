@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Buy\BuyCategoryController;
 use App\Http\Controllers\Api\Buy\BuyLectureController;
+use App\Http\Controllers\Api\Buy\BuyPromoController;
 use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
 use App\Http\Controllers\Api\Category\RetrieveCategoryController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
@@ -78,5 +80,15 @@ Route::prefix('v1')
                 ->name('categories');
             Route::get('/category/{slug}', RetrieveCategoryController::class)
                 ->name('subcategories');
+            Route::post('/category/{id}/buy/{period}', BuyCategoryController::class)
+                ->name('category.buy')
+                ->where('id', '[0-9]+')
+                ->where('period', '[0-9]+');
+
+
+            Route::post('/promopack/buy/{period}', BuyPromoController::class)
+                ->name('promopack.buy')
+                ->where('id', '[0-9]+')
+                ->where('period', '[0-9]+');
         });
     });

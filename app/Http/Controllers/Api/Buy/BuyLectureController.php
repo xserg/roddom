@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyLectureRequest;
+use App\Http\Resources\SubscriptionResource;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Subscription;
@@ -12,12 +13,12 @@ use App\Services\LectureService;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
-#[OA\Get(
+#[OA\Post(
     path: '/lecture/{id}/buy/{period}',
     description: "Покупка отдельной лекции на период 1, 14, 30 дней",
     summary: "Покупка отдельной лекции",
     security: [["bearerAuth" => []]],
-    tags: ["buy"])
+    tags: ["lecture"])
 ]
 class BuyLectureController extends Controller
 {
@@ -30,12 +31,12 @@ class BuyLectureController extends Controller
 
     public function __invoke(
         BuyLectureRequest $request,
-        int               $id,
+        int               $lectureId,
         int               $period
     )
     {
-        $lecture = $this->lectureRepository->getLectureById($id);
-        $isPurchasedStrict = $this->lectureService->isLecturePurchased($lecture->id);
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $isPurchasedStrict = $this->lectureService->isLecturePurchased($lectureId);
 
         if ($isPurchasedStrict) {
             return response()->json([
@@ -51,8 +52,6 @@ class BuyLectureController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $lectureId = $id;
-
         $attributes = [
             'user_id' => auth()->user()->id,
             'subscriptionable_type' => Lecture::class,
@@ -66,7 +65,7 @@ class BuyLectureController extends Controller
         $subscription->save();
 
         return response()->json([
-            'req' => $request->id
+            'subscription' => new SubscriptionResource($subscription)
         ]);
     }
 }

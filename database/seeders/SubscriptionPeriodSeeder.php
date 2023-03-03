@@ -16,7 +16,7 @@ class SubscriptionPeriodSeeder extends Seeder
             ],
             [
                 'title' => 'week',
-                'length' => 7
+                'length' => 14
             ],
             [
                 'title' => 'month',

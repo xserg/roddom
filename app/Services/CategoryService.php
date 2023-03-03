@@ -15,4 +15,14 @@ class CategoryService
     {
         return $category->parent_id != 0;
     }
+
+    public function isCategoryPurchased($id)
+    {
+        $purchasedCategoriesIds = auth()->user()
+            ->categorySubscriptions()
+            ->get()
+            ->pluck('subscriptionable_id');
+
+        return $purchasedCategoriesIds->contains($id);
+    }
 }
