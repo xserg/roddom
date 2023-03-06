@@ -49,6 +49,18 @@ use OpenApi\Attributes as OA;
     example: '21,11',
 )]
 #[OA\Parameter(
+    name: 'filter[watched]',
+    description: 'пишем filter[watched]=1 получаем просмотренные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
+    name: 'filter[saved]',
+    description: 'пишем filter[saved]=1 получаем сохраненные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
     name: 'include',
     description: 'включаем в объект каждой лекции соответствующие объекты категории или лектора этой лекции или оба',
     in: 'query',

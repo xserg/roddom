@@ -40,7 +40,7 @@ class LectureRepository
             ->allowedFilters([
                 AllowedFilter::scope('watched'),
                 AllowedFilter::scope('saved'),
-                AllowedFilter::scope('purchased'),
+//                AllowedFilter::scope('purchased'),
                 AllowedFilter::exact('lector_id'),
                 AllowedFilter::exact('category_id'),
             ]);

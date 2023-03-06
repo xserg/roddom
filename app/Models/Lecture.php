@@ -78,12 +78,12 @@ class Lecture extends Model
         $query->whereIn('id', $watchedIds);
     }
 
-    public function scopePurchased(Builder $query): void
-    {
-        $purchasedIds = auth()->user()->purchasedLectures->pluck('id')->toArray();
-
-        $query->whereIn('id', $purchasedIds);
-    }
+//    public function scopePurchased(Builder $query): void
+//    {
+//        $purchasedIds = auth()->user()->purchasedLectures->pluck('id')->toArray();
+//
+//        $query->whereIn('id', $purchasedIds);
+//    }
 
     public function scopeSaved(Builder $query): void
     {
