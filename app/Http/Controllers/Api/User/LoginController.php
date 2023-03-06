@@ -75,12 +75,14 @@ class LoginController
                 $request->input('email')
             );
 
+        $user->tokens()->delete();
+
         $token = $user
             ->createToken('access_token')
             ->plainTextToken;
 
         return response()->json([
-            'user' => $user->loadCount(['watchedLectures', 'purchasedLectures', 'savedLectures']),
+            'user' => $user->load(['watchedLectures', 'purchasedLectures', 'savedLectures']),
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);

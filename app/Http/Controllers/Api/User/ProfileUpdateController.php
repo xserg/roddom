@@ -71,7 +71,7 @@ class ProfileUpdateController
         }
 
         return response()->json([
-            'data' => new UserResource($user->loadCount(['watchedLectures', 'purchasedLectures', 'savedLectures'])),
+            'data' => new UserResource($user->load(['watchedLectures', 'purchasedLectures', 'savedLectures'])),
         ]);
     }
 }

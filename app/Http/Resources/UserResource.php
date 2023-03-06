@@ -41,9 +41,9 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
-            'watched_lectures_count' => $this->whenCounted('watchedLectures'),
-            'purchased_lectures_count' =>  $this->whenCounted('purchasedLectures'),
-            'saved_lectures_count' =>  $this->whenCounted('savedLectures'),
+            'watched_lectures' => $this->whenLoaded('watchedLectures'),
+            'purchased_lectures' =>  $this->whenLoaded('purchasedLectures'),
+            'saved_lectures' =>  $this->whenLoaded('savedLectures'),
         ];
     }
 }
