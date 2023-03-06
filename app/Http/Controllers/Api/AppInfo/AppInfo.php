@@ -9,10 +9,9 @@ use OpenApi\Attributes as OA;
 #[
     OA\Get(
         path: '/app/info',
-        description: "Получение данных профиля залогиненного пользователя",
-        summary: "Получение данных профиля пользователя",
+        summary: "Получение данных приложения",
         security: [["bearerAuth" => []]],
-        tags: ["user"])
+        tags: ["app"])
 ]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
