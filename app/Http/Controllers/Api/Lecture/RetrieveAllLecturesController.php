@@ -6,7 +6,6 @@ use App\Http\Resources\LectureCollection;
 use App\Repositories\LectureRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Attributes as OA;
@@ -31,20 +30,14 @@ use OpenApi\Attributes as OA;
     example: '2'
 )]
 #[OA\Parameter(
-    name: 'category',
-    description: 'id категории лекций, которые мы хотим получить',
-    in: 'query',
-    example: '32',
-)]
-#[OA\Parameter(
     name: 'filter[lector_id]',
-    description: 'id лектора/ов, лекции которого мы хотим получить',
+    description: 'пишем filter[lector_id]=12,25 id лектора/ов, лекции которого мы хотим получить',
     in: 'query',
     example: '12,25,1',
 )]
 #[OA\Parameter(
     name: 'filter[category_id]',
-    description: 'id категории/ий, лекции которых мы хотим получить',
+    description: 'пишем filter[category_id]=21,11 id подкатегории/ий, лекции которых мы хотим получить',
     in: 'query',
     example: '21,11',
 )]
