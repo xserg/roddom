@@ -15,7 +15,7 @@ class LectureRepository
     {
     }
 
-    public function getLectureById($id)
+    public function getLectureById($id): Lecture
     {
         $lecture = Lecture::query()
             ->with('lector', 'lector.diplomas')
@@ -53,7 +53,7 @@ class LectureRepository
 
         if ($lectures->isEmpty()) {
             throw new NotFoundHttpException(
-                'Not found any lecture with such parameters:per_page=' . $perPage . ', page=' . $page . '.'
+                'Not found any lecture with such parameters'
             );
         }
 

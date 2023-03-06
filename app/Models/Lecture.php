@@ -89,14 +89,8 @@ class Lecture extends Model
         $query->whereIn('id', $savedIds);
     }
 
-    public function isPurchasedByCurrentUser()
-    {
-        return auth()->user()->purchasedLectures->contains($this->id);
-    }
-
     public function promoPrices(): array
     {
-
         return [];
     }
 

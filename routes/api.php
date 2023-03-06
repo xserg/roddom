@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
+use App\Http\Controllers\Api\Lecture\WatchLectureController;
 use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
@@ -72,6 +73,8 @@ Route::prefix('v1')
                 ->name('lectures');
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->name('lecture');
+            Route::post('/lecture/{id}/watch', WatchLectureController::class)
+                ->name('lecture.watch');
             Route::post('/lecture/{id}/buy/{period}', BuyLectureController::class)
                 ->name('lecture.buy')
                 ->where('id', '[0-9]+')

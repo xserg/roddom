@@ -49,6 +49,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'free_lecture_watched' => 'datetime'
     ];
 
     public function watchedLectures(): BelongsToMany
@@ -58,7 +59,7 @@ class User extends Authenticatable
             'user_to_watched_lectures',
             'user_id',
             'lecture_id'
-        );
+        )->withPivot('available_until');
     }
 
     public function savedLectures(): BelongsToMany

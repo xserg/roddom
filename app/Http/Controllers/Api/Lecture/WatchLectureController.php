@@ -5,23 +5,25 @@ namespace App\Http\Controllers\Api\Lecture;
 use App\Http\Resources\LectureResource;
 use App\Jobs\WatchLecture;
 use App\Repositories\LectureRepository;
+use App\Services\LectureService;
 use App\Services\UserService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
-#[OA\Get(
-    path: '/lecture/{id}',
-    description: "Получение ресурса лекции",
-    summary: "Получение ресурса лекции",
+#[OA\Post(
+    path: '/lecture/{id}/watch',
+    description: "Кидаем id лекции, получаем в ответе id видео в kinescope, теперь лекция просмотренная",
+    summary: "Посмотреть лекцию",
     security: [["bearerAuth" => []]],
     tags: ["lecture"])
 ]
 #[OA\Parameter(
     name: 'id',
-    description: 'id лекции, которую хотим получить',
+    description: 'id лекции, которую хотим посмотреть',
     in: 'path',
     required: true,
     schema: new OA\Schema(type: 'integer')
@@ -47,27 +49,28 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'message', type: 'string'),
         ])
 )]
-
-class RetrieveLectureController
+class WatchLectureController
 {
     public function __construct(
-        private LectureRepository $repository,
+        private UserService $userService,
     )
     {
     }
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
-        $lecture = $this->repository->getLectureById($id);
-
-        if(! $lecture){
+        try {
+            $videoId = $this->userService->watchLecture($id, auth()->user());
+        } catch (Exception $exception) {
             return response()->json([
-                'message' => 'Lecture with id ' . $id . ' was not found'
-            ], Response::HTTP_NOT_FOUND);
+                'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage()
+            ], Response::HTTP_FORBIDDEN);
         }
 
         return response()->json(
-            new LectureResource($lecture),
+            [
+                'data' => ['kinescope.id' => $videoId]
+            ],
             Response::HTTP_OK
         );
     }

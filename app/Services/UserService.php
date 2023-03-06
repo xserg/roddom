@@ -4,23 +4,30 @@ namespace App\Services;
 
 use App\Exceptions\FailedSaveUserException;
 use App\Exceptions\ResetCodeExpiredException;
+use App\Exceptions\UserCannotWatchFreeLectureException;
+use App\Exceptions\UserCannotWatchPaidLectureException;
 use App\Jobs\UserDeletionRequest;
 use App\Models\PasswordReset;
 use App\Models\User;
+use App\Repositories\LectureRepository;
 use App\Repositories\PasswordResetRepository;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\Response;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserService
 {
     public function __construct(
         private PasswordResetService    $passwordResetService,
-        private PasswordResetRepository $passwordResetRepository
+        private PasswordResetRepository $passwordResetRepository,
+        private LectureService          $lectureService,
+        private LectureRepository       $lectureRepository
     )
     {
     }
@@ -118,27 +125,60 @@ class UserService
 
     public function addLectureToWatched(
         int  $lectureId,
-        User $currentUser
+        User $user,
+        bool $setAvailableUntil
     ): void
     {
-        $watchedLectures = $currentUser->watchedLectures;
-        $lectureAlreadyInWatched = $watchedLectures
-            ->keyBy('id')
-            ->has($lectureId);
-
-        if ($lectureAlreadyInWatched) {
-            return;
+        if ($setAvailableUntil) {
+            $user->watchedLectures()->attach($lectureId, ['available_until' => now()->addHours(24)]);
+        } else {
+            $user->watchedLectures()->attach($lectureId);
         }
 
-        $currentUser->watchedLectures()->attach($lectureId);
+        $user->save();
     }
 
-    public function canUserWatchLecture(
-        int             $lectureId,
-        Authenticatable $currentUser
-    ): bool
+    /**
+     * @throws FailedSaveUserException
+     * @throws UserCannotWatchFreeLectureException
+     * @throws UserCannotWatchPaidLectureException
+     */
+    public function watchLecture(
+        int                  $lectureId,
+        Authenticatable|User $user
+    ): int
     {
-        return true;
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+
+        if (!$lecture) {
+            throw new NotFoundHttpException('Лекция с id ' . $lectureId . ' не найдена');
+        }
+
+        if ($this->lectureService->isFree($lectureId)) {
+            if ($this->isFreeLectureAvailable($lectureId, $user)) {
+                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+            }
+
+            if ($this->userCanWatchNewFreeLecture($user)) {
+                $this->addLectureToWatched($lectureId, $user, true);
+                $user = $this->setFreeLectureWatchedNow($user);
+                $this->saveUserGuard($user);
+                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+            }
+
+            $cantViewFor = 24 - ($user->free_lecture_watched->diffInHours(now()));
+            throw new UserCannotWatchFreeLectureException(
+                'Пользователь не сможет посмотреть новую бесплатную лекцию ещё ' . $cantViewFor . ' час/часа/часов'
+            );
+        } else {
+            if (
+                $this->isLecturePurchased($lectureId, $user)
+            ) {
+                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+            }
+
+            throw new UserCannotWatchPaidLectureException('Пользователь не сможет посмотреть платную лекцию');
+        }
     }
 
     /**
@@ -196,5 +236,43 @@ class UserService
         $this->saveUserGuard($user);
 
         return $user;
+    }
+
+    private function isFreeLectureAvailable(int $lectureId, User $user): bool
+    {
+        $lecture = $user
+            ->watchedLectures
+            ->firstWhere('id', $lectureId);
+
+        if (!$lecture) {
+            return false;
+        }
+
+        $availableUntil = $lecture->pivot->available_until;
+
+        $available = $availableUntil > now();
+
+        return $available;
+    }
+
+    public function userCanWatchNewFreeLecture(User|Authenticatable $user): bool
+    {
+        return
+            $user->free_lecture_watched < now()->subHours(24) ||
+            is_null($user->free_lecture_watched);
+    }
+
+    public function setFreeLectureWatchedNow(User|Authenticatable $user): User
+    {
+        $user->free_lecture_watched = now();
+        return $user;
+    }
+
+    public function isLecturePurchased(int $lectureId, User|Authenticatable $user): bool
+    {
+        return
+            $this->lectureService->isLectureStrictPurchased($lectureId, $user) ||
+            $this->lectureService->isLecturesCategoryPurchased($lectureId, $user) ||
+            $this->lectureService->isLecturesPromoPurchased($lectureId, $user);
     }
 }

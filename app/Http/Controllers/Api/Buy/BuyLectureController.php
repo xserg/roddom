@@ -52,7 +52,7 @@ class BuyLectureController extends Controller
     )
     {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $isPurchasedStrict = $this->lectureService->isLecturePurchased($lectureId);
+        $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
 
         if ($isPurchasedStrict) {
             return response()->json([
@@ -60,7 +60,7 @@ class BuyLectureController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $isFree = $this->lectureService->isFree($lecture);
+        $isFree = $this->lectureService->isFree($lectureId);
 
         if ($isFree) {
             return response()->json([
