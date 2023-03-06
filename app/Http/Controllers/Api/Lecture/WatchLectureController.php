@@ -54,6 +54,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string', example: 'Пользователь не может смотреть лекцию с id: 113. Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'),
+            new OA\Property(property: 'cant_watch_for_seconds', type: 'integer', example: '81593')
         ])
 )]
 #[OA\Response(
@@ -76,10 +77,19 @@ class WatchLectureController
     {
         try {
             $videoId = $this->userService->watchLecture($id, auth()->user());
+        } catch (UserCannotWatchFreeLectureException $exception) {
+            $cantViewFor = now()->diffInSeconds(
+                auth()->user()->free_lecture_watched->addHours(24)
+            );
+
+            return response()->json([
+                'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage(),
+                'cant_watch_for_seconds' => $cantViewFor
+            ], Response::HTTP_FORBIDDEN);
+
         } catch (
         NotFoundHttpException|
-        UserCannotWatchPaidLectureException|
-        UserCannotWatchFreeLectureException $exception
+        UserCannotWatchPaidLectureException $exception
         ) {
             return response()->json([
                 'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage()

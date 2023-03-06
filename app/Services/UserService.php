@@ -134,8 +134,6 @@ class UserService
         } else {
             $user->watchedLectures()->attach($lectureId);
         }
-
-        $user->save();
     }
 
     /**
@@ -162,14 +160,14 @@ class UserService
             if ($this->userCanWatchNewFreeLecture($user)) {
                 $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user, true);
+
                 $user = $this->setFreeLectureWatchedNow($user);
                 $this->saveUserGuard($user);
                 return $this->lectureRepository->getLectureById($lectureId)->video_id;
             }
 
-            $cantViewFor = 24 - ($user->free_lecture_watched->diffInHours(now()));
             throw new UserCannotWatchFreeLectureException(
-                'Пользователь не сможет посмотреть новую бесплатную лекцию ещё ' . $cantViewFor . ' час/часа/часов'
+                'Пользователь не сможет посмотреть новую бесплатную лекцию'
             );
         } else {
             if ($this->isLecturePurchased($lectureId, $user)) {
