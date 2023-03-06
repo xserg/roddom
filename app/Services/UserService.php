@@ -126,7 +126,7 @@ class UserService
     public function addLectureToWatched(
         int  $lectureId,
         User $user,
-        bool $setAvailableUntil
+        bool $setAvailableUntil = false
     ): void
     {
         if ($setAvailableUntil) {
@@ -171,9 +171,8 @@ class UserService
                 'Пользователь не сможет посмотреть новую бесплатную лекцию ещё ' . $cantViewFor . ' час/часа/часов'
             );
         } else {
-            if (
-                $this->isLecturePurchased($lectureId, $user)
-            ) {
+            if ($this->isLecturePurchased($lectureId, $user)) {
+                $this->addLectureToWatched($lectureId, $user);
                 return $this->lectureRepository->getLectureById($lectureId)->video_id;
             }
 

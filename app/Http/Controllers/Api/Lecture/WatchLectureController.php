@@ -30,20 +30,30 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),
+        new OA\Property(property: 'data', example: [
+            'kinescope.id' => '837933399'
+        ]),
     ])
 )]
 #[OA\Response(
-    response: Response::HTTP_INTERNAL_SERVER_ERROR,
-    description: 'Server Error',
+    response: Response::HTTP_NOT_FOUND,
+    description: 'Not Found',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string'),
         ])
 )]
 #[OA\Response(
-    response: Response::HTTP_NOT_FOUND,
-    description: 'Not Found',
+    response: Response::HTTP_FORBIDDEN,
+    description: 'Forbidden',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'message', type: 'string',example: 'Пользователь не может смотреть лекцию с id: 113. Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'),
+        ])
+)]
+#[OA\Response(
+    response: Response::HTTP_INTERNAL_SERVER_ERROR,
+    description: 'Server Error',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string'),
