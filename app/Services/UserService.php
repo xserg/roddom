@@ -160,6 +160,7 @@ class UserService
             }
 
             if ($this->userCanWatchNewFreeLecture($user)) {
+                $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user, true);
                 $user = $this->setFreeLectureWatchedNow($user);
                 $this->saveUserGuard($user);
@@ -172,6 +173,7 @@ class UserService
             );
         } else {
             if ($this->isLecturePurchased($lectureId, $user)) {
+                $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user);
                 return $this->lectureRepository->getLectureById($lectureId)->video_id;
             }

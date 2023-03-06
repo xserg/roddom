@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\Lecture;
 
+use App\Exceptions\UserCannotWatchFreeLectureException;
+use App\Exceptions\UserCannotWatchPaidLectureException;
 use App\Http\Resources\LectureResource;
 use App\Jobs\WatchLecture;
 use App\Repositories\LectureRepository;
@@ -13,10 +15,13 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[OA\Post(
     path: '/lecture/{id}/watch',
-    description: "Кидаем id лекции, получаем в ответе id видео в kinescope, теперь лекция просмотренная",
+    description: "Кидаем id лекции, получаем в ответе id видео в kinescope, теперь лекция просмотренная, если ещё не была.
+    Когда юзер может посмотреть лекцию: 1. платная и купленная, 2. бесплатная, уже открытая, срок доступа к ней не вышел,
+    3. бесплатная, сегодня юзер ещё не открывал бесплатную лекцию",
     summary: "Посмотреть лекцию",
     security: [["bearerAuth" => []]],
     tags: ["lecture"])
@@ -48,7 +53,7 @@ use OpenApi\Attributes as OA;
     description: 'Forbidden',
     content: new OA\JsonContent(
         properties: [
-            new OA\Property(property: 'message', type: 'string',example: 'Пользователь не может смотреть лекцию с id: 113. Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'),
+            new OA\Property(property: 'message', type: 'string', example: 'Пользователь не может смотреть лекцию с id: 113. Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'),
         ])
 )]
 #[OA\Response(
@@ -71,7 +76,11 @@ class WatchLectureController
     {
         try {
             $videoId = $this->userService->watchLecture($id, auth()->user());
-        } catch (Exception $exception) {
+        } catch (
+        NotFoundHttpException|
+        UserCannotWatchPaidLectureException|
+        UserCannotWatchFreeLectureException $exception
+        ) {
             return response()->json([
                 'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage()
             ], Response::HTTP_FORBIDDEN);
