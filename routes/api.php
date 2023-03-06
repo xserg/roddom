@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AppInfo\AppInfo;
 use App\Http\Controllers\Api\Buy\BuyCategoryController;
 use App\Http\Controllers\Api\Buy\BuyLectureController;
 use App\Http\Controllers\Api\Buy\BuyPromoController;
@@ -35,6 +36,9 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')
     ->name('v1.')
     ->group(function () {
+
+        Route::get('/app/info', AppInfo::class)
+            ->name('app.info');
 
         Route::post('/user/register', RegisterController::class)
             ->name('register');
