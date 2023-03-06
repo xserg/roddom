@@ -12,9 +12,9 @@ class PromoLecturesPricesSeeder extends Seeder
     public function run(): void
     {
         $lectures = Lecture
-            ::where('is_free', '=', 0)
-            ->get()
-            ->random(15);
+            ::where('is_promo', '=', 1)
+            ->get();
+
         $promo = Promo::first();
         $periods = Period::all();
 

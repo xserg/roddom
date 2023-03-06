@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
         Lecture::factory(150)->create();
+        Lecture::factory(20)->promo()->create();
         $this->call(TestUserSeeder::class);
         $this->createUsers(20);
 

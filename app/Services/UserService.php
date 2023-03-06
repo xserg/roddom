@@ -184,7 +184,7 @@ class UserService
      * @throws Exception
      */
     public function saveUsersPhoto(
-        Authenticatable $user,
+        Authenticatable|User $user,
         UploadedFile    $file): array
     {
         // TODO: refactoring
@@ -192,7 +192,7 @@ class UserService
         $image = $manager->make($file)->resize(300, 300);
         $imageSmall = $manager->make($file)->resize(150, 150);
 
-        $dirCreated = Storage::makeDirectory('images/' . $user->id);
+        $dirCreated = Storage::makeDirectory('images/users/' . $user->id);
 
         if (!$dirCreated) {
             throw new Exception('Directory could not be created');
@@ -201,8 +201,8 @@ class UserService
         // /app/public/images/{user-id}/{user-id}.{extension}
         // linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
         // url . /storage/images/1/1.jpg
-        $path = "/images/$user->id/$user->id.jpg";
-        $smallImagePath = "/images/$user->id/$user->id-small.jpg";
+        $path = "/images/users/$user->id/$user->id.jpg";
+        $smallImagePath = "/images/users/$user->id/$user->id-small.jpg";
 
         if (!$image->save(storage_path('app/public' . $path), format: 'jpg') ||
             !$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')) {

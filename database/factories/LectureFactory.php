@@ -29,7 +29,18 @@ class LectureFactory extends Factory
             'description' => $this->faker->text(100),
             'preview_picture' => $this->faker->imageUrl,
             'video_id' => $this->faker->randomNumber(9, true),
-            'is_free' => rand(0, 1)
+            'is_free' => (bool)rand(0, 1),
+            'is_promo' => false
         ];
+    }
+
+    public function promo(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_free' => false,
+                'is_promo' => true,
+            ];
+        });
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Lecture extends Model
 {
     use HasFactory;
+
+    protected $appends = ['is_promo'];
 
     public function category(): BelongsTo
     {
@@ -96,7 +99,7 @@ class Lecture extends Model
 
     public function setPromoted()
     {
-        $this->is_promoted = 1;
+        $this->is_promot = 1;
     }
 
 }
