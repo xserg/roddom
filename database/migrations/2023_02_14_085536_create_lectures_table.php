@@ -22,7 +22,6 @@ return new class extends Migration
             $table->bigInteger('lector_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
             $table->boolean('is_free')->default(false);
-            $table->boolean('is_promo')->default(false);
 
             $table->timestamps();
 

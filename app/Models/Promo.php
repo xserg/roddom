@@ -9,7 +9,10 @@ class Promo extends Model
 {
     public function subscriptions()
     {
-        return $this->morphMany(Subscription::class, 'subscriptions');
+        return $this->morphMany(
+            Subscription::class,
+            'subscriptions'
+        );
     }
 
     public function subscriptionPeriods(): BelongsToMany
@@ -21,18 +24,14 @@ class Promo extends Model
             'period_id'
         );
     }
-    public function promoLecturesRelation(): BelongsToMany
+
+    public function promoLectures(): BelongsToMany
     {
         return $this->belongsToMany(
             Lecture::class,
-            'promo_lectures_prices',
+            'lectures_to_promo',
             'promo_id',
             'lecture_id'
         );
-    }
-
-    public function promoLectures()
-    {
-        return $this->promoLecturesRelation->unique('id');
     }
 }

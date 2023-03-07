@@ -16,9 +16,7 @@ use OpenApi\Attributes as OA;
     response: Response::HTTP_OK,
     description: 'OK',
     content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
-        new OA\Property(property: 'access_token', type: 'string', example: '2|bNyLNAS0eqriGpH3O2z9bViYtBOtBk1bQKDIEifD'),
-        new OA\Property(property: 'token_type', type: 'string', example: 'Bearer'),
+        new OA\Property(property: 'message', type: 'string'),
     ])
 )]
 #[OA\Response(

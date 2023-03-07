@@ -55,7 +55,7 @@ class TestUserSeeder extends Seeder
             ->random(50);
 
         foreach ($lectures as $lecture) {
-            $rand = rand(0, 2);
+            $rand = rand(0, 1);
             switch ($rand) {
                 case 0:
                 {
@@ -66,14 +66,6 @@ class TestUserSeeder extends Seeder
                 {
                     $user->savedLectures()
                         ->attach($lecture->id);
-                }
-                case 2:
-                {
-                    $user->purchasedLectures()
-                        ->attach(
-                            $lecture->id,
-                            ['purchased_until' => Carbon::now()->addDays($rand)]
-                        );
                 }
                 default;
             }

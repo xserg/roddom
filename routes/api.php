@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
 use App\Http\Controllers\Api\Lecture\SaveLectureController;
 use App\Http\Controllers\Api\Lecture\UnsaveLectureController;
 use App\Http\Controllers\Api\Lecture\WatchLectureController;
+use App\Http\Controllers\Api\Promo\RetrieveAllPromoLecturesController;
 use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
@@ -106,5 +107,7 @@ Route::prefix('v1')
                 ->name('promopack.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
+            Route::get('/promopack', RetrieveAllPromoLecturesController::class)
+                ->name('promopack');
         });
     });

@@ -51,5 +51,17 @@ class SubscriptionSeeder extends Seeder
 
         $subscription = new Subscription($attributes);
         $subscription->save();
+
+        $attributes = [
+            'user_id' => User::first()->id,
+            'subscriptionable_type' => Promo::class,
+            'subscriptionable_id' => Promo::first()->id,
+            'period_id' => $randomPeriod->id,
+            'start_date' => now(),
+            'end_date' => now()->addHours($randomPeriod->length)
+        ];
+
+        $subscription = new Subscription($attributes);
+        $subscription->save();
     }
 }

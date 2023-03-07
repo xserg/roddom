@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
         Lecture::factory(150)->create();
-        Lecture::factory(20)->promo()->create();
         $this->call(TestUserSeeder::class);
         $this->createUsers(20);
 
@@ -32,6 +31,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PromoSeeder::class);
         $this->call(PromoPackPricesSeeder::class);
         $this->call(CategoryPricesSeeder::class);
+        $this->call(PromoLecturesSeeder::class);
         $this->call(PromoLecturesPricesSeeder::class);
         $this->call(SubscriptionSeeder::class);
     }
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
                     ->random(50);
 
                 foreach ($lectures as $lecture) {
-                    $rand = rand(0, 2);
+                    $rand = rand(0, 1);
                     switch ($rand) {
                         case 0:
                         {
@@ -61,14 +61,6 @@ class DatabaseSeeder extends Seeder
                         {
                             $user->savedLectures()
                                 ->attach($lecture->id);
-                        }
-                        case 2:
-                        {
-                            $user->purchasedLectures()
-                                ->attach(
-                                    $lecture->id,
-                                    ['purchased_until' => Carbon::now()->addDays($rand)]
-                                );
                         }
                         default;
                     }

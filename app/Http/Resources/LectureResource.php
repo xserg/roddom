@@ -36,7 +36,6 @@ class LectureResource extends JsonResource
         type: 'string',
         format: 'datetime')
     ]
-
     public function toArray(Request $request): array
     {
         return [
@@ -47,8 +46,9 @@ class LectureResource extends JsonResource
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
             'is_free' => $this->is_free,
-            'is_promo' => $this->is_promo,
-            'is_watched' => (int)auth()->user()->watchedLectures->contains($this->id),
+            'is_promo' => (int)$this->is_promo,
+            'is_watched' => (int)$this->is_watched,
+            'is_purchased' => (int)$this->is_purchased,
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this->created_at,

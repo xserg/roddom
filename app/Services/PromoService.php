@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Category;
-
 class PromoService
 {
     public function isPromoPurchased()

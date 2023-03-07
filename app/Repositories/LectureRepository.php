@@ -2,22 +2,30 @@
 
 namespace App\Repositories;
 
+use App\Models\Category;
 use App\Models\Lecture;
+use App\Models\Promo;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LectureRepository
 {
-    public function __construct()
+    public function __construct(
+        private CategoryRepository $categoryRepository,
+        private PromoRepository $promoRepository
+    )
     {
     }
 
     /**
-     * @throws NotFoundHttpException
      * @param $id
      * @return Lecture|null
+     * @throws NotFoundHttpException
      */
     public function getLectureById($id): ?Lecture
     {
@@ -47,6 +55,7 @@ class LectureRepository
             ->allowedFilters([
                 AllowedFilter::scope('watched'),
                 AllowedFilter::scope('saved'),
+                AllowedFilter::scope('purchased'),
                 AllowedFilter::exact('lector_id'),
                 AllowedFilter::exact('category_id'),
             ]);
@@ -98,4 +107,44 @@ class LectureRepository
 //        return $builder;
 //    }
 
+    public function getAllPurchasedLectureIdsByUser(
+        Authenticatable|User $user
+    ): array
+    {
+        $lectures = [];
+
+        $lecturesSubscriptions = $user
+            ->subscriptions
+            ->where('subscriptionable_type', Lecture::class);
+
+        $categorySubscriptions = $user
+            ->subscriptions
+            ->where('subscriptionable_type', Category::class);
+
+        $promoSubscriptions = $user
+            ->subscriptions
+            ->where('subscriptionable_type', Promo::class);
+
+        foreach ($lecturesSubscriptions as $subscription) {
+            $lectures[] = $subscription['subscriptionable_id'];
+        }
+
+        foreach ($categorySubscriptions as $categorySubscription) {
+            $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
+            $categoryLectures = $category->lectures;
+            foreach ($categoryLectures as $lecture) {
+                $lectures[] = $lecture->id;
+            }
+        }
+
+        foreach ($promoSubscriptions as $promoSubscription){
+            $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
+            $promoLectures = $promo->promoLectures;
+            foreach ($promoLectures as $lecture){
+                $lectures[] = $lecture->id;
+            }
+        }
+
+        return $lectures;
+    }
 }

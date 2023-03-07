@@ -11,16 +11,12 @@ class PromoLecturesPricesSeeder extends Seeder
 {
     public function run(): void
     {
-        $lectures = Lecture
-            ::where('is_promo', '=', 1)
-            ->get();
-
-        $promo = Promo::first();
         $periods = Period::all();
+        $promo = Promo::first();
 
-        foreach ($lectures as $lecture){
+        foreach ($promo->promoLectures as $lecture){
             foreach ($periods as $period){
-                $lecture->promos()->attach($promo->id, [
+                $lecture->pricesInPromoPacks()->attach($promo->id, [
                     'lecture_id' => $lecture->id,
                     'period_id' => $period->id,
                     'price' => $period->id * mt_rand(10000, 11000)
