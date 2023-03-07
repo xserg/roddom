@@ -12,11 +12,13 @@ class SubCategorySeeder extends Seeder
     public function run()
     {
         for ($i = 1; $i < 26; $i++) {
+            $parentCategory = Category::all()
+                ->where('parent_id', '=', 0)
+                ->random();
             $category = [
-                'parent_id' => Category::all()
-                    ->where('parent_id', '=', 0)
-                    ->random()
-                    ->id,
+                'parent_id' => $parentCategory->id,
+                'parent_slug' => Str::slug($parentCategory->title),
+                'preview_picture' => fake()->imageUrl,
                 'title' => 'Название подкатегории - ' . $i,
                 'slug' => Str::slug('Название подкатегории - ' . $i),
                 'description' => fake()->text(150),
