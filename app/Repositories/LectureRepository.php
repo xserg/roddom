@@ -7,6 +7,7 @@ use App\Models\Lecture;
 use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -17,7 +18,7 @@ class LectureRepository
 {
     public function __construct(
         private CategoryRepository $categoryRepository,
-        private PromoRepository $promoRepository
+        private PromoRepository    $promoRepository
     )
     {
     }
@@ -41,10 +42,16 @@ class LectureRepository
         return $lecture;
     }
 
-    public function getAllWithPaginator(
-        ?int $perPage,
-        ?int $page,
-    ): LengthAwarePaginator
+    public function getLectureByIdQuery($id, $relations = []): Builder
+    {
+        $query = Lecture::query()
+            ->with($relations)
+            ->where(['id' => $id]);
+
+        return $query;
+    }
+
+    public function allWithFiltersQuery($relations = []): Builder|QueryBuilder
     {
         $builder = Lecture::query();
 
@@ -60,6 +67,39 @@ class LectureRepository
                 AllowedFilter::exact('category_id'),
             ]);
 
+        return $builder;
+    }
+
+    public function getAllWithFlags(Builder|QueryBuilder $builder): Collection
+    {
+        $lectures = $builder->get();
+        $purchasedLectureIds = $this
+            ->getAllPurchasedLectureIdsByUser(
+                auth()->user()
+            );
+        $watchedLectures = auth()->user()->watchedLectures;
+
+        $lectures = $lectures->map(function ($lecture) use ($purchasedLectureIds, $watchedLectures) {
+            $isPurchased = in_array($lecture->id, $purchasedLectureIds);
+            $isWatched = $watchedLectures->contains($lecture->id);
+            $isPromo = $lecture->promoPacks->isNotEmpty();
+
+            $lecture->is_watched = (int)$isWatched;
+            $lecture->is_promo = (int)$isPromo;
+            $lecture->is_purchased = (int)$isPurchased;
+
+            return $lecture;
+        });
+
+        return $lectures;
+    }
+
+    public function paginateCollection(
+        Builder|Collection $builder,
+        ?int               $perPage,
+        ?int               $page,
+    ): LengthAwarePaginator
+    {
         $lectures = $builder
             ->paginate(
                 perPage: $perPage,
@@ -137,10 +177,10 @@ class LectureRepository
             }
         }
 
-        foreach ($promoSubscriptions as $promoSubscription){
+        foreach ($promoSubscriptions as $promoSubscription) {
             $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
             $promoLectures = $promo->promoLectures;
-            foreach ($promoLectures as $lecture){
+            foreach ($promoLectures as $lecture) {
                 $lectures[] = $lecture->id;
             }
         }

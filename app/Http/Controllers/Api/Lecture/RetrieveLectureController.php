@@ -49,7 +49,6 @@ use OpenApi\Attributes as OA;
             new OA\Property(property: 'message', type: 'string'),
         ])
 )]
-
 class RetrieveLectureController
 {
     public function __construct(
@@ -60,9 +59,10 @@ class RetrieveLectureController
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
-        $lecture = $this->repository->getLectureById($id);
+        $builder = $this->repository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
+        $lecture = $this->repository->getAllWithFlags($builder)->first();
 
-        if(! $lecture){
+        if (is_null($lecture)) {
             return response()->json([
                 'message' => 'Lecture with id ' . $id . ' was not found'
             ], Response::HTTP_NOT_FOUND);

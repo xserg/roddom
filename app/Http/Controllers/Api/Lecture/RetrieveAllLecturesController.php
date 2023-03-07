@@ -109,7 +109,7 @@ use OpenApi\Attributes as OA;
 class RetrieveAllLecturesController
 {
     public function __construct(
-        private LectureRepository $repository
+        private LectureRepository $lectureRepository
     )
     {
     }
@@ -117,7 +117,10 @@ class RetrieveAllLecturesController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $lectures = $this->repository->getAllWithPaginator(
+            $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
+            $lecturesWithFlags = $this->lectureRepository->getAllWithFlags($builder);
+            $lectures = $this->lectureRepository->paginateCollection(
+                $lecturesWithFlags,
                 $request->per_page,
                 $request->page,
             );

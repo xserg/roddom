@@ -20,6 +20,8 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'is_free', description: 'бесплатная ли лекция', type: 'boolean')]
     #[OA\Property(property: 'is_promo', description: 'акционная ли лекция', type: 'boolean')]
     #[OA\Property(property: 'is_watched', description: 'просмотрена ли лекция', type: 'boolean')]
+    #[OA\Property(property: 'is_purchased', description: 'куплена ли лекция. Не важно как покупалась:
+    в категории ли, в промо паке или отдельно', type: 'boolean')]
     #[OA\Property(
         property: 'lector',
         ref: '#/components/schemas/LectorResource',
