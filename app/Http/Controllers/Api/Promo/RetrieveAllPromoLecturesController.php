@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Promo;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LectureCollection;
+use App\Repositories\LectureRepository;
 use App\Repositories\PromoRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -35,7 +36,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
-        private PromoRepository $promoRepository
+        private PromoRepository   $promoRepository,
+        private LectureRepository $lectureRepository,
     )
     {
     }
@@ -43,9 +45,12 @@ class RetrieveAllPromoLecturesController extends Controller
     public function __invoke(Request $request)
     {
         try {
-            $lectures = $this->promoRepository->getAllWithPaginator(
+            $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
+            $lectures = $this->lectureRepository->getAllWithFlags($builder);
+            $lectures = $this->lectureRepository->paginateCollection(
+                $lectures,
                 $request->per_page,
-                $request->page,
+                $request->page
             );
         } catch (NotFoundHttpException $exception) {
 

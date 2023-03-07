@@ -53,7 +53,7 @@ class LectureRepository
 
     public function allWithFiltersQuery($relations = []): Builder|QueryBuilder
     {
-        $builder = Lecture::query();
+        $builder = Lecture::query()->with($relations);
 
         $builder = QueryBuilder::for($builder)
             ->defaultSort('-created_at')
