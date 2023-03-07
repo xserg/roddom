@@ -70,9 +70,5 @@ class TestUserSeeder extends Seeder
                 default;
             }
         }
-
-        $lectures = Lecture::all()->random(4);
-        $categories = Category::subCategories()->get()->random(2);
-
     }
 }
