@@ -55,9 +55,11 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Parameter(
     name: 'include',
-    description: 'включаем в объект каждой лекции соответствующие объекты категории или лектора этой лекции или оба',
+    description: 'включаем в объект каждой лекции соответствующие
+    объекты категории или лектора этой лекции или оба.
+    Также можно lector.diplomas, чтобы дипломы захватить у лектора',
     in: 'query',
-    example: 'category,lector',
+    example: 'category,lector,lector.diplomas',
 )]
 #[OA\Parameter(
     name: 'sort',
@@ -99,9 +101,9 @@ use OpenApi\Attributes as OA;
         ]
     )
 )]
-#[OA\Response(response: 401, description: 'Unauthenticated')]
-#[OA\Response(response: 404, description: 'Not Found')]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
+#[OA\Response(response: Response::HTTP_NOT_FOUND, description: 'Not Found')]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class RetrieveAllLecturesController
 {
     public function __construct(

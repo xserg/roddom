@@ -31,17 +31,18 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),
     ])
 )]
+#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
 #[OA\Response(
-    response: Response::HTTP_INTERNAL_SERVER_ERROR,
-    description: 'Server Error',
+    response: Response::HTTP_NOT_FOUND,
+    description: 'Not Found',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string'),
         ])
 )]
 #[OA\Response(
-    response: Response::HTTP_NOT_FOUND,
-    description: 'Not Found',
+    response: Response::HTTP_INTERNAL_SERVER_ERROR,
+    description: 'Server Error',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string'),

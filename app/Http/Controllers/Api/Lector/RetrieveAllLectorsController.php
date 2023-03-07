@@ -9,10 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
-
 #[OA\Get(
     path: '/lectors',
-    description: "Получение ресурсов лекторов",
+    description: "Получение ресурсов лекторов с пагинацией. По дефолту 15 на странице",
     summary: "Получение ресурсов лекторов",
     security: [["bearerAuth" => []]],
     tags: ["lector"]
@@ -40,7 +39,8 @@ use OpenApi\Attributes as OA;
             ]
         ])
 )]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class RetrieveAllLectorsController
 {
     public function __construct(

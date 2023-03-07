@@ -22,20 +22,21 @@ use OpenApi\Attributes as OA;
     required: true,
     schema: new OA\Schema(type: 'integer')
 )]
-#[OA\Response(
-    response: Response::HTTP_NOT_FOUND,
-    description: 'Not Found',
-    content: new OA\JsonContent(
-        properties: [
-            new OA\Property(property: 'message', type: 'string', example: 'Лекция с таким id не найдена'),
-        ])
-)]
+#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
 #[OA\Response(
     response: Response::HTTP_FORBIDDEN,
     description: 'Forbidden',
     content: new OA\JsonContent(
         properties: [
             new OA\Property(property: 'message', type: 'string', example: 'Лекция уже удалена из сохраненных'),
+        ])
+)]
+#[OA\Response(
+    response: Response::HTTP_NOT_FOUND,
+    description: 'Not Found',
+    content: new OA\JsonContent(
+        properties: [
+            new OA\Property(property: 'message', type: 'string', example: 'Лекция с таким id не найдена'),
         ])
 )]
 #[OA\Response(

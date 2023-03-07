@@ -38,17 +38,15 @@ class LectureRepository
         ?int $page,
     ): LengthAwarePaginator
     {
-        $builder = Lecture::query()
-            ->with('lector.diplomas');
+        $builder = Lecture::query();
 
         $builder = QueryBuilder::for($builder)
             ->defaultSort('-created_at')
             ->allowedSorts(['created_at'])
-            ->allowedIncludes(['category', 'lector'])
+            ->allowedIncludes(['category', 'lector', 'lector.diplomas'])
             ->allowedFilters([
                 AllowedFilter::scope('watched'),
                 AllowedFilter::scope('saved'),
-//                AllowedFilter::scope('purchased'),
                 AllowedFilter::exact('lector_id'),
                 AllowedFilter::exact('category_id'),
             ]);
