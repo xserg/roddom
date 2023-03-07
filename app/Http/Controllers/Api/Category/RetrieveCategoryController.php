@@ -31,13 +31,14 @@ use OpenApi\Attributes as OA;
         example: [
             'data' => [
                 [
-                    "id" => 23,
+                    "id" => 8,
+                    "title" => "Название подкатегории - 1",
                     "parent_id" => 5,
-                    "title" => "Название подкатегории - 17",
-                    "slug" => "nazvanie-podkategorii-17",
-                    "description" => "In molestiae quae et recusandae nisi. Nihil eum non ut possimus voluptatum aut dolorem assumenda. Suscipit quis suscipit placeat qui provident.",
-                    "info" => "Accusantium mollitia et itaque vero quia. Velit eos quis autem enim et. Neque voluptas mollitia maiores optio aperiam molestias.",
-                    "preview_picture" => "https://via.placeholder.com/640x480.png/009988?text=dolore"
+                    "parent_slug" => "ginekologiia",
+                    "slug" => "nazvanie-podkategorii-1",
+                    "description" => "Tenetur et vel quis sit ex illo. Qui omnis minima inventore. Animi iste aut ducimus consequuntur est.",
+                    "info" => "Hic repellendus aut nihil est et. Eum quasi deleniti consequatur et dolorem tempore. Modi aliquid rem consequuntur quibusdam doloremque tempora. Sit id voluptatem commodi et rerum quaerat.",
+                    "preview_picture" => "https://url/storage/images/categories/1.png"
                 ]
             ]
         ]),
