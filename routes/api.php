@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
 use App\Http\Controllers\Api\User\DeleteUserController;
 use App\Http\Controllers\Api\User\LoginController;
+use App\Http\Controllers\Api\User\LogoutController;
 use App\Http\Controllers\Api\User\PhotoController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
@@ -65,6 +66,8 @@ Route::prefix('v1')
                 ->name('profile.update');
             Route::put('/user/photo', PhotoController::class)
                 ->name('photo');
+            Route::delete('/user/logout', LogoutController::class)
+                ->name('logout');
 
             Route::get('/lectors', RetrieveAllLectorsController::class)
                 ->name('lectors');

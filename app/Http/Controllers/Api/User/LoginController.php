@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
-use Symfony\Component\HttpFoundation\Response;
-
 
 #[OA\Post(
     path: '/user/login',
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
         new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/LoginRequest')),
     ]
 )]
-#[OA\Response(response: 200, description: 'OK',
+#[OA\Response(response: Response::HTTP_OK, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
         new OA\Property(property: 'access_token', type: 'string', example: '2|bNyLNAS0eqriGpH3O2z9bViYtBOtBk1bQKDIEifD'),
@@ -32,14 +32,14 @@ use Symfony\Component\HttpFoundation\Response;
     ])
 )]
 #[OA\Response(
-    response: 422,
+    response: Response::HTTP_UNPROCESSABLE_ENTITY,
     description: 'Validation exception',
     content: [
         new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 
 class LoginController
 {
@@ -82,7 +82,7 @@ class LoginController
             ->plainTextToken;
 
         return response()->json([
-            'user' => $user->load(['watchedLectures', 'savedLectures']),
+            'user' => new UserResource($user->load(['watchedLectures', 'savedLectures'])),
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);

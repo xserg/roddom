@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureResource;
-use App\Jobs\WatchLecture;
 use App\Repositories\LectureRepository;
-use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -31,7 +29,10 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),
     ])
 )]
-#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
+#[OA\Response(
+    response: Response::HTTP_UNAUTHORIZED,
+    description: 'Unauthenticated'
+)]
 #[OA\Response(
     response: Response::HTTP_NOT_FOUND,
     description: 'Not Found',

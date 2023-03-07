@@ -8,6 +8,7 @@ use App\Http\Requests\ResetPassword\ForgotPasswordRequest;
 use App\Jobs\SendResetPasswordCodeJob;
 use App\Services\PasswordResetService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -24,20 +25,25 @@ use OpenApi\Attributes as OA;
         new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ForgotPasswordRequest')),
     ]
 )]
-#[OA\Response(response: 200, description: 'OK',
+#[OA\Response(
+    response: Response::HTTP_OK,
+    description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'message', type: 'string'),
     ])
 )]
 #[OA\Response(
-    response: 422,
+    response: Response::HTTP_UNPROCESSABLE_ENTITY,
     description: 'Validation exception',
     content: [
         new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(
+    response: Response::HTTP_INTERNAL_SERVER_ERROR,
+    description: 'Server Error'
+)]
 class ForgotPasswordController extends Controller
 {
     public function __construct(

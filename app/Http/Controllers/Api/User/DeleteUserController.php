@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api\User;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Delete(
@@ -23,6 +23,10 @@ use OpenApi\Attributes as OA;
         properties: [
             new OA\Property(property: 'message', type: 'string'),
         ])
+)]
+#[OA\Response(
+    response: Response::HTTP_UNAUTHORIZED,
+    description: 'Unauthenticated'
 )]
 #[OA\Response(
     response: Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -44,15 +48,16 @@ class DeleteUserController
     {
         try {
             $this->service->makeDeletionRequest(auth()->user());
+
         } catch (Exception $exception) {
+
             return response()->json([
                 'message' => 'Заявка на удаление аккаунта не зарегистрирована: ' . $exception->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-
         return response()->json([
-            'message' => 'Заявка на удаление аккаунта зарегистрирована'
+            'message' => 'Заявка на удаление аккаунта успешно зарегистрирована'
         ], Response::HTTP_OK);
     }
 }

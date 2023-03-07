@@ -35,14 +35,26 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
         ]),
     ])
 )]
-#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthenticated')]
+#[OA\Response(
+    response: Response::HTTP_UNAUTHORIZED,
+    description: 'Unauthenticated'
+)]
 #[OA\Response(
     response: Response::HTTP_FORBIDDEN,
     description: 'Forbidden',
     content: new OA\JsonContent(
         properties: [
-            new OA\Property(property: 'message', type: 'string', example: 'Пользователь не может смотреть лекцию с id: 113. Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'),
-            new OA\Property(property: 'cant_watch_for_seconds', type: 'integer', example: '81593')
+            new OA\Property(
+                property: 'message',
+                type: 'string',
+                example: 'Пользователь не может смотреть лекцию с id: 113.
+                Пользователь не сможет посмотреть новую бесплатную лекцию ещё 24 час/часа/часов'
+            ),
+            new OA\Property(
+                property: 'cant_watch_for_seconds',
+                type: 'integer',
+                example: '81593'
+            )
         ])
 )]
 #[OA\Response(

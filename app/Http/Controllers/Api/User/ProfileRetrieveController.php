@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -14,20 +15,20 @@ use OpenApi\Attributes as OA;
     security: [["bearerAuth" => []]],
     tags: ["user"])
 ]
-#[OA\Response(response: 200, description: 'OK',
+#[OA\Response(response: Response::HTTP_OK, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
     ])
 )]
 #[OA\Response(
-    response: 422,
+    response: Response::HTTP_UNPROCESSABLE_ENTITY,
     description: 'Validation exception',
     content: [
         new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class ProfileRetrieveController
 {
     public function __construct(

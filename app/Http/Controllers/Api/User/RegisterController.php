@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 class RegisterController
 {
     public function __construct(
-        private UserService $service
+        private UserService $userService
     )
     {
     }
@@ -45,7 +45,7 @@ class RegisterController
         $password = $request->password;
 
         try {
-            $user = $this->service->create(compact('email', 'password'));
+            $user = $this->userService->create(compact('email', 'password'));
         } catch (\Exception $exception) {
             return response()->json(
                 ['message' => $exception->getMessage()],
@@ -56,7 +56,7 @@ class RegisterController
 
         return response()->json(
             [
-                'user' => new UserResource($user->loadCount(['watchedLectures', 'purchasedLectures', 'savedLectures'])),
+                'user' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
                 'access_token' => $token,
                 'token_type' => 'Bearer'
             ], Response::HTTP_CREATED);

@@ -18,7 +18,7 @@ use OpenApi\Attributes as OA;
 ),
 ]
 #[OA\Response(
-    response: 200,
+    response: Response::HTTP_OK,
     description: 'OK',
     content: new OA\JsonContent(
         properties: [

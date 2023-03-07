@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Put(
@@ -25,24 +26,29 @@ use OpenApi\Attributes as OA;
         new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
     ]
 )]
-#[OA\Response(response: 200, description: 'OK',
+#[OA\Response(
+    response: Response::HTTP_OK,
+    description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', ref: '#/components/schemas/UserResource'),
     ])
 )]
 #[OA\Response(
-    response: 422,
+    response: Response::HTTP_UNPROCESSABLE_ENTITY,
     description: 'Validation exception',
     content: [
         new OA\MediaType(
             mediaType: 'application/json',
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(
+    response: Response::HTTP_INTERNAL_SERVER_ERROR,
+    description: 'Server Error'
+)]
 class ProfileUpdateController
 {
     public function __construct(
-        private UserService $service
+        private UserService $userService
     )
     {
     }
@@ -61,7 +67,7 @@ class ProfileUpdateController
 
         try {
             $user = $this
-                ->service
+                ->userService
                 ->saveProfile($user, $request->input());
         } catch (Exception $exception) {
             return response()->json([
@@ -71,7 +77,7 @@ class ProfileUpdateController
         }
 
         return response()->json([
-            'data' => new UserResource($user->load(['watchedLectures', 'purchasedLectures', 'savedLectures'])),
+            'data' => new UserResource($user->load(['watchedLectures', 'savedLectures'])),
         ]);
     }
 }

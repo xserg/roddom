@@ -28,7 +28,11 @@ use OpenApi\Attributes as OA;
     description: 'Forbidden',
     content: new OA\JsonContent(
         properties: [
-            new OA\Property(property: 'message', type: 'string', example: 'Лекция уже удалена из сохраненных'),
+            new OA\Property(
+                property: 'message',
+                type: 'string',
+                example: 'Лекция уже удалена из сохраненных'
+            ),
         ])
 )]
 #[OA\Response(
