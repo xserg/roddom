@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Lecture;
+use App\Repositories\LectureRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -26,8 +28,21 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекций', type: 'integer')]
     #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекций', type: 'integer')]
 
+    private $lectureRepository;
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+        $this->lectureRepository = app(LectureRepository::class);
+    }
+
     public function toArray(Request $request): array
     {
+        $user = auth()->user();
+        $watchedLectures = $user->watchedLectures;
+        $savedLectures = $user->savedLectures;
+        $purchasedLecturesIds = $this->lectureRepository->getAllPurchasedLectureIdsByUser($user);
+        $purchasedLectures = Lecture::whereIn('id', $purchasedLecturesIds)->get();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -40,8 +55,9 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
-            'watched_lectures' => $this->whenLoaded('watchedLectures'),
-            'saved_lectures' =>  $this->whenLoaded('savedLectures'),
+            'watched_lectures' => $watchedLectures,
+            'saved_lectures' =>  $savedLectures,
+            'purchased_lectures' =>  $purchasedLectures,
         ];
     }
 }
