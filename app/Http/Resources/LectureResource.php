@@ -48,7 +48,7 @@ class LectureResource extends JsonResource
             'preview_picture' => $this->preview_picture,
             'is_free' => $this->is_free,
             'is_promo' => $this->is_promo,
-            'is_watched' => auth()->user()->watchedLectures->contains($this->id),
+            'is_watched' => (int)auth()->user()->watchedLectures->contains($this->id),
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this->created_at,
