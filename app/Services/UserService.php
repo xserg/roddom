@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Exceptions\FailedSaveUserException;
 use App\Exceptions\ResetCodeExpiredException;
+use App\Exceptions\UserCannotRemoveFromSavedLectureException;
+use App\Exceptions\UserCannotSaveLectureException;
 use App\Exceptions\UserCannotWatchFreeLectureException;
 use App\Exceptions\UserCannotWatchPaidLectureException;
 use App\Jobs\UserDeletionRequest;
@@ -64,16 +66,6 @@ class UserService
     }
 
     /**
-     * @throws FailedSaveUserException
-     */
-    private function saveUserGuard(User $user): void
-    {
-        if (!$user->save()) {
-            throw new FailedSaveUserException();
-        }
-    }
-
-    /**
      * @throws ResetCodeExpiredException|FailedSaveUserException
      */
     public function updateUsersPassword(
@@ -105,22 +97,6 @@ class UserService
         $passwordReset->delete();
 
         return $user;
-    }
-
-    private function codeIsOlderThanHour($createdAt): bool
-    {
-        return now()->subHour() > $createdAt;
-    }
-
-
-    /**
-     * @throws Exception
-     */
-    private function userAuthorizedGuard(int $id, User $currentUser): void
-    {
-        if ($currentUser->id !== $id) {
-            throw new Exception('This can only be done by the same user.');
-        }
     }
 
     public function addLectureToWatched(
@@ -185,7 +161,7 @@ class UserService
      */
     public function saveUsersPhoto(
         Authenticatable|User $user,
-        UploadedFile    $file): array
+        UploadedFile         $file): array
     {
         // TODO: refactoring
         $manager = new ImageManager(['driver' => 'imagick']);
@@ -237,22 +213,6 @@ class UserService
         return $user;
     }
 
-    private function isFreeLectureAvailable(int $lectureId, User $user): bool
-    {
-        $lecture = $user
-            ->watchedLectures
-            ->firstWhere('id', $lectureId);
-
-        if (!$lecture) {
-            return false;
-        }
-
-        $availableUntil = $lecture->pivot->available_until;
-
-        $available = $availableUntil > now();
-
-        return $available;
-    }
 
     public function userCanWatchNewFreeLecture(User|Authenticatable $user): bool
     {
@@ -273,5 +233,87 @@ class UserService
             $this->lectureService->isLectureStrictPurchased($lectureId, $user) ||
             $this->lectureService->isLecturesCategoryPurchased($lectureId, $user) ||
             $this->lectureService->isLecturesPromoPurchased($lectureId, $user);
+    }
+
+    /**
+     * @throws UserCannotSaveLectureException
+     * @throws NotFoundHttpException
+     */
+    public function addLectureToSaved(
+        int                  $lectureId,
+        User|Authenticatable $user
+    ): void
+    {
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $alreadySaved = $user->savedLectures->contains($lectureId);
+
+        if ($alreadySaved) {
+            throw new UserCannotSaveLectureException('Лекция c id ' . $lectureId . ' уже в сохраненных');
+        }
+
+        $user->savedLectures()->attach($lectureId);
+    }
+
+    /**
+     * @throws UserCannotRemoveFromSavedLectureException
+     * @throws NotFoundHttpException
+     */
+    public function removeLectureFromSaved(
+        int                       $lectureId,
+        User|Authenticatable|null $user
+    ): void
+    {
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $alreadyRemoved = !$user->savedLectures->contains($lectureId);
+
+        if ($alreadyRemoved) {
+            throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в сохраненных');
+        }
+
+        $user->savedLectures()->detach($lectureId);
+    }
+
+
+    private function codeIsOlderThanHour($createdAt): bool
+    {
+        return now()->subHour() > $createdAt;
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    private function userAuthorizedGuard(int $id, User $currentUser): void
+    {
+        if ($currentUser->id !== $id) {
+            throw new Exception('This can only be done by the same user.');
+        }
+    }
+
+    private function isFreeLectureAvailable(int $lectureId, User $user): bool
+    {
+        $lecture = $user
+            ->watchedLectures
+            ->firstWhere('id', $lectureId);
+
+        if (!$lecture) {
+            return false;
+        }
+
+        $availableUntil = $lecture->pivot->available_until;
+
+        $available = $availableUntil > now();
+
+        return $available;
+    }
+
+    /**
+     * @throws FailedSaveUserException
+     */
+    private function saveUserGuard(User $user): void
+    {
+        if (!$user->save()) {
+            throw new FailedSaveUserException();
+        }
     }
 }

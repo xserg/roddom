@@ -46,15 +46,15 @@ class Lecture extends Model
         );
     }
 
-    public function purchasedUsers(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            User::class,
-            'user_to_purchased_lectures',
-            'lecture_id',
-            'user_id'
-        );
-    }
+//    public function purchasedUsers(): BelongsToMany
+//    {
+//        return $this->belongsToMany(
+//            User::class,
+//            'user_to_purchased_lectures',
+//            'lecture_id',
+//            'user_id'
+//        );
+//    }
 
     public function subscriptions(): MorphMany
     {

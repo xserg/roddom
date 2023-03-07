@@ -10,17 +10,25 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LectureRepository
 {
-    public function __construct(
-    )
+    public function __construct()
     {
     }
 
-    public function getLectureById($id): Lecture
+    /**
+     * @throws NotFoundHttpException
+     * @param $id
+     * @return Lecture|null
+     */
+    public function getLectureById($id): ?Lecture
     {
         $lecture = Lecture::query()
             ->with('lector', 'lector.diplomas')
             ->where(['id' => $id])
             ->first();
+
+        if (!$lecture) {
+            throw new NotFoundHttpException('Лекция c id ' . $id . ' не найдена');
+        }
 
         return $lecture;
     }
