@@ -73,12 +73,16 @@ use OpenApi\Attributes as OA;
         example: [
             "data" => [
                 [
-                    "id" => 0,
-                    "lector_id" => 0,
-                    "category_id" => 0,
-                    "title" => "string",
-                    "preview_picture" => "string",
-                    "video_id" => 0
+                    "id" => 100,
+                    "lector_id" => 10,
+                    "category_id" => 28,
+                    "title" => "Dolor alias nam impedit deserunt.",
+                    "description" => "Error sint asperiores eum magni quis. Harum officiis iste impedit debitis facilis.",
+                    "preview_picture" => "https://via.placeholder.com/640x480.png/004477?text=ut",
+                    "is_free" => 1,
+                    "is_promo" => 0,
+                    "is_watched" => 1,
+                    "lector" => [],
                 ],
             ],
             "meta" => [
