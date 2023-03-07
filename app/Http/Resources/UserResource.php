@@ -38,10 +38,10 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $user = auth()->user();
-        $watchedLectures = $user->watchedLectures;
-        $savedLectures = $user->savedLectures;
+        $watchedLectures = new LectureCollection($user->watchedLectures);
+        $savedLectures = new LectureCollection($user->savedLectures);
         $purchasedLecturesIds = $this->lectureRepository->getAllPurchasedLectureIdsByUser($user);
-        $purchasedLectures = Lecture::whereIn('id', $purchasedLecturesIds)->get();
+        $purchasedLectures = new LectureCollection(Lecture::whereIn('id', $purchasedLecturesIds)->get());
 
         return [
             'id' => $this->id,
