@@ -82,7 +82,7 @@ class LoginController
             ->plainTextToken;
 
         return response()->json([
-            'user' => $user->load(['watchedLectures', 'purchasedLectures', 'savedLectures']),
+            'user' => $user->load(['watchedLectures', 'savedLectures']),
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);
