@@ -72,15 +72,15 @@ class User extends Authenticatable
         );
     }
 
-    public function purchasedLectures(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Lecture::class,
-            'user_to_purchased_lectures',
-            'user_id',
-            'lecture_id'
-        );
-    }
+//    public function purchasedLectures(): BelongsToMany
+//    {
+//        return $this->belongsToMany(
+//            Lecture::class,
+//            'user_to_purchased_lectures',
+//            'user_id',
+//            'lecture_id'
+//        );
+//    }
 
     public function subscriptions(): HasMany
     {

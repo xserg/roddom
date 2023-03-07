@@ -19,6 +19,7 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку лекции', type: 'string')]
     #[OA\Property(property: 'is_free', description: 'бесплатная ли лекция', type: 'boolean')]
     #[OA\Property(property: 'is_promo', description: 'акционная ли лекция', type: 'boolean')]
+    #[OA\Property(property: 'is_watched', description: 'просмотрена ли лекция', type: 'boolean')]
     #[OA\Property(
         property: 'lector',
         ref: '#/components/schemas/LectorResource',
@@ -47,6 +48,7 @@ class LectureResource extends JsonResource
             'preview_picture' => $this->preview_picture,
             'is_free' => $this->is_free,
             'is_promo' => $this->is_promo,
+            'is_watched' => auth()->user()->watchedLectures->contains($this->id),
             'lector' => LectorResource::make($this->whenLoaded('lector')),
             'category' => CategoryResource::make($this->whenLoaded('category')),
             'created_at' => $this->created_at,

@@ -23,9 +23,8 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'photo', description: 'Ссылка на 300x300 фото юзера', type: 'string')]
     #[OA\Property(property: 'photo_small', description: 'Ссылка на 150x150 фото юзера', type: 'string')]
     #[OA\Property(property: 'free_lecture_watched', description: 'Дата, когда последний раз пользователь смотрел бесплатную лекцию', type: 'datetime')]
-    #[OA\Property(property: 'watched_lectures_count', description: 'Количество просмотренных лекций', type: 'integer')]
-    #[OA\Property(property: 'saved_lectures_count', description: 'Количество сохраненных лекций', type: 'integer')]
-    #[OA\Property(property: 'purchased_lectures_count', description: 'Количество купленных лекций', type: 'integer')]
+    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекций', type: 'integer')]
+    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекций', type: 'integer')]
 
     public function toArray(Request $request): array
     {
@@ -42,7 +41,6 @@ class UserResource extends JsonResource
             'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
             'watched_lectures' => $this->whenLoaded('watchedLectures'),
-            'purchased_lectures' =>  $this->whenLoaded('purchasedLectures'),
             'saved_lectures' =>  $this->whenLoaded('savedLectures'),
         ];
     }

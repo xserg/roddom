@@ -14,7 +14,7 @@ class Lecture extends Model
 {
     use HasFactory;
 
-    protected $appends = ['is_promo'];
+    protected $hidden = ['pivot'];
 
     public function category(): BelongsTo
     {
@@ -99,7 +99,7 @@ class Lecture extends Model
 
     public function setPromoted()
     {
-        $this->is_promot = 1;
+        $this->is_promo = 1;
     }
 
 }

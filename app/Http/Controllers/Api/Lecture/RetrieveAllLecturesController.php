@@ -61,7 +61,8 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Parameter(
     name: 'sort',
-    description: 'сортировка по полю created_at. Возможные варианты sort=-created_at или sort=created_at',
+    description: 'сортировка по полю created_at. Возможные варианты sort=-created_at или sort=created_at.
+    По дефолту -created_at - лекции добавленные последними, идут первыми',
     in: 'query',
     example: '-created_at',
 )]
