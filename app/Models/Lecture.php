@@ -9,11 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Lecture extends Model
 {
     use HasFactory;
 
+    protected $appends = ['is_watched', 'is_promo', 'is_purchased'];
     private $lectureRepository;
 
     public function __construct(array $attributes = [])
@@ -142,5 +144,50 @@ class Lecture extends Model
     public function promoPrices(): array
     {
         return [];
+    }
+
+    protected function isPromo(): Attribute
+    {
+        $firstPromoPack = Promo::first();
+        $promoIds = $firstPromoPack
+            ->promoLectures
+            ->pluck('id')
+            ->toArray();
+
+        if($promoIds){
+            return new Attribute(
+                get: fn () => (int)in_array($this->id, $promoIds),
+            );
+        }
+        return new Attribute(
+            get: fn () => 0,
+        );
+    }
+    protected function isWatched(): Attribute
+    {
+        $user = auth()->user();
+        $watchedLectures = $user->watchedLectures;
+
+        if($watchedLectures){
+            return new Attribute(
+                get: fn () => (int)$user->watchedLectures->contains($this->id),
+            );
+        }
+        return new Attribute(
+            get: fn () => 0,
+        );
+    }
+    protected function isPurchased(): Attribute
+    {
+        $lectureRepository = app(LectureRepository::class);
+        $purchasedLecturesIds = $lectureRepository->getAllPurchasedLectureIdsByUser(auth()->user());
+        if($purchasedLecturesIds){
+            return new Attribute(
+                get: fn () => (int)in_array($this->id, $purchasedLecturesIds),
+            );
+        }
+        return new Attribute(
+            get: fn () => 0,
+        );
     }
 }

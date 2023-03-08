@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureCollection;
+use App\Models\Lecture;
 use App\Repositories\LectureRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -132,7 +133,8 @@ class RetrieveAllLecturesController
         }
 
         return response()->json(
-            (new LectureCollection($lectures))->response()->getData(true),
+            Lecture::all(),
+//            (new LectureCollection($lectures))->response()->getData(true),
             Response::HTTP_OK
         );
     }
