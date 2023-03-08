@@ -2,8 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Lecture;
-use App\Repositories\LectureRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -25,24 +23,11 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'photo', description: 'Ссылка на 300x300 фото юзера', type: 'string')]
     #[OA\Property(property: 'photo_small', description: 'Ссылка на 150x150 фото юзера', type: 'string')]
     #[OA\Property(property: 'free_lecture_watched', description: 'Дата, когда последний раз пользователь смотрел бесплатную лекцию', type: 'datetime')]
-    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекций', type: 'integer')]
-    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекций', type: 'integer')]
-
-    private $lectureRepository;
-    public function __construct($resource)
-    {
-        parent::__construct($resource);
-        $this->lectureRepository = app(LectureRepository::class);
-    }
-
+    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекции', type: 'array')]
+    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекции', type: 'array')]
+    #[OA\Property(property: 'purchased_lectures', description: 'Купленные лекции', type: 'array')]
     public function toArray(Request $request): array
     {
-        $user = auth()->user();
-        $watchedLectures = new LectureCollection($user->watchedLectures);
-        $savedLectures = new LectureCollection($user->savedLectures);
-        $purchasedLecturesIds = $this->lectureRepository->getAllPurchasedLectureIdsByUser($user);
-        $purchasedLectures = new LectureCollection(Lecture::whereIn('id', $purchasedLecturesIds)->get());
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -55,9 +40,9 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
-            'watched_lectures' => $this->whenNotNull($watchedLectures),
-            'saved_lectures' =>  $this->whenNotNull($savedLectures),
-            'purchased_lectures' =>  $this->whenNotNull($purchasedLectures),
+            'watched_lectures' => $this->when($this->watchedLectures, $this->watchedLectures),
+            'saved_lectures' => $this->when($this->savedLectures, $this->savedLectures),
+            'purchased_lectures' => $this->when($this->purchasedLectures, $this->purchasedLectures),
         ];
     }
 }
