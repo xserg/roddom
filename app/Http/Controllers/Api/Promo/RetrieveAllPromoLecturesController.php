@@ -36,7 +36,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
-        private PromoRepository   $promoRepository,
         private LectureRepository $lectureRepository,
     )
     {
@@ -45,8 +44,7 @@ class RetrieveAllPromoLecturesController extends Controller
     public function __invoke(Request $request)
     {
         try {
-            $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
-//            $lectures = $this->lectureRepository->getAllWithFlags($builder);
+            $builder = $this->lectureRepository->getAllPromoQuery(['lector', 'lector.diplomas']);
             $lectures = $this->lectureRepository->paginate(
                 $builder,
                 $request->per_page,

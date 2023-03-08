@@ -7,7 +7,7 @@ use App\Models\Lecture;
 use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -51,10 +51,22 @@ class LectureRepository
         return $query;
     }
 
-    public function allWithFiltersQuery($relations = []): Builder|QueryBuilder
+    public function getAllQuery($relations = []): Builder
     {
         $builder = Lecture::query()->with($relations);
+        return $builder;
+    }
 
+    public function getAllPromoQuery($relations = []): Builder
+    {
+        $builder = Lecture::query()->promo()->with($relations);
+        return $builder;
+    }
+
+    public function addFiltersToQuery(
+        Builder|QueryBuilder $builder,
+    ): Builder|QueryBuilder
+    {
         $builder = QueryBuilder::for($builder)
             ->defaultSort('-created_at')
             ->allowedSorts(['created_at'])
@@ -96,8 +108,8 @@ class LectureRepository
 
     public function paginate(
         QueryBuilder|Builder|Collection $builder,
-        ?int               $perPage,
-        ?int               $page,
+        ?int                            $perPage,
+        ?int                            $page,
     ): LengthAwarePaginator
     {
         $lectures = $builder

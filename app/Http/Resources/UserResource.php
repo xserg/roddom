@@ -23,9 +23,9 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'photo', description: 'Ссылка на 300x300 фото юзера', type: 'string')]
     #[OA\Property(property: 'photo_small', description: 'Ссылка на 150x150 фото юзера', type: 'string')]
     #[OA\Property(property: 'free_lecture_watched', description: 'Дата, когда последний раз пользователь смотрел бесплатную лекцию', type: 'datetime')]
-    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекции', type: 'array')]
-    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекции', type: 'array')]
-    #[OA\Property(property: 'purchased_lectures', description: 'Купленные лекции', type: 'array')]
+    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
+    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
+    #[OA\Property(property: 'purchased_lectures', description: 'Купленные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
     public function toArray(Request $request): array
     {
         return [
