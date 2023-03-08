@@ -121,7 +121,7 @@ class RetrieveAllLecturesController
             $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
 //            $lecturesWithFlags = $this->lectureRepository->getAllWithFlags($builder);
             $lectures = $this->lectureRepository->paginate(
-                $builder->get(),
+                $builder,
                 $request->per_page,
                 $request->page,
             );

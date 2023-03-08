@@ -48,7 +48,7 @@ class RetrieveAllPromoLecturesController extends Controller
             $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
 //            $lectures = $this->lectureRepository->getAllWithFlags($builder);
             $lectures = $this->lectureRepository->paginate(
-                $builder->get(),
+                $builder,
                 $request->per_page,
                 $request->page
             );
