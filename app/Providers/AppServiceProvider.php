@@ -53,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 $this->forPage($page, $perPage),
                 $total ?: $this->count(),
                 $perPage ?? 15,
-                $page,
+                $page ?? 1,
                 [
                     'path' => LengthAwarePaginator::resolveCurrentPath(),
                     'pageName' => $pageName,
