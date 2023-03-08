@@ -57,20 +57,33 @@ class BuyCategoryController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $attributes = [
-            'user_id' => auth()->user()->id,
-            'subscriptionable_type' => Category::class,
-            'subscriptionable_id' => $categoryId,
-            'period_id' => Period::firstWhere('length', '=', $period)->id,
-            'start_date' => now(),
-            'end_date' => now()->addDays($period)
-        ];
+        /**
+         * тут старт оплаты
+         */
 
-        $subscription = new Subscription($attributes);
-        $subscription->save();
+        $paymentSuccess = true;
 
-        return response()->json([
-            'subscription' => new SubscriptionResource($subscription)
-        ]);
+        if($paymentSuccess){
+            $attributes = [
+                'user_id' => auth()->user()->id,
+                'subscriptionable_type' => Category::class,
+                'subscriptionable_id' => $categoryId,
+                'period_id' => Period::firstWhere('length', '=', $period)->id,
+                'start_date' => now(),
+                'end_date' => now()->addDays($period)
+            ];
+
+            $subscription = new Subscription($attributes);
+            $subscription->save();
+
+            return response()->json([
+                'message' => 'Подписка на категорию успешно оформлена',
+                'subscription' => new SubscriptionResource($subscription)
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Подписка не была оформлена. ',
+            ]);
+        }
     }
 }

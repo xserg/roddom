@@ -48,20 +48,29 @@ class BuyPromoController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $attributes = [
-            'user_id' => auth()->user()->id,
-            'subscriptionable_type' => Promo::class,
-            'subscriptionable_id' => Promo::first()->id,
-            'period_id' => Period::firstWhere('length', '=', $period)->id,
-            'start_date' => now(),
-            'end_date' => now()->addDays($period)
-        ];
 
-        $subscription = new Subscription($attributes);
-        $subscription->save();
+        $paymentSuccess = true;
+        if ($paymentSuccess) {
+            $attributes = [
+                'user_id' => auth()->user()->id,
+                'subscriptionable_type' => Promo::class,
+                'subscriptionable_id' => Promo::first()->id,
+                'period_id' => Period::firstWhere('length', '=', $period)->id,
+                'start_date' => now(),
+                'end_date' => now()->addDays($period)
+            ];
 
-        return response()->json([
-            'subscription' => new SubscriptionResource($subscription)
-        ]);
+            $subscription = new Subscription($attributes);
+            $subscription->save();
+
+            return response()->json([
+                'message' => 'Подписка на лекцию успешно оформлена',
+                'subscription' => new SubscriptionResource($subscription)
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Подписка не была оформлена. ',
+            ]);
+        }
     }
 }
