@@ -94,7 +94,7 @@ class LectureRepository
         return $lectures;
     }
 
-    public function paginateCollection(
+    public function paginate(
         Builder|Collection $builder,
         ?int               $perPage,
         ?int               $page,

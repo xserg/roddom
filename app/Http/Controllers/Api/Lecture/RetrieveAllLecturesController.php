@@ -119,9 +119,9 @@ class RetrieveAllLecturesController
     {
         try {
             $builder = $this->lectureRepository->allWithFiltersQuery(['lector', 'lector.diplomas']);
-            $lecturesWithFlags = $this->lectureRepository->getAllWithFlags($builder);
-            $lectures = $this->lectureRepository->paginateCollection(
-                $lecturesWithFlags,
+//            $lecturesWithFlags = $this->lectureRepository->getAllWithFlags($builder);
+            $lectures = $this->lectureRepository->paginate(
+                $builder->get(),
                 $request->per_page,
                 $request->page,
             );
@@ -133,8 +133,7 @@ class RetrieveAllLecturesController
         }
 
         return response()->json(
-            Lecture::all(),
-//            (new LectureCollection($lectures))->response()->getData(true),
+            (new LectureCollection($lectures))->response()->getData(true),
             Response::HTTP_OK
         );
     }
