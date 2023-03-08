@@ -118,7 +118,7 @@ class RetrieveAllLecturesController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $builder = $this->lectureRepository->getAllQuery(['lector', 'lector.diplomas']);
+            $builder = $this->lectureRepository->getAllQuery();
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
             $lectures = $this->lectureRepository->paginate(
                 $builder,
