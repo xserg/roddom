@@ -3,18 +3,20 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Repositories\LectureRepository;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Builder;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $appends = ['purchased_lectures'];
     /**
      * The attributes that are mass assignable.
      *
@@ -72,16 +74,6 @@ class User extends Authenticatable
         );
     }
 
-//    public function purchasedLectures(): BelongsToMany
-//    {
-//        return $this->belongsToMany(
-//            Lecture::class,
-//            'user_to_purchased_lectures',
-//            'user_id',
-//            'lecture_id'
-//        );
-//    }
-
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
@@ -103,5 +95,19 @@ class User extends Authenticatable
     {
         return $this->subscriptions()
             ->where('subscriptionable_type', '=', Promo::class);
+    }
+
+    protected function purchasedLectures(): Attribute
+    {
+        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLectureIdsByUser($this);
+
+        if($purchasedLectureIds){
+            return new Attribute(
+                get: fn () => Lecture::whereIn('id', $purchasedLectureIds)->get(),
+            );
+        }
+        return new Attribute(
+            get: fn () => [],
+        );
     }
 }

@@ -154,40 +154,42 @@ class Lecture extends Model
             ->pluck('id')
             ->toArray();
 
-        if($promoIds){
+        if ($promoIds) {
             return new Attribute(
-                get: fn () => (int)in_array($this->id, $promoIds),
+                get: fn() => (int)in_array($this->id, $promoIds),
             );
         }
         return new Attribute(
-            get: fn () => 0,
+            get: fn() => 0,
         );
     }
+
     protected function isWatched(): Attribute
     {
         $user = auth()->user();
         $watchedLectures = $user->watchedLectures;
 
-        if($watchedLectures){
+        if ($watchedLectures) {
             return new Attribute(
-                get: fn () => (int)$user->watchedLectures->contains($this->id),
+                get: fn() => (int)$user->watchedLectures->contains($this->id),
             );
         }
         return new Attribute(
-            get: fn () => 0,
+            get: fn() => 0,
         );
     }
+
     protected function isPurchased(): Attribute
     {
         $lectureRepository = app(LectureRepository::class);
         $purchasedLecturesIds = $lectureRepository->getAllPurchasedLectureIdsByUser(auth()->user());
-        if($purchasedLecturesIds){
+        if ($purchasedLecturesIds) {
             return new Attribute(
-                get: fn () => (int)in_array($this->id, $purchasedLecturesIds),
+                get: fn() => (int)in_array($this->id, $purchasedLecturesIds),
             );
         }
         return new Attribute(
-            get: fn () => 0,
+            get: fn() => 0,
         );
     }
 }
