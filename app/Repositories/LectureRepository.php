@@ -95,7 +95,7 @@ class LectureRepository
     }
 
     public function paginate(
-        Builder|Collection $builder,
+        QueryBuilder|Builder|Collection $builder,
         ?int               $perPage,
         ?int               $page,
     ): LengthAwarePaginator
