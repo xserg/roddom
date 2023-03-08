@@ -15,6 +15,7 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'id', description: 'id лекции', type: 'integer')]
     #[OA\Property(property: 'lector_id', description: 'id лектора - автора лекции', type: 'integer')]
     #[OA\Property(property: 'category_id', description: 'id категории лекции', type: 'integer')]
+    #[OA\Property(property: 'description', description: 'описание лекции', type: 'string')]
     #[OA\Property(property: 'title', description: 'заголовок лекции', type: 'string')]
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку лекции', type: 'string')]
     #[OA\Property(property: 'is_free', description: 'бесплатная ли лекция', type: 'boolean')]
@@ -47,13 +48,13 @@ class LectureResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
+            'lector' => new LectorResource($this->whenLoaded('lector')),
+            'category' => new CategoryResource($this->whenLoaded('category')),
+            'created_at' => $this->created_at,
             'is_free' => $this->is_free,
             'is_promo' => $this->whenNotNull($this->is_promo),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'is_purchased' => $this->whenNotNull($this->is_purchased),
-            'lector' => LectorResource::make($this->whenLoaded('lector')),
-            'category' => CategoryResource::make($this->whenLoaded('category')),
-            'created_at' => $this->created_at,
         ];
     }
 }

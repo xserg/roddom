@@ -40,9 +40,17 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'free_lecture_watched' => $this->free_lecture_watched,
-            'watched_lectures' => $this->when($this->watchedLectures, $this->watchedLectures, []),
-            'saved_lectures' => $this->when($this->savedLectures, $this->savedLectures, []),
-            'purchased_lectures' => $this->when($this->purchasedLectures, $this->purchasedLectures, []),
+            'watched_lectures' => new LecturesInProfileCollection(
+                $this->whenLoaded('watchedLectures')
+            ),
+            'saved_lectures' => new LecturesInProfileCollection(
+                $this->whenLoaded('savedLectures')
+            ),
+            'purchased_lectures' =>
+                $this->when(
+                    $this->purchasedLectures,
+                    new LecturesInProfileCollection($this->purchasedLectures)
+                ),
         ];
     }
 }

@@ -45,7 +45,7 @@ class ProfileRetrieveController
         $user = auth()->user();
 
         return response()->json([
-            'data' => new UserResource($user),
+            'data' => new UserResource($user->load('watchedLectures', 'savedLectures')),
         ]);
     }
 }

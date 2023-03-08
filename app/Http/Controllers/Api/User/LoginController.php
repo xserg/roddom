@@ -44,7 +44,7 @@ use OpenApi\Attributes as OA;
 class LoginController
 {
     public function __construct(
-        private UserRepository $repository
+        private UserRepository $userRepository
     )
     {
     }
@@ -70,7 +70,7 @@ class LoginController
             );
         }
 
-        $user = $this->repository
+        $user = $this->userRepository
             ->findByEmail(
                 $request->input('email')
             );
