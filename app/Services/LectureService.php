@@ -48,7 +48,7 @@ class LectureService
         foreach ($promoPackIds as $promoPackId) {
             $promoPack = Promo::query()->where('id', $promoPackId)->first();
 
-            if ($promoPack->promoLectures()->contains($lectureId)) {
+            if ($promoPack->promoLectures->contains($lectureId)) {
                 return true;
             }
         }
