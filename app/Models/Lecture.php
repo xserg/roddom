@@ -82,16 +82,16 @@ class Lecture extends Model
         );
     }
 
-//    public function pricesInPromoPacks(): BelongsToMany
-//    {
-//        return $this->belongsToMany(
-//            Promo::class,
-//            'promo_lectures_prices',
-//            'lecture_id',
-//            'promo_id'
-//        )->withPivot('period_id', 'price');
-//    }
     public function pricesInPromoPacks(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Promo::class,
+            'promo_lectures_prices',
+            'lecture_id',
+            'promo_id'
+        )->withPivot('period_id', 'price');
+    }
+    public function pricesPeriodsInPromoPacks(): BelongsToMany
     {
         return $this->belongsToMany(
             Period::class,
@@ -217,7 +217,7 @@ class Lecture extends Model
             ];
         }
 
-        $periods = $this->pricesInPromoPacks;
+        $periods = $this->pricesPeriodsInPromoPacks;
         if ($periods->isNotEmpty()) {
             foreach ($periods as $period) {
                 $priceForLecture = number_format($period->pivot->price / 100, 2);
