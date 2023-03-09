@@ -55,6 +55,12 @@ use OpenApi\Attributes as OA;
     example: '1',
 )]
 #[OA\Parameter(
+    name: 'filter[purchased]',
+    description: 'пишем filter[purchased]=1 получаем купленные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
     name: 'include',
     description: 'включаем в объект каждой лекции соответствующие
     объекты категории или лектора этой лекции или оба.
@@ -84,10 +90,50 @@ use OpenApi\Attributes as OA;
                     "title" => "Dolor alias nam impedit deserunt.",
                     "description" => "Error sint asperiores eum magni quis. Harum officiis iste impedit debitis facilis.",
                     "preview_picture" => "https://via.placeholder.com/640x480.png/004477?text=ut",
+                    "lector" => [],
                     "is_free" => 1,
                     "is_promo" => 0,
                     "is_watched" => 1,
-                    "lector" => [],
+                    "purchase_info" => [
+                        "is_purchased" => 1,
+                        "end_date" => "2023-03-09 22:32:12"
+                    ],
+                    "prices" => [
+                        "price_by_category" => [
+                            [
+                                "title" => "day",
+                                "length" => 1,
+                                "price_for_lecture" => "109.60"
+                            ],
+                            [
+                                "title" => "week",
+                                "length" => 14,
+                                "price_for_lecture" => "302.48"
+                            ],
+                            [
+                                "title" => "month",
+                                "length" => 30,
+                                "price_for_lecture" => "519.83"
+                            ]
+                        ],
+                        "price_by_promo" => [
+                            [
+                                "title" => "day",
+                                "length" => 1,
+                                "price_for_promo_lecture" => "106.51"
+                            ],
+                            [
+                                "title" => "week",
+                                "length" => 14,
+                                "price_for_promo_lecture" => "209.06"
+                            ],
+                            [
+                                "title" => "month",
+                                "length" => 30,
+                                "price_for_promo_lecture" => "323.79"
+                            ]
+                        ]
+                    ]
                 ],
             ],
             "meta" => [
