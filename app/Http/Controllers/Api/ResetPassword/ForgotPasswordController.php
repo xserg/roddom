@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Api\ResetPassword;
 use App\Exceptions\FailedCreateResetCodeException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPassword\ForgotPasswordRequest;
-use App\Jobs\SendResetPasswordCodeJob;
+use App\Mail\SendCodeResetPassword;
 use App\Services\PasswordResetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -70,10 +71,20 @@ class ForgotPasswordController extends Controller
             ], 500);
         }
 
-        SendResetPasswordCodeJob::dispatch(
-            $request->email,
-            $passwordReset->code
-        );
+//        SendResetPasswordCodeJob::dispatch(
+//            $request->email,
+//            $passwordReset->code
+//        );
+
+        $sent = Mail
+            ::to($request->email)
+            ->send(new SendCodeResetPassword($passwordReset->code));
+
+        if (!$sent) {
+            return response()->json([
+                'message' => 'Невозможно отослать код на email'
+            ], 422);
+        }
 
         return response()->json([
             'message' => 'Код отослан на ваш email'
