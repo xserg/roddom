@@ -6,7 +6,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Info(
     version: "1.0.0",
-    description: "1. Header 'Accept: application/json' in all requests required;\n2. Bearer token for test purposes: 1|S5UQcrN2vnXSUfc8KoNh5xgEeipB2gyobh5Ms7IO",
+    description: "1. Header 'Accept: application/json' in all requests required;\n2. Bearer token for test purposes: 2|Z5UQcrN2vnXSUfc8KoNh5xgEeipB2gyobh5Ms7IO",
     title: "Mothers school API",
 )]
 #[OA\Contact(

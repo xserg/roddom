@@ -207,7 +207,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $tokenPlain = new NewAccessToken($token, $token->getKey() . '|' . env('TEST_USER2_PLAIN'));
-        echo $tokenPlain->plainTextToken;
 
         $lectures = Lecture
             ::all()
