@@ -219,7 +219,7 @@ class UserService
     public function userCanWatchNewFreeLecture(User|Authenticatable $user): bool
     {
         return
-            $user->next_free_lecture_available > now() ||
+            $user->next_free_lecture_available < now() ||
             is_null($user->next_free_lecture_available);
     }
 
