@@ -19,6 +19,8 @@ class LectorFactory extends Factory
     {
         return [
             'name' => $this->faker->name,
+            'position' => $this->faker->jobTitle,
+            'description' => $this->faker->text(200),
             'career_start' => Carbon::today()->subYears(rand(2, 25)),
             'photo' => $this->faker->imageUrl
         ];

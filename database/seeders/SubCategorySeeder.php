@@ -17,7 +17,6 @@ class SubCategorySeeder extends Seeder
                 ->random();
             $category = [
                 'parent_id' => $parentCategory->id,
-                'parent_slug' => Str::slug($parentCategory->title),
                 'preview_picture' => fake()->imageUrl,
                 'title' => 'Название подкатегории - ' . $i,
                 'slug' => Str::slug('Название подкатегории - ' . $i),

@@ -14,7 +14,7 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $appends = ['prices'];
+    protected $appends = ['prices', 'parent_slug'];
 
     protected $table = 'lecture_categories';
 
@@ -63,7 +63,7 @@ class Category extends Model
         $prices = $this->categoryPrices;
         $result = [];
 
-        foreach ($prices as $price){
+        foreach ($prices as $price) {
             $priceForPackInRoubles = number_format($price->price_for_pack / 100, 2);
             $result[] = [
                 'title' => $price->period->title,
@@ -79,6 +79,19 @@ class Category extends Model
         }
         return new Attribute(
             get: fn() => [],
+        );
+    }
+
+    protected function parentSlug(): Attribute
+    {
+        if ($this->parent_id != 0) {
+            return new Attribute(
+                get: fn() => $this->parentCategory->slug,
+            );
+        }
+
+        return new Attribute(
+            get: fn() => null,
         );
     }
 }

@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('lectors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('position');
+            $table->text('description');
             $table->date('career_start');
             $table->string('photo')->nullable()->default(null);
 
