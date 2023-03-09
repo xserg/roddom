@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('photo')->nullable()->default(null);
             $table->string('photo_small')->nullable()->default(null);
             $table->boolean('to_delete')->default(false);
-            $table->dateTime('free_lecture_watched')->nullable()->default(null);
+            $table->dateTime('next_free_lecture_available')->nullable()->default(null);
 
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

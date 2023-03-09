@@ -51,7 +51,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'free_lecture_watched' => 'datetime'
+        'next_free_lecture_available' => 'datetime'
     ];
 
     public function watchedLectures(): BelongsToMany
@@ -103,7 +103,7 @@ class User extends Authenticatable
 
         if($purchasedLectureIds){
             return new Attribute(
-                get: fn () => Lecture::whereIn('id', $purchasedLectureIds)->get(),
+                get: fn () => Lecture::whereIn('id', array_keys($purchasedLectureIds))->get(),
             );
         }
         return new Attribute(
