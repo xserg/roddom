@@ -17,7 +17,7 @@ return new class extends Migration
             $table->bigInteger('lecture_id')->unsigned();
             $table->bigInteger('promo_id')->unsigned();
             $table->bigInteger('period_id')->unsigned();
-            $table->integer('price')->unsigned();
+            $table->bigInteger('price')->unsigned();
 
             $table->foreign('lecture_id')->references('id')->on('lectures');
             $table->foreign('promo_id')->references('id')->on('promos');

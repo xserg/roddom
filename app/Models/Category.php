@@ -64,7 +64,7 @@ class Category extends Model
         $result = [];
 
         foreach ($prices as $price){
-            $priceForPackInRoubles = $price->price_for_pack / 100;
+            $priceForPackInRoubles = number_format($price->price_for_pack / 100, 2);
             $result[] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,

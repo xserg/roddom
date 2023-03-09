@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Log;
 
 class Lecture extends Model
 {
@@ -208,7 +209,7 @@ class Lecture extends Model
         $result = [];
 
         foreach ($prices as $price) {
-            $priceForLecture = $price->price_for_one_lecture / 100;
+            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
             $result['price_by_category'][] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
@@ -219,7 +220,7 @@ class Lecture extends Model
         $periods = $this->pricesInPromoPacks;
         if ($periods->isNotEmpty()) {
             foreach ($periods as $period) {
-                $priceForLecture = $period->pivot->price / 100;
+                $priceForLecture = number_format($period->pivot->price / 100, 2);
                 $result['price_by_promo'][] = [
                     'title' => $period->title,
                     'length' => $period->length,
