@@ -39,7 +39,7 @@ class UserResource extends JsonResource
             'baby_born' => $this->baby_born,
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
-            'free_lecture_watched' => $this->free_lecture_watched,
+            'next_free_lecture_available' => $this->next_free_lecture_available,
             'watched_lectures' => new LecturesInProfileCollection(
                 $this->whenLoaded('watchedLectures')
             ),
