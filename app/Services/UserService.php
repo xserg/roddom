@@ -8,7 +8,9 @@ use App\Exceptions\UserCannotRemoveFromSavedLectureException;
 use App\Exceptions\UserCannotSaveLectureException;
 use App\Exceptions\UserCannotWatchFreeLectureException;
 use App\Exceptions\UserCannotWatchPaidLectureException;
+use App\Http\Resources\LectureCollection;
 use App\Jobs\UserDeletionRequest;
+use App\Models\Lecture;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Repositories\LectureRepository;
@@ -217,13 +219,13 @@ class UserService
     public function userCanWatchNewFreeLecture(User|Authenticatable $user): bool
     {
         return
-            $user->free_lecture_watched < now()->subHours(24) ||
-            is_null($user->free_lecture_watched);
+            $user->next_free_lecture_available > now() ||
+            is_null($user->next_free_lecture_available);
     }
 
     public function setFreeLectureWatchedNow(User|Authenticatable $user): User
     {
-        $user->free_lecture_watched = now();
+        $user->next_free_lecture_available = now()->addHours(24);
         return $user;
     }
 
@@ -271,6 +273,12 @@ class UserService
         }
 
         $user->savedLectures()->detach($lectureId);
+    }
+
+    public function assignLecturesToUser(User|Authenticatable $user)
+    {
+        $purchasedLecturesIds = $this->lectureRepository->getAllPurchasedLecturesByUser($user);
+        $user->purchasedLectures = Lecture::whereIn('id', $purchasedLecturesIds)->get();
     }
 
 
