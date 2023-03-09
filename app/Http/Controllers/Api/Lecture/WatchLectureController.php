@@ -86,13 +86,10 @@ class WatchLectureController
         try {
             $videoId = $this->userService->watchLecture($id, auth()->user());
         } catch (UserCannotWatchFreeLectureException $exception) {
-            $cantViewFor = now()->diffInSeconds(
-                auth()->user()->free_lecture_watched->addHours(24)
-            );
 
             return response()->json([
                 'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage(),
-                'cant_watch_for_seconds' => $cantViewFor
+                'next_free_lecture_available' => auth()->user()->next_free_lecture_available
             ], Response::HTTP_FORBIDDEN);
 
         } catch (
