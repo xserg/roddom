@@ -14,7 +14,7 @@ class PromoPackPricesSeeder extends Seeder
         $promo = Promo::first();
 
         foreach ($periods as $period) {
-            $promo->subscriptionPeriods()->attach($period->id, [
+            $promo->subscriptionPeriodsForPromoPack()->attach($period->id, [
                 'promo_id' => $promo->id,
                 'price' => $period->id * mt_rand(100000, 110000)
             ]);
