@@ -20,8 +20,10 @@ class Period extends Model
     {
         return $this->hasMany(SubcategoryPrices::class);
     }
-    public function promoLectures()
+    public function promos()
     {
-        return $this->hasMany(SubcategoryPrices::class);
+        return $this->hasMany(
+            Promo::class,
+        );
     }
 }

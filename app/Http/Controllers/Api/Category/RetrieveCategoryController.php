@@ -58,7 +58,7 @@ class RetrieveCategoryController
 
         if (!$mainCategory) {
             return response()->json([
-                'message' => 'Not found category with slug: ' . $slug
+                'message' => 'Не найдена категория со слагом: ' . $slug
             ], 404);
         }
 

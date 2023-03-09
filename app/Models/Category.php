@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Category extends Model
 {
     use HasFactory;
+
+    protected $appends = ['prices'];
 
     protected $table = 'lecture_categories';
 
@@ -25,7 +28,7 @@ class Category extends Model
         return $this->hasMany(Lecture::class);
     }
 
-    public function prices(): HasMany
+    public function categoryPrices(): HasMany
     {
         return $this->hasMany(SubcategoryPrices::class);
     }
@@ -53,5 +56,29 @@ class Category extends Model
     public function scopeSubCategories(Builder $query): void
     {
         $query->where('parent_id', '!=', 0);
+    }
+
+    protected function prices(): Attribute
+    {
+        $prices = $this->categoryPrices;
+        $result = [];
+
+        foreach ($prices as $price){
+            $priceForPackInRoubles = $price->price_for_pack / 100;
+            $result[] = [
+                'title' => $price->period->title,
+                'length' => $price->period->length,
+                'price_for_category' => $priceForPackInRoubles
+            ];
+        }
+
+        if ($result) {
+            return new Attribute(
+                get: fn() => $result,
+            );
+        }
+        return new Attribute(
+            get: fn() => [],
+        );
     }
 }

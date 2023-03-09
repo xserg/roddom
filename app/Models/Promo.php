@@ -15,7 +15,7 @@ class Promo extends Model
         );
     }
 
-    public function subscriptionPeriods(): BelongsToMany
+    public function subscriptionPeriodsForPromoPack(): BelongsToMany
     {
         return $this->belongsToMany(
             Period::class,

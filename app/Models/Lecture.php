@@ -15,7 +15,7 @@ class Lecture extends Model
 {
     use HasFactory;
 
-    protected $appends = ['is_watched', 'is_promo', 'is_purchased'];
+    protected $appends = ['is_watched', 'is_promo', 'is_purchased', 'prices'];
     private $lectureRepository;
 
     public function __construct(array $attributes = [])
@@ -81,14 +81,23 @@ class Lecture extends Model
         );
     }
 
+//    public function pricesInPromoPacks(): BelongsToMany
+//    {
+//        return $this->belongsToMany(
+//            Promo::class,
+//            'promo_lectures_prices',
+//            'lecture_id',
+//            'promo_id'
+//        )->withPivot('period_id', 'price');
+//    }
     public function pricesInPromoPacks(): BelongsToMany
     {
         return $this->belongsToMany(
-            Promo::class,
+            Period::class,
             'promo_lectures_prices',
             'lecture_id',
-            'promo_id'
-        )->withPivot('period_id', 'price');
+            'period_id'
+        )->withPivot('promo_id', 'price');
     }
 
     public function scopeWatched(Builder $query): void
@@ -190,6 +199,42 @@ class Lecture extends Model
         }
         return new Attribute(
             get: fn() => 0,
+        );
+    }
+
+    protected function prices(): Attribute
+    {
+        $prices = $this->category->categoryPrices;
+        $result = [];
+
+        foreach ($prices as $price) {
+            $priceForLecture = $price->price_for_one_lecture / 100;
+            $result['price_by_category'][] = [
+                'title' => $price->period->title,
+                'length' => $price->period->length,
+                'price_for_lecture' => $priceForLecture
+            ];
+        }
+
+        $periods = $this->pricesInPromoPacks;
+        if ($periods->isNotEmpty()) {
+            foreach ($periods as $period) {
+                $priceForLecture = $period->pivot->price / 100;
+                $result['price_by_promo'][] = [
+                    'title' => $period->title,
+                    'length' => $period->length,
+                    'price_for_promo_lecture' => $priceForLecture,
+                ];
+            }
+        }
+
+        if ($result) {
+            return new Attribute(
+                get: fn() => $result,
+            );
+        }
+        return new Attribute(
+            get: fn() => [],
         );
     }
 }
