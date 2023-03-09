@@ -16,7 +16,7 @@ class Lecture extends Model
 {
     use HasFactory;
 
-    protected $appends = ['is_watched', 'is_promo', 'is_purchased', 'prices'];
+    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices'];
     private $lectureRepository;
 
     public function __construct(array $attributes = [])
@@ -91,6 +91,7 @@ class Lecture extends Model
             'promo_id'
         )->withPivot('period_id', 'price');
     }
+
     public function pricesPeriodsInPromoPacks(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -136,9 +137,9 @@ class Lecture extends Model
 
     public function scopePurchased(Builder $query): void
     {
-        $purchasedIds = $this->lectureRepository->getAllPurchasedLectureIdsByUser(auth()->user());
+        $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesByUser(auth()->user());
 
-        $query->whereIn('id', $purchasedIds);
+        $query->whereIn('id', array_keys($purchasedIds));
     }
 
     public function scopeFree(Builder $query): void
@@ -189,13 +190,21 @@ class Lecture extends Model
         );
     }
 
-    protected function isPurchased(): Attribute
+    protected function purchaseInfo(): Attribute
     {
         $lectureRepository = app(LectureRepository::class);
-        $purchasedLecturesIds = $lectureRepository->getAllPurchasedLectureIdsByUser(auth()->user());
-        if ($purchasedLecturesIds) {
+        $purchasedLectures = $lectureRepository->getAllPurchasedLecturesByUser(auth()->user());
+
+        $isPurchased = (int)array_key_exists($this->id, $purchasedLectures);
+
+        $purchasedInfo = [
+            'is_purchased' => (int)array_key_exists($this->id, $purchasedLectures),
+            'end_date' => $isPurchased == 1 ? $purchasedLectures[$this->id]['end_date'] : null
+        ];
+
+        if ($purchasedLectures) {
             return new Attribute(
-                get: fn() => (int)in_array($this->id, $purchasedLecturesIds),
+                get: fn() => $purchasedInfo,
             );
         }
         return new Attribute(

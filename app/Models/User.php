@@ -99,7 +99,7 @@ class User extends Authenticatable
 
     protected function purchasedLectures(): Attribute
     {
-        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLectureIdsByUser($this);
+        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLecturesByUser($this);
 
         if($purchasedLectureIds){
             return new Attribute(
