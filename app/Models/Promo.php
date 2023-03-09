@@ -22,7 +22,7 @@ class Promo extends Model
             'promo_pack_prices',
             'promo_id',
             'period_id'
-        );
+        )->withPivot('period_id', 'price');
     }
 
     public function promoLectures(): BelongsToMany
