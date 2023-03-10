@@ -27,6 +27,8 @@ class LectorResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'position' => $this->position,
+            'description' => $this->description,
             'career_start' => $this->career_start,
             'photo' => $this->photo,
             'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas'))
