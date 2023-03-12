@@ -53,7 +53,7 @@ class LectureResource extends JsonResource
             'preview_picture' => $this->preview_picture,
             'lector' => new LectorResource($this->whenLoaded('lector')),
             'category' => new CategoryResource($this->whenLoaded('category')),
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'is_free' => $this->is_free,
             'is_promo' => $this->whenNotNull($this->is_promo),
             'is_watched' => $this->whenNotNull($this->is_watched),

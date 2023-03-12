@@ -31,6 +31,51 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     in: 'query',
     example: '2'
 )]
+#[OA\Parameter(
+    name: 'filter[lector_id]',
+    description: 'пишем filter[lector_id]=12,25 id лектора/ов, лекции которого мы хотим получить',
+    in: 'query',
+    example: '12,25,1',
+)]
+#[OA\Parameter(
+    name: 'filter[category_id]',
+    description: 'пишем filter[category_id]=21,11 id подкатегории/ий, лекции которых мы хотим получить',
+    in: 'query',
+    example: '21,11',
+)]
+#[OA\Parameter(
+    name: 'filter[watched]',
+    description: 'пишем filter[watched]=1 получаем просмотренные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
+    name: 'filter[saved]',
+    description: 'пишем filter[saved]=1 получаем сохраненные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
+    name: 'filter[purchased]',
+    description: 'пишем filter[purchased]=1 получаем купленные пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
+    name: 'include',
+    description: 'включаем в объект каждой лекции соответствующие
+    объекты категории или лектора этой лекции или оба.
+    Также можно lector.diplomas, чтобы дипломы захватить у лектора',
+    in: 'query',
+    example: 'category,lector,lector.diplomas',
+)]
+#[OA\Parameter(
+    name: 'sort',
+    description: 'сортировка по полю created_at. Возможные варианты sort=-created_at или sort=created_at.
+    По дефолту -created_at - лекции добавленные последними, идут первыми',
+    in: 'query',
+    example: '-created_at',
+)]
 #[OA\Response(
     response: Response::HTTP_OK,
     description: 'OK',
@@ -79,7 +124,8 @@ class RetrieveAllPromoLecturesController extends Controller
     public function __invoke(Request $request)
     {
         try {
-            $builder = $this->lectureRepository->getAllPromoQuery(['lector', 'lector.diplomas']);
+            $builder = $this->lectureRepository->getAllPromoQuery();
+            $builder = $this->lectureRepository->addFiltersToQuery($builder);
             $lectures = $this->lectureRepository->paginate(
                 $builder,
                 $request->per_page,

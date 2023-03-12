@@ -16,8 +16,11 @@ class Lecture extends Model
 {
     use HasFactory;
 
-    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices'];
     private $lectureRepository;
+
+    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices'];
+
+    protected $casts = ['created_at' => 'datetime'];
 
     public function __construct(array $attributes = [])
     {
