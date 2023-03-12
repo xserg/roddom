@@ -276,18 +276,10 @@ class UserService
         $user->savedLectures()->detach($lectureId);
     }
 
-    public function assignLecturesToUser(User|Authenticatable $user)
-    {
-        $purchasedLecturesIds = $this->lectureRepository->getAllPurchasedLecturesByUser($user);
-        $user->purchasedLectures = Lecture::whereIn('id', $purchasedLecturesIds)->get();
-    }
-
-
     private function codeIsOlderThanHour($createdAt): bool
     {
         return now()->subHour() > $createdAt;
     }
-
 
     /**
      * @throws Exception

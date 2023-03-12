@@ -137,7 +137,7 @@ class Lecture extends Model
 
     public function scopePurchased(Builder $query): void
     {
-        $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesByUser(auth()->user());
+        $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
         $query->whereIn('id', array_keys($purchasedIds));
     }
@@ -193,7 +193,7 @@ class Lecture extends Model
     protected function purchaseInfo(): Attribute
     {
         $lectureRepository = app(LectureRepository::class);
-        $purchasedLectures = $lectureRepository->getAllPurchasedLecturesByUser(auth()->user());
+        $purchasedLectures = $lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
         $isPurchased = (int)array_key_exists($this->id, $purchasedLectures);
 
@@ -230,7 +230,7 @@ class Lecture extends Model
         if ($periods->isNotEmpty()) {
             foreach ($periods as $period) {
                 $priceForLecture = number_format($period->pivot->price / 100, 2);
-                $result['price_by_promo'][] = [
+                $result['price_by_promo'][$period->length] = [
                     'title' => $period->title,
                     'length' => $period->length,
                     'price_for_promo_lecture' => $priceForLecture,

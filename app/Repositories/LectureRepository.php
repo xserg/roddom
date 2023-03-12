@@ -86,7 +86,7 @@ class LectureRepository
     {
         $lectures = $builder->get();
         $purchasedLectureIds = $this
-            ->getAllPurchasedLecturesByUser(
+            ->getAllPurchasedLecturesIdsAndTheirDatesByUser(
                 auth()->user()
             );
         $watchedLectures = auth()->user()->watchedLectures;
@@ -159,7 +159,7 @@ class LectureRepository
 //        return $builder;
 //    }
 
-    public function getAllPurchasedLecturesByUser(
+    public function getAllPurchasedLecturesIdsAndTheirDatesByUser(
         Authenticatable|User $user
     ): array
     {
@@ -178,7 +178,7 @@ class LectureRepository
             ->where('subscriptionable_type', Promo::class);
 
         foreach ($lecturesSubscriptions as $lecturesSubscription) {
-            if($lecturesSubscription['end_date'] < now()) continue;
+            if ($lecturesSubscription['end_date'] < now()) continue;
 
             $lectures[$lecturesSubscription['subscriptionable_id']] = [
                 'start_date' => $lecturesSubscription['start_date'],
@@ -187,7 +187,7 @@ class LectureRepository
         }
 
         foreach ($categorySubscriptions as $categorySubscription) {
-            if($categorySubscription['end_date'] < now()) continue;
+            if ($categorySubscription['end_date'] < now()) continue;
 
             $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
             $categoryLectures = $category->lectures;
@@ -200,7 +200,7 @@ class LectureRepository
         }
 
         foreach ($promoSubscriptions as $promoSubscription) {
-            if($promoSubscription['end_date'] < now()) continue;
+            if ($promoSubscription['end_date'] < now()) continue;
 
             $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
             $promoLectures = $promo->promoLectures;
@@ -213,5 +213,74 @@ class LectureRepository
         }
 
         return $lectures;
+    }
+
+    public function setFlagsToLectures(
+        Collection $lectures
+    ): Collection
+    {
+        $watchedLectures = auth()->user()->watchedLectures;
+        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $promoLecturesIds = $this->getAllPromoQuery()->get();
+
+        $lectures = $lectures->map(function ($lecture) use ($watchedLectures, $purchasedLectures, $promoLecturesIds) {
+            /**
+             * @var $lecture Lecture
+             */
+            $lecture->setAppends([]);
+
+            $isWatched = $watchedLectures->contains($lecture->id);
+            $isPromo = $promoLecturesIds->contains($lecture->id);
+            $isPurchased = (int)array_key_exists($lecture->id, $purchasedLectures);
+
+            $purchaseInfo = [
+                'is_purchased' => (int)array_key_exists($lecture->id, $purchasedLectures),
+                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null
+            ];
+
+            $categoryPrices = $lecture->category->categoryPrices;
+            $prices = [];
+
+            foreach ($categoryPrices as $price) {
+                $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
+                $prices['price_by_category'][] = [
+                    'title' => $price->period->title,
+                    'length' => $price->period->length,
+                    'price_for_lecture' => $priceForLecture
+                ];
+            }
+
+            $periods = $lecture->pricesPeriodsInPromoPacks;
+            if ($periods->isNotEmpty()) {
+                foreach ($periods as $period) {
+                    $priceForLecture = number_format($period->pivot->price / 100, 2);
+                    $prices['price_by_promo'][$period->length] = [
+                        'title' => $period->title,
+                        'length' => $period->length,
+                        'price_for_promo_lecture' => $priceForLecture,
+                    ];
+                }
+            }
+
+            $lecture->is_watched = (int)$isWatched;
+            $lecture->is_promo = (int)$isPromo;
+            $lecture->purchase_info = $purchaseInfo;
+            $lecture->prices = $prices;
+
+            return $lecture;
+        });
+
+        return $lectures;
+    }
+
+    public function getPurchasedLecturesByUser(Authenticatable|User $user): Collection
+    {
+        $purchasedLectureIds = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        return Lecture::whereIn('id', array_keys($purchasedLectureIds))->get();
+    }
+
+    public function getPurchasedInfoByUser(Authenticatable|User $user): Collection
+    {
+
     }
 }

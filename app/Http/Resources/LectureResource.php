@@ -58,7 +58,7 @@ class LectureResource extends JsonResource
             'is_promo' => $this->whenNotNull($this->is_promo),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
-            'prices' => $this->prices,
+            'prices' => $this->whenNotNull($this->prices),
         ];
     }
 }

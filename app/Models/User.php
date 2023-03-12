@@ -51,7 +51,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'next_free_lecture_available' => 'datetime'
     ];
 
     public function watchedLectures(): BelongsToMany
@@ -99,7 +98,7 @@ class User extends Authenticatable
 
     protected function purchasedLectures(): Attribute
     {
-        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLecturesByUser($this);
+        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLecturesIdsAndTheirDatesByUser($this);
 
         if($purchasedLectureIds){
             return new Attribute(
@@ -107,7 +106,7 @@ class User extends Authenticatable
             );
         }
         return new Attribute(
-            get: fn () => collect([]),
+            get: fn () => [],
         );
     }
 }

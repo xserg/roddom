@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyLectureRequest;
-use App\Http\Resources\SubscriptionResource;
 use App\Models\Lecture;
-use App\Models\Period;
-use App\Models\Subscription;
+use App\Models\Order;
 use App\Repositories\LectureRepository;
 use App\Services\LectureService;
+use App\Services\PaymentService;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use OpenApi\Attributes as OA;
+use YooKassa\Client;
 
 #[OA\Post(
     path: '/lecture/{id}/buy/{period}',
@@ -36,11 +37,21 @@ use OpenApi\Attributes as OA;
     schema: new OA\Schema(type: 'integer'),
     example: '14'
 )]
+#[OA\Response(
+    response: Response::HTTP_OK,
+    description: 'OK',
+    content: new OA\JsonContent(
+        example: [
+            "link" => "https://yoomoney.ru/checkout/payments/"
+        ]
+    )
+)]
 class BuyLectureController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private LectureService    $lectureService
+        private LectureService    $lectureService,
+        private PaymentService    $paymentService
     )
     {
     }
@@ -72,28 +83,61 @@ class BuyLectureController extends Controller
          * тут старт оплаты
          */
 
-        $paymentSuccess = true;
-        if($paymentSuccess){
-            $attributes = [
-                'user_id' => auth()->user()->id,
-                'subscriptionable_type' => Lecture::class,
-                'subscriptionable_id' => $lectureId,
-                'period_id' => Period::firstWhere('length', '=', $period)->id,
-                'start_date' => now(),
-                'end_date' => now()->addDays($period)
-            ];
-
-            $subscription = new Subscription($attributes);
-            $subscription->save();
-
-            return response()->json([
-                'message' => 'Подписка на лекцию успешно оформлена',
-                'subscription' => new SubscriptionResource($subscription)
-            ]);
+        $prices = $lecture->prices;
+        if ($lecture->is_promo == 1) {
+            $priceArr = Arr::where(
+                $prices['price_by_promo'],
+                fn($value) => $value['length'] == $period
+            );
         } else {
-            return response()->json([
-                'message' => 'Подписка не была оформлена. ',
-            ]);
+            $priceArr = Arr::where(
+                $prices['price_by_category'],
+                fn($value) => $value['length'] == $period
+            );
         }
+        $price = Arr::first($priceArr)['price_for_lecture'];
+
+        $order = Order::create([
+            'user_id' => auth()->user()->id,
+            'price' => $price,
+            'subscriptionable_type' => Lecture::class,
+            'subscriptionable_id' => $lectureId,
+            'period' => $period
+        ]);
+
+        if ($order) {
+            $link = $this->paymentService->createPayment(
+                $price,
+                ['order_id' => $order->id]
+            );
+
+            return response()->json([
+                'link' => $link
+            ], Response::HTTP_OK);
+        }
+
+//        $paymentSuccess = true;
+//        if ($paymentSuccess) {
+//            $attributes = [
+//                'user_id' => auth()->user()->id,
+//                'subscriptionable_type' => Lecture::class,
+//                'subscriptionable_id' => $lectureId,
+//                'period_id' => Period::firstWhere('length', '=', $period)->id,
+//                'start_date' => now(),
+//                'end_date' => now()->addDays($period)
+//            ];
+//
+//            $subscription = new Subscription($attributes);
+//            $subscription->save();
+//
+//            return response()->json([
+//                'message' => 'Подписка на лекцию успешно оформлена',
+//                'subscription' => new SubscriptionResource($subscription)
+//            ]);
+//        } else {
+//            return response()->json([
+//                'message' => 'Подписка не была оформлена. ',
+//            ]);
+//        }
     }
 }

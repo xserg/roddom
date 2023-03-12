@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
 use App\Http\Controllers\Api\Lecture\SaveLectureController;
 use App\Http\Controllers\Api\Lecture\UnsaveLectureController;
 use App\Http\Controllers\Api\Lecture\WatchLectureController;
+use App\Http\Controllers\Api\Payment\PaymentController;
 use App\Http\Controllers\Api\Promo\RetrieveAllPromoLecturesController;
 use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\Api\User\LoginController;
 use App\Http\Controllers\Api\User\LogoutController;
 use App\Http\Controllers\Api\User\PhotoController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
+use App\Http\Controllers\Api\User\ProfileRetrieveControllerTest;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\RetrieveAllUsersController;
@@ -50,14 +52,17 @@ Route::prefix('v1')
         Route::post('/user/login', LoginController::class)
             ->name('login');
 
-        Route::post('password/forgot',  ForgotPasswordController::class);
+        Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
         Route::post('password/reset', ResetPasswordController::class);
         Route::get('/check', RetrieveAllUsersController::class)
             ->name('check');
 
-        Route::group(['middleware' => ['auth:sanctum']], function () {
+        //payments notifications listener
+        Route::post('/listen', PaymentController::class)
+            ->name('payments.listener');
 
+        Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::delete('/user', DeleteUserController::class)
                 ->name('delete');
