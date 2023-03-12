@@ -204,7 +204,8 @@ class UserService
     {
         $user->fill($profile);
 
-        if ($pregnancy_weeks = $profile['pregnancy_weeks']) {
+        if (isset($profile['pregnancy_weeks'])) {
+            $pregnancy_weeks = $profile['pregnancy_weeks'];
             $user->pregnancy_start = Carbon::now()
                 ->subWeeks($pregnancy_weeks)
                 ->toDateString();
