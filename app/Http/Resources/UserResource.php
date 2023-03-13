@@ -49,7 +49,8 @@ class UserResource extends JsonResource
             'purchased_lectures' =>
                 $this->when(
                     $this->purchasedLectures,
-                    new LecturesInProfileCollection($this->purchasedLectures)
+                    new LecturesInProfileCollection($this->purchasedLectures),
+                    []
                 ),
         ];
     }
