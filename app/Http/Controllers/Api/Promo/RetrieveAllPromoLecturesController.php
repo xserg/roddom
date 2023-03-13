@@ -63,6 +63,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
     example: '1',
 )]
 #[OA\Parameter(
+    name: 'filter[not_watched]',
+    description: 'пишем filter[not_watched]=1 получаем не просмотренные юзером лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
     name: 'include',
     description: 'включаем в объект каждой лекции соответствующие
     объекты категории или лектора этой лекции или оба.

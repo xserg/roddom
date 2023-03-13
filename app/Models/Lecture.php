@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\Log;
 
 class Lecture extends Model
 {
@@ -165,6 +164,16 @@ class Lecture extends Model
         $query->where('is_free', '=', 0);
     }
 
+    public function scopeNotWatched(Builder $query): void
+    {
+        $user = auth()->user();
+        if ($user) {
+            $watchedIds = $user->watchedLectures->pluck('id')->toArray();
+
+            $query->whereNotIn('id', $watchedIds);
+        }
+    }
+
     public function scopeRecommended(Builder $query): void
     {
         $query->where('is_recommended', '=', true);
@@ -196,11 +205,28 @@ class Lecture extends Model
     protected function isWatched(): Attribute
     {
         $user = auth()->user();
-        $watchedLectures = $user->watchedLectures;
 
-        if ($watchedLectures) {
+        if ($user) {
+            $watchedLectures = $user->watchedLectures;
+
             return new Attribute(
-                get: fn() => (int)$user->watchedLectures->contains($this->id),
+                get: fn() => (int)$watchedLectures->contains($this->id),
+            );
+        }
+        return new Attribute(
+            get: fn() => 0,
+        );
+    }
+
+    protected function isSaved(): Attribute
+    {
+        $user = auth()->user();
+
+        if ($user) {
+            $savedLectures = $user->savedLectures;
+
+            return new Attribute(
+                get: fn() => (int)$savedLectures->contains($this->id),
             );
         }
         return new Attribute(
