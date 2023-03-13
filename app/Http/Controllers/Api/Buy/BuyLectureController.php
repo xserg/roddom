@@ -89,13 +89,14 @@ class BuyLectureController extends Controller
                 $prices['price_by_promo'],
                 fn($value) => $value['length'] == $period
             );
+            $price = Arr::first($priceArr)['price_for_promo_lecture'];
         } else {
             $priceArr = Arr::where(
                 $prices['price_by_category'],
                 fn($value) => $value['length'] == $period
             );
+            $price = Arr::first($priceArr)['price_for_lecture'];
         }
-        $price = Arr::first($priceArr)['price_for_lecture'];
 
         $order = Order::create([
             'user_id' => auth()->user()->id,
