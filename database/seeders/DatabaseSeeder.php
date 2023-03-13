@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
         Lecture::factory(150)->create();
+        Lecture::factory(30)->notPublished()->create();
 
         $this->call(SubscriptionPeriodSeeder::class);
         $this->call(PromoSeeder::class);
@@ -44,6 +45,7 @@ class DatabaseSeeder extends Seeder
         $this->createFirstTestUser();
         $this->createSecondTestUser();
         $this->createUsers(20);
+        $this->setRecommendedLectures(20);
 
 //        $this->call(SubscriptionSeeder::class);
     }
@@ -231,5 +233,13 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->createSubscriptionsForUser($user);
+    }
+
+    private function setRecommendedLectures(int $num)
+    {
+        Lecture::all()->random($num)->each(function ($lecture) {
+            $lecture->setRecommended();
+            $lecture->save();
+        });
     }
 }

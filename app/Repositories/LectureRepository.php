@@ -75,6 +75,7 @@ class LectureRepository
                 AllowedFilter::scope('watched'),
                 AllowedFilter::scope('saved'),
                 AllowedFilter::scope('purchased'),
+                AllowedFilter::scope('recommended'),
                 AllowedFilter::exact('lector_id'),
                 AllowedFilter::exact('category_id'),
             ]);

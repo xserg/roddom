@@ -14,6 +14,7 @@ class LecturesInProfileResource extends JsonResource
             'title' => $this->title,
             'preview_picture' => $this->preview_picture,
             'is_free' => $this->is_free,
+            'is_recommended' => $this->is_recommended,
             'is_promo' => $this->whenNotNull($this->is_promo),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),

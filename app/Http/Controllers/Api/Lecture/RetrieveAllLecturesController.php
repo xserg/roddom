@@ -61,6 +61,12 @@ use OpenApi\Attributes as OA;
     example: '1',
 )]
 #[OA\Parameter(
+    name: 'filter[recommended]',
+    description: 'пишем filter[recommended]=1 получаем отмеченные рекомендованными лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
     name: 'include',
     description: 'включаем в объект каждой лекции соответствующие
     объекты категории или лектора этой лекции или оба.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\PublishedScope;
 use App\Repositories\LectureRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,13 +23,18 @@ class Lecture extends Model
 
     protected $casts = ['created_at' => 'datetime'];
 
+    protected $hidden = ['pivot'];
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
         $this->lectureRepository = app(LectureRepository::class);
     }
 
-    protected $hidden = ['pivot'];
+    protected static function booted()
+    {
+        static::addGlobalScope(new PublishedScope);
+    }
 
     public function category(): BelongsTo
     {
@@ -107,13 +113,15 @@ class Lecture extends Model
 
     public function scopeWatched(Builder $query): void
     {
-        $watchedIds = auth()
-            ->user()
-            ->watchedLectures
-            ->pluck('id')
-            ->toArray();
+        if (auth()->user()) {
+            $watchedIds = auth()
+                ->user()
+                ->watchedLectures
+                ->pluck('id')
+                ->toArray();
 
-        $query->whereIn('id', $watchedIds);
+            $query->whereIn('id', $watchedIds);
+        }
     }
 
     public function scopePromo(Builder $query): void
@@ -129,13 +137,15 @@ class Lecture extends Model
 
     public function scopeSaved(Builder $query): void
     {
-        $savedIds = auth()
-            ->user()
-            ->savedLectures
-            ->pluck('id')
-            ->toArray();
+        if (auth()->user()) {
+            $savedIds = auth()
+                ->user()
+                ->savedLectures
+                ->pluck('id')
+                ->toArray();
 
-        $query->whereIn('id', $savedIds);
+            $query->whereIn('id', $savedIds);
+        }
     }
 
     public function scopePurchased(Builder $query): void
@@ -153,6 +163,11 @@ class Lecture extends Model
     public function scopePayed(Builder $query): void
     {
         $query->where('is_free', '=', 0);
+    }
+
+    public function scopeRecommended(Builder $query): void
+    {
+        $query->where('is_recommended', '=', true);
     }
 
     public function promoPrices(): array
@@ -249,5 +264,10 @@ class Lecture extends Model
         return new Attribute(
             get: fn() => [],
         );
+    }
+
+    public function setRecommended(): void
+    {
+        $this->is_recommended = true;
     }
 }

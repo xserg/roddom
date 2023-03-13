@@ -30,16 +30,16 @@ class LectureFactory extends Factory
             'preview_picture' => $this->faker->imageUrl,
             'video_id' => $this->faker->randomNumber(9, true),
             'is_free' => (bool)rand(0, 1),
+            'is_published' => true,
         ];
     }
-//
-//    public function promo(): Factory
-//    {
-//        return $this->state(function (array $attributes) {
-//            return [
-//                'is_free' => false,
-//                'is_promo' => true,
-//            ];
-//        });
-//    }
+
+    public function notPublished(): Factory
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'is_published' => false,
+            ];
+        });
+    }
 }
