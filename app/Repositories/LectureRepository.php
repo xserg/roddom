@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -283,5 +284,25 @@ class LectureRepository
     public function getPurchasedInfoByUser(Authenticatable|User $user): Collection
     {
 
+    }
+
+    public function getLecturePrice(Lecture $lecture, int $period): int|float
+    {
+        $prices = $lecture->prices;
+        if ($lecture->is_promo == 1) {
+            $priceArr = Arr::where(
+                $prices['price_by_promo'],
+                fn($value) => $value['length'] == $period
+            );
+            $price = Arr::first($priceArr)['price_for_promo_lecture'];
+        } else {
+            $priceArr = Arr::where(
+                $prices['price_by_category'],
+                fn($value) => $value['length'] == $period
+            );
+            $price = Arr::first($priceArr)['price_for_lecture'];
+        }
+
+        return $price;
     }
 }

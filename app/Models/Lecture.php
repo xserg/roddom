@@ -236,7 +236,7 @@ class Lecture extends Model
         $result = [];
 
         foreach ($prices as $price) {
-            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
+            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
             $result['price_by_category'][] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
@@ -247,7 +247,7 @@ class Lecture extends Model
         $periods = $this->pricesPeriodsInPromoPacks;
         if ($periods->isNotEmpty()) {
             foreach ($periods as $period) {
-                $priceForLecture = number_format($period->pivot->price / 100, 2);
+                $priceForLecture = number_format($period->pivot->price / 100, 2, thousands_separator: '');
                 $result['price_by_promo'][$period->length] = [
                     'title' => $period->title,
                     'length' => $period->length,

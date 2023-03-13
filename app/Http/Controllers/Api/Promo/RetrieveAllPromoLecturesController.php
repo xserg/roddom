@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\LectureCollection;
 use App\Models\Promo;
 use App\Repositories\LectureRepository;
+use App\Repositories\PromoRepository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -117,6 +118,7 @@ class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
+        private PromoRepository   $promoRepository
     )
     {
     }
@@ -131,20 +133,12 @@ class RetrieveAllPromoLecturesController extends Controller
                 $request->per_page,
                 $request->page
             );
+
             /**
              * @var $promo Promo
              */
-
             $promo = Promo::first();
-            $periods = $promo->subscriptionPeriodsForPromoPack;
-            $prices = [];
-            foreach ($periods as $period) {
-                $prices[] = [
-                    'title' => $period->title,
-                    'length' => $period->length,
-                    'price' => number_format($period->pivot->price / 100, 2)
-                ];
-            }
+            $prices = $this->promoRepository->getPrices($promo);
 
         } catch (NotFoundHttpException $exception) {
 

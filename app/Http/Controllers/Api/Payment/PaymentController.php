@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Period;
 use App\Models\Subscription;
+use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +27,8 @@ use YooKassa\Model\NotificationEventType;
 class PaymentController extends Controller
 {
     public function __construct(
-        private PaymentService $paymentService
+        private PaymentService $paymentService,
+        private PeriodRepository $periodRepository
     )
     {
     }
@@ -70,7 +72,8 @@ class PaymentController extends Controller
 
                     //тут создаем подписку
 
-                    $period = Period::query()->firstWhere('length', '=', $order->period);
+                    $period = $this->periodRepository->getPeriodByLength($order->period);
+
                     $attributes = [
                         'user_id' => $order->user_id,
                         'subscriptionable_type' => $order->subscriptionable_type,

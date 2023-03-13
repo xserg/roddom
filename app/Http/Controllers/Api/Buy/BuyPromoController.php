@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
-use App\Http\Resources\SubscriptionResource;
-use App\Models\Period;
+use App\Models\Order;
 use App\Models\Promo;
-use App\Models\Subscription;
+use App\Repositories\PromoRepository;
+use App\Services\PaymentService;
 use App\Services\PromoService;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -27,17 +27,28 @@ use OpenApi\Attributes as OA;
     schema: new OA\Schema(type: 'integer'),
     example: '30'
 )]
+#[OA\Response(
+    response: Response::HTTP_OK,
+    description: 'OK',
+    content: new OA\JsonContent(
+        example: [
+            "link" => "https://yoomoney.ru/checkout/payments/"
+        ]
+    )
+)]
 class BuyPromoController extends Controller
 {
     public function __construct(
-        private PromoService $promoService
+        private PromoService    $promoService,
+        private PromoRepository $promoRepository,
+        private PaymentService  $paymentService
     )
     {
     }
 
     public function __invoke(
         BuyPromoRequest $request,
-        int             $period
+        int             $periodLength
     )
     {
         $isPurchased = $this->promoService->isPromoPurchased();
@@ -48,29 +59,26 @@ class BuyPromoController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
+        $promoPack = Promo::first();
+        $price = $this->promoRepository->getPriceForExactPeriodLength($promoPack, $periodLength);
 
-        $paymentSuccess = true;
-        if ($paymentSuccess) {
-            $attributes = [
-                'user_id' => auth()->user()->id,
-                'subscriptionable_type' => Promo::class,
-                'subscriptionable_id' => Promo::first()->id,
-                'period_id' => Period::firstWhere('length', '=', $period)->id,
-                'start_date' => now(),
-                'end_date' => now()->addDays($period)
-            ];
+        $order = Order::create([
+            'user_id' => auth()->user()->id,
+            'price' => $price,
+            'subscriptionable_type' => Promo::class,
+            'subscriptionable_id' => $promoPack->id,
+            'period' => $periodLength
+        ]);
 
-            $subscription = new Subscription($attributes);
-            $subscription->save();
+        if ($order) {
+            $link = $this->paymentService->createPayment(
+                $price,
+                ['order_id' => $order->id]
+            );
 
             return response()->json([
-                'message' => 'Подписка на лекцию успешно оформлена',
-                'subscription' => new SubscriptionResource($subscription)
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Подписка не была оформлена. ',
-            ]);
+                'link' => $link
+            ], Response::HTTP_OK);
         }
     }
 }

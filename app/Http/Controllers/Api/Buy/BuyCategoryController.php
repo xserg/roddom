@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyCategoryRequest;
-use App\Http\Resources\SubscriptionResource;
 use App\Models\Category;
-use App\Models\Period;
-use App\Models\Subscription;
+use App\Models\Order;
+use App\Repositories\CategoryRepository;
 use App\Services\CategoryService;
+use App\Services\PaymentService;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -35,10 +35,21 @@ use OpenApi\Attributes as OA;
     schema: new OA\Schema(type: 'integer'),
     example: '14'
 )]
+#[OA\Response(
+    response: Response::HTTP_OK,
+    description: 'OK',
+    content: new OA\JsonContent(
+        example: [
+            "link" => "https://yoomoney.ru/checkout/payments/"
+        ]
+    )
+)]
 class BuyCategoryController extends Controller
 {
     public function __construct(
-        private CategoryService $categoryService
+        private CategoryService $categoryService,
+        private CategoryRepository $categoryRepository,
+        private PaymentService $paymentService
     )
     {
     }
@@ -49,7 +60,9 @@ class BuyCategoryController extends Controller
         int               $period
     )
     {
+        $category = $this->categoryRepository->getCategoryById($categoryId);
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
+        $price = $this->categoryRepository->getCategoryPriceForPeriodLength($category, $period);
 
         if ($isPurchased) {
             return response()->json([
@@ -57,33 +70,48 @@ class BuyCategoryController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        /**
-         * тут старт оплаты
-         */
+        $order = Order::create([
+            'user_id' => auth()->user()->id,
+            'price' => $price,
+            'subscriptionable_type' => Category::class,
+            'subscriptionable_id' => $categoryId,
+            'period' => $period
+        ]);
 
-        $paymentSuccess = true;
-
-        if($paymentSuccess){
-            $attributes = [
-                'user_id' => auth()->user()->id,
-                'subscriptionable_type' => Category::class,
-                'subscriptionable_id' => $categoryId,
-                'period_id' => Period::firstWhere('length', '=', $period)->id,
-                'start_date' => now(),
-                'end_date' => now()->addDays($period)
-            ];
-
-            $subscription = new Subscription($attributes);
-            $subscription->save();
+        if ($order) {
+            $link = $this->paymentService->createPayment(
+                $price,
+                ['order_id' => $order->id]
+            );
 
             return response()->json([
-                'message' => 'Подписка на категорию успешно оформлена',
-                'subscription' => new SubscriptionResource($subscription)
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Подписка не была оформлена. ',
-            ]);
+                'link' => $link
+            ], Response::HTTP_OK);
         }
+
+//        $paymentSuccess = true;
+//
+//        if($paymentSuccess){
+//            $attributes = [
+//                'user_id' => auth()->user()->id,
+//                'subscriptionable_type' => Category::class,
+//                'subscriptionable_id' => $categoryId,
+//                'period_id' => Period::firstWhere('length', '=', $period)->id,
+//                'start_date' => now(),
+//                'end_date' => now()->addDays($period)
+//            ];
+//
+//            $subscription = new Subscription($attributes);
+//            $subscription->save();
+//
+//            return response()->json([
+//                'message' => 'Подписка на категорию успешно оформлена',
+//                'subscription' => new SubscriptionResource($subscription)
+//            ]);
+//        } else {
+//            return response()->json([
+//                'message' => 'Подписка не была оформлена. ',
+//            ]);
+//        }
     }
 }

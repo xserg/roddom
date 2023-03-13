@@ -10,9 +10,7 @@ use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Services\PaymentService;
 use Illuminate\Http\Response;
-use Illuminate\Support\Arr;
 use OpenApi\Attributes as OA;
-use YooKassa\Client;
 
 #[OA\Post(
     path: '/lecture/{id}/buy/{period}',
@@ -64,6 +62,7 @@ class BuyLectureController extends Controller
     {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
+        $price = $this->lectureRepository->getLecturePrice($lecture, $period);
 
         if ($isPurchasedStrict) {
             return response()->json([
@@ -77,25 +76,6 @@ class BuyLectureController extends Controller
             return response()->json([
                 'message' => 'You cannot purchase free lecture'
             ], Response::HTTP_FORBIDDEN);
-        }
-
-        /**
-         * тут старт оплаты
-         */
-
-        $prices = $lecture->prices;
-        if ($lecture->is_promo == 1) {
-            $priceArr = Arr::where(
-                $prices['price_by_promo'],
-                fn($value) => $value['length'] == $period
-            );
-            $price = Arr::first($priceArr)['price_for_promo_lecture'];
-        } else {
-            $priceArr = Arr::where(
-                $prices['price_by_category'],
-                fn($value) => $value['length'] == $period
-            );
-            $price = Arr::first($priceArr)['price_for_lecture'];
         }
 
         $order = Order::create([
@@ -116,29 +96,5 @@ class BuyLectureController extends Controller
                 'link' => $link
             ], Response::HTTP_OK);
         }
-
-//        $paymentSuccess = true;
-//        if ($paymentSuccess) {
-//            $attributes = [
-//                'user_id' => auth()->user()->id,
-//                'subscriptionable_type' => Lecture::class,
-//                'subscriptionable_id' => $lectureId,
-//                'period_id' => Period::firstWhere('length', '=', $period)->id,
-//                'start_date' => now(),
-//                'end_date' => now()->addDays($period)
-//            ];
-//
-//            $subscription = new Subscription($attributes);
-//            $subscription->save();
-//
-//            return response()->json([
-//                'message' => 'Подписка на лекцию успешно оформлена',
-//                'subscription' => new SubscriptionResource($subscription)
-//            ]);
-//        } else {
-//            return response()->json([
-//                'message' => 'Подписка не была оформлена. ',
-//            ]);
-//        }
     }
 }
