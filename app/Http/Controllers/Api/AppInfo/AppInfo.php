@@ -66,8 +66,13 @@ class AppInfo
     {
         return response()->json([
             'data' => [
-                'app_help_page' => DB::select('SELECT title,text FROM app_help_page'),
-                'app_info' => DB::select('SELECT * FROM app_info'),
+                'app_help_page' =>
+                    DB::table('app_help_page')
+                        ->select('title', 'text')
+                        ->get(),
+                'app_info' => DB::table('app_info')
+                    ->select('*')
+                    ->get(),
             ],
         ]);
     }

@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CategoryPricesSeeder::class);
         $this->call(PromoLecturesSeeder::class);
         $this->call(PromoLecturesPricesSeeder::class);
+        $this->call(AppInfoSeeder::class);
 
         $this->createFirstTestUser();
         $this->createSecondTestUser();
