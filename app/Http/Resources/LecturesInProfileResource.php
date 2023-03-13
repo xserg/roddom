@@ -12,6 +12,7 @@ class LecturesInProfileResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->title,
+            'category_slug' => $this->category->slug,
             'preview_picture' => $this->preview_picture,
             'is_free' => $this->is_free,
             'is_recommended' => $this->is_recommended,
