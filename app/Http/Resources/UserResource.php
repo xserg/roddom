@@ -15,7 +15,7 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'id', description: 'id юзера', type: 'integer')]
     #[OA\Property(property: 'name', type: 'string')]
     #[OA\Property(property: 'email', type: 'string')]
-    #[OA\Property(property: 'birthday', description: 'Дата рождения юзера', type: 'string')]
+    #[OA\Property(property: 'birthdate', description: 'Дата рождения юзера', type: 'string')]
     #[OA\Property(property: 'phone', description: 'Телефон юзера', type: 'string')]
     #[OA\Property(property: 'is_mother', description: 'Родила ли уже юзер', type: 'boolean', example: 0)]
     #[OA\Property(property: 'pregnancy_start', description: 'Дата начала беременности', type: 'string', example: '2022-03-17')]
@@ -32,7 +32,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'birthday' => $this->birthday,
+            'birthdate' => $this->birthdate,
             'phone' => $this->phone,
             'is_mother' => $this->is_mother,
             'pregnancy_start' => $this->pregnancy_start,
