@@ -69,7 +69,7 @@ class LectureRepository
     ): Builder|QueryBuilder
     {
         $builder = QueryBuilder::for($builder)
-            ->defaultSort('-created_at')
+//            ->defaultSort('-created_at')
             ->allowedSorts(['created_at'])
             ->allowedIncludes(['category', 'lector', 'lector.diplomas'])
             ->allowedFilters([

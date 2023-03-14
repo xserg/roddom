@@ -60,7 +60,10 @@ class User extends Authenticatable
             'user_to_watched_lectures',
             'user_id',
             'lecture_id'
-        )->withPivot('available_until');
+        )
+            ->withPivot(['available_until'])
+            ->withTimestamps()
+            ->orderByPivot('updated_at', 'desc');
     }
 
     public function savedLectures(): BelongsToMany
@@ -70,7 +73,9 @@ class User extends Authenticatable
             'user_to_saved_lectures',
             'user_id',
             'lecture_id'
-        );
+        )
+            ->withTimestamps()
+            ->orderByPivot('updated_at', 'desc');
     }
 
     public function subscriptions(): HasMany

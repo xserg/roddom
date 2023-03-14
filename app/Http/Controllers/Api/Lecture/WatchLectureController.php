@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', example: [
-            'kinescope.id' => '837933399'
+            'kinescope-id' => '837933399'
         ]),
     ])
 )]
@@ -103,7 +103,7 @@ class WatchLectureController
 
         return response()->json(
             [
-                'data' => ['kinescope.id' => $videoId]
+                'data' => ['kinescope-id' => $videoId]
             ],
             Response::HTTP_OK
         );

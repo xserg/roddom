@@ -119,7 +119,11 @@ class Lecture extends Model
                 ->pluck('id')
                 ->toArray();
 
-            $query->whereIn('id', $watchedIds);
+            $ids = implode(',', $watchedIds);
+
+            $query
+                ->whereIn('id', $watchedIds)
+                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -143,7 +147,11 @@ class Lecture extends Model
                 ->pluck('id')
                 ->toArray();
 
-            $query->whereIn('id', $savedIds);
+            $ids = implode(',', $savedIds);
+
+            $query
+                ->whereIn('id', $savedIds)
+                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -151,7 +159,11 @@ class Lecture extends Model
     {
         $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
-        $query->whereIn('id', array_keys($purchasedIds));
+        $ids = implode(',', array_keys($purchasedIds));
+
+        $query
+            ->whereIn('id', array_keys($purchasedIds))
+            ->orderByRaw("FIELD(id, $ids)");
     }
 
     public function scopeFree(Builder $query): void
