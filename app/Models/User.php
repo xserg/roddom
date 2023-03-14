@@ -16,7 +16,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $appends = ['purchased_lectures'];
+    protected $appends = ['purchased_lectures_count'];
     /**
      * The attributes that are mass assignable.
      *
@@ -101,17 +101,15 @@ class User extends Authenticatable
             ->where('subscriptionable_type', '=', Promo::class);
     }
 
-    protected function purchasedLectures(): Attribute
+    protected function purchasedLecturesCount(): Attribute
     {
-        $purchasedLectureIds = app(LectureRepository::class)->getAllPurchasedLecturesIdsAndTheirDatesByUser($this);
-
-        if($purchasedLectureIds){
-            return new Attribute(
-                get: fn () => Lecture::whereIn('id', array_keys($purchasedLectureIds))->get(),
-            );
-        }
         return new Attribute(
-            get: fn () => [],
+            set: fn($value) => $value
         );
+    }
+
+    public function canAccessFilament(): bool
+    {
+        return $this->is_admin;
     }
 }

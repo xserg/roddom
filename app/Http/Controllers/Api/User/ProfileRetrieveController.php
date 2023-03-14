@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Resources\UserResource;
+use App\Models\Lecture;
 use App\Models\User;
+use App\Repositories\LectureRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -32,7 +35,8 @@ use OpenApi\Attributes as OA;
 class ProfileRetrieveController
 {
     public function __construct(
-//        private UserService $service
+//        private UserService $service,
+        private LectureRepository $lectureRepository
     )
     {
     }
@@ -43,9 +47,12 @@ class ProfileRetrieveController
          * @var $user User
          */
         $user = auth()->user();
+        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        $purchasedLecturesCount = count($purchasedLectureIds);
+        $user->purchased_lectures_count = $purchasedLecturesCount;
 
         return response()->json([
-            'data' => new UserResource($user->load('watchedLectures', 'savedLectures')),
+            'data' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
         ]);
     }
 }

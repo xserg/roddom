@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
+use App\Models\Lecture;
+use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
@@ -44,7 +46,8 @@ use OpenApi\Attributes as OA;
 class LoginController
 {
     public function __construct(
-        private UserRepository $userRepository
+        private UserRepository $userRepository,
+        private LectureRepository $lectureRepository
     )
     {
     }
@@ -81,8 +84,12 @@ class LoginController
             ->createToken('access_token')
             ->plainTextToken;
 
+        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        $purchasedLecturesCount = count($purchasedLectureIds);
+        $user->purchased_lectures_count = $purchasedLecturesCount;
+
         return response()->json([
-            'user' => new UserResource($user->load(['watchedLectures', 'savedLectures'])),
+            'user' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);

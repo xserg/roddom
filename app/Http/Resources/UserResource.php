@@ -23,9 +23,9 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'photo', description: 'Ссылка на 300x300 фото юзера', type: 'string')]
     #[OA\Property(property: 'photo_small', description: 'Ссылка на 150x150 фото юзера', type: 'string')]
     #[OA\Property(property: 'next_free_lecture_available', description: 'Дата, когда пользователь сможет смотреть бесплатную лекцию', type: 'datetime')]
-    #[OA\Property(property: 'watched_lectures', description: 'Просмотренные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
-    #[OA\Property(property: 'saved_lectures', description: 'Сохраненные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
-    #[OA\Property(property: 'purchased_lectures', description: 'Купленные лекции', type: 'array', items: new OA\Items('#/components/schemas/LectureResource'))]
+    #[OA\Property(property: 'watched_lectures_count', description: 'Количество просмотренные лекции', type: 'integer')]
+    #[OA\Property(property: 'saved_lectures_count', description: 'Количество сохраненных лекции', type: 'integer')]
+    #[OA\Property(property: 'purchased_lectures_count', description: 'Количество купленных лекции', type: 'integer')]
     public function toArray(Request $request): array
     {
         return [
@@ -40,24 +40,12 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'next_free_lecture_available' => $this->next_free_lecture_available,
-            'watched_lectures' =>
-                $this->whenLoaded(
-                    'watchedLectures',
-                    new LecturesInProfileCollection($this->watchedLectures),
-                    []
-                ),
-            'saved_lectures' =>
-                $this->whenLoaded(
-                    'savedLectures',
-                    new LecturesInProfileCollection($this->savedLectures),
-                    []
-                ),
-            'purchased_lectures' =>
-                $this->when(
-                    $this->purchasedLectures,
-                    new LecturesInProfileCollection($this->purchasedLectures),
-                    []
-                ),
+            'watched_lectures_count' =>
+                $this->whenCounted('watchedLectures', default: 0),
+            'saved_lectures_count' =>
+                $this->whenCounted('savedLectures', default: 0),
+            'purchased_lectures_count' =>
+                $this->whenNotNull($this->purchased_lectures_count, default: 0)
         ];
     }
 }
