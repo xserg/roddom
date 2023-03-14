@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Category;
 
 use App\Http\Resources\CategoryCollection;
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -63,12 +64,14 @@ class RetrieveCategoryController
         }
 
         return response()->json(
-            new CategoryCollection(
-                Category
-                    ::subCategories()
-                    ->where('parent_id', '=', $mainCategory->id)
-                    ->get()
-            )
+            ['category' => new CategoryResource($mainCategory),
+                'data' => new CategoryCollection(
+                    Category
+                        ::subCategories()
+                        ->where('parent_id', '=', $mainCategory->id)
+                        ->get()
+                )
+            ]
         );
     }
 }
