@@ -74,6 +74,7 @@ class LectureRepository
             ->allowedIncludes(['category', 'lector', 'lector.diplomas'])
             ->allowedFilters([
                 AllowedFilter::scope('watched'),
+                AllowedFilter::scope('list-watched'),
                 AllowedFilter::scope('saved'),
                 AllowedFilter::scope('purchased'),
                 AllowedFilter::scope('recommended'),

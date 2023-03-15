@@ -47,6 +47,8 @@ class LectureResource extends JsonResource
     ]
     public function toArray(Request $request): array
     {
+        $loadCategory = $this->resource->relationLoaded('category');
+
         return [
             'id' => $this->id,
             'lector_id' => $this->lector_id,
@@ -57,7 +59,9 @@ class LectureResource extends JsonResource
             'description' => $this->description,
             'preview_picture' => $this->preview_picture,
             'lector' => new LectorResource($this->whenLoaded('lector')),
-            'category' => new CategoryResource($this->whenLoaded('category')),
+            $this->mergeWhen($loadCategory, [
+                'category' => new CategoryResource($this->category),
+            ]),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'is_free' => $this->is_free,
             'is_recommended' => $this->is_recommended,

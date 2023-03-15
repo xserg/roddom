@@ -59,31 +59,7 @@ class DatabaseSeeder extends Seeder
                  * @var User $user
                  */
 
-                $lectures = Lecture
-                    ::all()
-                    ->random(50);
-
-                foreach ($lectures as $lecture) {
-                    $rand = rand(0, 2);
-                    switch ($rand) {
-                        case 0:
-                        {
-                            $user->watchedLectures()
-                                ->attach($lecture->id);
-                        }
-                        case 1:
-                        {
-                            $user->savedLectures()
-                                ->attach($lecture->id);
-                        }
-                        case 2:
-                        {
-                            $user->listWatchedLectures()
-                                ->attach($lecture->id);
-                        }
-                        default;
-                    }
-                }
+                $this->setDiffLectureTypes($user);
                 $this->createSubscriptionsForUser($user);
             });
     }
@@ -167,32 +143,7 @@ class DatabaseSeeder extends Seeder
 
         $tokenPlain = new NewAccessToken($token, $user->id . '|' . env('TEST_USER1_PLAIN'));
 
-        $lectures = Lecture
-            ::all()
-            ->random(50);
-
-        foreach ($lectures as $lecture) {
-            $rand = rand(0, 1);
-            switch ($rand) {
-                case 0:
-                {
-                    $user->watchedLectures()
-                        ->attach($lecture->id);
-                }
-                case 1:
-                {
-                    $user->savedLectures()
-                        ->attach($lecture->id);
-                }
-                case 2:
-                {
-                    $user->listWatchedLectures()
-                        ->attach($lecture->id);
-                }
-                default;
-            }
-        }
-
+        $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
     }
 
@@ -221,32 +172,7 @@ class DatabaseSeeder extends Seeder
 
         $tokenPlain = new NewAccessToken($token, $token->getKey() . '|' . env('TEST_USER2_PLAIN'));
 
-        $lectures = Lecture
-            ::all()
-            ->random(50);
-
-        foreach ($lectures as $lecture) {
-            $rand = rand(0, 1);
-            switch ($rand) {
-                case 0:
-                {
-                    $user->watchedLectures()
-                        ->attach($lecture->id);
-                }
-                case 1:
-                {
-                    $user->savedLectures()
-                        ->attach($lecture->id);
-                }
-                case 2:
-                {
-                    $user->listWatchedLectures()
-                        ->attach($lecture->id);
-                }
-                default;
-            }
-        }
-
+        $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
     }
 
@@ -256,5 +182,21 @@ class DatabaseSeeder extends Seeder
             $lecture->setRecommended();
             $lecture->save();
         });
+    }
+
+    private function setDiffLectureTypes($user)
+    {
+        $lectures = Lecture
+            ::all()
+            ->random(150);
+
+        foreach ($lectures as $lecture) {
+            $rand = rand(0, 2);
+            match ($rand) {
+                0 => $user->watchedLectures()->attach($lecture->id),
+                1 => $user->savedLectures()->attach($lecture->id),
+                2 => $user->listWatchedLectures()->attach($lecture->id)
+            };
+        }
     }
 }

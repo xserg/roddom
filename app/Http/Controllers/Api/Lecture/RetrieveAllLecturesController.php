@@ -49,6 +49,12 @@ use OpenApi\Attributes as OA;
     example: '1',
 )]
 #[OA\Parameter(
+    name: 'filter[list-watched]',
+    description: 'пишем filter[list-watched]=1 получаем добавленные в список просмотренных пользователем лекции',
+    in: 'query',
+    example: '1',
+)]
+#[OA\Parameter(
     name: 'filter[saved]',
     description: 'пишем filter[saved]=1 получаем сохраненные пользователем лекции',
     in: 'query',

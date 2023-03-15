@@ -42,10 +42,12 @@ class UserResource extends JsonResource
             'next_free_lecture_available' => $this->next_free_lecture_available,
             'watched_lectures_count' =>
                 $this->whenNotNull($this->watched_lectures_count, default: 0),
+            'list_watched_lectures_count' =>
+                $this->whenNotNull($this->list_watched_lectures_count, default: 0),
             'saved_lectures_count' =>
                 $this->whenNotNull($this->saved_lectures_count, default: 0),
             'purchased_lectures_count' =>
-                $this->whenNotNull($this->purchased_lectures_count, default: 0)
+                $this->whenNotNull($this->purchased_lectures_counter, default: 0),
         ];
     }
 }

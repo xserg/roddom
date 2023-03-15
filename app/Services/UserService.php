@@ -17,7 +17,7 @@ use App\Repositories\LectureRepository;
 use App\Repositories\PasswordResetRepository;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Http\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -200,7 +200,7 @@ class UserService
     /**
      * @throws Exception
      */
-    public function saveProfile($user, array $profile)
+    public function saveProfile($user, array $profile): User
     {
         $user->fill($profile);
 
@@ -312,6 +312,17 @@ class UserService
         }
 
         $user->listWatchedLectures()->detach($lectureId);
+    }
+
+    public function appendLectureCountersToUser(Model|User $user): User
+    {
+        $user = $user->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures');
+
+        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        $purchasedLecturesCount = count($purchasedLectureIds);
+        $user->purchased_lectures_counter = $purchasedLecturesCount;
+
+        return $user;
     }
 
     private function codeIsOlderThanHour($createdAt): bool

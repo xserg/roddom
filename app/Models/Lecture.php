@@ -140,6 +140,23 @@ class Lecture extends Model
         }
     }
 
+    public function scopeListWatched(Builder $query): void
+    {
+        if (auth()->user()) {
+            $listWatchedIds = auth()
+                ->user()
+                ->listWatchedLectures
+                ->pluck('id')
+                ->toArray();
+
+            $ids = implode(',', $listWatchedIds);
+
+            $query
+                ->whereIn('id', $listWatchedIds)
+                ->orderByRaw("FIELD(id, $ids)");
+        }
+    }
+
     public function scopePromo(Builder $query): void
     {
         $firstPromoPack = Promo::first();

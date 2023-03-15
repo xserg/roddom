@@ -7,6 +7,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Lecture;
 use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +48,8 @@ class LoginController
 {
     public function __construct(
         private UserRepository $userRepository,
-        private LectureRepository $lectureRepository
+        private LectureRepository $lectureRepository,
+        private UserService $userService
     )
     {
     }
@@ -84,12 +86,10 @@ class LoginController
             ->createToken('access_token')
             ->plainTextToken;
 
-        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
-        $purchasedLecturesCount = count($purchasedLectureIds);
-        $user->purchased_lectures_count = $purchasedLecturesCount;
+        $user = $this->userService->appendLectureCountersToUser($user);
 
         return response()->json([
-            'user' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
+            'user' => new UserResource($user),
             'access_token' => $token,
             'token_type' => 'Bearer'
         ]);

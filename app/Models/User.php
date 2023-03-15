@@ -17,7 +17,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $appends = ['purchased_lectures_count'];
+    protected $appends = ['purchased_lectures_counter'];
     /**
      * The attributes that are mass assignable.
      *
@@ -114,7 +114,7 @@ class User extends Authenticatable
             ->where('subscriptionable_type', '=', Promo::class);
     }
 
-    protected function purchasedLecturesCount(): Attribute
+    protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(
             set: fn($value) => $value

@@ -50,7 +50,6 @@ class ProfileUpdateController
 {
     public function __construct(
         private UserService $userService,
-        private LectureRepository $lectureRepository
     )
     {
     }
@@ -78,12 +77,10 @@ class ProfileUpdateController
             ]);
         }
 
-        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
-        $purchasedLecturesCount = count($purchasedLectureIds);
-        $user->purchased_lectures_count = $purchasedLecturesCount;
+        $user = $this->userService->appendLectureCountersToUser($user);
 
         return response()->json([
-            'data' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
+            'data' => new UserResource($user),
         ]);
     }
 }
