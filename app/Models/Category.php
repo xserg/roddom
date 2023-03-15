@@ -16,6 +16,7 @@ class Category extends Model
 
     protected $appends = ['prices', 'parent_slug'];
 
+    protected $fillable = ['parent_id', 'title', 'description', 'info', 'slug'];
     protected $table = 'lecture_categories';
 
     public function parentCategory(): BelongsTo

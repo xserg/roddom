@@ -22,6 +22,7 @@ class LectureResource extends JsonResource
     #[OA\Property(property: 'is_recommended', description: 'рекомендованная ли лекция', type: 'boolean')]
     #[OA\Property(property: 'is_promo', description: 'акционная ли лекция', type: 'boolean')]
     #[OA\Property(property: 'is_watched', description: 'просмотрена ли лекция', type: 'boolean')]
+    #[OA\Property(property: 'list_watched', description: 'находится ли лекция в списке просмотренных', type: 'string')]
     #[OA\Property(property: 'is_saved', description: 'сохранена ли лекция', type: 'boolean')]
     #[OA\Property(property: 'purchase_info', description: 'куплена ли лекция. Дата до которой куплена. Не важно как покупалась:
     в категории ли, в промо паке или отдельно', type: 'boolean')]
@@ -61,6 +62,7 @@ class LectureResource extends JsonResource
             'is_free' => $this->is_free,
             'is_recommended' => $this->is_recommended,
             'is_saved' => $this->whenNotNull($this->is_saved),
+            'list_watched' => $this->whenNotNull($this->list_watched),
             'is_promo' => $this->whenNotNull($this->is_promo),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),

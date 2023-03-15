@@ -276,6 +276,44 @@ class UserService
         $user->savedLectures()->detach($lectureId);
     }
 
+    /**
+     * @throws UserCannotSaveLectureException
+     * @throws NotFoundHttpException
+     */
+    public function addLectureToListWatched(
+        int                  $lectureId,
+        User|Authenticatable $user
+    ): void
+    {
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $alreadySaved = $user->listWatchedLectures->contains($lectureId);
+
+        if ($alreadySaved) {
+            throw new UserCannotSaveLectureException('Лекция c id ' . $lectureId . ' уже в списке просмотренных');
+        }
+
+        $user->listWatchedLectures()->attach($lectureId);
+    }
+
+    /**
+     * @throws UserCannotRemoveFromSavedLectureException
+     * @throws NotFoundHttpException
+     */
+    public function removeLectureFromListWatched(
+        int                       $lectureId,
+        User|Authenticatable|null $user
+    ): void
+    {
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $alreadyRemoved = !$user->listWatchedLectures->contains($lectureId);
+
+        if ($alreadyRemoved) {
+            throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в списке просмотренных');
+        }
+
+        $user->listWatchedLectures()->detach($lectureId);
+    }
+
     private function codeIsOlderThanHour($createdAt): bool
     {
         return now()->subHour() > $createdAt;

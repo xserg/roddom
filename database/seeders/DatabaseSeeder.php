@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
                     ->random(50);
 
                 foreach ($lectures as $lecture) {
-                    $rand = rand(0, 1);
+                    $rand = rand(0, 2);
                     switch ($rand) {
                         case 0:
                         {
@@ -74,6 +74,11 @@ class DatabaseSeeder extends Seeder
                         case 1:
                         {
                             $user->savedLectures()
+                                ->attach($lecture->id);
+                        }
+                        case 2:
+                        {
+                            $user->listWatchedLectures()
                                 ->attach($lecture->id);
                         }
                         default;
@@ -179,6 +184,11 @@ class DatabaseSeeder extends Seeder
                     $user->savedLectures()
                         ->attach($lecture->id);
                 }
+                case 2:
+                {
+                    $user->listWatchedLectures()
+                        ->attach($lecture->id);
+                }
                 default;
             }
         }
@@ -226,6 +236,11 @@ class DatabaseSeeder extends Seeder
                 case 1:
                 {
                     $user->savedLectures()
+                        ->attach($lecture->id);
+                }
+                case 2:
+                {
+                    $user->listWatchedLectures()
                         ->attach($lecture->id);
                 }
                 default;

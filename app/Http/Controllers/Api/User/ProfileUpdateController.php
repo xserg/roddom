@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Repositories\LectureRepository;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -48,7 +49,8 @@ use OpenApi\Attributes as OA;
 class ProfileUpdateController
 {
     public function __construct(
-        private UserService $userService
+        private UserService $userService,
+        private LectureRepository $lectureRepository
     )
     {
     }
@@ -76,8 +78,12 @@ class ProfileUpdateController
             ]);
         }
 
+        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        $purchasedLecturesCount = count($purchasedLectureIds);
+        $user->purchased_lectures_count = $purchasedLecturesCount;
+
         return response()->json([
-            'data' => new UserResource($user->load(['watchedLectures', 'savedLectures'])),
+            'data' => new UserResource($user->loadCount(['watchedLectures', 'savedLectures'])),
         ]);
     }
 }

@@ -18,9 +18,12 @@ class Lecture extends Model
 
     private $lectureRepository;
 
-    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices'];
+    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices', 'list_watched'];
 
     protected $casts = ['created_at' => 'datetime'];
+
+    protected $fillable = ['id', 'lector_id', 'description', 'title', 'preview_picture',
+        'is_free', 'category_id', 'video_id'];
 
     protected $hidden = ['pivot'];
 
@@ -50,6 +53,16 @@ class Lecture extends Model
         return $this->belongsToMany(
             User::class,
             'user_to_watched_lectures',
+            'lecture_id',
+            'user_id'
+        );
+    }
+
+    public function listWatchedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'user_to_saved_lectures',
             'lecture_id',
             'user_id'
         );
@@ -243,6 +256,24 @@ class Lecture extends Model
         }
         return new Attribute(
             get: fn() => 0,
+        );
+    }
+
+    protected function listWatched(): Attribute
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return new Attribute(
+                get: fn() => false,
+            );
+        }
+
+        $listWatchedLectures = $user->listWatchedLectures;
+
+        return new Attribute(
+            get: fn() => (int)$listWatchedLectures
+                ->contains($this->id),
         );
     }
 
