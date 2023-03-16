@@ -19,6 +19,45 @@ class Category extends Model
     protected $fillable = ['parent_id', 'title', 'description', 'info', 'slug'];
     protected $table = 'lecture_categories';
 
+    protected static function booted(): void
+    {
+        static::created(function (Category $category) {
+            if ($category->categoryPrices->isNotEmpty()) {
+                return;
+            }
+
+            $categoryPricesDay = new SubcategoryPrices(
+                [
+                    'category_id' => $category->id,
+                    'price_for_pack' => 100000,
+                    'price_for_one_lecture' => 10000,
+                    'period_id' => 1
+                ]
+            );
+            $categoryPricesDay->save();
+
+            $categoryPricesWeek = new SubcategoryPrices(
+                [
+                    'category_id' => $category->id,
+                    'price_for_pack' => 200000,
+                    'price_for_one_lecture' => 20000,
+                    'period_id' => 2
+                ]
+            );
+            $categoryPricesWeek->save();
+
+            $categoryPricesMonth = new SubcategoryPrices(
+                [
+                    'category_id' => $category->id,
+                    'price_for_pack' => 500000,
+                    'price_for_one_lecture' => 50000,
+                    'period_id' => 3
+                ]
+            );
+            $categoryPricesMonth->save();
+        });
+    }
+
     public function parentCategory(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');

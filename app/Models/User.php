@@ -13,11 +13,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $appends = ['purchased_lectures_counter'];
+//    protected $appends = ['purchased_lectures_counter'];
     /**
      * The attributes that are mass assignable.
      *
