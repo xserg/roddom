@@ -162,9 +162,9 @@ class UserService
         Authenticatable|User $user,
         UploadedFile         $file): array
     {
-        // TODO: refactoring
         $manager = new ImageManager(['driver' => 'imagick']);
-        $image = $manager->make($file)->crop(300, 300);
+        $image = $manager->make($file)->fit(300, 300);
+        $imageSmall = $manager->make($file)->fit(150, 150);
 
         $dirCreated = Storage::makeDirectory('images/users/' . $user->id);
 
@@ -172,21 +172,15 @@ class UserService
             throw new Exception('Directory could not be created');
         }
 
-        // /app/public/images/{user-id}/{user-id}.{extension}
-        // linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
-        // url . /storage/images/1/1.jpg
+//         /app/public/images/{user-id}/{user-id}.{extension}
+//         linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
+//         url . /storage/images/1/1.jpg
         $path = "/images/users/$user->id/$user->id.jpg";
-
-
-        if (!$image->save(storage_path('app/public' . $path), format: 'jpg')
-        ) {
-            throw new Exception('Could not upload image');
-        }
-
         $smallImagePath = "/images/users/$user->id/$user->id-small.jpg";
-        $imageSmall = $image->resize(150, 150);
 
-        if (!$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')
+        if (
+            !$image->save(storage_path('app/public' . $path), format: 'jpg')
+            || !$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')
         ) {
             throw new Exception('Could not upload image');
         }
