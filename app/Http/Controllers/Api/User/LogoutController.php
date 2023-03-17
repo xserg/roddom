@@ -37,7 +37,7 @@ class LogoutController
 {
     public function __invoke(Request $request)
     {
-        $request->user()->tokens()->delete();
+        auth('sanctum')->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Логаут пользователя прошел успешно'
