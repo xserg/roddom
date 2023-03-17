@@ -164,8 +164,7 @@ class UserService
     {
         // TODO: refactoring
         $manager = new ImageManager(['driver' => 'imagick']);
-        $image = $manager->make($file)->resize(300, 300);
-        $imageSmall = $manager->make($file)->resize(150, 150);
+        $image = $manager->make($file)->crop(300, 300, 0, 0);
 
         $dirCreated = Storage::makeDirectory('images/users/' . $user->id);
 
@@ -177,10 +176,18 @@ class UserService
         // linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
         // url . /storage/images/1/1.jpg
         $path = "/images/users/$user->id/$user->id.jpg";
-        $smallImagePath = "/images/users/$user->id/$user->id-small.jpg";
 
-        if (!$image->save(storage_path('app/public' . $path), format: 'jpg') ||
-            !$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')) {
+
+        if (!$image->save(storage_path('app/public' . $path), format: 'jpg')
+        ) {
+            throw new Exception('Could not upload image');
+        }
+
+        $smallImagePath = "/images/users/$user->id/$user->id-small.jpg";
+        $imageSmall = $image->resize(150, 150);
+
+        if (!$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')
+        ) {
             throw new Exception('Could not upload image');
         }
 
