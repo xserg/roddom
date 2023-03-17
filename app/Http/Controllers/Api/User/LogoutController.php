@@ -37,7 +37,8 @@ class LogoutController
 {
     public function __invoke(Request $request)
     {
-        $request->user()->tokens()->delete();
+        auth()->user()->tokens()->delete();
+
         return response()->json([
             'message' => 'Логаут пользователя прошел успешно'
         ], Response::HTTP_OK);
