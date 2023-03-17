@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
-use App\Models\Lecture;
 use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
 use App\Services\UserService;

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use Illuminate\Http\Client\Request;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -37,7 +37,7 @@ class LogoutController
 {
     public function __invoke(Request $request)
     {
-        auth()->user()->tokens()->delete();
+        $request->user()->tokens()->delete();
 
         return response()->json([
             'message' => 'Логаут пользователя прошел успешно'
