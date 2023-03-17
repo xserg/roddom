@@ -164,7 +164,7 @@ class UserService
     {
         // TODO: refactoring
         $manager = new ImageManager(['driver' => 'imagick']);
-        $image = $manager->make($file)->crop(300, 300, 0, 0);
+        $image = $manager->make($file)->crop(300, 300);
 
         $dirCreated = Storage::makeDirectory('images/users/' . $user->id);
 
