@@ -57,7 +57,7 @@ class ForgotPasswordController extends Controller
         ForgotPasswordRequest $request
     ): JsonResponse
     {
-        $email = $request->email;
+        $email = $request->input('email');
         $this->passwordResetService->deleteWhereEmail($email);
 
         $code = mt_rand(100000, 999999);
@@ -77,7 +77,7 @@ class ForgotPasswordController extends Controller
 //        );
 
         $sent = Mail
-            ::to($request->email)
+            ::to($email)
             ->send(new SendCodeResetPassword($passwordReset->code));
 
         if (!$sent) {

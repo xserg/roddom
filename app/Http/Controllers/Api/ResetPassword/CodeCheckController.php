@@ -57,14 +57,16 @@ class CodeCheckController extends Controller
 
     public function __invoke(CodeRequest $request)
     {
+        $requestCode = $request->input('code');
+
         try {
             $code = $this
                 ->passwordResetService
-                ->checkCodeIfExpired($request->code);
+                ->checkCodeIfExpired($requestCode);
 
         } catch (ResetCodeExpiredException $exception) {
 
-            $this->passwordResetService->deleteCode($request->code);
+            $this->passwordResetService->deleteCode($requestCode);
 
             return response()->json([
                 'message' => $exception->getMessage()

@@ -56,10 +56,13 @@ class ResetPasswordController extends Controller
         UpdatePasswordRequest $request
     ): JsonResponse
     {
+        $code = $request->input('code');
+        $password = $request->input('password');
+
         try {
             $this->userService->updateUsersPassword(
-                $request->code,
-                $request->password
+                $code,
+                $password
             );
         } catch (Exception $exception) {
 
