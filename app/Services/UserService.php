@@ -195,11 +195,20 @@ class UserService
         return [$user->photo, $user->photo_small];
     }
 
-    public function deletePhoto(Authenticatable|User $user)
+    /**
+     * @throws FailedSaveUserException
+     * @throws NotFoundHttpException
+     */
+    public function deletePhoto(Authenticatable|User $user): void
     {
         if (isset($user->id)) {
             $files = Storage::allFiles('images/users/' . $user->id);
             Storage::delete($files);
+
+            $user->photo = null;
+            $user->photo_small = null;
+
+            $this->saveUserGuard($user);
         } else {
             throw new NotFoundHttpException('User not found');
         }
