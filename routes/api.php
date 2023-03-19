@@ -24,8 +24,8 @@ use App\Http\Controllers\Api\User\DeleteUserController;
 use App\Http\Controllers\Api\User\LoginController;
 use App\Http\Controllers\Api\User\LogoutController;
 use App\Http\Controllers\Api\User\PhotoController;
+use App\Http\Controllers\Api\User\PhotoDeleteController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
-use App\Http\Controllers\Api\User\ProfileRetrieveControllerTest;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\RetrieveAllUsersController;
@@ -74,6 +74,8 @@ Route::prefix('v1')
                 ->name('profile.update');
             Route::put('/user/photo', PhotoController::class)
                 ->name('photo');
+            Route::delete('/user/photo', PhotoDeleteController::class)
+                ->name('photo.delete');
             Route::delete('/user/logout', LogoutController::class)
                 ->name('logout');
 

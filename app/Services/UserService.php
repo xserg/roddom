@@ -195,6 +195,13 @@ class UserService
         return [$user->photo, $user->photo_small];
     }
 
+    public function deletePhoto(Authenticatable|User $user)
+    {
+        $files = Storage::allFiles('images/users/' . $user->id);
+
+        Storage::delete($files);
+    }
+
     /**
      * @throws Exception
      */
