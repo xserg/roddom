@@ -79,6 +79,13 @@ class PhotoController
         $user = auth()->user();
         $file = $request->file('photo');
 
+        if(is_null($file)){
+            return response()->json([
+                'data' => '',
+                'message' => 'Требуется передать поле \'photo\' в теле запроса с файлом фото',
+            ], 422);
+        }
+
         try {
             $paths = $this->service->saveUsersPhoto($user, $file);
 
