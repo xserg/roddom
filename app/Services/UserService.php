@@ -197,9 +197,12 @@ class UserService
 
     public function deletePhoto(Authenticatable|User $user)
     {
-        $files = Storage::allFiles('images/users/' . $user->id);
-
-        Storage::delete($files);
+        if (isset($user->id)) {
+            $files = Storage::allFiles('images/users/' . $user->id);
+            Storage::delete($files);
+        } else {
+            throw new NotFoundHttpException('User not found');
+        }
     }
 
     /**
