@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Category\RetrieveCategoryController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lecture\AddToListWatchedLectureController;
+use App\Http\Controllers\Api\Lecture\FeedbackLectureController;
 use App\Http\Controllers\Api\Lecture\RemoveFromListWatchedLectureController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
@@ -90,6 +91,8 @@ Route::prefix('v1')
                 ->name('lecture');
             Route::post('/lecture/{id}/watch', WatchLectureController::class)
                 ->name('lecture.watch');
+            Route::post('/lecture/{id}/feedback', FeedbackLectureController::class)
+                ->name('lecture.feedback');
 
             Route::put('/lecture/{id}/save', SaveLectureController::class)
                 ->name('lecture.save');
