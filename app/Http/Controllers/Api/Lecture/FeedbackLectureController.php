@@ -9,7 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
-#[OA\Get(
+#[OA\Post(
     path: '/lecture/{id}/feedback',
     description: "Оставить отзыв о лекции",
     summary: "Оставить отзыв о лекции",
