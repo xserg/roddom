@@ -24,7 +24,7 @@ class PaymentService
                 'capture' => false,
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => config('app.url')
+                    'return_url' => config('app.back2site')
                 ],
                 'metadata' => [
                     'order_id' => $options['order_id']
