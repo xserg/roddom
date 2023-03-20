@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Requests\FeedbackRequest;
-use App\Http\Resources\LectureResource;
 use App\Repositories\LectureRepository;
 use App\Services\FeedbackService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -24,6 +22,14 @@ use OpenApi\Attributes as OA;
     in: 'path',
     required: true,
     schema: new OA\Schema(type: 'integer')
+)]
+#[OA\RequestBody (
+    description: "Данные, необходимые для отзыва",
+    required: true,
+    content: [
+        new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/FeedbackRequest')),
+        new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/FeedbackRequest')),
+    ]
 )]
 #[OA\Response(response: Response::HTTP_CREATED, description: 'CREATED',
 )]
