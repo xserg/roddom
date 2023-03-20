@@ -22,7 +22,8 @@ class Category extends Model
     protected static function booted(): void
     {
         static::created(function (Category $category) {
-            if ($category->categoryPrices->isNotEmpty()) {
+            if ($category->categoryPrices->isNotEmpty()
+                || $category->parent_id == 0) {
                 return;
             }
 

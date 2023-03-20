@@ -164,9 +164,12 @@ class LectureRepository
 //    }
 
     public function getAllPurchasedLecturesIdsAndTheirDatesByUser(
-        Authenticatable|User $user
+        ?User $user
     ): array
     {
+        if (is_null($user)) {
+            return [];
+        }
         $lectures = [];
 
         $lecturesSubscriptions = $user

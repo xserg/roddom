@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\LectureResource\Pages;
+namespace App\Filament\Resources\AppInfoResource\Pages;
 
-use App\Filament\Resources\LectureResource;
+use App\Filament\Resources\AppInfoResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListLectures extends ListRecords
+class ListAppInfos extends ListRecords
 {
-    protected static string $resource = LectureResource::class;
+    protected static string $resource = AppInfoResource::class;
 
     protected function getActions(): array
     {

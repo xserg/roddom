@@ -8,6 +8,7 @@ use App\Filament\Resources\UserResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\Position;
 use Illuminate\Support\Facades\Log;
 
 class ListUsers extends ListRecords
@@ -24,7 +25,7 @@ class ListUsers extends ListRecords
     protected function getTableHeaderActions(): array
     {
         return [
-            FilamentExportHeaderAction::make('Export'),
+            FilamentExportHeaderAction::make('Export')
         ];
     }
 }

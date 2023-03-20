@@ -7,15 +7,15 @@ use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Lecture;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Livewire\TemporaryUploadedFile;
 
 class LectureResource extends Resource
 {
@@ -37,6 +37,11 @@ class LectureResource extends Resource
                     Forms\Components\TextInput::make('title')
                         ->required()
                         ->maxLength(255),
+                    Forms\Components\TextInput::make('video_id')
+                        ->label('kinescope id видео')
+                        ->required(),
+                ])->columns(2),
+                Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('description')
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('preview_picture')
@@ -44,11 +49,6 @@ class LectureResource extends Resource
                         ->dehydrateStateUsing(fn($state) => config('app.url') . '/storage/' . Arr::first($state))
                         ->maxSize(10240)
                         ->image(),
-                    Forms\Components\TextInput::make('video_id')
-                        ->label('kinescope id видео')
-                        ->required(),
-                ]),
-                Forms\Components\Card::make([
                     Forms\Components\Toggle::make('is_published')
                         ->required()
                         ->label('опубликованная'),
@@ -58,7 +58,26 @@ class LectureResource extends Resource
                     Forms\Components\Toggle::make('is_recommended')
                         ->label('рекомендованная')
                         ->required(),
-                ])
+                ]),
+
+//                Repeater::make('pricesInPromoPacks')
+//                    ->defaultItems(2)
+//                    ->relationship()
+//                    ->schema([
+//                        Forms\Components\TextInput::make('lecture_id')
+//                            ->required()
+//                            ->placeholder(fn(\Closure $get) => $get('id')),
+//                        Forms\Components\Select::make('promo_id')
+//                            ->options(['1' => 1])
+//                            ->default('1')
+//                            ->hidden()
+//                            ->disabled(),
+//                        Forms\Components\TextInput::make('period_id')
+//                            ->required(),
+//                        Forms\Components\TextInput::make('price')
+//                            ->required(),
+//                    ])
+//                    ->columns(3),
             ]);
     }
 
@@ -66,28 +85,36 @@ class LectureResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('lector.name'),
-                Tables\Columns\TextColumn::make('category.title'),
-                Tables\Columns\TextColumn::make('title'),
-                Tables\Columns\TextColumn::make('description'),
-                Tables\Columns\TextColumn::make('preview_picture'),
-                Tables\Columns\TextColumn::make('video_id'),
-                Tables\Columns\IconColumn::make('is_free')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('title')
+                    ->limit(15)
+                    ->tooltip(fn(Model $record): string => $record->title),
+                Tables\Columns\TextColumn::make('category.title')
+                    ->limit(15)
+                    ->tooltip(fn(Model $record): string => $record->category->title),
+                Tables\Columns\TextColumn::make('lector.name')
+                    ->limit(15)
+                    ->tooltip(fn(Model $record): string => $record->lector->name),
+                Tables\Columns\ImageColumn::make('preview_picture'),
                 Tables\Columns\IconColumn::make('is_published')
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('is_recommended')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
+                    ->boolean()
+                    ->sortable(),
+                Tables\Columns\IconColumn::make('is_promo')
+                    ->boolean()
+                    ->sortable(),
             ])
             ->filters([
-                //
+                Filter::make('is_free')
+                    ->query(fn(Builder $query): Builder => $query->where('is_free', true))
+                    ->label('бесплатные'),
+                Filter::make('is_recommended')
+                    ->query(fn(Builder $query): Builder => $query->where('is_recommended', true))
+                    ->label('рекомендованные'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -97,7 +124,7 @@ class LectureResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\PromoLecturesPricesRelationManager::class,
         ];
     }
 
@@ -108,5 +135,10 @@ class LectureResource extends Resource
             'create' => Pages\CreateLecture::route('/create'),
             'edit' => Pages\EditLecture::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 }

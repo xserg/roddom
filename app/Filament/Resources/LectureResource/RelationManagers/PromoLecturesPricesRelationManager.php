@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Filament\Resources\LectureResource\RelationManagers;
+
+use App\Models\Period;
+use App\Models\Promo;
+use App\Traits\MoneyConversion;
+use Filament\Forms;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Form;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Resources\Table;
+use Filament\Tables;
+use Filament\Tables\Actions\AttachAction;
+use Livewire\Component as Livewire;
+
+class PromoLecturesPricesRelationManager extends RelationManager
+{
+    use MoneyConversion;
+
+    protected static string $relationship = 'pricesInPromoPacks';
+
+    protected static ?string $inverseRelationship = 'pricesForPromoLectures';
+
+    protected static ?string $recordTitleAttribute = 'id';
+
+    protected bool $allowsDuplicates = true;
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\TextInput::make('lecture_id')
+                    ->required()
+                    ->maxLength(255),
+
+                Forms\Components\Select::make('period_id')
+                    ->required()
+                    ->options([
+                        Period::all()->pluck('id', 'length')
+                    ]),
+
+                Forms\Components\TextInput::make('price')
+                    ->required()
+                    ->afterStateHydrated(function (TextInput $component, $state) {
+                        if ($state) {
+                            $component->state(self::coinsToRoubles($state));
+                        }
+                    })
+                    ->dehydrateStateUsing(fn($state) => self::roublesToCoins($state))
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('period_id')
+                    ->formatStateUsing(
+                        fn(string $state): string => Period::firstWhere('id', $state)->length
+                    )
+                    ->label('Период покупки, дней'),
+
+                Tables\Columns\TextColumn::make('price')
+                    ->formatStateUsing(
+                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                    )->label('Цена за одну лекцию этой категории, рублей'),
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                Tables\Actions\AttachAction::make()
+                    ->label('добавить период и цену')
+                    ->disableAttachAnother()
+                    ->preloadRecordSelect()
+                    ->disabled(function (Livewire $livewire) {
+                        $lecture = $livewire->ownerRecord;
+                        $periods = $lecture->pricesPeriodsInPromoPacks;
+                        if ($periods->count() == Period::all()->count()) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    ->form(fn(AttachAction $action): array => [
+                        Forms\Components\Card::make([
+                            Forms\Components\Select::make('period_id')
+                                ->required()
+                                ->options(function (Livewire $livewire) {
+                                    $lecture = $livewire->ownerRecord;
+                                    $periodsAlreadyAttached = $lecture
+                                        ?->pricesPeriodsInPromoPacks
+                                        ?->pluck('id')
+                                        ?->toArray();
+
+                                    if (is_null($periodsAlreadyAttached)) {
+                                        return Period::all()->pluck('length', 'id');
+                                    } else {
+                                        return Period::query()->whereNotIn('id', $periodsAlreadyAttached)
+                                            ->pluck('length', 'id');
+                                    }
+
+
+                                })->label('период, дней'),
+
+                            self::priceField('price')
+                                ->label('цена, рублей'),
+                        ])->columns(2),
+                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
+                    ]),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DetachAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
+    }
+
+    public static function priceField(string $name): Forms\Components\Field
+    {
+        return Forms\Components\TextInput::make($name)
+            ->required()
+            ->afterStateHydrated(function (TextInput $component, $state) {
+                $component->state(number_format($state / 100, 2, thousands_separator: ''));
+            })
+            ->dehydrateStateUsing(fn($state) => $state * 100)
+            ->numeric()
+            ->mask(fn(TextInput\Mask $mask) => $mask
+                ->numeric()
+                ->decimalPlaces(2) // Set the number of digits after the decimal point.
+                ->decimalSeparator('.') // Add a separator for decimal numbers.
+            );
+    }
+}

@@ -1,32 +1,34 @@
 <?php
 
-namespace App\Filament\Resources\CategoryResource\RelationManagers;
+namespace App\Filament\Resources\PromoResource\RelationManagers;
 
 use App\Models\Period;
-use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Model;
 
-class CategoryPricesRelationManager extends RelationManager
+class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
-    use MoneyConversion;
+    protected static ?string $title = 'Цены на весь акционный пак';
 
-    protected static string $relationship = 'categoryPrices';
+    protected static string $relationship = 'subscriptionPeriodsForPromoPack';
 
-    protected static ?string $inverseRelationship = 'category';
+    protected static ?string $recordTitleAttribute = 'period_id';
 
-    protected static ?string $recordTitleAttribute = 'id';
+    protected function isTablePaginationEnabled(): bool
+    {
+        return false;
+    }
 
     public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                self::priceField('price_for_pack'),
-                self::priceField('price_for_one_lecture'),
+            ->schema(fn(?Model $record, string $context) => [
+                self::priceField('price')
             ]);
     }
 
@@ -34,29 +36,34 @@ class CategoryPricesRelationManager extends RelationManager
     {
         return $table
             ->columns([
+//                Tables\Columns\TextColumn::make('lecture title')
+//                    ->formatStateUsing(
+//                        function (callable $get) {
+//                            $lecture_id = $get('lecture_id'); // Store the value of the `email` field in the `$email` variable.
+//                            return Lecture::firstWhere('id', $lecture_id)->title;
+//                        }
+//                    )
+//                    ->searchable()
+//                    ->label('id лекции')
+//                    ->searchable(),
+
+
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
                         fn(string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней'),
 
-                Tables\Columns\TextColumn::make('price_for_pack')
+                Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(
-                        fn(string $state): string => self::coinsToRoubles($state)
+                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )
-                    ->label('Цена за всю категорию, рублей'),
-
-                Tables\Columns\TextColumn::make('price_for_one_lecture')
-                    ->formatStateUsing(
-                        fn(string $state): string => self::coinsToRoubles($state)
-                    )
-                    ->label('Цена за одну лекцию этой категории, рублей'),
+                    ->label('Цена, рублей'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-//                Tables\Actions\AssociateAction::make()->preloadRecordSelect()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -76,13 +83,8 @@ class CategoryPricesRelationManager extends RelationManager
             ->numeric()
             ->mask(fn(TextInput\Mask $mask) => $mask
                 ->numeric()
-                ->decimalPlaces(2) // Set the number of digits after the decimal point.
-                ->decimalSeparator('.') // Add a separator for decimal numbers.
+                ->decimalPlaces(2)
+                ->decimalSeparator('.')
             );
-    }
-
-    protected function isTablePaginationEnabled(): bool
-    {
-        return false;
     }
 }

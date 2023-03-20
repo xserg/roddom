@@ -64,9 +64,13 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Наименование'),
+                    ->label('Наименование')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('parentCategory.title')
-                    ->label('Родительская категория'),
+                    ->label('Родительская категория')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 //

@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateLector extends CreateRecord
 {
     protected static string $resource = LectorResource::class;
+
+    public function createAnother(): void
+    {
+        parent::create(false);
+    }
 }

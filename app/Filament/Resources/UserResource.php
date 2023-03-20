@@ -2,18 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
-use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Livewire\Component;
+use Livewire\TemporaryUploadedFile;
 
 class UserResource extends Resource
 {
@@ -39,20 +42,58 @@ class UserResource extends Resource
                     ->required(),
                 Forms\Components\DatePicker::make('pregnancy_start'),
                 Forms\Components\DatePicker::make('baby_born'),
-                Forms\Components\TextInput::make('photo')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('photo_small')
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('to_delete')
-                    ->required(),
+                Forms\Components\FileUpload::make('photo')
+                    ->directory(function (Closure $get, string $context) {
+                        if ($context == 'create') {
+                            $nextId = DB::select("show table status like 'users'")[0]->Auto_increment;
+                            return 'images/users' . '/' . $nextId;
+                        }
+                        return 'images/users' . '/' . $get('id');
+                    })
+                    ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
+                        $redundantStr = config('app.url') . '/storage/';
+
+                        if (is_null($state)) {
+                            return;
+                        }
+
+                        if (Str::contains($state, $redundantStr)) {
+                            $component->state([Str::remove($redundantStr, $state)]);
+                        } else {
+                            $component->state([$state]);
+                        }
+                    })
+                    ->dehydrateStateUsing(
+                        function (Closure $set, $state, Closure $get) {
+                            return config('app.url') . '/storage/' . Arr::first($state);
+                        })
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
+                        if ($context == 'create') {
+                            $nextId = DB::select("show table status like 'users'")[0]->Auto_increment;
+                            return (string)$nextId . '.' . $file->getClientOriginalExtension();
+                        }
+                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
+                    })
+                    ->maxSize(10240)
+                    ->image()
+                    ->imageResizeMode('force')
+                    ->imageCropAspectRatio('1:1')
+                    ->imageResizeTargetWidth('300')
+                    ->imageResizeTargetHeight('300'),
+
+                Forms\Components\TextInput::make('phone')
+                    ->tel()
+                    ->maxLength(20)
+                    ->visible(false),
                 Forms\Components\DateTimePicker::make('next_free_lecture_available'),
-                Forms\Components\DateTimePicker::make('email_verified_at'),
+
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('is_admin')
-                    ->required(),
+                    ->minLength(8)
+                    ->maxLength(255)
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->visible(fn(Component $livewire): bool => $livewire instanceof Pages\CreateUser),
             ]);
     }
 
@@ -60,41 +101,20 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('email'),
+                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('email')->searchable(),
+                Tables\Columns\ImageColumn::make('photo'),
                 Tables\Columns\TextColumn::make('birthdate')
                     ->date(),
                 Tables\Columns\TextColumn::make('phone'),
-                Tables\Columns\IconColumn::make('is_mother')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('pregnancy_start')
-                    ->date(),
-                Tables\Columns\TextColumn::make('baby_born')
-                    ->date(),
-                Tables\Columns\TextColumn::make('photo'),
-                Tables\Columns\TextColumn::make('photo_small'),
-                Tables\Columns\IconColumn::make('to_delete')
-                    ->boolean(),
-                Tables\Columns\TextColumn::make('next_free_lecture_available')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('email_verified_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-                Tables\Columns\IconColumn::make('is_admin')
-                    ->boolean(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                FilamentExportHeaderAction::make('export')
             ])
             ->bulkActions([
-                FilamentExportBulkAction::make('Export'),
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }

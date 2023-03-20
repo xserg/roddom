@@ -114,6 +114,11 @@ class User extends Authenticatable implements FilamentUser
             ->where('subscriptionable_type', '=', Promo::class);
     }
 
+    public function feedbacks(): HasMany
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
     protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(

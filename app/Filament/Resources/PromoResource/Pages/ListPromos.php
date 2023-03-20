@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\CategoryResource\Pages;
+namespace App\Filament\Resources\PromoResource\Pages;
 
-use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\PromoResource;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListCategories extends ListRecords
+class ListPromos extends ListRecords
 {
-    protected static string $resource = CategoryResource::class;
+    protected static string $resource = PromoResource::class;
 
     protected function getActions(): array
     {
@@ -16,7 +16,6 @@ class ListCategories extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-
     protected function isTablePaginationEnabled(): bool
     {
         return false;

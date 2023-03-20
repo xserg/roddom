@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('app_info', function (Blueprint $table) {
+            $table->id();
+
             $table->string('agreement_title')->default('Прочтите соглашение');
             $table->text('agreement_text')->nullable();
             $table->string('recommended_title')->default('Рекомендуем');

@@ -3,15 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectorResource\Pages;
-use App\Filament\Resources\LectorResource\RelationManagers;
 use App\Models\Lector;
+use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Livewire\TemporaryUploadedFile;
 
 class LectorResource extends Resource
 {
@@ -34,8 +36,44 @@ class LectorResource extends Resource
                     ->maxLength(65535),
                 Forms\Components\DatePicker::make('career_start')
                     ->required(),
-                Forms\Components\TextInput::make('photo')
-                    ->maxLength(255),
+                Forms\Components\FileUpload::make('photo')
+                    ->directory(function (Closure $get, string $context) {
+                        if ($context == 'create') {
+                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
+                            return 'images/lectors' . '/' . $nextId;
+                        }
+                        return 'images/lectors' . '/' . $get('id');
+                    })
+                    ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
+                        if (is_null($state)) {
+                            return;
+                        }
+
+                        $redundantStr = config('app.url') . '/storage/';
+
+                        if (Str::contains($state, $redundantStr)) {
+                            $component->state([Str::remove($redundantStr, $state)]);
+                        } else {
+                            $component->state([$state]);
+                        }
+                    })
+                    ->dehydrateStateUsing(
+                        function (Closure $set, $state, Closure $get) {
+                            return config('app.url') . '/storage/' . Arr::first($state);
+                        })
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
+                        if ($context == 'create') {
+                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
+                            return (string)$nextId . '.' . $file->getClientOriginalExtension();
+                        }
+                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
+                    })
+                    ->maxSize(10240)
+                    ->image()
+                    ->imageResizeMode('force')
+                    ->imageCropAspectRatio('1:1')
+                    ->imageResizeTargetWidth('300')
+                    ->imageResizeTargetHeight('300'),
             ]);
     }
 
@@ -45,14 +83,9 @@ class LectorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('position'),
-                Tables\Columns\TextColumn::make('description'),
+                Tables\Columns\ImageColumn::make('photo'),
                 Tables\Columns\TextColumn::make('career_start')
                     ->date(),
-                Tables\Columns\TextColumn::make('photo'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
             ])
             ->filters([
                 //
@@ -64,14 +97,14 @@ class LectorResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -79,5 +112,5 @@ class LectorResource extends Resource
             'create' => Pages\CreateLector::route('/create'),
             'edit' => Pages\EditLector::route('/{record}/edit'),
         ];
-    }    
+    }
 }

@@ -10,6 +10,14 @@ class Lector extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'position',
+        'career_start',
+        'photo',
+        'description'
+    ];
+
     public function lectures(): HasMany
     {
         return $this->hasMany(Lecture::class);

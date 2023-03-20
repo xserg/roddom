@@ -22,7 +22,7 @@ class Promo extends Model
             'promo_pack_prices',
             'promo_id',
             'period_id'
-        )->withPivot('period_id', 'price');
+        )->withPivot(['period_id', 'price']);
     }
 
     public function promoLectures(): BelongsToMany
@@ -33,5 +33,13 @@ class Promo extends Model
             'promo_id',
             'lecture_id'
         );
+    }
+
+    public function pricesForPromoLectures(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Lecture::class,
+            'promo_lectures_prices'
+        )->withPivot(['id', 'period_id', 'price']);
     }
 }

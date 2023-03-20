@@ -39,7 +39,7 @@ class SubcategoryPrices extends Model
     protected function periodLength(): Attribute
     {
         return new Attribute(
-            get: fn() => 'цена за ' . $this->period->length . ' дня/дней',
+            get: fn() => 'цену за ' . $this->period->length . ' дня/дней',
         );
     }
 }

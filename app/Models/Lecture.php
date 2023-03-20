@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
@@ -18,7 +19,7 @@ class Lecture extends Model
 
     private $lectureRepository;
 
-    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices', 'list_watched'];
+    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices', 'list_watched', 'id_title'];
 
     protected $casts = ['created_at' => 'datetime'];
 
@@ -110,7 +111,7 @@ class Lecture extends Model
             'promo_lectures_prices',
             'lecture_id',
             'promo_id'
-        )->withPivot('period_id', 'price');
+        )->withPivot(['price', 'id', 'period_id']);
     }
 
     public function pricesPeriodsInPromoPacks(): BelongsToMany
@@ -120,7 +121,7 @@ class Lecture extends Model
             'promo_lectures_prices',
             'lecture_id',
             'period_id'
-        )->withPivot('promo_id', 'price');
+        )->withPivot(['promo_id', 'price']);
     }
 
     public function scopeWatched(Builder $query): void
@@ -161,11 +162,22 @@ class Lecture extends Model
     {
         $firstPromoPack = Promo::first();
         $promoIds = $firstPromoPack
-            ->promoLectures
+            ->pricesForPromoLectures
             ->pluck('id')
             ->toArray();
 
         $query->whereIn('id', $promoIds);
+    }
+
+    public function scopeNotPromo(Builder $query): void
+    {
+        $firstPromoPack = Promo::first();
+        $promoIds = $firstPromoPack
+            ->pricesForPromoLectures
+            ->pluck('id')
+            ->toArray();
+
+        $query->whereNotIn('id', $promoIds);
     }
 
     public function scopeSaved(Builder $query): void
@@ -230,7 +242,7 @@ class Lecture extends Model
     {
         $firstPromoPack = Promo::first();
         $promoIds = $firstPromoPack
-            ->promoLectures
+            ->pricesForPromoLectures
             ->pluck('id')
             ->toArray();
 
@@ -349,6 +361,13 @@ class Lecture extends Model
         }
         return new Attribute(
             get: fn() => [],
+        );
+    }
+
+    protected function idTitle(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->id . ' ' . $this->title,
         );
     }
 

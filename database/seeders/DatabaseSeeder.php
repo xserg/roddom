@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
 use App\Models\Diploma;
 use App\Models\Lector;
@@ -20,6 +20,8 @@ use Laravel\Sanctum\NewAccessToken;
 
 class DatabaseSeeder extends Seeder
 {
+    use WithoutModelEvents;
+
     /**
      * Seed the application's database.
      *
@@ -29,12 +31,12 @@ class DatabaseSeeder extends Seeder
     {
         Lector::factory(25)->create();
         Diploma::factory(50)->create();
+        $this->call(SubscriptionPeriodSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
         Lecture::factory(150)->create();
         Lecture::factory(30)->notPublished()->create();
 
-        $this->call(SubscriptionPeriodSeeder::class);
         $this->call(PromoSeeder::class);
         $this->call(PromoPackPricesSeeder::class);
         $this->call(CategoryPricesSeeder::class);
@@ -44,7 +46,8 @@ class DatabaseSeeder extends Seeder
 
         $this->createFirstTestUser();
         $this->createSecondTestUser();
-        $this->createUsers(20);
+        $this->createAnotherUser();
+        $this->createUsers(5);
         $this->setRecommendedLectures(20);
 
 //        $this->call(SubscriptionSeeder::class);
@@ -119,7 +122,6 @@ class DatabaseSeeder extends Seeder
 
     private function createFirstTestUser()
     {
-
         $user = [
             'name' => 'test',
             'email' => 'test@test.test',
@@ -157,6 +159,7 @@ class DatabaseSeeder extends Seeder
             'phone' => fake()->phoneNumber,
             'is_mother' => rand(0, 1),
             'remember_token' => Str::random(10),
+            'is_admin' => false
         ];
 
         DB::table('users')->insert($user);
@@ -174,6 +177,19 @@ class DatabaseSeeder extends Seeder
 
         $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
+    }
+
+    private function createAnotherUser()
+    {
+        $user = [
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make(env('ADMIN_USER_PWD')),
+            'remember_token' => Str::random(10),
+            'is_admin' => true
+        ];
+
+        DB::table('users')->insert($user);
     }
 
     private function setRecommendedLectures(int $num)
