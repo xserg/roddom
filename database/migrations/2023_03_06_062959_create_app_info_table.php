@@ -31,9 +31,9 @@ return new class extends Migration
             $table->text('about_app')->nullable();
             $table->string('app_author_name')->default('Сергей Тарасов');
             $table->string('app_link_share_title')->default('Поделиться ссылкой');
-            $table->string('app_link_share_link')->default('https://xn--80axb4d.online');
+            $table->string('app_link_share_link')->default('https://мамы.online');
             $table->string('app_show_qr_title')->default('Показать QR-код');
-            $table->string('app_show_qr_link')->default('https://api.мамы.online/storage/images/app/qr.jpeg');
+            $table->string('app_show_qr_link')->default('images/app/qr.jpeg');
         });
     }
 
