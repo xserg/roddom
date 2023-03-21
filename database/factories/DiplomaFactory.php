@@ -17,8 +17,13 @@ class DiplomaFactory extends Factory
      */
     public function definition()
     {
+        $previewPictures = [
+            'images/diplomas/diploma1.jpg',
+            'images/diplomas/diploma2.jpg',
+            'images/diplomas/diploma3.jpg',
+        ];
         return [
-            'preview_picture' => fake()->imageUrl,
+            'preview_picture' => fake()->randomElement($previewPictures),
             'lector_id' => Lector::all()->random()
         ];
     }

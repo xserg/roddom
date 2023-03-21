@@ -18,6 +18,11 @@ class LectureFactory extends Factory
      */
     public function definition()
     {
+        $previewPictures = [
+            'images/lectures/lecture1.jpg',
+            'images/lectures/lecture2.jpg',
+            'images/lectures/lecture3.jpg',
+        ];
         return [
             'lector_id' => Lector::all()->random()->id,
             'title' => $this->faker->sentence(5),
@@ -27,7 +32,7 @@ class LectureFactory extends Factory
                 ->random()
                 ->id,
             'description' => $this->faker->text(100),
-            'preview_picture' => $this->faker->imageUrl,
+            'preview_picture' => $this->faker->randomElement($previewPictures),
             'video_id' => $this->faker->randomNumber(9, true),
             'is_free' => (bool)rand(0, 1),
             'is_published' => true,

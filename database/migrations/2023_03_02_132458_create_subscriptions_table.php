@@ -18,8 +18,8 @@ return new class extends Migration {
 
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('period_id')->references('id')->on('subscription_periods');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('period_id')->references('id')->on('subscription_periods')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

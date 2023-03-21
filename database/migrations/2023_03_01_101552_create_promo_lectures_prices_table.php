@@ -19,9 +19,9 @@ return new class extends Migration
             $table->bigInteger('period_id')->unsigned();
             $table->bigInteger('price')->unsigned();
 
-            $table->foreign('lecture_id')->references('id')->on('lectures');
-            $table->foreign('promo_id')->references('id')->on('promos');
-            $table->foreign('period_id')->references('id')->on('subscription_periods');
+            $table->foreign('lecture_id')->references('id')->on('lectures')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('promo_id')->references('id')->on('promos')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('period_id')->references('id')->on('subscription_periods')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

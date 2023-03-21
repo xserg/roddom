@@ -18,6 +18,14 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $previewPictures = [
+            'images/users/user1.jpg',
+            'images/users/user2.jpg',
+            'images/users/user3.jpg',
+        ];
+
+        $randomPhoto = fake()->randomElement($previewPictures);
+
         return [
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -29,7 +37,8 @@ class UserFactory extends Factory
             'pregnancy_start' => Carbon::today()->subMonths(rand(3, 12)),
             'baby_born' => Carbon::today()->subMonths(rand(1, 2)),
             'phone' => fake()->phoneNumber,
-            'photo' => fake()->imageUrl
+            'photo' => $randomPhoto,
+            'photo_small' => $randomPhoto
         ];
     }
 

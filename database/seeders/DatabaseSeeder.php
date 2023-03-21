@@ -22,6 +22,12 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    private array $previewPictures = [
+        'images/users/user1.jpg',
+        'images/users/user2.jpg',
+        'images/users/user3.jpg',
+    ];
+
     /**
      * Seed the application's database.
      *
@@ -122,10 +128,13 @@ class DatabaseSeeder extends Seeder
 
     private function createFirstTestUser()
     {
+        $photo = fake()->randomElement($this->previewPictures);
         $user = [
             'name' => 'test',
             'email' => 'test@test.test',
             'password' => Hash::make('test'),
+            'photo' => $photo,
+            'photo_small' => $photo,
             'birthdate' => Carbon::today()->subYears(rand(20, 35)),
             'phone' => fake()->phoneNumber,
             'is_mother' => rand(0, 1),
@@ -151,10 +160,13 @@ class DatabaseSeeder extends Seeder
 
     private function createSecondTestUser()
     {
+        $photo = fake()->randomElement($this->previewPictures);
         $user = [
             'name' => 'foo',
             'email' => 'foo@foo.foo',
             'password' => Hash::make('foo'),
+            'photo' => $photo,
+            'photo_small' => $photo,
             'birthdate' => Carbon::today()->subYears(rand(20, 35)),
             'phone' => fake()->phoneNumber,
             'is_mother' => rand(0, 1),

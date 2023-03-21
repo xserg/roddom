@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->foreign('lector_id')->references('id')->on('lectors');
+            $table->foreign('lector_id')->references('id')->on('lectors')->cascadeOnDelete();
         });
     }
 

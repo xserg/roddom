@@ -19,16 +19,16 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('preview_picture')->nullable();
             $table->integer('video_id')->unsigned()->unique();
-            $table->bigInteger('lector_id')->unsigned();
-            $table->bigInteger('category_id')->unsigned();
+            $table->bigInteger('lector_id')->unsigned()->nullable();
+            $table->bigInteger('category_id')->unsigned()->nullable();
             $table->boolean('is_free')->default(false);
             $table->boolean('is_published')->default(false);
             $table->boolean('is_recommended')->default(false);
 
             $table->timestamps();
 
-            $table->foreign('lector_id')->references('id')->on('lectors');
-            $table->foreign('category_id')->references('id')->on('lecture_categories');
+            $table->foreign('lector_id')->references('id')->on('lectors')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('category_id')->references('id')->on('lecture_categories')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

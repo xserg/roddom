@@ -12,8 +12,8 @@ return new class extends Migration {
             $table->bigInteger('promo_id')->unsigned();
             $table->bigInteger('lecture_id')->unsigned();
 
-            $table->foreign('promo_id')->references('id')->on('promos');
-            $table->foreign('lecture_id')->references('id')->on('lectures');
+            $table->foreign('promo_id')->references('id')->on('promos')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('lecture_id')->references('id')->on('lectures')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

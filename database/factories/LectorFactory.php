@@ -17,12 +17,17 @@ class LectorFactory extends Factory
      */
     public function definition()
     {
+        $previewPictures = [
+            'images/lectors/lector1.jpg',
+            'images/lectors/lector2.jpg',
+            'images/lectors/lector3.jpg',
+        ];
         return [
             'name' => $this->faker->name,
             'position' => $this->faker->jobTitle,
             'description' => $this->faker->text(200),
             'career_start' => Carbon::today()->subYears(rand(2, 25)),
-            'photo' => $this->faker->imageUrl
+            'photo' => $this->faker->randomElement($previewPictures)
         ];
     }
 }
