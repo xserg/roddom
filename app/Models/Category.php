@@ -16,7 +16,8 @@ class Category extends Model
 
     protected $appends = ['prices', 'parent_slug'];
 
-    protected $fillable = ['parent_id', 'title', 'description', 'info', 'slug'];
+    protected $fillable = ['parent_id', 'title', 'description', 'info', 'slug',
+        'preview_picture'];
     protected $table = 'lecture_categories';
 
     protected static function booted(): void
