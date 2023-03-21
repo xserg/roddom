@@ -58,7 +58,7 @@ class CategoryResource extends Resource
                     ->directory('images/categories')
                     ->maxSize(10240)
                     ->image()
-                    ->imageResizeMode('cover')
+                    ->imageResizeMode('force')
                     ->imageCropAspectRatio('4:3')
                     ->imageResizeTargetWidth('640')
                     ->imageResizeTargetHeight('480'),
