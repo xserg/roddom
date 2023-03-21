@@ -28,4 +28,6 @@ class AppInfo extends Model
         'app_link_share_link',
         'out_lectors_title',
     ];
+
+    public $timestamps = false;
 }
