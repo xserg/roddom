@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class DiplomasRelationManager extends RelationManager
 {
     protected static string $relationship = 'diplomas';
+    protected static ?string $inverseRelationship = 'lector';
 
     protected static ?string $recordTitleAttribute = 'id';
 
