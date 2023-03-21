@@ -55,10 +55,13 @@ class CategoryResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('preview_picture')
-                    ->directory('categories')
-                    ->dehydrateStateUsing(fn($state) => config('app.url') . '/storage/' . Arr::first($state))
+                    ->directory('images/categories')
                     ->maxSize(10240)
-                    ->image(),
+                    ->image()
+                    ->imageResizeMode('cover')
+                    ->imageCropAspectRatio('4:3')
+                    ->imageResizeTargetWidth('640')
+                    ->imageResizeTargetHeight('480'),
             ]);
     }
 
@@ -80,6 +83,7 @@ class CategoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

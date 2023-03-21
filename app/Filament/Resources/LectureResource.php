@@ -59,40 +59,41 @@ class LectureResource extends Resource
                     Forms\Components\RichEditor::make('description')
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('preview_picture')
-                        ->directory(function (Closure $get, string $context) {
-                            if ($context == 'create') {
-                                $nextId = DB::select("show table status like 'lecture'")[0]->Auto_increment;
-                                return 'images/lectures' . '/' . $nextId;
-                            }
-                            return 'images/lectures' . '/' . $get('id');
-                        })
-                        ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
-                            $redundantStr = config('app.url') . '/storage/';
-
-                            if (is_null($state)) {
-                                return;
-                            }
-
-                            if (Str::contains($state, $redundantStr)) {
-                                $component->state([Str::remove($redundantStr, $state)]);
-                            } else {
-                                $component->state([$state]);
-                            }
-                        })
-                        ->dehydrateStateUsing(
-                            function (Closure $set, $state, Closure $get) {
-                                return config('app.url') . '/storage/' . Arr::first($state);
-                            })
-                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
-                            if ($context == 'create') {
-                                $nextId = DB::select("show table status like 'lectures'")[0]->Auto_increment;
-                                return (string)$nextId . '.' . $file->getClientOriginalExtension();
-                            }
-                            return (string)$get('id') . '.' . $file->getClientOriginalExtension();
-                        })
+                        ->directory('images/lectures')
+//                        ->directory(function (Closure $get, string $context) {
+//                            if ($context == 'create') {
+//                                $nextId = DB::select("show table status like 'lecture'")[0]->Auto_increment;
+//                                return 'images/lectures' . '/' . $nextId;
+//                            }
+//                            return 'images/lectures' . '/' . $get('id');
+//                        })
+//                        ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
+//                            $redundantStr = config('app.url') . '/storage/';
+//
+//                            if (is_null($state)) {
+//                                return;
+//                            }
+//
+//                            if (Str::contains($state, $redundantStr)) {
+//                                $component->state([Str::remove($redundantStr, $state)]);
+//                            } else {
+//                                $component->state([$state]);
+//                            }
+//                        })
+//                        ->dehydrateStateUsing(
+//                            function (Closure $set, $state, Closure $get) {
+//                                return config('app.url') . '/storage/' . Arr::first($state);
+//                            })
+//                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
+//                            if ($context == 'create') {
+//                                $nextId = DB::select("show table status like 'lectures'")[0]->Auto_increment;
+//                                return (string)$nextId . '.' . $file->getClientOriginalExtension();
+//                            }
+//                            return (string)$get('id') . '.' . $file->getClientOriginalExtension();
+//                        })
                         ->maxSize(10240)
                         ->image()
-                        ->imageResizeMode('force')
+                        ->imageResizeMode('cover')
                         ->imageCropAspectRatio('4:3')
                         ->imageResizeTargetWidth('640')
                         ->imageResizeTargetHeight('480'),
@@ -140,10 +141,10 @@ class LectureResource extends Resource
                     ->tooltip(fn(Model $record): string => $record->title),
                 Tables\Columns\TextColumn::make('category.title')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => $record->category->title),
+                    ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : ''),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => $record->lector->name),
+                    ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : ''),
                 Tables\Columns\ImageColumn::make('preview_picture'),
                 Tables\Columns\IconColumn::make('is_published')
                     ->boolean()

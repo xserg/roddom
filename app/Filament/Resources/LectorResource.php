@@ -48,37 +48,37 @@ class LectorResource extends Resource
                 Forms\Components\DatePicker::make('career_start')
                     ->required(),
                 Forms\Components\FileUpload::make('photo')
-                    ->directory(function (Closure $get, string $context) {
-                        if ($context == 'create') {
-                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
-                            return 'images/lectors' . '/' . $nextId;
-                        }
-                        return 'images/lectors' . '/' . $get('id');
-                    })
-                    ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
-                        if (is_null($state)) {
-                            return;
-                        }
-
-                        $redundantStr = config('app.url') . '/storage/';
-
-                        if (Str::contains($state, $redundantStr)) {
-                            $component->state([Str::remove($redundantStr, $state)]);
-                        } else {
-                            $component->state([$state]);
-                        }
-                    })
-                    ->dehydrateStateUsing(
-                        function (Closure $set, $state, Closure $get) {
-                            return config('app.url') . '/storage/' . Arr::first($state);
-                        })
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
-                        if ($context == 'create') {
-                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
-                            return (string)$nextId . '.' . $file->getClientOriginalExtension();
-                        }
-                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
-                    })
+                    ->directory('images/lectors')
+//                        if ($context == 'create') {
+//                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
+//                            return 'images/lectors' . '/' . $nextId;
+//                        }
+//                        return 'images/lectors' . '/' . $get('id');
+//                    })
+//                    ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
+//                        if (is_null($state)) {
+//                            return;
+//                        }
+//
+//                        $redundantStr = config('app.url') . '/storage/';
+//
+//                        if (Str::contains($state, $redundantStr)) {
+//                            $component->state([Str::remove($redundantStr, $state)]);
+//                        } else {
+//                            $component->state([$state]);
+//                        }
+//                    })
+//                    ->dehydrateStateUsing(
+//                        function (Closure $set, $state, Closure $get) {
+//                            return config('app.url') . '/storage/' . Arr::first($state);
+//                        })
+//                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
+//                        if ($context == 'create') {
+//                            $nextId = DB::select("show table status like 'lectors'")[0]->Auto_increment;
+//                            return (string)$nextId . '.' . $file->getClientOriginalExtension();
+//                        }
+//                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
+//                    })
                     ->maxSize(10240)
                     ->image()
                     ->imageResizeMode('force')
@@ -103,6 +103,7 @@ class LectorResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
