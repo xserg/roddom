@@ -12,6 +12,10 @@ class Diploma extends Model
 
     protected $table = 'diplomas';
 
+    protected $fillable = [
+        'preview_picture',
+    ];
+
     public function lector(): BelongsTo
     {
         return $this->belongsTo(Lector::class);

@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\FeedbackResource\Pages;
 use App\Filament\Resources\FeedbackResource\RelationManagers;
 use App\Models\Feedback;
+use App\Models\Lector;
+use App\Models\Lecture;
 use App\Models\User;
 use Closure;
 use Filament\Forms;
@@ -39,6 +41,24 @@ class FeedbackResource extends Resource
                     Forms\Components\TextInput::make('lector_id')
                         ->required(),
                 ])->columns(3),
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('user_name')
+                        ->formatStateUsing(function (Closure $get) {
+                            return User::firstWhere('id', $get('user_id'))->name;
+                        }),
+                    Forms\Components\TextInput::make('lecture_title')
+                        ->formatStateUsing(function (Closure $get) {
+                            return Lecture::firstWhere('id', $get('lecture_id'))->title;
+                        }),
+                    Forms\Components\TextInput::make('lector_name')
+                        ->formatStateUsing(function (Closure $get) {
+                            return Lector::firstWhere('id', $get('lector_id'))->name;
+                        }),
+//                    Forms\Components\TextInput::make('lecture_id')
+//                        ->required(),
+//                    Forms\Components\TextInput::make('lector_id')
+//                        ->required(),
+                ])->columns(3),
 
                 Forms\Components\Textarea::make('content')
                     ->required()
@@ -50,12 +70,16 @@ class FeedbackResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('id отзыва')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
                         return $route;
                     })
-                    ->label('имя пользователя'),
+                    ->label('имя пользователя')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->label('лекция')
                     ->url(function (Feedback $record): string {
@@ -70,17 +94,16 @@ class FeedbackResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('создано')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

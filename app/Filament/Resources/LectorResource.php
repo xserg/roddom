@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectorResource\Pages;
+use App\Filament\Resources\LectorResource\RelationManagers\DiplomasRelationManager;
 use App\Models\Lector;
 use Closure;
 use Filament\Forms;
@@ -101,19 +102,24 @@ class LectorResource extends Resource
             ->filters([
                 //
             ])
+            ->headerActions([
+                // ...
+                Tables\Actions\AssociateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            DiplomasRelationManager::class
         ];
     }
 

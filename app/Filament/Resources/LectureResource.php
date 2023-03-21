@@ -101,11 +101,6 @@ class LectureResource extends Resource
                         ->label('опубликованная'),
                     Forms\Components\Toggle::make('is_free')
                         ->label('бесплатная')
-                        ->afterStateHydrated(function (?Lecture $record, Component $component) {
-                            if ($record->isPromo) {
-                                $component->state(false);
-                            }
-                        })
                         ->disabled(function (?Lecture $record, $state, $context) {
                             if ($context == 'create') return false;
                             if ($record->isPromo) {

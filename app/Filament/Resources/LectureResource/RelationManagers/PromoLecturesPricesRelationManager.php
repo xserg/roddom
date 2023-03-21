@@ -99,8 +99,6 @@ class PromoLecturesPricesRelationManager extends RelationManager
                                         return Period::query()->whereNotIn('id', $periodsAlreadyAttached)
                                             ->pluck('length', 'id');
                                     }
-
-
                                 })->label('период, дней'),
 
                             self::priceField('price')
