@@ -166,27 +166,21 @@ class UserService
         $image = $manager->make($file)->fit(300, 300);
         $imageSmall = $manager->make($file)->fit(150, 150);
 
-        $dirCreated = Storage::makeDirectory('images/users/' . $user->id);
+        $dirCreated = Storage::makeDirectory('images/users/');
 
         if (!$dirCreated) {
             throw new Exception('Directory could not be created');
         }
 
-//         /app/public/images/{user-id}/{user-id}.{extension}
-//         linked folder -> /public/storage/images/{user-id}/{user-id}.{extension}
-//         url . /storage/images/1/1.jpg
-        $path = "/images/users/$user->id/$user->id.jpg";
-        $smallImagePath = "/images/users/$user->id/$user->id-small.jpg";
-
         if (
-            !$image->save(storage_path('app/public' . $path), format: 'jpg')
-            || !$imageSmall->save(storage_path('app/public' . $smallImagePath), format: 'jpg')
+            !$image->save(storage_path('app/public/images/users/' . $user->id . '.jpg'))
+            || !$imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'))
         ) {
             throw new Exception('Could not upload image');
         }
 
-        $user->photo = config('app.url') . '/storage' . $path;
-        $user->photo_small = config('app.url') . '/storage' . $smallImagePath;
+        $user->photo = 'images/users/' . $user->id . '.jpg';
+        $user->photo_small = 'images/users/' . $user->id . '-small' . '.jpg';
 
         if (!$user->save()) {
             throw new Exception('Could not save user in database');
