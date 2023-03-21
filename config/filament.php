@@ -105,7 +105,6 @@ return [
         'namespace' => 'App\\Filament\\Pages',
         'path' => app_path('Filament/Pages'),
         'register' => [
-            Pages\Dashboard::class,
         ],
     ],
 
@@ -245,7 +244,7 @@ return [
             'alignment' => 'right',
         ],
         'sidebar' => [
-            'is_collapsible_on_desktop' => false,
+            'is_collapsible_on_desktop' => true,
             'groups' => [
                 'are_collapsible' => true,
             ],

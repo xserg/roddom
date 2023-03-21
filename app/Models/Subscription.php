@@ -26,4 +26,9 @@ class Subscription extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function period(): BelongsTo
+    {
+        return $this->belongsTo(Period::class);
+    }
 }

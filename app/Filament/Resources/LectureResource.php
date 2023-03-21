@@ -6,6 +6,7 @@ use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Lecture;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Resources\Form;
@@ -16,6 +17,9 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Livewire\TemporaryUploadedFile;
 
 class LectureResource extends Resource
 {
@@ -23,11 +27,21 @@ class LectureResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
+    protected static ?string $navigationLabel = 'Лекции';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $label = 'Лекции';
+    protected static ?string $pluralModelLabel = 'Лекции';
+    protected static ?string $modelLabel = 'Лекция';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('id')
+                        ->disabled(),
                     Forms\Components\Select::make('lector_id')
                         ->relationship('lector', 'name')
                         ->required(),
@@ -45,10 +59,44 @@ class LectureResource extends Resource
                     Forms\Components\RichEditor::make('description')
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('preview_picture')
-                        ->directory('lectures')
-                        ->dehydrateStateUsing(fn($state) => config('app.url') . '/storage/' . Arr::first($state))
+                        ->directory(function (Closure $get, string $context) {
+                            if ($context == 'create') {
+                                $nextId = DB::select("show table status like 'lecture'")[0]->Auto_increment;
+                                return 'images/lectures' . '/' . $nextId;
+                            }
+                            return 'images/lectures' . '/' . $get('id');
+                        })
+                        ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
+                            $redundantStr = config('app.url') . '/storage/';
+
+                            if (is_null($state)) {
+                                return;
+                            }
+
+                            if (Str::contains($state, $redundantStr)) {
+                                $component->state([Str::remove($redundantStr, $state)]);
+                            } else {
+                                $component->state([$state]);
+                            }
+                        })
+                        ->dehydrateStateUsing(
+                            function (Closure $set, $state, Closure $get) {
+                                return config('app.url') . '/storage/' . Arr::first($state);
+                            })
+                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
+                            if ($context == 'create') {
+                                $nextId = DB::select("show table status like 'lectures'")[0]->Auto_increment;
+                                return (string)$nextId . '.' . $file->getClientOriginalExtension();
+                            }
+                            return (string)$get('id') . '.' . $file->getClientOriginalExtension();
+                        })
                         ->maxSize(10240)
-                        ->image(),
+                        ->image()
+                        ->imageResizeMode('force')
+                        ->imageCropAspectRatio('4:3')
+                        ->imageResizeTargetWidth('640')
+                        ->imageResizeTargetHeight('480'),
+
                     Forms\Components\Toggle::make('is_published')
                         ->required()
                         ->label('опубликованная'),

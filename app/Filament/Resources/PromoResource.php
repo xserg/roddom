@@ -21,6 +21,14 @@ class PromoResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    protected static ?string $navigationLabel = 'Акционный пак лекций';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $label = 'Акционный пак лекций';
+    protected static ?string $pluralModelLabel = 'Акции';
+    protected static ?string $modelLabel = 'Акция';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -32,14 +40,7 @@ class PromoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\TextColumn::make('title'),
-                Tables\Columns\TextColumn::make('slug'),
-                Tables\Columns\TextColumn::make('description'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
             ])
             ->filters([
                 //
@@ -48,7 +49,6 @@ class PromoResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

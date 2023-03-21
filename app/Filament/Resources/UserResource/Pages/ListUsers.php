@@ -15,6 +15,8 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
+    protected static ?string $navigationLabel = 'Пользователи';
+
     protected function getActions(): array
     {
         return [

@@ -21,6 +21,12 @@ class AppInfoResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    protected static ?string $navigationLabel = 'Динамические заголовки';
+
+    protected static ?int $navigationSort = 5;
+
+    protected static ?string $navigationGroup = 'Приложение';
+
     public static function form(Form $form): Form
     {
         return $form

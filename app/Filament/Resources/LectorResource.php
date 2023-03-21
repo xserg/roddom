@@ -21,10 +21,21 @@ class LectorResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
+    protected static ?string $navigationLabel = 'Лекторы';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static ?string $label = 'Лекторы';
+    protected static ?string $pluralModelLabel = 'Лекторы';
+    protected static ?string $modelLabel = 'Лектор';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('id')
+                    ->required()
+                    ->disabled(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
