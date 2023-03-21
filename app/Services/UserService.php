@@ -196,8 +196,8 @@ class UserService
     public function deletePhoto(Authenticatable|User $user): void
     {
         if (isset($user->id)) {
-            $files = Storage::allFiles('images/users/' . $user->id);
-            Storage::delete($files);
+            Storage::delete('images/users/' . $user->id . '.jpg');
+            Storage::delete('images/users/' . $user->id . '-small' . '.jpg');
 
             $user->photo = null;
             $user->photo_small = null;
