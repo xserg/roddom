@@ -133,4 +133,9 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 ->decimalSeparator('.') // Add a separator for decimal numbers.
             );
     }
+
+    protected function isTablePaginationEnabled(): bool
+    {
+        return false;
+    }
 }

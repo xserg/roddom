@@ -17,6 +17,7 @@ use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component as Livewire;
+use Filament\Forms\Components\Component;
 
 class LectureResource extends Resource
 {
@@ -100,10 +101,14 @@ class LectureResource extends Resource
                         ->label('опубликованная'),
                     Forms\Components\Toggle::make('is_free')
                         ->label('бесплатная')
+                        ->afterStateHydrated(function (?Lecture $record, Component $component) {
+                            if ($record->isPromo) {
+                                $component->state(false);
+                            }
+                        })
                         ->disabled(function (?Lecture $record, $state, $context) {
                             if ($context == 'create') return false;
                             if ($record->isPromo) {
-                                $state = false;
                                 return true;
                             }
                             return false;
