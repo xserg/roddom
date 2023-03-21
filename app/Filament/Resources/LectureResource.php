@@ -16,10 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Livewire\TemporaryUploadedFile;
+use Livewire\Component as Livewire;
 
 class LectureResource extends Resource
 {
@@ -103,7 +100,15 @@ class LectureResource extends Resource
                         ->label('опубликованная'),
                     Forms\Components\Toggle::make('is_free')
                         ->label('бесплатная')
-                        ->required(),
+                        ->disabled(function (Lecture $record, $state) {
+                            if ($record->isPromo) {
+                                $state = false;
+                                return true;
+                            }
+                            return false;
+                        })
+                        ->required()
+                        ->reactive(),
                     Forms\Components\Toggle::make('is_recommended')
                         ->label('рекомендованная')
                         ->required(),
@@ -166,7 +171,7 @@ class LectureResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 
