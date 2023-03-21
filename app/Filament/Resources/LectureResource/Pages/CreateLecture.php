@@ -9,4 +9,6 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateLecture extends CreateRecord
 {
     protected static string $resource = LectureResource::class;
+
+    protected static bool $canCreateAnother = false;
 }
