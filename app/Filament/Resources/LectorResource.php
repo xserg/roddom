@@ -35,7 +35,6 @@ class LectorResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('id')
-                    ->required()
                     ->disabled(),
                 Forms\Components\TextInput::make('name')
                     ->required()
