@@ -97,21 +97,29 @@ class LectureResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
+                    ->label('ID лекции')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->label('Наименование лекции')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => $record->title),
+                    ->tooltip(fn(Model $record): string => $record->title)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
+                    ->label('Подкатегория лекции')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : ''),
                 Tables\Columns\TextColumn::make('lector.name')
+                    ->label('Имя лектора')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : ''),
-                Tables\Columns\ImageColumn::make('preview_picture'),
+                Tables\Columns\ImageColumn::make('preview_picture')
+                    ->label('Превью лекции'),
                 Tables\Columns\IconColumn::make('is_published')
+                    ->label('Опубликована')
                     ->boolean()
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_promo')
+                    ->label('Акционная')
                     ->boolean()
                     ->sortable(),
             ])
@@ -128,7 +136,8 @@ class LectureResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DissociateBulkAction::make(),
+//                Tables\Actions\DissociateBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

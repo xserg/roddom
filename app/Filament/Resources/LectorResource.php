@@ -35,19 +35,25 @@ class LectorResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('id')
+                    ->label('ID, заполняется автоматически')
                     ->disabled(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Имя лектора')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('position')
+                    ->label('Должность, позиция')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\RichEditor::make('description')
+                    ->label('О лекторе')
                     ->required()
                     ->maxLength(65535),
                 Forms\Components\DatePicker::make('career_start')
+                    ->label('Начало карьеры')
                     ->required(),
                 Forms\Components\FileUpload::make('photo')
+                    ->label('Фото лектора')
                     ->directory('images/lectors')
                     ->maxSize(10240)
                     ->image()
@@ -62,10 +68,14 @@ class LectorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('position'),
-                Tables\Columns\ImageColumn::make('photo'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Имя лектора'),
+                Tables\Columns\TextColumn::make('position')
+                    ->label('Должность, позиция'),
+                Tables\Columns\ImageColumn::make('photo')
+                    ->label('Фото лектора'),
                 Tables\Columns\TextColumn::make('career_start')
+                    ->label('Начало карьеры')
                     ->date(),
             ])
             ->filters([
@@ -73,7 +83,7 @@ class LectorResource extends Resource
             ])
             ->headerActions([
                 // ...
-                Tables\Actions\AssociateAction::make(),
+//                Tables\Actions\AssociateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -81,7 +91,7 @@ class LectorResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\DissociateBulkAction::make(),
+//                Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 

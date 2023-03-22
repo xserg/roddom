@@ -14,10 +14,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use PhpParser\Node\Expr\AssignOp\Mod;
 
 class FeedbackResource extends Resource
 {
@@ -82,12 +78,14 @@ class FeedbackResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->label('лекция')
+                    ->sortable()
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
                         return $route;
                     }),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('лектор')
+                    ->sortable()
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.lectors.edit', ['record' => $record->lector_id]);
                         return $route;

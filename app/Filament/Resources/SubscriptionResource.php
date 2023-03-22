@@ -68,7 +68,7 @@ class SubscriptionResource extends Resource
                             return Lecture::all()
                                 ->pluck('id_title', 'id');
                         } elseif ($get('subscriptionable_type') == 'App\Models\Category') {
-                            return Category::all()
+                            return Category::subCategories()
                                 ->pluck('title', 'id');
                         } elseif ($get('subscriptionable_type') == 'App\Models\Promo') {
                             return Promo::all()
@@ -114,10 +114,13 @@ class SubscriptionResource extends Resource
                     )
                     ->label('тип подписки')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('subscriptionable_id'),
+                Tables\Columns\TextColumn::make('subscriptionable_id')
+                    ->label('id объекта подписки'),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->dateTime(),
+                    ->dateTime()
+                    ->label('начало подписки'),
                 Tables\Columns\TextColumn::make('end_date')
+                    ->label('конец подписки')
                     ->dateTime(),])
             ->filters([//
             ])
