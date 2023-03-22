@@ -39,22 +39,27 @@ class LectureResource extends Resource
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('id')
+                        ->label('ID, заполняется автоматически')
                         ->disabled(),
                     Forms\Components\Select::make('lector_id')
+                        ->label('Лектор')
                         ->relationship('lector', 'name')
                         ->required(),
                     Forms\Components\Select::make('category_id')
+                        ->label('Подкатегория лекции')
                         ->options(Category::subcategories()->get()->pluck('title', 'id'))
                         ->required(),
                     Forms\Components\TextInput::make('title')
+                        ->label('Наименование лекции')
                         ->required()
                         ->maxLength(255),
                     Forms\Components\TextInput::make('video_id')
-                        ->label('kinescope id видео')
+                        ->label('kinescope id видео(должно быть уникальным)')
                         ->required(),
                 ])->columns(2),
                 Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('description')
+                        ->label('Описание лекции')
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('preview_picture')
                         ->directory('images/lectures')
@@ -70,9 +75,10 @@ class LectureResource extends Resource
                         ->label('опубликованная'),
                     Forms\Components\Toggle::make('is_free')
                         ->label('бесплатная')
-                        ->disabled(function (?Lecture $record, $state, $context) {
+                        ->disabled(function (?Lecture $record, Component $component, $context) {
                             if ($context == 'create') return false;
                             if ($record->isPromo) {
+                                $component->state(false);
                                 return true;
                             }
                             return false;
