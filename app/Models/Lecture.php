@@ -24,7 +24,7 @@ class Lecture extends Model
     protected $casts = ['created_at' => 'datetime'];
 
     protected $fillable = ['id', 'lector_id', 'description', 'title', 'preview_picture',
-        'is_free', 'category_id', 'video_id'];
+        'is_free', 'category_id', 'video_id', 'is_published'];
 
     protected $hidden = ['pivot'];
 
