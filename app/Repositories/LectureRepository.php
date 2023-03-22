@@ -184,38 +184,44 @@ class LectureRepository
             ->subscriptions
             ->where('subscriptionable_type', Promo::class);
 
-        foreach ($lecturesSubscriptions as $lecturesSubscription) {
-            if ($lecturesSubscription['end_date'] < now()) continue;
+        if ($lecturesSubscriptions && $lecturesSubscriptions->isNotEmpty()) {
+            foreach ($lecturesSubscriptions as $lecturesSubscription) {
+                if ($lecturesSubscription['end_date'] < now()) continue;
 
-            $lectures[$lecturesSubscription['subscriptionable_id']] = [
-                'start_date' => $lecturesSubscription['start_date'],
-                'end_date' => $lecturesSubscription['end_date'],
-            ];
-        }
-
-        foreach ($categorySubscriptions as $categorySubscription) {
-            if ($categorySubscription['end_date'] < now()) continue;
-
-            $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
-            $categoryLectures = $category->lectures;
-            foreach ($categoryLectures as $lecture) {
-                $lectures[$lecture->id] = [
-                    'start_date' => $categorySubscription['start_date'],
-                    'end_date' => $categorySubscription['end_date'],
+                $lectures[$lecturesSubscription['subscriptionable_id']] = [
+                    'start_date' => $lecturesSubscription['start_date'],
+                    'end_date' => $lecturesSubscription['end_date'],
                 ];
             }
         }
 
-        foreach ($promoSubscriptions as $promoSubscription) {
-            if ($promoSubscription['end_date'] < now()) continue;
+        if ($categorySubscriptions && $categorySubscriptions->isNotEmpty()) {
+            foreach ($categorySubscriptions as $categorySubscription) {
+                if ($categorySubscription['end_date'] < now()) continue;
 
-            $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
-            $promoLectures = $promo->promoLectures;
-            foreach ($promoLectures as $lecture) {
-                $lectures[$lecture->id] = [
-                    'start_date' => $promoSubscription['start_date'],
-                    'end_date' => $promoSubscription['end_date'],
-                ];
+                $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
+                $categoryLectures = $category->lectures;
+                foreach ($categoryLectures as $lecture) {
+                    $lectures[$lecture->id] = [
+                        'start_date' => $categorySubscription['start_date'],
+                        'end_date' => $categorySubscription['end_date'],
+                    ];
+                }
+            }
+        }
+
+        if ($promoSubscriptions && $promoSubscriptions->isNotEmpty()) {
+            foreach ($promoSubscriptions as $promoSubscription) {
+                if ($promoSubscription['end_date'] < now()) continue;
+
+                $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
+                $promoLectures = $promo->promoLectures;
+                foreach ($promoLectures as $lecture) {
+                    $lectures[$lecture->id] = [
+                        'start_date' => $promoSubscription['start_date'],
+                        'end_date' => $promoSubscription['end_date'],
+                    ];
+                }
             }
         }
 
