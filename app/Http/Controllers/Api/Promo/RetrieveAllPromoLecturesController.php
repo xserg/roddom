@@ -131,7 +131,7 @@ class RetrieveAllPromoLecturesController extends Controller
 
     public function __invoke(Request $request)
     {
-        try {
+//        try {
             $builder = $this->lectureRepository->getAllPromoQuery();
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
             $lectures = $this->lectureRepository->paginate(
@@ -146,13 +146,13 @@ class RetrieveAllPromoLecturesController extends Controller
             $promo = Promo::first();
             $prices = $this->promoRepository->getPrices($promo);
 
-        } catch (NotFoundHttpException $exception) {
-
-            return response()->json(
-                ['message' => $exception->getMessage()],
-                Response::HTTP_NOT_FOUND
-            );
-        }
+//        } catch (NotFoundHttpException $exception) {
+//
+//            return response()->json(
+//                ['message' => $exception->getMessage()],
+//                Response::HTTP_NOT_FOUND
+//            );
+//        }
         return response()->json(
             [
                 'prices' => $prices,
