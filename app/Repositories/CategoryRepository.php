@@ -15,7 +15,7 @@ class CategoryRepository
 
     public function getCategoryById(int $id): ?Category
     {
-        return Category::findOrFail($id);
+        return Category::find($id);
     }
 
     public function getCategoryPriceForPeriodLength(?Category $category, int $period): string|int|float

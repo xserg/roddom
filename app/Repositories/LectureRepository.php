@@ -200,6 +200,7 @@ class LectureRepository
                 if ($categorySubscription['end_date'] < now()) continue;
 
                 $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
+                if (is_null($category)) continue;
                 $categoryLectures = $category->lectures;
                 foreach ($categoryLectures as $lecture) {
                     $lectures[$lecture->id] = [

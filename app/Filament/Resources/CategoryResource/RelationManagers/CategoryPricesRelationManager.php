@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use App\Models\Period;
+use App\Models\SubcategoryPrices;
+use App\Services\CategoryService;
 use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -10,6 +12,7 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Livewire\Component as Livewire;
 
 class CategoryPricesRelationManager extends RelationManager
 {
@@ -39,18 +42,33 @@ class CategoryPricesRelationManager extends RelationManager
                         fn(string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней'),
+                Tables\Columns\TextColumn::make('price_pack')
+                    ->getStateUsing(
+                        function (?SubcategoryPrices $record): ?string {
+                            $categoryId = $record->category_id;
+                            $periodId = $record->period_id;
+                            $price = app(CategoryService::class)
+                                ->getCategoryPrice(
+                                    $categoryId,
+                                    $periodId);
 
-                Tables\Columns\TextColumn::make('price_for_pack')
-                    ->formatStateUsing(
-                        fn(string $state): string => self::coinsToRoubles($state)
+                            return $price;
+                        }
                     )
                     ->label('Цена за всю категорию, рублей'),
-
                 Tables\Columns\TextColumn::make('price_for_one_lecture')
                     ->formatStateUsing(
                         fn(string $state): string => self::coinsToRoubles($state)
                     )
                     ->label('Цена за одну лекцию этой категории, рублей'),
+                Tables\Columns\TextColumn::make('lectures_count')
+                    ->getStateUsing(
+                        function (?SubcategoryPrices $record): string {
+                            $category = $record->category;
+                            $lecturesCount = $category->lectures()->count();
+                            return $lecturesCount;
+                        }
+                    )->label('Количество лекций в категории'),
             ])
             ->filters([
                 //

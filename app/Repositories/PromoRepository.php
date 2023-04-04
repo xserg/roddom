@@ -7,11 +7,11 @@ use Illuminate\Support\Arr;
 
 class PromoRepository
 {
-    public function getById(int $id): Promo
+    public function getById(int $id): ?Promo
     {
         return Promo::query()
             ->where('id', '=', $id)
-            ->firstOrFail();
+            ->first();
     }
 
     public function getPrices(Promo $promo)

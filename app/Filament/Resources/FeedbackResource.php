@@ -14,6 +14,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\Position;
 
 class FeedbackResource extends Resource
 {
@@ -22,6 +23,9 @@ class FeedbackResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $navigationLabel = 'Отзывы';
+    protected static ?string $label = 'Отзыв';
+
+    protected static ?string $pluralModelLabel = 'Отзывы';
 
     protected static ?int $navigationSort = 4;
 
@@ -66,16 +70,21 @@ class FeedbackResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('id отзыва')
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('id')
+//                    ->label('id отзыва')
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
                         return $route;
                     })
                     ->label('имя пользователя')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('email пользователя')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->label('лекция')
                     ->sortable()
@@ -89,7 +98,8 @@ class FeedbackResource extends Resource
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.lectors.edit', ['record' => $record->lector_id]);
                         return $route;
-                    }),
+                    })
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('создано')
                     ->dateTime()
@@ -101,9 +111,15 @@ class FeedbackResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
+            ->actionsPosition(Position::BeforeCells)
             ->bulkActions([
             ]);
     }
+
+//    protected function getTableActionsPosition(): ?string
+//    {
+//        return Position::BeforeColumns;
+//    }
 
     public static function getRelations(): array
     {

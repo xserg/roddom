@@ -9,6 +9,8 @@ use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
+use App\Models\User;
+use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -34,8 +36,12 @@ class SubscriptionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
+                Forms\Components\TextInput::make('user_id')
+                    ->label('пользователь')
+                    ->formatStateUsing(function (Closure $get) {
+                        return User::firstWhere('id', $get('user_id'))?->name;
+                    })
+                    ->disabled()
                     ->required(),
                 Forms\Components\Select::make('period_id')
                     ->relationship('period', 'length')
@@ -83,8 +89,10 @@ class SubscriptionResource extends Resource
                             $component->state(Carbon::now()->timezone('Europe/Moscow'));
                         }
                     })
+                    ->label('начало подписки')
                     ->required(),
                 Forms\Components\DateTimePicker::make('end_date')
+                    ->label('начало подписки')
                     ->required(),
             ]);
     }

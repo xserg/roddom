@@ -96,24 +96,27 @@ class LectureResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID лекции')
-                    ->sortable(),
+//                Tables\Columns\TextColumn::make('id')
+//                    ->label('ID лекции')
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
                     ->label('Наименование лекции')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => $record->title)
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('Подкатегория лекции')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : ''),
+                    ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : '')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('Имя лектора')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : ''),
-                Tables\Columns\ImageColumn::make('preview_picture')
-                    ->label('Превью лекции'),
+                    ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : '')
+                    ->sortable(),
+//                Tables\Columns\ImageColumn::make('preview_picture')
+//                    ->label('Превью лекции'),
                 Tables\Columns\IconColumn::make('is_published')
                     ->label('Опубликована')
                     ->boolean()

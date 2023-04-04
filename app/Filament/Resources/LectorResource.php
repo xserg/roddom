@@ -69,14 +69,16 @@ class LectorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Имя лектора'),
+                    ->label('Имя лектора')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('position')
                     ->label('Должность, позиция'),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
                 Tables\Columns\TextColumn::make('career_start')
                     ->label('Начало карьеры')
-                    ->date(),
+                    ->date()
+                    ->sortable(),
             ])
             ->filters([
                 //

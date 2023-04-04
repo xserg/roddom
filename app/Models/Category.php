@@ -31,7 +31,7 @@ class Category extends Model
             $categoryPricesDay = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => 100000,
+                    'price_for_pack' => null,
                     'price_for_one_lecture' => 10000,
                     'period_id' => 1
                 ]
@@ -41,7 +41,7 @@ class Category extends Model
             $categoryPricesWeek = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => 200000,
+                    'price_for_pack' => null,
                     'price_for_one_lecture' => 20000,
                     'period_id' => 2
                 ]
@@ -51,7 +51,7 @@ class Category extends Model
             $categoryPricesMonth = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => 500000,
+                    'price_for_pack' => null,
                     'price_for_one_lecture' => 50000,
                     'period_id' => 3
                 ]
@@ -105,8 +105,11 @@ class Category extends Model
         $prices = $this->categoryPrices;
         $result = [];
 
+        $lecturesCount = $this->lectures()->count();
         foreach ($prices as $price) {
-            $priceForPackInRoubles = number_format($price->price_for_pack / 100, 2, thousands_separator: '');
+            $priceForPackInRoubles =
+                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
+
             $result[] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
