@@ -364,6 +364,33 @@ class Lecture extends Model
         );
     }
 
+    protected function rates(): Attribute
+    {
+        $rates = [];
+
+        $rates['rate_avg'] = LectureRate::query()
+            ->where('lecture_id', '=', $this->id)
+            ->average('rating');
+
+        if (auth()->user()) {
+            $rates['rate_user'] = LectureRate::query()
+                ->where('lecture_id', '=', $this->id)
+                ->where('user_id', '=', auth()->user()->id)
+                ->average('rating');
+        } else {
+            $rates['rate_user'] = null;
+        }
+
+//        if ($rates) {
+//            return new Attribute(
+//                get: fn() => $rates,
+//            );
+//        }
+        return new Attribute(
+            get: fn() => $rates,
+        );
+    }
+
     protected function idTitle(): Attribute
     {
         return new Attribute(

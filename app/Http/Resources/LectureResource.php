@@ -45,6 +45,10 @@ class LectureResource extends JsonResource
         type: 'string',
         format: 'datetime')
     ]
+    #[OA\Property(property: 'rates', example: [
+        "rate_user" => 5,
+        "rate_avg" => "3.2525"
+    ])]
     public function toArray(Request $request): array
     {
         $loadCategory = $this->resource->relationLoaded('category');
@@ -71,6 +75,7 @@ class LectureResource extends JsonResource
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
             'prices' => $this->whenNotNull($this->prices),
+            'rates' => $this->whenNotNull($this->rates)
         ];
     }
 }

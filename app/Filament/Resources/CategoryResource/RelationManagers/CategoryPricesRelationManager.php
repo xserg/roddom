@@ -12,7 +12,6 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Livewire\Component as Livewire;
 
 class CategoryPricesRelationManager extends RelationManager
 {

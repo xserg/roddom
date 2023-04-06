@@ -84,11 +84,15 @@ Route::prefix('v1')
                 ->name('lectors');
             Route::get('/lector/{id}', RetrieveLectorController::class)
                 ->name('lector');
+            Route::post('/lector/{id}/rate', \App\Http\Controllers\Api\Lector\RateLectorController::class)
+                ->name('lector.rate');
 
             Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->name('lecture');
+            Route::post('/lecture/{id}/rate', \App\Http\Controllers\Api\Lecture\RateLectureController::class)
+                ->name('lecture.rate');
             Route::post('/lecture/{id}/watch', WatchLectureController::class)
                 ->name('lecture.watch');
             Route::post('/lecture/{id}/feedback', FeedbackLectureController::class)

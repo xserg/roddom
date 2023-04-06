@@ -16,6 +16,7 @@ class DiplomasRelationManager extends RelationManager
     protected static ?string $inverseRelationship = 'lector';
 
     protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $title = 'Дипломы';
 
     public static function form(Form $form): Form
     {
@@ -29,15 +30,16 @@ class DiplomasRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id'),
-                Tables\Columns\ImageColumn::make('preview_picture'),
+//                Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\ImageColumn::make('preview_picture')
+                    ->label('превью диплома'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                ->disableCreateAnother(),
+                    ->disableCreateAnother(),
 //                Tables\Actions\AssociateAction::make(),
             ])
             ->actions([

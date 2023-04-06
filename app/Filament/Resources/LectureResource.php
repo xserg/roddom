@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Models\Category;
+use App\Models\Lector;
 use App\Models\Lecture;
 use Closure;
 use Filament\Forms;
@@ -100,21 +101,28 @@ class LectureResource extends Resource
 //                    ->label('ID лекции')
 //                    ->sortable(),
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Наименование лекции')
+                    ->label('Наименование')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => $record->title)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
-                    ->label('Подкатегория лекции')
+                    ->label('Подкатегория')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
-                    ->label('Имя лектора')
+                    ->label('Лектор')
                     ->limit(15)
                     ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : '')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('rate_avg')
+                    ->getStateUsing(
+                        function (?Lecture $record): ?string {
+                            return round($record->rates['rate_avg'], 1) ?: 'нет оценок';
+                        }
+                    )
+                    ->label('Рейтинг, из 10'),
 //                Tables\Columns\ImageColumn::make('preview_picture')
 //                    ->label('Превью лекции'),
                 Tables\Columns\IconColumn::make('is_published')

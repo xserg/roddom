@@ -5,12 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LectorResource\Pages;
 use App\Filament\Resources\LectorResource\RelationManagers\DiplomasRelationManager;
 use App\Models\Lector;
+use App\Models\SubcategoryPrices;
+use App\Services\CategoryService;
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -70,15 +73,28 @@ class LectorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Имя лектора')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('position')
-                    ->label('Должность, позиция'),
+                    ->label('Должность, позиция')
+                    ->limit(15)
+                    ->tooltip(fn(Model $record): string => $record->position),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
+//                Tables\Columns\TextColumn::make('career_start')
+//                    ->label('Начало карьеры')
+//                    ->date()
+//                    ->sortable(),
                 Tables\Columns\TextColumn::make('career_start')
                     ->label('Начало карьеры')
-                    ->date()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('rate_avg')
+                    ->getStateUsing(
+                        function (?Lector $record): ?string {
+                            return round($record->rates['rate_avg'], 1) ?: 'нет оценок';
+                        }
+                    )
+                    ->label('Рейтинг, из 10'),
             ])
             ->filters([
                 //
