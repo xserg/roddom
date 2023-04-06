@@ -43,12 +43,15 @@ class CategoryResource extends Resource
                                 $set('slug', Str::slug($state));
                             })
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->label('Наименование категории'),
                         Forms\Components\RichEditor::make('description')
                             ->disableToolbarButtons(['attachFiles',])
-                            ->maxLength(65535),
+                            ->maxLength(65535)
+                            ->label('Описание категории'),
                         Forms\Components\Textarea::make('info')
-                            ->maxLength(65535),
+                            ->maxLength(65535)
+                            ->label('Блок "инфо" категории'),
                     ]),
                 Forms\Components\TextInput::make('slug')
                     ->label('Слаг категории, заполняется автоматически с наименования')
@@ -61,7 +64,8 @@ class CategoryResource extends Resource
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('4:3')
                     ->imageResizeTargetWidth('640')
-                    ->imageResizeTargetHeight('480'),
+                    ->imageResizeTargetHeight('480')
+                    ->label('Превью картинка категории'),
             ]);
     }
 

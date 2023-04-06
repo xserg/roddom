@@ -40,20 +40,20 @@ class FeedbackResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make('lector_id')
                         ->required(),
-                ])->columns(3),
+                ])->columns(3)->hidden(),
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('user_name')
                         ->formatStateUsing(function (Closure $get) {
                             return User::firstWhere('id', $get('user_id'))->name;
-                        }),
+                        })->label('имя пользователя'),
                     Forms\Components\TextInput::make('lecture_title')
                         ->formatStateUsing(function (Closure $get) {
                             return Lecture::firstWhere('id', $get('lecture_id'))->title;
-                        }),
+                        })->label('наименование лекции'),
                     Forms\Components\TextInput::make('lector_name')
                         ->formatStateUsing(function (Closure $get) {
                             return Lector::firstWhere('id', $get('lector_id'))->name;
-                        }),
+                        })->label('имя лектора'),
 //                    Forms\Components\TextInput::make('lecture_id')
 //                        ->required(),
 //                    Forms\Components\TextInput::make('lector_id')
@@ -62,7 +62,8 @@ class FeedbackResource extends Resource
 
                 Forms\Components\Textarea::make('content')
                     ->required()
-                    ->maxLength(65535),
+                    ->maxLength(65535)
+                    ->label('отзыв'),
             ]);
     }
 

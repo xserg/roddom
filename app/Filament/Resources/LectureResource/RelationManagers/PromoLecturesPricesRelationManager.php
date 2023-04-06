@@ -26,6 +26,8 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
     protected bool $allowsDuplicates = true;
 
+    protected static ?string $title = 'Цены в акционном паке лекций';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -104,7 +106,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                             self::priceField('price')
                                 ->label('цена, рублей'),
                         ])->columns(2),
-                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
+                        $action->getRecordSelect()->hidden()->default(Promo::first()->id)->disabled(),
                     ]),
             ])
             ->actions([

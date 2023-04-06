@@ -24,12 +24,15 @@ class CategoryPricesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'id';
 
+    protected static ?string $title = 'Цены категории';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                self::priceField('price_for_pack'),
-                self::priceField('price_for_one_lecture'),
+//                self::priceField('price_for_pack'),
+                self::priceField('price_for_one_lecture')
+                    ->label('цена за одну лекцию данной подкатегории'),
             ]);
     }
 
