@@ -70,13 +70,13 @@ class BuyLectureController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $isFree = $this->lectureService->isFree($lectureId);
+//        $isFree = $this->lectureService->isFree($lectureId);
 
-        if ($isFree) {
-            return response()->json([
-                'message' => 'You cannot purchase free lecture'
-            ], Response::HTTP_FORBIDDEN);
-        }
+//        if ($isFree) {
+//            return response()->json([
+//                'message' => 'You cannot purchase free lecture'
+//            ], Response::HTTP_FORBIDDEN);
+//        }
 
         $order = Order::create([
             'user_id' => auth()->user()->id,
