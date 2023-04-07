@@ -9,6 +9,7 @@ use App\Exceptions\UserCannotSaveLectureException;
 use App\Exceptions\UserCannotWatchFreeLectureException;
 use App\Exceptions\UserCannotWatchPaidLectureException;
 use App\Jobs\UserDeletionRequest;
+use App\Models\AppInfo;
 use App\Models\User;
 use App\Repositories\LectureRepository;
 use App\Repositories\PasswordResetRepository;
@@ -237,7 +238,10 @@ class UserService
 
     public function setFreeLectureWatchedNow(User|Authenticatable $user): User
     {
-        $user->next_free_lecture_available = now()->addHours(24);
+        $user->next_free_lecture_available = now()->addHours(
+            AppInfo::query()->first()?->free_lecture_hours ?? 24
+        );
+
         return $user;
     }
 

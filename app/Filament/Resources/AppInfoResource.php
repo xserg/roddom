@@ -29,69 +29,107 @@ class AppInfoResource extends Resource
 
     protected static ?string $navigationGroup = 'Приложение';
 
+    protected static ?string $label = 'Динамические заголовки';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('free_lecture_hours')
+                        ->required()
+                        ->integer()
+                        ->label('часов, раз во сколько можно смотреть бесплатную лекцию'),
+                    Forms\Components\TextInput::make('tarif_title_1')
+                        ->required()
+                        ->maxLength(255)
+                        ->label('тариф 1'),
+                    Forms\Components\TextInput::make('tarif_title_2')
+                        ->required()
+                        ->maxLength(255)
+                        ->label('тариф 2'),
+                    Forms\Components\TextInput::make('tarif_title_3')
+                        ->required()
+                        ->maxLength(255)
+                        ->label('тариф 3'),
+                ])->columns(4),
+                Forms\Components\Card::make([
                     Forms\Components\TextInput::make('agreement_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "прочтите соглашение"'),
                     Forms\Components\RichEditor::make('agreement_text')
-                        ->maxLength(65535),
+                        ->maxLength(65535)
+                        ->label('текст соглашения'),
                 ]),
 
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('recommended_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Рекомендуем"'),
                     Forms\Components\TextInput::make('recommended_subtitle')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Не пропустите новые лекции"'),
                     Forms\Components\TextInput::make('lectures_catalog_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Каталог лекций"'),
                     Forms\Components\TextInput::make('lectures_catalog_subtitle')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Выберите тему, которая вас интересует"'),
                     Forms\Components\TextInput::make('out_lectors_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Наши лекторы"'),
                     Forms\Components\TextInput::make('not_viewed_yet_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Вы ещё не смотрели"'),
                     Forms\Components\TextInput::make('more_in_the_collection')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Ещё в подборке"'),
                     Forms\Components\TextInput::make('about_lector_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "О лекторе"'),
                     Forms\Components\TextInput::make('diplomas_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Дипломы и сертификаты"'),
                     Forms\Components\TextInput::make('lectors_videos')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Видео от лектора"'),
                     Forms\Components\TextInput::make('app_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('имя приложения'),
                 ])
-                ->columns(2),
+                    ->columns(2),
                 Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('about_app')
-                        ->maxLength(65535),
+                        ->maxLength(65535)
+                        ->label('Описание приложения'),
                     Forms\Components\TextInput::make('app_author_name')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('имя автора'),
                     Forms\Components\TextInput::make('app_link_share_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Поделиться ссылкой"'),
                     Forms\Components\TextInput::make('app_link_share_link')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('линк приложения'),
                     Forms\Components\TextInput::make('app_show_qr_title')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->label('строка "Показать QR-код"'),
                     Forms\Components\FileUpload::make('app_show_qr_link')
                         ->directory('images/app')
                         ->required()
@@ -99,6 +137,7 @@ class AppInfoResource extends Resource
                             function (): string {
                                 return 'qr.jpeg';
                             })
+                        ->label('qr код линка приложения')
                 ])
             ]);
     }
