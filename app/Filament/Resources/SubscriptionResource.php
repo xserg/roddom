@@ -36,13 +36,13 @@ class SubscriptionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('user_id')
-                    ->label('пользователь')
-                    ->formatStateUsing(function (Closure $get) {
-                        return User::firstWhere('id', $get('user_id'))?->name;
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'email')
+                    ->required()
+                    ->disabled(function (string $context) {
+                        return $context === 'edit';
                     })
-                    ->disabled()
-                    ->required(),
+                    ->label('пользователь'),
                 Forms\Components\Select::make('period_id')
                     ->relationship('period', 'length')
                     ->label('период подписки, дней')
@@ -101,7 +101,10 @@ class SubscriptionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('имя'),
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('email'),
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
                         fn(string $state): string => Period::firstWhere('id', $state)->length
