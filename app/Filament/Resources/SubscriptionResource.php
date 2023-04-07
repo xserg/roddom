@@ -10,6 +10,9 @@ use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Repositories\CategoryRepository;
+use App\Repositories\LectureRepository;
+use App\Repositories\PromoRepository;
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -125,6 +128,36 @@ class SubscriptionResource extends Resource
                     )
                     ->label('тип подписки')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('spent')
+                    ->getStateUsing(
+                        function (?Subscription $record): string {
+                            $type = $record->subscriptionable_type;
+                            $id = $record->subscriptionable_id;
+                            $startDate = Carbon::parse($record->start_date);
+                            $endDate = Carbon::parse($record->end_date);
+                            $length = $startDate->diffInDays($endDate);
+
+                            if ($type == 'App\Models\Lecture') {
+                                $lecture = app(LectureRepository::class)->getLectureById($id);
+                                if ($lecture) {
+                                    return app(LectureRepository::class)->getLecturePrice($lecture, $length);
+                                }
+                            } elseif ($type == 'App\Models\Category') {
+                                $category = app(CategoryRepository::class)->getCategoryById($id);
+                                if ($category) {
+                                    return app(CategoryRepository::class)->getCategoryPriceForPeriodLength($category, $length);
+                                }
+                            } elseif ($type == 'App\Models\Promo') {
+                                $promo = Promo::first();
+                                if ($promo) {
+                                    return app(PromoRepository::class)->getPriceForExactPeriodLength($promo, $length);
+                                }
+                            }
+
+                            return 0;
+                        }
+                    )
+                    ->label('сумма подписки'),
                 Tables\Columns\TextColumn::make('subscriptionable_id')
                     ->label('id объекта подписки'),
                 Tables\Columns\TextColumn::make('start_date')
