@@ -215,8 +215,8 @@ class LectureRepository
             foreach ($promoSubscriptions as $promoSubscription) {
                 if ($promoSubscription['end_date'] < now()) continue;
 
-                $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
-                $promoLectures = $promo->promoLectures;
+//                $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
+                $promoLectures = Lecture::promo()->get();
                 foreach ($promoLectures as $lecture) {
                     $lectures[$lecture->id] = [
                         'start_date' => $promoSubscription['start_date'],
