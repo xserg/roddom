@@ -26,6 +26,8 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'watched_lectures_count', description: 'Количество просмотренные лекции', type: 'integer')]
     #[OA\Property(property: 'saved_lectures_count', description: 'Количество сохраненных лекции', type: 'integer')]
     #[OA\Property(property: 'purchased_lectures_count', description: 'Количество купленных лекции', type: 'integer')]
+    #[OA\Property(property: 'created_at', description: 'Когда создан аккаунт', type: 'string')]
+    #[OA\Property(property: 'updated_at', description: 'Когда обновлен аккаунт', type: 'string')]
     public function toArray(Request $request): array
     {
         return [
@@ -48,6 +50,8 @@ class UserResource extends JsonResource
                 $this->whenNotNull($this->saved_lectures_count, default: 0),
             'purchased_lectures_count' =>
                 $this->whenNotNull($this->purchased_lectures_counter, default: 0),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

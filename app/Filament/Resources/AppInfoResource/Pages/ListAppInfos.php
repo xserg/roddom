@@ -15,4 +15,9 @@ class ListAppInfos extends ListRecords
         return [
         ];
     }
+
+    protected function isTablePaginationEnabled(): bool
+    {
+        return false;
+    }
 }

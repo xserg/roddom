@@ -10,16 +10,22 @@ class Period extends Model
     const WEEK = 'week';
     const MONTH = 'month';
 
+    protected $fillable = [
+        'length'
+    ];
+
     protected $table = 'subscription_periods';
 
     public function subscriptions()
     {
         return $this->hasMany(Subscription::class);
     }
+
     public function categoryPrices()
     {
         return $this->hasMany(SubcategoryPrices::class);
     }
+
     public function promos()
     {
         return $this->hasMany(

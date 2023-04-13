@@ -13,6 +13,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Closure;
 use Livewire\Component as Livewire;
@@ -21,11 +22,12 @@ class PromoLecturesPricesRelationManager extends RelationManager
 {
     use MoneyConversion;
 
-    protected static ?string $title = 'Цены на каждую акционную лекцию';
+    protected static ?string $title = 'Цены подписки на акционную лекцию, за один период';
 
     protected static string $relationship = 'pricesForPromoLectures';
     protected static ?string $inverseRelationship = 'pricesInPromoPacks';
     protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $label = 'Цена за период';
 
     protected bool $allowsDuplicates = true;
 
@@ -47,28 +49,23 @@ class PromoLecturesPricesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('lecture_id')
-                    ->label('id и название лекции')
-                    ->formatStateUsing(fn(Lecture $record, string $state): string => $state . '. ' . $record->title)
-                    ->sortable(),
-
-//                Tables\Columns\TextColumn::make('lecture title')
-//                    ->formatStateUsing(
-//                        function (callable $get) {
-//                            $lecture_id = $get('lecture_id'); // Store the value of the `email` field in the `$email` variable.
-//                            return Lecture::firstWhere('id', $lecture_id)->title;
-//                        }
-//                    )
-//                    ->searchable()
-//                    ->label('id лекции')
-//                    ->searchable(),
-
+                    ->label('Название лекции')
+                    ->formatStateUsing(fn(Lecture $record, string $state): string => $record->title)
+                    ->sortable(query: function (Builder $query, string $direction): Builder {
+                        return $query
+                            ->orderBy('title', $direction)
+                            ->orderBy('period_id', 'ASC');
+                    })
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query
+                            ->where('title', 'like', "%{$search}%");
+                    }),
 
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
                         fn(string $state): string => Period::firstWhere('id', $state)->length
                     )
-                    ->label('Период покупки, дней')
-                    ->sortable(),
+                    ->label('Период покупки, дней'),
 
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(
@@ -88,6 +85,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                     ->form(fn(AttachAction $action): array => [
 
                         Forms\Components\Select::make('lecture_id')
+                            ->label('лекция')
                             ->options(function (Livewire $livewire) {
                                 $promo = $livewire->ownerRecord;
 
@@ -101,7 +99,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
                                 $filtered = Lecture::all()
                                     ->whereNotIn('id', $promoLectures)
-                                    ->pluck('id_title', 'id');
+                                    ->pluck('title', 'id');
 
                                 return $filtered;
                             })
@@ -112,6 +110,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                             }),
 
                         Forms\Components\Select::make('period_id')
+                            ->label('период подписки')
                             ->required()
                             ->options(function (callable $get, Livewire $livewire) {
                                 $promo = $livewire->ownerRecord;
@@ -136,6 +135,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                             ->reactive(),
 
                         Forms\Components\TextInput::make('price')
+                            ->label('цена в рублях')
                             ->required()
                             ->afterStateHydrated(
                                 fn(TextInput $component, $state) => $component->state(number_format($state / 100, 2, thousands_separator: ''))
@@ -150,6 +150,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
+            ->actionsPosition(Tables\Actions\Position::BeforeCells)
             ->bulkActions([
                 Tables\Actions\DetachBulkAction::make(),
             ]);

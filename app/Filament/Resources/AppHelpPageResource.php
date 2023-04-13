@@ -26,16 +26,22 @@ class AppHelpPageResource extends Resource
 
     protected static ?string $navigationGroup = 'Приложение';
 
+    protected static ?string $label = 'Страница "Помощь"';
+    protected static ?string $pluralModelLabel = 'Страница "Помощь"';
+    protected static ?string $modelLabel = 'Страница "Помощь"';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('заголовок'),
                 Forms\Components\Textarea::make('text')
                     ->required()
-                    ->maxLength(65535),
+                    ->maxLength(65535)
+                    ->label('текст'),
             ]);
     }
 
@@ -43,10 +49,11 @@ class AppHelpPageResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id'),
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('заголовок'),
                 Tables\Columns\TextColumn::make('text')
-                    ->limit(15)
+                    ->label('текст')
+                    ->limit(25)
                     ->tooltip(fn(Model $record): string => $record->text),
             ])
             ->filters([

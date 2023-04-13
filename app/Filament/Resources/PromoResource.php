@@ -40,7 +40,7 @@ class PromoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('id'),
             ])
             ->filters([
                 //
@@ -48,6 +48,7 @@ class PromoResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
+            ->actionsPosition(Tables\Actions\Position::BeforeCells)
             ->bulkActions([
             ]);
     }
