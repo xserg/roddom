@@ -6,6 +6,7 @@ use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Filament\Resources\SubscriptionResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Lecture;
+use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
@@ -133,28 +134,14 @@ class SubscriptionResource extends Resource
                         function (?Subscription $record): string {
                             $type = $record->subscriptionable_type;
                             $id = $record->subscriptionable_id;
-                            $startDate = Carbon::parse($record->start_date);
-                            $endDate = Carbon::parse($record->end_date);
-                            $length = $startDate->diffInDays($endDate);
+                            $order = Order::query()
+                                ->where('subscriptionable_type', $type)
+                                ->where('subscriptionable_id', $id)
+                                ->where('user_id', $record->user->id)
+                                ->first();
 
-                            if ($type == 'App\Models\Lecture') {
-                                $lecture = app(LectureRepository::class)->getLectureById($id);
-                                if ($lecture) {
-                                    return app(LectureRepository::class)->getLecturePrice($lecture, $length);
-                                }
-                            } elseif ($type == 'App\Models\Category') {
-                                $category = app(CategoryRepository::class)->getCategoryById($id);
-                                if ($category) {
-                                    return app(CategoryRepository::class)->getCategoryPriceForPeriodLength($category, $length);
-                                }
-                            } elseif ($type == 'App\Models\Promo') {
-                                $promo = Promo::first();
-                                if ($promo) {
-                                    return app(PromoRepository::class)->getPriceForExactPeriodLength($promo, $length);
-                                }
-                            }
 
-                            return 0;
+                            return $order?->price ?? 'не смогли рассчитать';
                         }
                     )
                     ->label('сумма подписки'),
