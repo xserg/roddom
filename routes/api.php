@@ -58,8 +58,6 @@ Route::prefix('v1')
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
         Route::post('password/reset', ResetPasswordController::class);
-        Route::get('/check', RetrieveAllUsersController::class)
-            ->name('check');
 
         //payments notifications listener
         Route::post('/listen', PaymentController::class)

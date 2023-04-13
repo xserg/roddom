@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\AppInfo;
 
+use App\Models\Period;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
@@ -56,9 +57,7 @@ use OpenApi\Attributes as OA;
 #[OA\Response(response: 500, description: 'Server Error')]
 class AppInfo
 {
-    public function __construct(
-//        private UserService $service
-    )
+    public function __construct()
     {
     }
 
@@ -73,6 +72,7 @@ class AppInfo
                 'app_info' => DB::table('app_info')
                     ->select('*')
                     ->get(),
+                'app_periods' => Period::all()->pluck('length')
             ],
         ]);
     }
