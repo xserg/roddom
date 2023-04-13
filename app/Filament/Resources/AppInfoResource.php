@@ -73,6 +73,10 @@ class AppInfoResource extends Resource
                     ->schema([
                         Forms\Components\Card::make()
                             ->schema([
+                                Forms\Components\TextInput::make('app_title')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('имя приложения'),
                                 Forms\Components\TextInput::make('recommended_title')
                                     ->required()
                                     ->maxLength(255)
@@ -113,10 +117,46 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('строка "Видео от лектора"'),
-                                Forms\Components\TextInput::make('app_title')
+                                Forms\Components\TextInput::make('validation_wrong_credentials')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('имя приложения'),
+                                    ->label('Неправильный логин/пароль. Повторите попытку.'),
+                                Forms\Components\TextInput::make('reset_code_sent')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Код подтверждения отправлен'),
+                                Forms\Components\TextInput::make('added_to_saved')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Добавили в «Сохранённые»'),
+                                Forms\Components\TextInput::make('removed_from_saved')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Удалили из «Сохранённых»'),
+                                Forms\Components\TextInput::make('added_to_watched')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Добавили в «Просмотренные»'),
+                                Forms\Components\TextInput::make('removed_from_watched')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Удалили из «Просмотренных»'),
+                                Forms\Components\TextInput::make('message_sent')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Ваше сообщение успешно отправлено.'),
+                                Forms\Components\TextInput::make('message_sent_error')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Во время отправки сообщения произошла ошибка.'),
+                                Forms\Components\TextInput::make('thanks_for_rate')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Спасибо за вашу оценку!'),
+                                Forms\Components\TextInput::make('thanks_for_feedback')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Спасибо за обратную связь! Ваше сообщение успено отправлено.'),
                             ])->columns(2)
                     ])
                     ->collapsible()
