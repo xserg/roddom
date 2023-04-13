@@ -17,8 +17,8 @@ class ListCategories extends ListRecords
         ];
     }
 
-    protected function isTablePaginationEnabled(): bool
+    protected function getTableRecordsPerPageSelectOptions(): array
     {
-        return false;
+        return [25, 50, 100];
     }
 }
