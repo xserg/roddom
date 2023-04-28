@@ -6,8 +6,10 @@ use App\Http\Controllers\Api\Buy\BuyLectureController;
 use App\Http\Controllers\Api\Buy\BuyPromoController;
 use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
 use App\Http\Controllers\Api\Category\RetrieveCategoryController;
+use App\Http\Controllers\Api\Lector\RateLectorController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
+use App\Http\Controllers\Api\Lector\RetrieveLectorsByCategoryController;
 use App\Http\Controllers\Api\Lecture\AddToListWatchedLectureController;
 use App\Http\Controllers\Api\Lecture\FeedbackLectureController;
 use App\Http\Controllers\Api\Lecture\RemoveFromListWatchedLectureController;
@@ -82,8 +84,10 @@ Route::prefix('v1')
                 ->name('lectors');
             Route::get('/lector/{id}', RetrieveLectorController::class)
                 ->name('lector');
-            Route::post('/lector/{id}/rate', \App\Http\Controllers\Api\Lector\RateLectorController::class)
+            Route::post('/lector/{id}/rate', RateLectorController::class)
                 ->name('lector.rate');
+            Route::get('/lectors/category/{slug}', RetrieveLectorsByCategoryController::class)
+                ->name('lector.by.category');
 
             Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');
