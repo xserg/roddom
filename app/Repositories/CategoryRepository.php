@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class CategoryRepository
 {
@@ -31,5 +32,43 @@ class CategoryRepository
         }
 
         return $price;
+    }
+
+    public function getAllLectorsByCategory(string $slug): Collection|array
+    {
+        $category = Category
+            ::query()
+            ->where('slug', '=', $slug)
+            ->firstOrFail();
+
+        $lectors = [];
+        if ($category->parent_id === 0) {
+            $subCategories = Category
+                ::subCategories()
+                ->where('parent_id', '=', $category->id)
+                ->with('lectures.lector')
+                ->get();
+
+            if ($subCategories->isNotEmpty()) {
+                $subCategories->each(function ($subCategory) use (&$lectors) {
+                    $lectures = $subCategory->lectures;
+                    $lectures->each(function ($lecture) use (&$lectors) {
+                        $lector = $lecture->lector;
+                        $lectors[] = $lector;
+                    });
+                });
+            }
+        } else {
+            $lectures = $category->lectures;
+            $lectures->each(function ($lecture) use (&$lectors) {
+                $lector = $lecture->lector;
+                $lectors[] = $lector;
+            });
+        }
+
+        return collect($lectors)
+            ->unique()
+            ->sort()
+            ->values();
     }
 }
