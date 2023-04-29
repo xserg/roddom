@@ -49,16 +49,16 @@ class LoginCodeController extends Controller
 
     public function __invoke(LoginCodeRequest $request)
     {
-        $loginCode = $request->validated('code');
+        $code = $request->validated('code');
 
         try {
             $this
                 ->loginCodeService
-                ->throwIfExpired($loginCode);
+                ->throwIfExpired($code);
 
         } catch (LoginCodeExpiredException $exception) {
 
-            $this->loginCodeService->deleteRecordsWithCode($loginCode);
+            $this->loginCodeService->deleteRecordsWithCode($code);
 
             return response()->json([
                 'message' => $exception->getMessage()
@@ -73,7 +73,7 @@ class LoginCodeController extends Controller
 
         $loginCode = $this
             ->loginCodeRepository
-            ->latestWhereCode($loginCode);
+            ->latestWhereCode($code);
 
         $user = $this
             ->userRepository
@@ -81,7 +81,7 @@ class LoginCodeController extends Controller
                 $loginCode->email
             );
 
-        $this->loginCodeService->deleteRecordsWithCode($loginCode);
+        $this->loginCodeService->deleteRecordsWithCode($code);
         $user->tokens()->delete();
 
         $token = $user
