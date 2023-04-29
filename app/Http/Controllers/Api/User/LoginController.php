@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\User;
 
+use App\Exceptions\FailedCreateLoginCodeException;
 use App\Http\Requests\LoginRequest;
-use App\Http\Resources\UserResource;
-use App\Repositories\LectureRepository;
-use App\Repositories\UserRepository;
-use App\Services\UserService;
+use App\Mail\SendLoginCode;
+use App\Services\LoginCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -26,13 +26,7 @@ use OpenApi\Attributes as OA;
         new OA\MediaType(mediaType: 'multipart/form-data', schema: new OA\Schema(ref: '#/components/schemas/LoginRequest')),
     ]
 )]
-#[OA\Response(response: Response::HTTP_OK, description: 'OK',
-    content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'user', ref: '#/components/schemas/UserResource'),
-        new OA\Property(property: 'access_token', type: 'string', example: '2|bNyLNAS0eqriGpH3O2z9bViYtBOtBk1bQKDIEifD'),
-        new OA\Property(property: 'token_type', type: 'string', example: 'Bearer'),
-    ])
-)]
+#[OA\Response(response: Response::HTTP_OK, description: 'OK')]
 #[OA\Response(
     response: Response::HTTP_UNPROCESSABLE_ENTITY,
     description: 'Validation exception',
@@ -42,13 +36,10 @@ use OpenApi\Attributes as OA;
             schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
 )]
 #[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
-
 class LoginController
 {
     public function __construct(
-        private UserRepository $userRepository,
-        private LectureRepository $lectureRepository,
-        private UserService $userService
+        private LoginCodeService $loginCodeService
     )
     {
     }
@@ -74,23 +65,31 @@ class LoginController
             );
         }
 
-        $user = $this->userRepository
-            ->findByEmail(
-                $request->input('email')
-            );
+        $email = $request->validated('email');
+        $this->loginCodeService->deleteWhereEmail($email);
+        $code = mt_rand(100000, 999999);
 
-        $user->tokens()->delete();
+        try {
+            $this->loginCodeService->create($email, $code);
 
-        $token = $user
-            ->createToken('access_token')
-            ->plainTextToken;
+        } catch (FailedCreateLoginCodeException $exception) {
 
-        $user = $this->userService->appendLectureCountersToUser($user);
+            return response()->json([
+                'message' => $exception->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $sent = Mail::to($email)
+            ->send(new SendLoginCode($code));
+
+        if (!$sent) {
+            return response()->json([
+                'message' => 'Невозможно послать email с кодом логина'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
 
         return response()->json([
-            'user' => new UserResource($user),
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ]);
+            'message' => 'Код отослан на ваш email',
+        ], Response::HTTP_OK);
     }
 }

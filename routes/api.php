@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
 use App\Http\Controllers\Api\User\DeleteUserController;
+use App\Http\Controllers\Api\User\LoginCodeController;
 use App\Http\Controllers\Api\User\LoginController;
 use App\Http\Controllers\Api\User\LogoutController;
 use App\Http\Controllers\Api\User\PhotoController;
@@ -56,6 +57,8 @@ Route::prefix('v1')
             ->name('register');
         Route::post('/user/login', LoginController::class)
             ->name('login');
+        Route::post('/user/login/code', LoginCodeController::class)
+            ->name('login.code');
 
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);

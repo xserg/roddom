@@ -3,7 +3,6 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Repositories\LectureRepository;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -122,6 +121,7 @@ class User extends Authenticatable implements FilamentUser
     protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(
+            get: fn($value) => $value,
             set: fn($value) => $value
         );
     }
