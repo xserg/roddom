@@ -58,11 +58,6 @@ class CategoryPricesRelationManager extends RelationManager
                         }
                     )
                     ->label('Цена за всю категорию, рублей'),
-                Tables\Columns\TextColumn::make('price_for_one_lecture')
-                    ->formatStateUsing(
-                        fn(string $state): string => self::coinsToRoubles($state)
-                    )
-                    ->label('Цена за одну лекцию этой категории, рублей'),
                 Tables\Columns\TextColumn::make('lectures_count')
                     ->getStateUsing(
                         function (?SubcategoryPrices $record): string {
@@ -70,7 +65,13 @@ class CategoryPricesRelationManager extends RelationManager
                             $lecturesCount = $category->lectures()->count();
                             return $lecturesCount;
                         }
-                    )->label('Количество лекций в категории'),
+                    )->label('Количество лекций'),
+                Tables\Columns\TextColumn::make('price_for_one_lecture')
+                    ->formatStateUsing(
+                        fn(string $state): string => self::coinsToRoubles($state)
+                    )
+                    ->label('Цена за одну лекцию этой категории, рублей')
+                ->weight('bold'),
             ])
             ->filters([
                 //

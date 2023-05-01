@@ -5,11 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Models\Category;
-use App\Models\Lector;
 use App\Models\Lecture;
-use Closure;
+use App\Models\LectureType;
 use Filament\Forms;
-use Filament\Forms\Components\Repeater;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -41,7 +39,12 @@ class LectureResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\TextInput::make('id')
                         ->label('ID, заполняется автоматически')
-                        ->disabled(),
+                        ->disabled()
+                        ->visible(false),
+                    Forms\Components\TextInput::make('title')
+                        ->label('Наименование лекции')
+                        ->required()
+                        ->maxLength(255),
                     Forms\Components\Select::make('lector_id')
                         ->label('Лектор')
                         ->relationship('lector', 'name')
@@ -50,17 +53,28 @@ class LectureResource extends Resource
                         ->label('Подкатегория лекции')
                         ->options(Category::subcategories()->get()->pluck('title', 'id'))
                         ->required(),
-                    Forms\Components\TextInput::make('title')
-                        ->label('Наименование лекции')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\TextInput::make('video_id')
-                        ->label('kinescope id видео(должно быть уникальным)')
-                        ->required(),
                 ])->columns(2),
+                Forms\Components\Section::make('content')
+                    ->schema([
+                        Forms\Components\Select::make('type_id')
+                            ->options(LectureType::all()->pluck('title', 'id')),
+                        Forms\Components\TextInput::make('video_id')
+                            ->label('kinescope id видео(должно быть уникальным)')
+                            ->required(),
+                    ]),
                 Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('description')
                         ->label('Описание лекции')
+                        ->toolbarButtons([
+                            'bold',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'redo',
+                            'strike',
+                            'undo',
+                            'preview'
+                        ])
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('preview_picture')
                         ->directory('images/lectures')

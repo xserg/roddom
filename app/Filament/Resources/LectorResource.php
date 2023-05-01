@@ -37,33 +37,48 @@ class LectorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->label('ID, заполняется автоматически')
-                    ->disabled(),
-                Forms\Components\TextInput::make('name')
-                    ->label('Имя лектора')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('position')
-                    ->label('Должность, позиция')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\RichEditor::make('description')
-                    ->label('О лекторе')
-                    ->required()
-                    ->maxLength(65535),
-                Forms\Components\DatePicker::make('career_start')
-                    ->label('Начало карьеры')
-                    ->required(),
-                Forms\Components\FileUpload::make('photo')
-                    ->label('Фото лектора')
-                    ->directory('images/lectors')
-                    ->maxSize(10240)
-                    ->image()
-                    ->imageResizeMode('force')
-                    ->imageCropAspectRatio('1:1')
-                    ->imageResizeTargetWidth('300')
-                    ->imageResizeTargetHeight('300'),
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('id')
+                        ->label('ID, заполняется автоматически')
+                        ->disabled()
+                        ->visible(false),
+                    Forms\Components\TextInput::make('name')
+                        ->label('Имя лектора')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('position')
+                        ->label('Должность, позиция')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DatePicker::make('career_start')
+                        ->label('Начало карьеры')
+                        ->required(),
+                ])->columns(1),
+                Forms\Components\Card::make([
+                    Forms\Components\RichEditor::make('description')
+                        ->label('О лекторе')
+                        ->toolbarButtons([
+                            'bold',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'redo',
+                            'strike',
+                            'undo',
+                            'preview'
+                        ])
+                        ->required()
+                        ->maxLength(65535),
+                    Forms\Components\FileUpload::make('photo')
+                        ->label('Фото лектора')
+                        ->directory('images/lectors')
+                        ->maxSize(10240)
+                        ->image()
+                        ->imageResizeMode('force')
+                        ->imageCropAspectRatio('1:1')
+                        ->imageResizeTargetWidth('300')
+                        ->imageResizeTargetHeight('300'),
+                ])->columns(2)
             ]);
     }
 

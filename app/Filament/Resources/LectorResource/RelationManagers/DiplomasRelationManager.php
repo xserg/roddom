@@ -7,22 +7,21 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DiplomasRelationManager extends RelationManager
 {
     protected static string $relationship = 'diplomas';
     protected static ?string $inverseRelationship = 'lector';
-
     protected static ?string $recordTitleAttribute = 'id';
     protected static ?string $title = 'Дипломы';
+    protected static ?string $label = 'Диплом';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\FileUpload::make('preview_picture')
+                ->label('превью диплома')
             ]);
     }
 
@@ -39,6 +38,7 @@ class DiplomasRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
+                    ->label('Добавить')
                     ->disableCreateAnother(),
 //                Tables\Actions\AssociateAction::make(),
             ])

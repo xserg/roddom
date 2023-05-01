@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
+use Illuminate\Database\Eloquent\Model;
 
 class FeedbackResource extends Resource
 {
@@ -42,28 +43,43 @@ class FeedbackResource extends Resource
                         ->required(),
                 ])->columns(3)->hidden(),
                 Forms\Components\Card::make([
+                    Forms\Components\Textarea::make('content')
+                        ->required()
+                        ->maxLength(65535)
+                        ->label('отзыв'),
                     Forms\Components\TextInput::make('user_name')
                         ->formatStateUsing(function (Closure $get) {
                             return User::firstWhere('id', $get('user_id'))->name;
-                        })->label('имя пользователя'),
+                        })
+                        ->hint(function (Feedback $record): string {
+                            $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
+                            return $route;
+                        })
+                        ->label('Пользователь, оставивший отзыв'),
                     Forms\Components\TextInput::make('lecture_title')
                         ->formatStateUsing(function (Closure $get) {
                             return Lecture::firstWhere('id', $get('lecture_id'))->title;
-                        })->label('наименование лекции'),
+                        })
+
+                        ->hint(function (Feedback $record): string {
+                            $route = route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
+                            return $route;
+                        })
+                        ->label('Лекция'),
                     Forms\Components\TextInput::make('lector_name')
                         ->formatStateUsing(function (Closure $get) {
                             return Lector::firstWhere('id', $get('lector_id'))->name;
-                        })->label('имя лектора'),
+                        })
+                        ->hint(function (Feedback $record): string {
+                            $route = route('filament.resources.lectors.edit', ['record' => $record->lector_id]);
+                            return url($route);
+                        })
+                        ->label('Лектор'),
 //                    Forms\Components\TextInput::make('lecture_id')
 //                        ->required(),
 //                    Forms\Components\TextInput::make('lector_id')
 //                        ->required(),
-                ])->columns(3),
-
-                Forms\Components\Textarea::make('content')
-                    ->required()
-                    ->maxLength(65535)
-                    ->label('отзыв'),
+                ])->columns(1),
             ]);
     }
 
@@ -129,13 +145,23 @@ class FeedbackResource extends Resource
         ];
     }
 
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListFeedback::route('/'),
-            'create' => Pages\CreateFeedback::route('/create'),
+//            'create' => Pages\CreateFeedback::route('/create'),
             'view' => Pages\ViewFeedback::route('/{record}'),
-            'edit' => Pages\EditFeedback::route('/{record}/edit'),
+//            'edit' => Pages\EditFeedback::route('/{record}/edit'),
         ];
     }
 }

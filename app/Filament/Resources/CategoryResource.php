@@ -11,7 +11,6 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
@@ -31,12 +30,6 @@ class CategoryResource extends Resource
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
-                        Forms\Components\Select::make('parent_id')
-                            ->label('Родительская категория (оставьте \'Выберите вариант\', если у категории нет родительской)')
-                            ->options(
-                                Category::mainCategories()->pluck('title', 'id')
-                            )
-                            ->default(0),
                         Forms\Components\TextInput::make('title')
                             ->reactive()
                             ->afterStateUpdated(function (Closure $set, $state) {
@@ -45,27 +38,46 @@ class CategoryResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->label('Наименование категории'),
-                        Forms\Components\RichEditor::make('description')
-                            ->disableToolbarButtons(['attachFiles',])
-                            ->maxLength(65535)
-                            ->label('Описание категории'),
-                        Forms\Components\Textarea::make('info')
-                            ->maxLength(65535)
-                            ->label('Блок "инфо" категории'),
+                        Forms\Components\Select::make('parent_id')
+                            ->label('Родительская категория (оставьте \'Выберите вариант\', если у категории нет родительской)')
+                            ->options(
+                                Category::mainCategories()->pluck('title', 'id')
+                            )
+                            ->default(0),
                     ]),
+                Forms\Components\Card::make([
+                    Forms\Components\RichEditor::make('description')
+                        ->toolbarButtons([
+                            'bold',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'redo',
+                            'strike',
+                            'undo',
+                            'preview'
+                        ])
+                        ->maxLength(65535)
+                        ->label('Описание категории'),
+                    Forms\Components\Textarea::make('info')
+                        ->maxLength(65535)
+                        ->label('Блок "инфо" категории'),
+                    Forms\Components\FileUpload::make('preview_picture')
+                        ->directory('images/categories')
+                        ->maxSize(10240)
+                        ->image()
+                        ->imageResizeMode('cover')
+                        ->imageCropAspectRatio('4:3')
+                        ->imageResizeTargetWidth('640')
+                        ->imageResizeTargetHeight('480')
+                        ->label('Превью картинка категории'),
+                ])->columns(2),
                 Forms\Components\TextInput::make('slug')
                     ->label('Слаг категории, заполняется автоматически с наименования')
+                    ->unique(table: Category::class)
+                    ->validationAttribute('"Слаг категории"')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\FileUpload::make('preview_picture')
-                    ->directory('images/categories')
-                    ->maxSize(10240)
-                    ->image()
-                    ->imageResizeMode('cover')
-                    ->imageCropAspectRatio('4:3')
-                    ->imageResizeTargetWidth('640')
-                    ->imageResizeTargetHeight('480')
-                    ->label('Превью картинка категории'),
             ]);
     }
 
