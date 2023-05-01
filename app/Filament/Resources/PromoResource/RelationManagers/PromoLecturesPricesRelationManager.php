@@ -31,7 +31,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
     protected bool $allowsDuplicates = true;
 
-    public function getTableRecordTitle(Model $record): string
+    public function getTableRecordTitle(?Model $record): string
     {
         return 'цены на промо лекции';
     }
