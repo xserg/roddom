@@ -133,11 +133,6 @@ class FeedbackResource extends Resource
             ]);
     }
 
-//    protected function getTableActionsPosition(): ?string
-//    {
-//        return Position::BeforeColumns;
-//    }
-
     public static function getRelations(): array
     {
         return [

@@ -23,11 +23,4 @@ class ListUsers extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-
-    protected function getTableHeaderActions(): array
-    {
-        return [
-            FilamentExportHeaderAction::make('Export')
-        ];
-    }
 }

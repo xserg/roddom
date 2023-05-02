@@ -92,17 +92,13 @@ class LectorResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('position')
                     ->label('Должность, позиция')
-                    ->limit(15)
+                    ->limit(35)
                     ->tooltip(fn(Model $record): string => $record->position),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
 //                Tables\Columns\TextColumn::make('career_start')
 //                    ->label('Начало карьеры')
-//                    ->date()
 //                    ->sortable(),
-                Tables\Columns\TextColumn::make('career_start')
-                    ->label('Начало карьеры')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lector $record): ?string {

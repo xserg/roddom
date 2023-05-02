@@ -140,9 +140,15 @@ class PromoLecturesPricesRelationManager extends RelationManager
                             ->afterStateHydrated(
                                 fn(TextInput $component, $state) => $component->state(number_format($state / 100, 2, thousands_separator: ''))
                             )
-                            ->dehydrateStateUsing(fn($state) => $state * 100),
+                            ->dehydrateStateUsing(fn($state) => $state * 100)
+                            ->numeric()
+                            ->mask(fn(TextInput\Mask $mask) => $mask
+                                ->numeric()
+                                ->decimalPlaces(2) // Set the number of digits after the decimal point.
+                                ->decimalSeparator('.') // Add a separator for decimal numbers.
+                            ),
 
-                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
+                        $action->getRecordSelect()->visible(false)->default(Promo::first()->id)->disabled(),
 
                     ]),
             ])

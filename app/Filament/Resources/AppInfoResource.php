@@ -54,7 +54,11 @@ class AppInfoResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->label('тариф 3'),
-                ])->columns(4),
+                    Forms\Components\Textarea::make('successful_purchase_text')
+                        ->required()
+                        ->maxLength(65535)
+                        ->label('текст успешной покупки, на email'),
+                ])->columns(2),
 
                 Forms\Components\Section::make('Раздел "Лицензионное соглашение"')
                     ->schema([

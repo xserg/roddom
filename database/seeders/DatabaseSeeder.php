@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LectureType;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
 use App\Models\Diploma;
@@ -40,6 +41,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SubscriptionPeriodSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
+        $this->call(LectureTypeSeeder::class);
         Lecture::factory(150)->create();
         Lecture::factory(30)->notPublished()->create();
 

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
@@ -19,12 +18,29 @@ class Lecture extends Model
 
     private $lectureRepository;
 
-    protected $appends = ['is_watched', 'is_promo', 'purchase_info', 'prices', 'list_watched', 'id_title'];
+    protected $appends = [
+        'is_watched',
+        'is_promo',
+        'purchase_info',
+        'prices',
+        'list_watched',
+        'id_title',
+    ];
 
     protected $casts = ['created_at' => 'datetime'];
 
-    protected $fillable = ['id', 'lector_id', 'description', 'title', 'preview_picture',
-        'is_free', 'category_id', 'video_id', 'is_published'];
+    protected $fillable = [
+        'id',
+        'lector_id',
+        'description',
+        'title',
+        'preview_picture',
+        'category_id',
+        'content',
+        'is_published',
+        'content_type_id',
+        'payment_type_id',
+    ];
 
     protected $hidden = ['pivot'];
 
@@ -47,6 +63,16 @@ class Lecture extends Model
     public function lector(): BelongsTo
     {
         return $this->belongsTo(Lector::class);
+    }
+
+    public function contentType(): BelongsTo
+    {
+        return $this->belongsTo(LectureContentType::class);
+    }
+
+    public function paymentType(): BelongsTo
+    {
+        return $this->belongsTo(LecturePaymentType::class);
     }
 
     public function watchedUsers(): BelongsToMany
@@ -210,12 +236,12 @@ class Lecture extends Model
 
     public function scopeFree(Builder $query): void
     {
-        $query->where('is_free', '=', 1);
+        $query->where('payment_type_id', '=', LecturePaymentType::FREE);
     }
 
     public function scopePayed(Builder $query): void
     {
-        $query->where('is_free', '=', 0);
+        $query->where('payment_type_id', '!=', LecturePaymentType::FREE);
     }
 
     public function scopeNotWatched(Builder $query): void
@@ -240,19 +266,8 @@ class Lecture extends Model
 
     protected function isPromo(): Attribute
     {
-        $firstPromoPack = Promo::first();
-        $promoIds = $firstPromoPack
-            ->pricesForPromoLectures
-            ->pluck('id')
-            ->toArray();
-
-        if ($promoIds) {
-            return new Attribute(
-                get: fn() => (int)in_array($this->id, $promoIds),
-            );
-        }
         return new Attribute(
-            get: fn() => 0,
+            get: fn() => $this->paymentType->id === LecturePaymentType::PROMO,
         );
     }
 

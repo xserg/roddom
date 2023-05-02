@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
@@ -128,7 +129,11 @@ class UserResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Export')
+            ])
+            ->actionsPosition(Tables\Actions\Position::BeforeColumns);
     }
 
     public static function getRelations(): array
