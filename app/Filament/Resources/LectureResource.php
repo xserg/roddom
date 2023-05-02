@@ -62,7 +62,11 @@ class LectureResource extends Resource
                             ->reactive()
                             ->label('Тип')
                             ->required()
-                            ->afterStateUpdated(function (callable $set, callable $get, ?Model $record) {
+                            ->afterStateUpdated(function (callable $set, callable $get, ?Model $record, string $context) {
+                                if($context === 'create'){
+                                    return;
+                                }
+
                                 if ($record->contentType->id != $get('content_type_id')) {
                                     $set('content', null);
                                 } elseif (
@@ -83,7 +87,11 @@ class LectureResource extends Resource
                                 return $get('content_type_id') == LectureContentType::KINESCOPE;
                             })
                             ->required()
-                            ->afterStateHydrated(function (TextInput $component, ?Model $record) {
+                            ->afterStateHydrated(function (TextInput $component, ?Model $record, string $context) {
+                                if($context === 'create'){
+                                    return;
+                                }
+
                                 if ($record->contentType->id != LectureContentType::PDF) {
                                     $component->state($record->content);
                                 } else {
@@ -98,7 +106,11 @@ class LectureResource extends Resource
                             ->visible(function (callable $get) {
                                 return $get('content_type_id') == LectureContentType::PDF;
                             })
-                            ->afterStateHydrated(function (Forms\Components\FileUpload $component, ?Model $record) {
+                            ->afterStateHydrated(function (Forms\Components\FileUpload $component, ?Model $record, string $context) {
+                                if($context === 'create'){
+                                    return;
+                                }
+
                                 if ($record->contentType->id != LectureContentType::PDF) {
                                     $component->state($record->content);
                                 } else {
@@ -112,7 +124,11 @@ class LectureResource extends Resource
                                 return $get('content_type_id') == LectureContentType::EMBED;
                             })
                             ->required()
-                            ->afterStateHydrated(function (TextInput $component, ?Model $record) {
+                            ->afterStateHydrated(function (TextInput $component, ?Model $record, string $context) {
+                                if($context === 'create'){
+                                    return;
+                                }
+
                                 if ($record->contentType->id != LectureContentType::PDF) {
                                     $component->state($record->content);
                                 } else {
