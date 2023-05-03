@@ -315,10 +315,8 @@ class LectureRepository
         return $price;
     }
 
-    public function formPricesForLecture(int $id): array
+    public function formPricesForLecture(Lecture $lecture): array
     {
-        $lecture = $this->getLectureById($id);
-
         $prices = [];
 
         //чекаем что лекция промо
