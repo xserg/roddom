@@ -225,11 +225,26 @@ class LectureResource extends Resource
             ])
             ->filters([
                 Filter::make('is_free')
-                    ->query(fn(Builder $query): Builder => $query->where('is_free', true))
+                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::FREE))
                     ->label('бесплатные'),
+                Filter::make('payed')
+                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PAY))
+                    ->label('платные'),
+                Filter::make('promo')
+                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PROMO))
+                    ->label('промо'),
                 Filter::make('is_recommended')
                     ->query(fn(Builder $query): Builder => $query->where('is_recommended', true))
                     ->label('рекомендованные'),
+                Filter::make('kinescope')
+                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::KINESCOPE))
+                    ->label('kinescope'),
+                Filter::make('pdf')
+                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::PDF))
+                    ->label('pdf'),
+                Filter::make('embed')
+                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::EMBED))
+                    ->label('youtube/rutube'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
