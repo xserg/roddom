@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Models\Lecture;
+use App\Models\LecturePaymentType;
+use App\Models\Period;
 use App\Models\Promo;
 use App\Models\User;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -229,73 +231,68 @@ class LectureRepository
         return $lectures;
     }
 
-    public function setFlagsToLectures(
-        Collection $lectures
-    ): Collection
-    {
-        $watchedLectures = auth()->user()->watchedLectures;
-        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
-        $promoLecturesIds = $this->getAllPromoQuery()->get();
-
-        $lectures = $lectures->map(function ($lecture) use ($watchedLectures, $purchasedLectures, $promoLecturesIds) {
-            /**
-             * @var $lecture Lecture
-             */
-            $lecture->setAppends([]);
-
-            $isWatched = $watchedLectures->contains($lecture->id);
-            $isPromo = $promoLecturesIds->contains($lecture->id);
-            $isPurchased = (int)array_key_exists($lecture->id, $purchasedLectures);
-
-            $purchaseInfo = [
-                'is_purchased' => (int)array_key_exists($lecture->id, $purchasedLectures),
-                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null
-            ];
-
-            $categoryPrices = $lecture->category->categoryPrices;
-            $prices = [];
-
-            foreach ($categoryPrices as $price) {
-                $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
-                $prices['price_by_category'][] = [
-                    'title' => $price->period->title,
-                    'length' => $price->period->length,
-                    'price_for_lecture' => $priceForLecture
-                ];
-            }
-
-            $periods = $lecture->pricesPeriodsInPromoPacks;
-            if ($periods->isNotEmpty()) {
-                foreach ($periods as $period) {
-                    $priceForLecture = number_format($period->pivot->price / 100, 2);
-                    $prices['price_by_promo'][$period->length] = [
-                        'title' => $period->title,
-                        'length' => $period->length,
-                        'price_for_promo_lecture' => $priceForLecture,
-                    ];
-                }
-            }
-
-            $lecture->is_watched = (int)$isWatched;
-            $lecture->is_promo = (int)$isPromo;
-            $lecture->purchase_info = $purchaseInfo;
-            $lecture->prices = $prices;
-
-            return $lecture;
-        });
-
-        return $lectures;
-    }
+//    public function setFlagsToLectures(
+//        Collection $lectures
+//    ): Collection
+//    {
+//        $watchedLectures = auth()->user()->watchedLectures;
+//        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+//        $promoLecturesIds = $this->getAllPromoQuery()->get();
+//
+//        $lectures = $lectures->map(function ($lecture) use ($watchedLectures, $purchasedLectures, $promoLecturesIds) {
+//            /**
+//             * @var $lecture Lecture
+//             */
+//            $lecture->setAppends([]);
+//
+//            $isWatched = $watchedLectures->contains($lecture->id);
+//            $isPromo = $promoLecturesIds->contains($lecture->id);
+//            $isPurchased = (int)array_key_exists($lecture->id, $purchasedLectures);
+//
+//            $purchaseInfo = [
+//                'is_purchased' => (int)array_key_exists($lecture->id, $purchasedLectures),
+//                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null
+//            ];
+//
+//            $categoryPrices = $lecture->category->categoryPrices;
+//            $prices = [];
+//
+//            foreach ($categoryPrices as $price) {
+//                $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
+//                $prices['price_by_category'][] = [
+//                    'title' => $price->period->title,
+//                    'length' => $price->period->length,
+//                    'price_for_lecture' => $priceForLecture
+//                ];
+//            }
+//
+//            $periods = $lecture->pricesPeriodsInPromoPacks;
+//            if ($periods->isNotEmpty()) {
+//                foreach ($periods as $period) {
+//                    $priceForLecture = number_format($period->pivot->price / 100, 2);
+//                    $prices['price_by_promo'][$period->length] = [
+//                        'title' => $period->title,
+//                        'length' => $period->length,
+//                        'price_for_promo_lecture' => $priceForLecture,
+//                    ];
+//                }
+//            }
+//
+//            $lecture->is_watched = (int)$isWatched;
+//            $lecture->is_promo = (int)$isPromo;
+//            $lecture->purchase_info = $purchaseInfo;
+//            $lecture->prices = $prices;
+//
+//            return $lecture;
+//        });
+//
+//        return $lectures;
+//    }
 
     public function getPurchasedLecturesByUser(Authenticatable|User $user): Collection
     {
         $purchasedLectureIds = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
         return Lecture::whereIn('id', array_keys($purchasedLectureIds))->get();
-    }
-
-    public function getPurchasedInfoByUser(Authenticatable|User $user): Collection
-    {
-
     }
 
     public function getLecturePrice(Lecture $lecture, int $period): int|float
@@ -316,5 +313,78 @@ class LectureRepository
         }
 
         return $price;
+    }
+
+    public function formPricesForLecture(int $id): array
+    {
+        $lecture = $this->getLectureById($id);
+
+        $prices = [];
+
+        //чекаем что лекция промо
+        if ($lecture->paymentType->id === LecturePaymentType::PROMO) {
+            $promoCustomPrices = $lecture->pricesPeriodsInPromoPacks;
+            $promoCommonPrices = Promo::first()->subscriptionPeriodsForPromoPack;
+
+            $periods = Period::all();
+            foreach ($periods as $period) {
+                //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
+                $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
+                $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
+                $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
+                //а вот кастомной может не быть цены, поэтому проверяем
+                if (is_null($priceCustom)) {
+                    //если нет кастомной цены для конкретного периода, ставим null
+                    $prices[] = [
+                        'length' => $period->length,
+                        'custom_price_for_one_lecture' => null,
+                        'common_price_for_one_lecture' => $priceCommonForOneLecture
+                    ];
+                } else {
+                    //а если есть, то преобразовываем в формат рубли.копейки и ставим
+                    //а common_price_for_one_lecture одна и таже в обоих случаях
+
+                    $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+
+                    $prices[] = [
+                        'length' => $period->length,
+                        'custom_price_for_one_lecture' => $priceForOneLecture,
+                        'common_price_for_one_lecture' => $priceCommonForOneLecture
+                    ];
+                }
+            }
+        } else {
+            //если не промо - то не важно, платная или бесплатная, бесплатную тоже можно купить по ценам платной
+            $periods = Period::all();
+            $categoryCommonPrices = $lecture->category->prices;
+            $customPrices = $lecture->pricesForLectures;
+
+            foreach ($periods as $period) {
+                //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
+                $priceCommon = Arr::where($categoryCommonPrices, function ($value) use ($period) {
+                    return $value['length'] == $period->length;
+                });
+                $priceCommon = array_pop($priceCommon);
+                $priceCustom = $customPrices->where('length', $period->length)->first();
+
+                if (is_null($priceCustom)) {
+                    $prices[] = [
+                        'length' => $period->length,
+                        'custom_price_for_one_lecture' => null,
+                        'common_price_for_one_lecture' => $priceCommon['price_for_one_lecture']
+                    ];
+                } else {
+                    $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+
+                    $prices[] = [
+                        'length' => $period->length,
+                        'custom_price_for_one_lecture' => $priceForOneLecture,
+                        'common_price_for_one_lecture' => $priceCommon['price_for_one_lecture']
+                    ];
+                }
+            }
+        }
+
+        return $prices;
     }
 }

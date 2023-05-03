@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\LectureResource\RelationManagers;
 
 use App\Models\Period;
-use App\Models\Promo;
 use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -14,29 +13,18 @@ use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
 use Livewire\Component as Livewire;
 
-class PromoLecturesPricesRelationManager extends RelationManager
+class PricesForLecturesRelationManager extends RelationManager
 {
     use MoneyConversion;
 
-    protected static string $relationship = 'pricesInPromoPacks';
-
-    protected static ?string $inverseRelationship = 'pricesForPromoLectures';
-
+    protected static string $relationship = 'pricesForLectures';
+    protected static ?string $title = 'Цены лекций';
     protected static ?string $recordTitleAttribute = 'id';
-
-    protected bool $allowsDuplicates = true;
-
-    protected static ?string $title = 'Цены в акционном паке лекций';
-    protected static ?string $label = 'Цена на отдельную лекцию в промо паке';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('lecture_id')
-                    ->required()
-                    ->maxLength(255),
-
                 Forms\Components\Select::make('period_id')
                     ->required()
                     ->options(
@@ -66,25 +54,26 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
+
                 Tables\Actions\AttachAction::make()
                     ->label('добавить период и цену')
                     ->disableAttachAnother()
                     ->preloadRecordSelect()
                     ->disabled(function (Livewire $livewire) {
                         $lecture = $livewire->ownerRecord;
-                        $periods = $lecture->pricesPeriodsInPromoPacks;
+                        $periods = $lecture->pricesForLectures;
                         if ($periods->count() == Period::all()->count()) {
                             return true;
                         }
                         return false;
                     })
                     ->form(fn(AttachAction $action): array => [
-                        Forms\Components\Select::make('period_id')
-                            ->required()
+                        $action
+                            ->getRecordSelect()
                             ->options(function (Livewire $livewire) {
                                 $lecture = $livewire->ownerRecord;
                                 $periodsAlreadyAttached = $lecture
-                                    ?->pricesPeriodsInPromoPacks
+                                    ?->pricesForLectures
                                     ?->pluck('id')
                                     ?->toArray();
 
@@ -94,21 +83,22 @@ class PromoLecturesPricesRelationManager extends RelationManager
                                     return Period::query()->whereNotIn('id', $periodsAlreadyAttached)
                                         ->pluck('length', 'id');
                                 }
-                            })->label('период, дней'),
+                            })
+                            ->label('период, дней'),
 
                         self::priceField('price')
                             ->label('цена, рублей'),
-                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
                     ]),
+
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DetachAction::make(),
+                Tables\Actions\DetachAction::make()
             ])
             ->bulkActions([
 //                Tables\Actions\DetachBulkAction::make()
 //                    ->before(function (Tables\Actions\DetachBulkAction $action, $records) {
-//                        if($records->count() > 3){
+//                        if ($records->count() > 3) {
 //                            $action->cancel();
 //                        }
 //                    }),

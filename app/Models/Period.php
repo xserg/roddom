@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Period extends Model
 {
@@ -31,5 +32,13 @@ class Period extends Model
         return $this->hasMany(
             Promo::class,
         );
+    }
+
+    public function lectures(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Lecture::class,
+            'lectures_prices'
+        )->withPivot(['id', 'price', 'lecture_id']);
     }
 }

@@ -8,6 +8,8 @@ use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
+use App\Models\Promo;
+use App\Repositories\PromoRepository;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -15,8 +17,10 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
+use Filament\Widgets\StatsOverviewWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 
 class LectureResource extends Resource
 {
@@ -54,7 +58,7 @@ class LectureResource extends Resource
                         ->options(Category::subcategories()->get()->pluck('title', 'id'))
                         ->required(),
                 ])->columns(2),
-                Forms\Components\Section::make('Тип лекции, формат распространения')
+                Forms\Components\Section::make('Тип контента лекции')
                     ->columns(2)
                     ->schema([
                         Forms\Components\Select::make('content_type_id')
@@ -63,7 +67,7 @@ class LectureResource extends Resource
                             ->label('Тип')
                             ->required()
                             ->afterStateUpdated(function (callable $set, callable $get, ?Model $record, string $context) {
-                                if($context === 'create'){
+                                if ($context === 'create') {
                                     return;
                                 }
 
@@ -88,7 +92,7 @@ class LectureResource extends Resource
                             })
                             ->required()
                             ->afterStateHydrated(function (TextInput $component, ?Model $record, string $context) {
-                                if($context === 'create'){
+                                if ($context === 'create') {
                                     return;
                                 }
 
@@ -107,7 +111,7 @@ class LectureResource extends Resource
                                 return $get('content_type_id') == LectureContentType::PDF;
                             })
                             ->afterStateHydrated(function (Forms\Components\FileUpload $component, ?Model $record, string $context) {
-                                if($context === 'create'){
+                                if ($context === 'create') {
                                     return;
                                 }
 
@@ -125,7 +129,7 @@ class LectureResource extends Resource
                             })
                             ->required()
                             ->afterStateHydrated(function (TextInput $component, ?Model $record, string $context) {
-                                if($context === 'create'){
+                                if ($context === 'create') {
                                     return;
                                 }
 
@@ -135,11 +139,6 @@ class LectureResource extends Resource
                                     $component->state([$record->content]);
                                 }
                             }),
-
-                        Forms\Components\Select::make('payment_type_id')
-                            ->options(LecturePaymentType::all()->pluck('title_ru', 'id'))
-                            ->label('Формат распространения')
-                            ->required(),
                     ]),
                 Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('description')
@@ -168,22 +167,114 @@ class LectureResource extends Resource
                     Forms\Components\Toggle::make('is_published')
                         ->required()
                         ->label('опубликованная'),
-//                    Forms\Components\Toggle::make('is_free')
-//                        ->label('бесплатная')
-//                        ->disabled(function (?Lecture $record, Component $component, $context) {
-//                            if ($context == 'create') return false;
-//                            if ($record->isPromo) {
-//                                $component->state(false);
-//                                return true;
-//                            }
-//                            return false;
-//                        })
-//                        ->required()
-//                        ->reactive(),
                     Forms\Components\Toggle::make('is_recommended')
                         ->label('рекомендованная')
                         ->required(),
                 ]),
+                Forms\Components\Section::make('Форма распространения')
+                    ->compact()
+                    ->schema([
+                        Forms\Components\Select::make('payment_type_id')
+                            ->options(LecturePaymentType::all()->pluck('title_ru', 'id'))
+                            ->label('Форма распространения')
+                            ->required(),
+                    ])->columns(3),
+
+
+                Forms\Components\Grid::make(3)
+                    ->schema([
+                        Forms\Components\Fieldset::make('общие цены, категория')
+                            ->label(function (?Model $record) {
+                                return new HtmlString(
+                                    'общия цены лекции, указывается в <a style="color: #0000EE" href="'
+                                    . route('filament.resources.categories.edit', ['record' => $record->category->id])
+                                    . '" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
+ страницу категории/промо пака и смотреть общие цены'
+                                );
+                            })
+                            ->schema([
+                                TextInput::make('custom_price-1')
+                                    ->formatStateUsing(function (?Model $record) {
+                                        return $record?->category->prices[0]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[0]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create'),
+                                TextInput::make('custom_price-2')
+                                    ->formatStateUsing(function (?Model $record) {
+                                        return $record?->category->prices[1]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[1]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create'),
+                                TextInput::make('custom_price-3')
+                                    ->formatStateUsing(function (?Model $record) {
+                                        return $record?->category->prices[2]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[2]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create')
+
+                            ])
+                            ->columnSpan(1),
+                        Forms\Components\Fieldset::make('общие цены, промо')
+                            ->label(function (?Model $record) {
+                                return new HtmlString(
+                                    'общие цены промо лекции, указывается в <a style="color: #0000EE" href="'
+                                    . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 1])
+                                    . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
+ страницу категории/промо пака и смотреть общие цены'
+                                );
+                            })
+                            ->schema([
+                                TextInput::make('custom_promo-price-1')
+                                    ->formatStateUsing(function () {
+                                        $promo = Promo::first();
+                                        if(!$promo) return false;
+                                        $prices = app(PromoRepository::class)->getPrices($promo);
+
+                                        return $prices[0]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[0]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create'),
+                                TextInput::make('custom_promo_price-2')
+                                    ->formatStateUsing(function () {
+                                        $promo = Promo::first();
+                                        if(!$promo) return false;
+                                        $prices = app(PromoRepository::class)->getPrices($promo);
+
+                                        return $prices[1]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[1]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create'),
+                                TextInput::make('custom_promo_price-3')
+                                    ->formatStateUsing(function () {
+                                        $promo = Promo::first();
+                                        if(!$promo) return false;
+                                        $prices = app(PromoRepository::class)->getPrices($promo);
+
+                                        return $prices[2]['price_for_one_lecture'];
+                                    })
+                                    ->label(function (?Model $record) {
+                                        return "период, дней: " . $record?->category->prices[2]['length'];
+                                    })
+                                    ->disabled()
+                                    ->visible(fn(string $context) => $context != 'create')
+                            ])
+                            ->columnSpan(1)
+                    ])
             ]);
     }
 
@@ -214,7 +305,7 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lecture $record): ?string {
-                            return round($record->rates['rate_avg'], 1) ?: 'нет оценок';
+                            return round($record?->rates['rate_avg'], 1) ?: 'нет оценок';
                         }
                     )
                     ->label('Рейтинг, из 10'),
@@ -259,6 +350,7 @@ class LectureResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\PricesForLecturesRelationManager::class,
             RelationManagers\PromoLecturesPricesRelationManager::class,
         ];
     }

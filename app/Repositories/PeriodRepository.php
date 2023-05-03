@@ -10,4 +10,9 @@ class PeriodRepository
     {
         return Period::query()->firstWhere('length', $length);
     }
+
+    public function getPeriodById(int $id): ?Period
+    {
+        return Period::query()->firstWhere('id', $id);
+    }
 }

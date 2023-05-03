@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
-    protected static ?string $title = 'Цены на весь акционный пак';
+    protected static ?string $title = 'Общие цены, акционный пак';
 
     protected static string $relationship = 'subscriptionPeriodsForPromoPack';
 
@@ -28,7 +28,7 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
     {
         return $form
             ->schema(fn(?Model $record, string $context) => [
-                self::priceField('price')
+                self::priceField('price_for_one_lecture')
             ]);
     }
 
@@ -59,6 +59,14 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                         fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )
                     ->label('Цена, рублей'),
+
+                Tables\Columns\TextColumn::make('price_for_one_lecture')
+                    ->formatStateUsing(
+                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                    )
+                    ->label('Цена за одну промо лекцию, рублей')
+                    ->weight('bold')
+                    ->sortable(),
             ])
             ->filters([
                 //

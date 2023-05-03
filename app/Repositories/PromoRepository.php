@@ -22,7 +22,8 @@ class PromoRepository
             $prices[] = [
                 'title' => $period->title,
                 'length' => $period->length,
-                'price' => number_format($period->pivot->price / 100, 2, thousands_separator: '')
+                'price' => number_format($period->pivot->price / 100, 2, thousands_separator: ''),
+                'price_for_one_lecture' => number_format($period->pivot->price_for_one_lecture / 100, 2, thousands_separator: '')
             ];
         }
 

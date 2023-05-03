@@ -103,7 +103,9 @@ class WatchLectureController
 
         return response()->json(
             [
-                'data' => ['kinescope-id' => $videoId]
+                'data' => [
+                    'content' => $videoId
+                ]
             ],
             Response::HTTP_OK
         );

@@ -58,6 +58,6 @@ class LectureService
 
     public function isFree(int $id): bool
     {
-        return $this->lectureRepository->getLectureById($id)->is_free == 1;
+        return $this->lectureRepository->getLectureById($id)->is_free;
     }
 }

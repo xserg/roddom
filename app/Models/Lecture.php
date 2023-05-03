@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Arr;
 
 class Lecture extends Model
 {
@@ -21,10 +22,13 @@ class Lecture extends Model
     protected $appends = [
         'is_watched',
         'is_promo',
+        'is_free',
         'purchase_info',
         'prices',
         'list_watched',
         'id_title',
+        'c_type',
+        'p_type'
     ];
 
     protected $casts = ['created_at' => 'datetime'];
@@ -105,16 +109,6 @@ class Lecture extends Model
         );
     }
 
-//    public function purchasedUsers(): BelongsToMany
-//    {
-//        return $this->belongsToMany(
-//            User::class,
-//            'user_to_purchased_lectures',
-//            'lecture_id',
-//            'user_id'
-//        );
-//    }
-
     public function subscriptions(): MorphMany
     {
         return $this->morphMany(Subscription::class, 'subscriptions');
@@ -128,6 +122,14 @@ class Lecture extends Model
             'lecture_id',
             'promo_id'
         );
+    }
+
+    public function pricesForLectures(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Period::class,
+            'lectures_prices'
+        )->withPivot(['id', 'price']);
     }
 
     public function pricesInPromoPacks(): BelongsToMany
@@ -186,24 +188,12 @@ class Lecture extends Model
 
     public function scopePromo(Builder $query): void
     {
-        $firstPromoPack = Promo::first();
-        $promoIds = $firstPromoPack
-            ->pricesForPromoLectures
-            ->pluck('id')
-            ->toArray();
-
-        $query->whereIn('id', $promoIds);
+        $query->where('payment_type_id', LecturePaymentType::PROMO);
     }
 
     public function scopeNotPromo(Builder $query): void
     {
-        $firstPromoPack = Promo::first();
-        $promoIds = $firstPromoPack
-            ->pricesForPromoLectures
-            ->pluck('id')
-            ->toArray();
-
-        $query->whereNotIn('id', $promoIds);
+        $query->where('payment_type_id', '!=', LecturePaymentType::PROMO);
     }
 
     public function scopeSaved(Builder $query): void
@@ -259,15 +249,10 @@ class Lecture extends Model
         $query->where('is_recommended', '=', true);
     }
 
-    public function promoPrices(): array
-    {
-        return [];
-    }
-
     protected function isPromo(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->paymentType->id === LecturePaymentType::PROMO,
+            get: fn() => $this->payment_type_id === LecturePaymentType::PROMO,
         );
     }
 
@@ -345,33 +330,35 @@ class Lecture extends Model
 
     protected function prices(): Attribute
     {
-        $prices = $this->category->categoryPrices;
-        $result = [];
+        $prices = app(LectureRepository::class)->formPricesForLecture($this->id);
 
-        foreach ($prices as $price) {
-            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
-            $result['price_by_category'][] = [
-                'title' => $price->period->title,
-                'length' => $price->period->length,
-                'price_for_lecture' => $priceForLecture
-            ];
-        }
+//        $prices = $this->category->categoryPrices;
+//        $result = [];
+//
+//        foreach ($prices as $price) {
+//            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
+//            $result['price_by_category'][] = [
+//                'title' => $price->period->title,
+//                'length' => $price->period->length,
+//                'price_for_lecture' => $priceForLecture
+//            ];
+//        }
+//
+//        $periods = $this->pricesPeriodsInPromoPacks;
+//        if ($periods->isNotEmpty()) {
+//            foreach ($periods as $period) {
+//                $priceForLecture = number_format($period->pivot->price / 100, 2, thousands_separator: '');
+//                $result['price_by_promo'][$period->length] = [
+//                    'title' => $period->title,
+//                    'length' => $period->length,
+//                    'price_for_promo_lecture' => $priceForLecture,
+//                ];
+//            }
+//        }
 
-        $periods = $this->pricesPeriodsInPromoPacks;
-        if ($periods->isNotEmpty()) {
-            foreach ($periods as $period) {
-                $priceForLecture = number_format($period->pivot->price / 100, 2, thousands_separator: '');
-                $result['price_by_promo'][$period->length] = [
-                    'title' => $period->title,
-                    'length' => $period->length,
-                    'price_for_promo_lecture' => $priceForLecture,
-                ];
-            }
-        }
-
-        if ($result) {
+        if ($prices) {
             return new Attribute(
-                get: fn() => $result,
+                get: fn() => $prices,
             );
         }
         return new Attribute(
@@ -396,11 +383,6 @@ class Lecture extends Model
             $rates['rate_user'] = null;
         }
 
-//        if ($rates) {
-//            return new Attribute(
-//                get: fn() => $rates,
-//            );
-//        }
         return new Attribute(
             get: fn() => $rates,
         );
@@ -416,5 +398,32 @@ class Lecture extends Model
     public function setRecommended(): void
     {
         $this->is_recommended = true;
+    }
+
+    public function isFree(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->payment_type_id === LecturePaymentType::FREE,
+        );
+    }
+
+    public function cType(): Attribute
+    {
+        return new Attribute(
+            get: fn() => [
+                'id' => $this?->contentType?->id,
+                'type' => $this?->contentType?->title,
+            ],
+        );
+    }
+
+    public function pType(): Attribute
+    {
+        return new Attribute(
+            get: fn() => [
+                'id' => $this?->paymentType?->id,
+                'type' => $this?->paymentType?->title,
+            ],
+        );
     }
 }

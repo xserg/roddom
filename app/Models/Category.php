@@ -110,9 +110,13 @@ class Category extends Model
             $priceForPackInRoubles =
                 number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
 
+            $priceForOneLectureInRoubles =
+                number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
+
             $result[] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
+                'price_for_one_lecture' => $priceForOneLectureInRoubles,
                 'price_for_category' => $priceForPackInRoubles
             ];
         }

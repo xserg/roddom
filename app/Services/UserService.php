@@ -106,7 +106,12 @@ class UserService
     ): void
     {
         if ($setAvailableUntil) {
-            $user->watchedLectures()->attach($lectureId, ['available_until' => now()->addHours(24)]);
+            $hoursAvailableToWatch = AppInfo::query()->first()?->free_lecture_hours ?? 24;
+
+            $user->watchedLectures()->attach(
+                $lectureId,
+                ['available_until' => now()->addHours($hoursAvailableToWatch)]
+            );
         } else {
             $user->watchedLectures()->attach($lectureId);
         }
@@ -120,7 +125,7 @@ class UserService
     public function watchLecture(
         int                  $lectureId,
         Authenticatable|User $user
-    ): int
+    ): string
     {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
@@ -130,7 +135,7 @@ class UserService
 
         if ($this->lectureService->isFree($lectureId)) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
-                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+                return $this->lectureRepository->getLectureById($lectureId)->content;
             }
 
             if ($this->userCanWatchNewFreeLecture($user)) {
@@ -139,7 +144,7 @@ class UserService
 
                 $user = $this->setFreeLectureWatchedNow($user);
                 $this->saveUserGuard($user);
-                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+                return $this->lectureRepository->getLectureById($lectureId)->content;
             }
 
             throw new UserCannotWatchFreeLectureException(
@@ -149,7 +154,7 @@ class UserService
             if ($this->isLecturePurchased($lectureId, $user)) {
                 $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user);
-                return $this->lectureRepository->getLectureById($lectureId)->video_id;
+                return $this->lectureRepository->getLectureById($lectureId)->content;
             }
 
             throw new UserCannotWatchPaidLectureException('Пользователь не сможет посмотреть платную лекцию');

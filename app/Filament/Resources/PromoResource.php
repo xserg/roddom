@@ -56,8 +56,8 @@ class PromoResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\SubscriptionPeriodsForPromoPackRelationManager::class,
             RelationManagers\PromoLecturesPricesRelationManager::class,
-            RelationManagers\SubscriptionPeriodsForPromoPackRelationManager::class
         ];
     }
 
