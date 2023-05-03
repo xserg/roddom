@@ -332,37 +332,8 @@ class Lecture extends Model
     {
         $prices = app(LectureRepository::class)->formPricesForLecture($this);
 
-//        $prices = $this->category->categoryPrices;
-//        $result = [];
-//
-//        foreach ($prices as $price) {
-//            $priceForLecture = number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
-//            $result['price_by_category'][] = [
-//                'title' => $price->period->title,
-//                'length' => $price->period->length,
-//                'price_for_lecture' => $priceForLecture
-//            ];
-//        }
-//
-//        $periods = $this->pricesPeriodsInPromoPacks;
-//        if ($periods->isNotEmpty()) {
-//            foreach ($periods as $period) {
-//                $priceForLecture = number_format($period->pivot->price / 100, 2, thousands_separator: '');
-//                $result['price_by_promo'][$period->length] = [
-//                    'title' => $period->title,
-//                    'length' => $period->length,
-//                    'price_for_promo_lecture' => $priceForLecture,
-//                ];
-//            }
-//        }
-
-        if ($prices) {
-            return new Attribute(
-                get: fn() => $prices,
-            );
-        }
         return new Attribute(
-            get: fn() => [],
+            get: fn() => $prices ?? [],
         );
     }
 
