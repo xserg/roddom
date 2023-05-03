@@ -193,7 +193,7 @@ class LectureResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Наименование')
-                    ->limit(15)
+                    ->limit(25)
                     ->tooltip(fn(Model $record): string => $record->title)
                     ->searchable()
                     ->sortable(),

@@ -6,18 +6,14 @@ use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
-use Closure;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\TemporaryUploadedFile;
 
 class UserResource extends Resource
 {
@@ -126,14 +122,42 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Tables\Actions\DeleteAction $action, $record) {
+                        if ($record->isAdmin()) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Невозможно удалить пользователя, который является админом!')
+                                ->body('Защита от случайного удаления аккаунта администратора')
+                                ->persistent()
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make()
+                    ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
+                        foreach ($records as $record){
+                            if ($record->isAdmin()) {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Невозможно удалить пользователя, который является админом!')
+                                    ->body('Защита от случайного удаления аккаунта администратора')
+                                    ->persistent()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        }
+                    }),
+
             ])
             ->headerActions([
                 FilamentExportHeaderAction::make('Export')
             ])
-            ->actionsPosition(Tables\Actions\Position::BeforeColumns);
+            ->actionsPosition();
     }
 
     public static function getRelations(): array
