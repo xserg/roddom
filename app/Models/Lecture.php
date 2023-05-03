@@ -330,7 +330,7 @@ class Lecture extends Model
 
     protected function prices(): Attribute
     {
-        $prices = app(LectureRepository::class)->formPricesForLecture($this->id);
+        $prices = app(LectureRepository::class)->formPricesForLecture($this);
 
 //        $prices = $this->category->categoryPrices;
 //        $result = [];

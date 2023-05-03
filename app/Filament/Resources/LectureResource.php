@@ -182,11 +182,14 @@ class LectureResource extends Resource
 
 
                 Forms\Components\Grid::make(3)
+                    ->visible(function(string $context){
+                        if($context =='create') return false;
+                    })
                     ->schema([
                         Forms\Components\Fieldset::make('общие цены, категория')
                             ->label(function (?Model $record) {
                                 return new HtmlString(
-                                    'общия цены лекции, указывается в <a style="color: #0000EE" href="'
+                                    'общая цена лекции, указывается в <a style="color: #0000EE" href="'
                                     . route('filament.resources.categories.edit', ['record' => $record->category->id])
                                     . '" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
