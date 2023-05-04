@@ -93,7 +93,7 @@ class LectorResource extends Resource
                 Tables\Columns\TextColumn::make('position')
                     ->label('Должность, позиция')
                     ->limit(35)
-                    ->tooltip(fn(Model $record): string => $record->position),
+                    ->tooltip(fn(?Model $record): string => $record->position),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
 //                Tables\Columns\TextColumn::make('career_start')

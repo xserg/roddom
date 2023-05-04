@@ -40,7 +40,6 @@ class DiplomasRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->label('Добавить')
                     ->disableCreateAnother(),
-//                Tables\Actions\AssociateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -49,7 +48,7 @@ class DiplomasRelationManager extends RelationManager
             ])
             ->bulkActions([
 //                Tables\Actions\DissociateBulkAction::make(),
-                Tables\Actions\DeleteBulkAction::make(),
+//                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 }
