@@ -31,7 +31,12 @@ class Lecture extends Model
         'p_type'
     ];
 
-    protected $casts = ['created_at' => 'datetime'];
+    protected $casts = [
+        'created_at' => 'datetime',
+        'show_tariff_1' => 'boolean',
+        'show_tariff_2' => 'boolean',
+        'show_tariff_3' => 'boolean',
+    ];
 
     protected $fillable = [
         'id',
