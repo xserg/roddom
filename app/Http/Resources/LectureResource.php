@@ -78,6 +78,9 @@ class LectureResource extends JsonResource
             'rates' => $this->whenNotNull($this->rates),
             'content_type' => $this->whenNotNull($this->c_type),
             'payment_type' => $this->whenNotNull($this->p_type),
+            'show_tariff_1' => $this->whenNotNull($this->show_tariff_1),
+            'show_tariff_2' => $this->whenNotNull($this->show_tariff_2),
+            'show_tariff_3' => $this->whenNotNull($this->show_tariff_3),
         ];
     }
 }

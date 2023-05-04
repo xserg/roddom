@@ -182,8 +182,9 @@ class LectureResource extends Resource
 
 
                 Forms\Components\Grid::make(3)
-                    ->visible(function(string $context){
-                        if($context =='create') return false;
+                    ->visible(function (string $context) {
+                        if ($context == 'create') return false;
+                        return true;
                     })
                     ->schema([
                         Forms\Components\Fieldset::make('общие цены, категория')
@@ -239,7 +240,7 @@ class LectureResource extends Resource
                                 TextInput::make('custom_promo-price-1')
                                     ->formatStateUsing(function () {
                                         $promo = Promo::first();
-                                        if(!$promo) return false;
+                                        if (!$promo) return false;
                                         $prices = app(PromoRepository::class)->getPrices($promo);
 
                                         return $prices[0]['price_for_one_lecture'];
@@ -252,7 +253,7 @@ class LectureResource extends Resource
                                 TextInput::make('custom_promo_price-2')
                                     ->formatStateUsing(function () {
                                         $promo = Promo::first();
-                                        if(!$promo) return false;
+                                        if (!$promo) return false;
                                         $prices = app(PromoRepository::class)->getPrices($promo);
 
                                         return $prices[1]['price_for_one_lecture'];
@@ -265,7 +266,7 @@ class LectureResource extends Resource
                                 TextInput::make('custom_promo_price-3')
                                     ->formatStateUsing(function () {
                                         $promo = Promo::first();
-                                        if(!$promo) return false;
+                                        if (!$promo) return false;
                                         $prices = app(PromoRepository::class)->getPrices($promo);
 
                                         return $prices[2]['price_for_one_lecture'];
@@ -277,6 +278,16 @@ class LectureResource extends Resource
                                     ->visible(fn(string $context) => $context != 'create')
                             ])
                             ->columnSpan(1)
+                    ]),
+
+                Forms\Components\Card::make()
+                    ->schema([
+                        Forms\Components\Toggle::make('show_tariff_1')
+                            ->label('тариф 1'),
+                        Forms\Components\Toggle::make('show_tariff_2')
+                            ->label('тариф 2'),
+                        Forms\Components\Toggle::make('show_tariff_3')
+                            ->label('тариф 3'),
                     ])
             ]);
     }

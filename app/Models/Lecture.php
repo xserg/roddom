@@ -44,6 +44,9 @@ class Lecture extends Model
         'is_published',
         'content_type_id',
         'payment_type_id',
+        'show_tariff_1',
+        'show_tariff_2',
+        'show_tariff_3',
     ];
 
     protected $hidden = ['pivot'];
