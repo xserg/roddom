@@ -48,7 +48,6 @@ class PromoResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
-            ->actionsPosition(Tables\Actions\Position::BeforeCells)
             ->bulkActions([
             ]);
     }

@@ -156,9 +156,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DetachAction::make(),
             ])
-            ->actionsPosition(Tables\Actions\Position::BeforeCells)
             ->bulkActions([
-                Tables\Actions\DetachBulkAction::make(),
             ]);
     }
 

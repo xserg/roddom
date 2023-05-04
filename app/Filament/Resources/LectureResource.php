@@ -231,7 +231,7 @@ class LectureResource extends Resource
                             ->label(function (?Model $record) {
                                 return new HtmlString(
                                     'общие цены промо лекции, указывается в <a style="color: #0000EE" href="'
-                                    . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 1])
+                                    . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
                                     . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
                                 );
