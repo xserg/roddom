@@ -130,6 +130,7 @@ class FeedbackResource extends Resource
             ])
             ->actionsPosition(Position::BeforeCells)
             ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make()
             ]);
     }
 
