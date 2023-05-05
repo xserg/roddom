@@ -30,21 +30,36 @@ class CategoryResource extends Resource
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->reactive()
-                            ->afterStateUpdated(function (Closure $set, $state) {
-                                $set('slug', Str::slug($state));
-                            })
-                            ->required()
-                            ->maxLength(255)
-                            ->label('Наименование категории'),
-                        Forms\Components\Select::make('parent_id')
-                            ->label('Родительская категория (оставьте \'Выберите вариант\', если у категории нет родительской)')
-                            ->options(
-                                Category::mainCategories()->pluck('title', 'id')
-                            )
-                            ->default(0),
-                    ]),
+                        Forms\Components\Grid::make(1)
+                            ->schema([
+                                Forms\Components\TextInput::make('title')
+                                    ->reactive()
+                                    ->afterStateUpdated(function (Closure $set, $state) {
+                                        $set('slug', Str::slug($state));
+                                    })
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Наименование категории')
+                                    ->columnSpan(1),
+                                Forms\Components\Select::make('parent_id')
+                                    ->label('Родительская категория (оставьте \'Выберите вариант\', если у категории нет родительской)')
+                                    ->options(
+                                        Category::mainCategories()->pluck('title', 'id')
+                                    )
+                                    ->default(0)
+                                    ->columnSpan(1),
+                            ])
+                            ->columnSpan(1),
+                        Forms\Components\FileUpload::make('preview_picture')
+                            ->directory('images/categories')
+                            ->maxSize(10240)
+                            ->image()
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('4:3')
+                            ->imageResizeTargetWidth('640')
+                            ->imageResizeTargetHeight('480')
+                            ->label('Превью картинка категории'),
+                    ])->columns(2),
                 Forms\Components\Card::make([
                     Forms\Components\RichEditor::make('description')
                         ->toolbarButtons([
@@ -62,15 +77,6 @@ class CategoryResource extends Resource
                     Forms\Components\Textarea::make('info')
                         ->maxLength(65535)
                         ->label('Блок "инфо" категории'),
-                    Forms\Components\FileUpload::make('preview_picture')
-                        ->directory('images/categories')
-                        ->maxSize(10240)
-                        ->image()
-                        ->imageResizeMode('cover')
-                        ->imageCropAspectRatio('4:3')
-                        ->imageResizeTargetWidth('640')
-                        ->imageResizeTargetHeight('480')
-                        ->label('Превью картинка категории'),
                 ])->columns(2),
                 Forms\Components\TextInput::make('slug')
                     ->label('Слаг категории, заполняется автоматически с наименования')

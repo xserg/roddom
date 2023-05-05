@@ -34,6 +34,7 @@ class LectureResource extends Resource
 
     protected static ?string $label = 'Лекции';
     protected static ?string $pluralModelLabel = 'Лекции';
+    protected static ?string $recordTitleAttribute = 'title';
     protected static ?string $modelLabel = 'Лекция';
 
     public static function form(Form $form): Form
