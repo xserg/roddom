@@ -180,16 +180,20 @@ class LectureResource extends Resource
                         ]),
                         Forms\Components\Grid::make(1)->schema([
                             Forms\Components\Toggle::make('show_tariff_1')
-                                ->label('тариф 1'),
+                                ->label('тариф 1')
+                                ->default(true),
                             Forms\Components\Toggle::make('show_tariff_2')
-                                ->label('тариф 2'),
+                                ->label('тариф 2')
+                                ->default(true),
                             Forms\Components\Toggle::make('show_tariff_3')
-                                ->label('тариф 3'),
+                                ->label('тариф 3')
+                                ->default(true),
                         ])->columnSpan(1),
                         Forms\Components\Grid::make(1)->schema([
                             Forms\Components\Toggle::make('is_published')
                                 ->required()
-                                ->label('опубликованная'),
+                                ->label('опубликованная')
+                                ->default(true),
                             Forms\Components\Toggle::make('is_recommended')
                                 ->label('рекомендованная')
                                 ->required(),
