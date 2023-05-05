@@ -67,6 +67,16 @@ class AppInfoResource extends Resource
                             ->maxLength(255)
                             ->label('строка "прочтите соглашение"'),
                         Forms\Components\RichEditor::make('agreement_text')
+                            ->toolbarButtons([
+                                'bold',
+                                'h2',
+                                'h3',
+                                'italic',
+                                'redo',
+                                'strike',
+                                'undo',
+                                'preview'
+                            ])
                             ->maxLength(65535)
                             ->label('текст соглашения'),
 
@@ -166,29 +176,46 @@ class AppInfoResource extends Resource
                     ->collapsible()
                     ->collapsed(),
                 Forms\Components\Section::make('Раздел "О приложении"')
+                    ->columns(2)
                     ->schema([
                         Forms\Components\RichEditor::make('about_app')
+                            ->toolbarButtons([
+                                'bold',
+                                'h2',
+                                'h3',
+                                'italic',
+                                'redo',
+                                'strike',
+                                'undo',
+                                'preview'
+                            ])
                             ->maxLength(65535)
+                            ->columnSpan(2)
                             ->label('Описание приложения'),
                         Forms\Components\TextInput::make('app_author_name')
                             ->required()
+                            ->columnSpan(1)
                             ->maxLength(255)
                             ->label('имя автора'),
                         Forms\Components\TextInput::make('app_link_share_title')
                             ->required()
+                            ->columnSpan(1)
                             ->maxLength(255)
                             ->label('строка "Поделиться ссылкой"'),
                         Forms\Components\TextInput::make('app_link_share_link')
                             ->required()
+                            ->columnSpan(1)
                             ->maxLength(255)
                             ->label('линк приложения'),
                         Forms\Components\TextInput::make('app_show_qr_title')
                             ->required()
+                            ->columnSpan(1)
                             ->maxLength(255)
                             ->label('строка "Показать QR-код"'),
                         Forms\Components\FileUpload::make('app_show_qr_link')
                             ->directory('images/app')
                             ->required()
+                            ->columnSpan(1)
                             ->getUploadedFileNameForStorageUsing(
                                 function (): string {
                                     return 'qr.jpeg';

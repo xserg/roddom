@@ -96,7 +96,7 @@ class SubscriptionResource extends Resource
                     ->label('начало подписки')
                     ->required(),
                 Forms\Components\DateTimePicker::make('end_date')
-                    ->label('начало подписки')
+                    ->label('окончание подписки')
                     ->required(),
             ]);
     }

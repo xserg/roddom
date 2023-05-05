@@ -57,7 +57,31 @@ class LectureResource extends Resource
                         ->label('Подкатегория лекции')
                         ->options(Category::subcategories()->get()->pluck('title', 'id'))
                         ->required(),
+                    Forms\Components\FileUpload::make('preview_picture')
+                        ->directory('images/lectures')
+                        ->label('Превью лекции')
+                        ->maxSize(10240)
+                        ->image()
+                        ->imageResizeMode('cover')
+                        ->imageCropAspectRatio('4:3')
+                        ->imageResizeTargetWidth('640')
+                        ->imageResizeTargetHeight('480'),
                 ])->columns(2),
+                Forms\Components\Card::make([
+                    Forms\Components\RichEditor::make('description')
+                        ->label('Описание лекции')
+                        ->toolbarButtons([
+                            'bold',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'redo',
+                            'strike',
+                            'undo',
+                            'preview'
+                        ])
+                        ->maxLength(65535),
+                ]),
                 Forms\Components\Section::make('Тип контента лекции')
                     ->columns(2)
                     ->schema([
@@ -140,45 +164,32 @@ class LectureResource extends Resource
                                 }
                             }),
                     ]),
-                Forms\Components\Card::make([
-                    Forms\Components\RichEditor::make('description')
-                        ->label('Описание лекции')
-                        ->toolbarButtons([
-                            'bold',
-                            'h2',
-                            'h3',
-                            'italic',
-                            'redo',
-                            'strike',
-                            'undo',
-                            'preview'
-                        ])
-                        ->maxLength(65535),
-                    Forms\Components\FileUpload::make('preview_picture')
-                        ->directory('images/lectures')
-                        ->label('Превью картинка лекции')
-                        ->maxSize(10240)
-                        ->image()
-                        ->imageResizeMode('cover')
-                        ->imageCropAspectRatio('4:3')
-                        ->imageResizeTargetWidth('640')
-                        ->imageResizeTargetHeight('480'),
-
-                    Forms\Components\Toggle::make('is_published')
-                        ->required()
-                        ->label('опубликованная'),
-                    Forms\Components\Toggle::make('is_recommended')
-                        ->label('рекомендованная')
-                        ->required(),
-                ]),
                 Forms\Components\Section::make('Форма распространения')
-                    ->compact()
                     ->schema([
-                        Forms\Components\Select::make('payment_type_id')
-                            ->options(LecturePaymentType::all()->pluck('title_ru', 'id'))
-                            ->label('Форма распространения')
-                            ->required(),
-                    ])->columns(3),
+
+                        Forms\Components\Grid::make(2)->schema([
+                            Forms\Components\Select::make('payment_type_id')
+                                ->options(LecturePaymentType::all()->pluck('title_ru', 'id'))
+                                ->label('Форма распространения')
+                                ->required()->columnSpan(1),
+                        ]),
+                        Forms\Components\Grid::make(1)->schema([
+                            Forms\Components\Toggle::make('show_tariff_1')
+                                ->label('тариф 1'),
+                            Forms\Components\Toggle::make('show_tariff_2')
+                                ->label('тариф 2'),
+                            Forms\Components\Toggle::make('show_tariff_3')
+                                ->label('тариф 3'),
+                        ])->columnSpan(1),
+                        Forms\Components\Grid::make(1)->schema([
+                            Forms\Components\Toggle::make('is_published')
+                                ->required()
+                                ->label('опубликованная'),
+                            Forms\Components\Toggle::make('is_recommended')
+                                ->label('рекомендованная')
+                                ->required(),
+                        ])->columnSpan(1),
+                    ])->columns(2),
 
 
                 Forms\Components\Grid::make(3)
@@ -205,6 +216,7 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[0]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-2')
                                     ->formatStateUsing(function (?Model $record) {
@@ -214,6 +226,7 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[1]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-3')
                                     ->formatStateUsing(function (?Model $record) {
@@ -223,6 +236,7 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[2]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create')
 
                             ])
@@ -249,6 +263,7 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[0]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-2')
                                     ->formatStateUsing(function () {
@@ -262,6 +277,7 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[1]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-3')
                                     ->formatStateUsing(function () {
@@ -275,20 +291,11 @@ class LectureResource extends Resource
                                         return "период, дней: " . $record?->category->prices[2]['length'];
                                     })
                                     ->disabled()
+                                    ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create')
                             ])
                             ->columnSpan(1)
                     ]),
-
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\Toggle::make('show_tariff_1')
-                            ->label('тариф 1'),
-                        Forms\Components\Toggle::make('show_tariff_2')
-                            ->label('тариф 2'),
-                        Forms\Components\Toggle::make('show_tariff_3')
-                            ->label('тариф 3'),
-                    ])
             ]);
     }
 
