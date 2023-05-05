@@ -140,6 +140,7 @@ class LectureResource extends Resource
                         Forms\Components\FileUpload::make('content')
                             ->label('pdf')
                             ->directory('pdf')
+                            ->rules(['mimes:pdf'])
                             ->required()
                             ->visible(function (callable $get) {
                                 return $get('content_type_id') == LectureContentType::PDF;
