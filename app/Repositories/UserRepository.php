@@ -23,7 +23,6 @@ class UserRepository
         if (auth()->user()) {
             return auth()->user()
                 ->promoSubscriptions()
-                ->where('user_id', auth()->user()->id)
                 ->get();
         }
 
@@ -35,7 +34,6 @@ class UserRepository
         if (auth()->user()) {
             return auth()->user()
                 ->categorySubscriptions()
-                ->where('user_id', auth()->user()->id)
                 ->get();
         }
 
@@ -47,7 +45,6 @@ class UserRepository
         if (auth()->user()) {
             return auth()->user()
                 ->lectureSubscriptions()
-                ->where('user_id', auth()->user()->id)
                 ->get();
         }
 
