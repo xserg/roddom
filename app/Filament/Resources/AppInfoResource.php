@@ -19,16 +19,11 @@ use Livewire\TemporaryUploadedFile;
 class AppInfoResource extends Resource
 {
     protected static ?string $model = AppInfo::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
     protected static ?string $recordTitleAttribute = 'id';
-
     protected static ?string $navigationLabel = 'Динамические заголовки';
     protected static ?int $navigationSort = 5;
-
     protected static ?string $navigationGroup = 'Приложение';
-
     protected static ?string $label = 'Динамические заголовки';
     protected static ?string $pluralLabel = 'Динамические заголовки';
 
@@ -41,7 +36,7 @@ class AppInfoResource extends Resource
                         ->required()
                         ->integer()
                         ->label('часов, раз во сколько можно смотреть бесплатную лекцию')
-                        ->rules(['gt:0']),
+                        ->rules(['gte:0']),
                     Forms\Components\TextInput::make('tarif_title_1')
                         ->required()
                         ->maxLength(255)
