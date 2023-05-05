@@ -2,55 +2,35 @@
 
 namespace App\Services;
 
-use App\Models\Category;
-use App\Repositories\CategoryRepository;
+use App\Repositories\UserRepository;
 
 class CategoryService
 {
     public function __construct(
-        private CategoryRepository $categoryRepository
+        private UserRepository $userRepository
     )
     {
     }
 
-    public function isCategoryMain(Category $category): bool
+    public function isCategoryPurchased(int $categoryId): bool
     {
-        return $category->parent_id == 0;
-    }
+        $categorySubscriptions = $this->userRepository
+            ->categorySubscriptions();
 
-    public function isCategorySub(Category $category): bool
-    {
-        return $category->parent_id != 0;
-    }
-
-    public function isCategoryPurchased($id)
-    {
-        $purchasedCategoriesIds = auth()->user()
-            ->categorySubscriptions()
-            ->get()
-            ->pluck('subscriptionable_id');
-
-        return $purchasedCategoriesIds->contains($id);
-    }
-
-    public function getCategoryPrice(int $categoryId, int $periodLength): int|string
-    {
-        $category = $this->categoryRepository->getCategoryById($categoryId);
-        if (!$category) {
-            return 0;
+        if (
+            is_null($categorySubscriptions)
+            || $categorySubscriptions->isEmpty()
+        ) {
+            return false;
         }
 
-        $prices = $category->categoryPrices;
-        $lecturesCount = $category->lectures->count();
+        $categoriesSubscriptions = $categorySubscriptions
+            ->where('subscriptionable_id', $categoryId);
 
-        foreach ($prices as $price) {
-            $priceForPackInRoubles =
-                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
-
-            if($price->period->id == $periodLength){
-                return $priceForPackInRoubles;
-            }
+        foreach ($categoriesSubscriptions as $subscription) {
+            if ($subscription->isActual()) return true;
         }
-        return 0;
+
+        return false;
     }
 }

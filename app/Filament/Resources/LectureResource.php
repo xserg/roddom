@@ -9,6 +9,7 @@ use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
 use App\Models\Promo;
+use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -25,17 +26,21 @@ use Illuminate\Support\HtmlString;
 class LectureResource extends Resource
 {
     protected static ?string $model = Lecture::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
     protected static ?string $navigationLabel = 'Лекции';
-
     protected static ?int $navigationSort = 2;
-
     protected static ?string $label = 'Лекции';
     protected static ?string $pluralModelLabel = 'Лекции';
     protected static ?string $recordTitleAttribute = 'title';
     protected static ?string $modelLabel = 'Лекция';
+
+    public function __construct(
+        private PeriodRepository $periodRepository,
+        private PromoRepository  $promoRepository
+    )
+    {
+
+    }
 
     public static function form(Form $form): Form
     {
@@ -253,7 +258,7 @@ class LectureResource extends Resource
                         Forms\Components\Fieldset::make('общие цены, промо')
                             ->label(function (?Model $record) {
                                 return new HtmlString(
-                                    'общие цены промо лекции, указывается в <a style="color: #0000EE" href="'
+                                    'общие цены одной промо лекции, указывается в <a style="color: #0000EE" href="'
                                     . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
                                     . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
@@ -262,11 +267,10 @@ class LectureResource extends Resource
                             ->schema([
                                 TextInput::make('custom_promo-price-1')
                                     ->formatStateUsing(function () {
-                                        $promo = Promo::first();
-                                        if (!$promo) return false;
-                                        $prices = app(PromoRepository::class)->getPrices($promo);
+                                        $price = app(PromoRepository::class)
+                                            ->getCommonPriceForOneLectureForPeriod(1);
 
-                                        return $prices[0]['price_for_one_lecture'];
+                                        return $price;
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->prices[0]['length'];
@@ -276,11 +280,10 @@ class LectureResource extends Resource
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-2')
                                     ->formatStateUsing(function () {
-                                        $promo = Promo::first();
-                                        if (!$promo) return false;
-                                        $prices = app(PromoRepository::class)->getPrices($promo);
+                                        $price = app(PromoRepository::class)
+                                            ->getCommonPriceForOneLectureForPeriod(2);
 
-                                        return $prices[1]['price_for_one_lecture'];
+                                        return $price;
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->prices[1]['length'];
@@ -290,11 +293,10 @@ class LectureResource extends Resource
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-3')
                                     ->formatStateUsing(function () {
-                                        $promo = Promo::first();
-                                        if (!$promo) return false;
-                                        $prices = app(PromoRepository::class)->getPrices($promo);
+                                        $price = app(PromoRepository::class)
+                                            ->getCommonPriceForOneLectureForPeriod(3);
 
-                                        return $prices[2]['price_for_one_lecture'];
+                                        return $price;
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->prices[2]['length'];

@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SubcategoryPrices extends Model
 {
-    protected $appends = ['period_length'];
+    protected $appends = [
+        'period_length'
+    ];
     protected $table = 'category_prices';
 
     public $timestamps = false;
@@ -39,7 +41,7 @@ class SubcategoryPrices extends Model
     protected function periodLength(): Attribute
     {
         return new Attribute(
-            get: fn() => 'цену за ' . $this->period->length . ' дня/дней',
+            get: fn() => $this->period->length,
         );
     }
 }

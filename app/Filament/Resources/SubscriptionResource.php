@@ -10,19 +10,12 @@ use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
-use App\Models\User;
-use App\Repositories\CategoryRepository;
-use App\Repositories\LectureRepository;
-use App\Repositories\PromoRepository;
-use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Forms\Components\Component;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 
 class SubscriptionResource extends Resource

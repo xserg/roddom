@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\LectureRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
@@ -16,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(LectureRepository::class, LectureRepository::class);
     }
 
     /**
@@ -24,18 +25,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        DB::listen(function ($query) {
-//            $location = collect(debug_backtrace())->filter(function ($trace) {
-//                return !str_contains($trace['file'], 'vendor/');
-//            })->first(); // берем первый элемент не из каталога вендора
-//            $bindings = implode(", ", $query->bindings); // форматируем привязку как строку
-//            Log::info("
-//               ------------
-//               Sql: $query->sql
-//               Time: $query->time
-//               ------------
-//            ");
-//        });
+        DB::listen(function ($query) {
+            $bindings = implode(", ", $query->bindings); // format the bindings as string
+
+            Log::info("
+                   ------------
+                   Sql: $query->sql
+                   Bindings: $bindings
+                   Time: $query->time
+                   ------------
+            ");
+        });
 
         /**
          * Paginate a standard Laravel Collection.

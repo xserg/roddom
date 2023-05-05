@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyCategoryRequest;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Period;
 use App\Repositories\CategoryRepository;
+use App\Repositories\PeriodRepository;
 use App\Services\CategoryService;
 use App\Services\PaymentService;
 use Illuminate\Http\Response;
@@ -49,7 +51,8 @@ class BuyCategoryController extends Controller
     public function __construct(
         private CategoryService $categoryService,
         private CategoryRepository $categoryRepository,
-        private PaymentService $paymentService
+        private PaymentService $paymentService,
+        private PeriodRepository $periodRepository
     )
     {
     }
@@ -60,9 +63,10 @@ class BuyCategoryController extends Controller
         int               $period
     )
     {
-        $category = $this->categoryRepository->getCategoryById($categoryId);
+        $periodId = $this->periodRepository->getPeriodByLength($period)->id;
+
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
-        $price = $this->categoryRepository->getCategoryPriceForPeriodLength($category, $period);
+        $price = $this->categoryRepository->getCategoryPriceForPeriodComplex($categoryId, $periodId);
 
         if ($isPurchased) {
             return response()->json([

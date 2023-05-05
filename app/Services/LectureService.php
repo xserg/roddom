@@ -2,55 +2,80 @@
 
 namespace App\Services;
 
-use App\Models\Promo;
-use App\Models\User;
 use App\Repositories\LectureRepository;
-use Illuminate\Contracts\Auth\Authenticatable;
+use App\Repositories\UserRepository;
 
 class LectureService
 {
     public function __construct(
-        private LectureRepository $lectureRepository
+        private LectureRepository $lectureRepository,
+        private UserRepository    $userRepository
     )
     {
     }
 
-    public function isLectureStrictPurchased($id, User|Authenticatable $user): bool
+    public function isLectureStrictPurchased(int $lectureId): bool
     {
-        $purchasedLecturesIds = $user
-            ->lectureSubscriptions()
-            ->get()
-            ->pluck('subscriptionable_id');
+        $lecturesSubscriptions = $this->userRepository
+            ->lectureSubscriptions();
 
-        return $purchasedLecturesIds->contains($id);
+        if (
+            is_null($lecturesSubscriptions)
+            || $lecturesSubscriptions->isEmpty()
+        ) {
+            return false;
+        }
+
+        $lecturesSubscriptions = $lecturesSubscriptions
+            ->where('subscriptionable_id', $lectureId);
+
+        foreach ($lecturesSubscriptions as $subscription) {
+            if ($subscription->isActual()) return true;
+        }
+
+        return false;
     }
 
-    public function isLecturesCategoryPurchased($lectureId, User|Authenticatable $user): bool
+    public function isLecturesCategoryPurchased(int $lectureId): bool
     {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $lectureCategoryId = $lecture->category_id;
 
-        $purchasedCategoriesIds = $user
-            ->categorySubscriptions()
-            ->get()
-            ->pluck('subscriptionable_id');
+        $categoriesSubscriptions = $this->userRepository
+            ->categorySubscriptions();
 
-        return $purchasedCategoriesIds->contains($lectureCategoryId);
+        if (
+            is_null($categoriesSubscriptions)
+            || $categoriesSubscriptions->isEmpty()
+        ) {
+            return false;
+        }
+
+        $categoriesSubscriptions = $categoriesSubscriptions
+            ->where('subscriptionable_id', $lectureCategoryId);
+
+        foreach ($categoriesSubscriptions as $subscription) {
+            if ($subscription->isActual()) return true;
+        }
+
+        return false;
     }
 
-    public function isLecturesPromoPurchased($lectureId, User|Authenticatable $user): bool
+    public function isLecturePromoPurchased(int $lectureId): bool
     {
-        $promoPackIds = $user
-            ->promoSubscriptions()
-            ->get()
-            ->pluck('subscriptionable_id');
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $promoSubscription = $this->userRepository->promoSubscriptions();
 
-        foreach ($promoPackIds as $promoPackId) {
-            $promoPack = Promo::query()->where('id', $promoPackId)->first();
+        if (
+            is_null($promoSubscription)
+            || $promoSubscription->isEmpty()
+        ) {
+            return false;
+        }
 
-            if ($promoPack->promoLectures->contains($lectureId)) {
-                return true;
-            }
+        if ($lecture->is_promo) {
+            $stillActual = $promoSubscription->last()->isActual();
+            return $stillActual;
         }
 
         return false;

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Repositories\CategoryRepository;
+use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,12 +14,21 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Category extends Model
 {
-    use HasFactory;
+    use HasFactory, MoneyConversion;
 
-    protected $appends = ['prices', 'parent_slug'];
+    protected $appends = [
+        'prices',
+        'parent_slug'
+    ];
 
-    protected $fillable = ['parent_id', 'title', 'description', 'info', 'slug',
-        'preview_picture'];
+    protected $fillable = [
+        'parent_id',
+        'title',
+        'description',
+        'info',
+        'slug',
+        'preview_picture'
+    ];
     protected $table = 'lecture_categories';
 
     protected static function booted(): void
@@ -103,20 +114,22 @@ class Category extends Model
     protected function prices(): Attribute
     {
         $prices = $this->categoryPrices;
+        $id = $this->id;
         $result = [];
 
-        $lecturesCount = $this->lectures()->count();
         foreach ($prices as $price) {
-            $priceForPackInRoubles =
-                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
+            $priceForPackInRoubles = app(CategoryRepository::class)
+                ->getCategoryPriceForPeriodComplex(
+                    $id,
+                    $price->period->id
+                );
 
-            $priceForOneLectureInRoubles =
-                number_format($price->price_for_one_lecture / 100, 2, thousands_separator: '');
+            $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
 
             $result[] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
-                'price_for_one_lecture' => $priceForOneLectureInRoubles,
+                'price_for_one_lecture' => (float)$priceForOneLectureInRoubles,
                 'price_for_category' => $priceForPackInRoubles
             ];
         }
@@ -142,5 +155,15 @@ class Category extends Model
         return new Attribute(
             get: fn() => null,
         );
+    }
+
+    public function isMain(): bool
+    {
+        return $this->parent_id == 0;
+    }
+
+    public function isSub(): bool
+    {
+        return $this->parent_id != 0;
     }
 }

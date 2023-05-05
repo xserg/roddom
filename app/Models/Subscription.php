@@ -31,4 +31,9 @@ class Subscription extends Model
     {
         return $this->belongsTo(Period::class);
     }
+
+    public function isActual(): bool
+    {
+        return $this->end_date > now();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use App\Models\Period;
 use App\Models\SubcategoryPrices;
+use App\Repositories\CategoryRepository;
 use App\Services\CategoryService;
 use App\Traits\MoneyConversion;
 use Filament\Forms;
@@ -18,11 +19,8 @@ class CategoryPricesRelationManager extends RelationManager
     use MoneyConversion;
 
     protected static string $relationship = 'categoryPrices';
-
     protected static ?string $inverseRelationship = 'category';
-
     protected static ?string $recordTitleAttribute = 'id';
-
     protected static ?string $title = 'Цены категории';
 
     public static function form(Form $form): Form
@@ -49,8 +47,8 @@ class CategoryPricesRelationManager extends RelationManager
                         function (?SubcategoryPrices $record): ?string {
                             $categoryId = $record->category_id;
                             $periodId = $record->period_id;
-                            $price = app(CategoryService::class)
-                                ->getCategoryPrice(
+                            $price = app(CategoryRepository::class)
+                                ->getCategoryPriceForPeriodComplex(
                                     $categoryId,
                                     $periodId);
 

@@ -25,16 +25,6 @@ class Promo extends Model
         )->withPivot(['period_id', 'price', 'price_for_one_lecture']);
     }
 
-    public function promoLectures(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Lecture::class,
-            'lectures_to_promo',
-            'promo_id',
-            'lecture_id'
-        );
-    }
-
     public function pricesForPromoLectures(): BelongsToMany
     {
         return $this->belongsToMany(

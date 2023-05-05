@@ -316,8 +316,7 @@ class Lecture extends Model
 
     protected function purchaseInfo(): Attribute
     {
-        $lectureRepository = app(LectureRepository::class);
-        $purchasedLectures = $lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $purchasedLectures = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
         $isPurchased = (int)array_key_exists($this->id, $purchasedLectures);
 
@@ -336,9 +335,13 @@ class Lecture extends Model
         );
     }
 
+    /**
+     * В этот проперти попадают либо промо цены, либо цены категории
+     * @return Attribute
+     */
     protected function prices(): Attribute
     {
-        $prices = app(LectureRepository::class)->formPricesForLecture($this);
+        $prices = $this->lectureRepository->formPricesForLecture($this);
 
         return new Attribute(
             get: fn() => $prices ?? [],

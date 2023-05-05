@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
 use App\Models\Order;
 use App\Models\Promo;
+use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use App\Services\PaymentService;
 use App\Services\PromoService;
@@ -39,9 +40,10 @@ use OpenApi\Attributes as OA;
 class BuyPromoController extends Controller
 {
     public function __construct(
-        private PromoService    $promoService,
-        private PromoRepository $promoRepository,
-        private PaymentService  $paymentService
+        private PromoService     $promoService,
+        private PromoRepository  $promoRepository,
+        private PeriodRepository $periodRepository,
+        private PaymentService   $paymentService
     )
     {
     }
@@ -59,14 +61,17 @@ class BuyPromoController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $promoPack = Promo::first();
-        $price = $this->promoRepository->getPriceForExactPeriodLength($promoPack, $periodLength);
+        $periodId = $this->periodRepository
+            ->getPeriodByLength($periodLength)
+            ->id;
+        $price = $this->promoRepository
+            ->getPriceForPackForPeriod(1, $periodId);
 
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
             'subscriptionable_type' => Promo::class,
-            'subscriptionable_id' => $promoPack->id,
+            'subscriptionable_id' => 1,
             'period' => $periodLength
         ]);
 

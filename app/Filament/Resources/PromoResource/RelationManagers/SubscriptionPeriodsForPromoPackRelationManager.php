@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PromoResource\RelationManagers;
 
 use App\Models\Period;
+use App\Repositories\PromoRepository;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -14,9 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
     protected static ?string $title = 'Общие цены, акционный пак';
-
     protected static string $relationship = 'subscriptionPeriodsForPromoPack';
-
     protected static ?string $recordTitleAttribute = 'period_id';
 
     protected function isTablePaginationEnabled(): bool
@@ -55,8 +54,11 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                     ->label('Период покупки, дней'),
 
                 Tables\Columns\TextColumn::make('price')
-                    ->formatStateUsing(
-                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                    ->getStateUsing(
+                        function (?Model $record) {
+                            return app(PromoRepository::class)
+                                ->getPriceForPackForPeriod(1, $record->period_id);
+                        }
                     )
                     ->label('Цена, рублей'),
 

@@ -135,7 +135,7 @@ class UserService
 
         if ($this->lectureService->isFree($lectureId)) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
-                return $this->lectureRepository->getLectureById($lectureId)->content;
+                return $lecture->content;
             }
 
             if ($this->userCanWatchNewFreeLecture($user)) {
@@ -144,7 +144,7 @@ class UserService
 
                 $user = $this->setFreeLectureWatchedNow($user);
                 $this->saveUserGuard($user);
-                return $this->lectureRepository->getLectureById($lectureId)->content;
+                return $lecture->content;
             }
 
             throw new UserCannotWatchFreeLectureException(
@@ -154,7 +154,7 @@ class UserService
             if ($this->isLecturePurchased($lectureId, $user)) {
                 $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user);
-                return $this->lectureRepository->getLectureById($lectureId)->content;
+                return $lecture->content;
             }
 
             throw new UserCannotWatchPaidLectureException('Пользователь не сможет посмотреть платную лекцию');
@@ -250,12 +250,12 @@ class UserService
         return $user;
     }
 
-    public function isLecturePurchased(int $lectureId, User|Authenticatable $user): bool
+    public function isLecturePurchased(int $lectureId): bool
     {
         return
-            $this->lectureService->isLectureStrictPurchased($lectureId, $user) ||
-            $this->lectureService->isLecturesCategoryPurchased($lectureId, $user) ||
-            $this->lectureService->isLecturesPromoPurchased($lectureId, $user);
+            $this->lectureService->isLectureStrictPurchased($lectureId) ||
+            $this->lectureService->isLecturesCategoryPurchased($lectureId) ||
+            $this->lectureService->isLecturePromoPurchased($lectureId);
     }
 
     /**

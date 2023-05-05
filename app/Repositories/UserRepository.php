@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Lecture;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
 class UserRepository
@@ -17,4 +18,39 @@ class UserRepository
         return $user;
     }
 
+    public function promoSubscriptions(): ?Collection
+    {
+        if (auth()->user()) {
+            return auth()->user()
+                ->promoSubscriptions()
+                ->where('user_id', auth()->user()->id)
+                ->get();
+        }
+
+        return null;
+    }
+
+    public function categorySubscriptions(): ?Collection
+    {
+        if (auth()->user()) {
+            return auth()->user()
+                ->categorySubscriptions()
+                ->where('user_id', auth()->user()->id)
+                ->get();
+        }
+
+        return null;
+    }
+
+    public function lectureSubscriptions(): ?Collection
+    {
+        if (auth()->user()) {
+            return auth()->user()
+                ->lectureSubscriptions()
+                ->where('user_id', auth()->user()->id)
+                ->get();
+        }
+
+        return null;
+    }
 }

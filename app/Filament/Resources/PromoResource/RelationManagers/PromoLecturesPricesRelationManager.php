@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PromoResource\RelationManagers;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
+use App\Repositories\PromoRepository;
 use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -23,7 +24,6 @@ class PromoLecturesPricesRelationManager extends RelationManager
     use MoneyConversion;
 
     protected static ?string $title = 'Цены подписки на акционную лекцию, за один период';
-
     protected static string $relationship = 'pricesForPromoLectures';
     protected static ?string $inverseRelationship = 'pricesInPromoPacks';
     protected static ?string $recordTitleAttribute = 'id';

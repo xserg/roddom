@@ -8,22 +8,29 @@ use App\Models\LecturePaymentType;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\User;
+use App\Traits\MoneyConversion;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LectureRepository
 {
+    use MoneyConversion;
+
+    private $periods;
+
     public function __construct(
         private CategoryRepository $categoryRepository,
         private PromoRepository    $promoRepository
     )
     {
+        $this->periods = Period::all();
     }
 
     /**
@@ -169,10 +176,11 @@ class LectureRepository
         ?User $user
     ): array
     {
-        if (is_null($user)) {
-            return [];
-        }
         $lectures = [];
+
+        if (is_null($user)) {
+            return $lectures;
+        }
 
         $lecturesSubscriptions = $user
             ->subscriptions
@@ -324,8 +332,7 @@ class LectureRepository
             $promoCustomPrices = $lecture->pricesPeriodsInPromoPacks;
             $promoCommonPrices = Promo::first()->subscriptionPeriodsForPromoPack;
 
-            $periods = Period::all();
-            foreach ($periods as $period) {
+            foreach ($this->periods as $period) {
                 //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
                 $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
                 $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
@@ -335,8 +342,9 @@ class LectureRepository
                     //если нет кастомной цены для конкретного периода, ставим null
                     $prices[] = [
                         'length' => $period->length,
+                        'period_id' => $period->id,
                         'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => $priceCommonForOneLecture
+                        'common_price_for_one_lecture' => (float)$priceCommonForOneLecture
                     ];
                 } else {
                     //а если есть, то преобразовываем в формат рубли.копейки и ставим
@@ -346,21 +354,26 @@ class LectureRepository
 
                     $prices[] = [
                         'length' => $period->length,
-                        'custom_price_for_one_lecture' => $priceForOneLecture,
-                        'common_price_for_one_lecture' => $priceCommonForOneLecture
+                        'period_id' => $period->id,
+                        'custom_price_for_one_lecture' => (float)$priceForOneLecture,
+                        'common_price_for_one_lecture' => (float)$priceCommonForOneLecture
                     ];
                 }
             }
         } else {
-            //если не промо - то не важно, платная или бесплатная, бесплатную тоже можно купить по ценам платной
-            $periods = Period::all();
-            $categoryCommonPrices = $lecture->category->prices;
+            //если не промо - то не важно, платная или бесплатная,
+            //бесплатную тоже можно купить по ценам платной
+            //берем общую цену за одну лекцию у категории
+            $categoryId = $lecture->category_id;
+            $commonCategoryPrices = DB::select('SELECT period_id, price_for_one_lecture
+                                       FROM `mothers-school`.category_prices
+                                      WHERE category_id = ?', [$categoryId]);
             $customPrices = $lecture->pricesForLectures;
 
-            foreach ($periods as $period) {
+            foreach ($this->periods as $period) {
                 //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
-                $priceCommon = Arr::where($categoryCommonPrices, function ($value) use ($period) {
-                    return $value['length'] == $period->length;
+                $priceCommon = Arr::where($commonCategoryPrices, function ($value) use ($period) {
+                    return $value->period_id == $period->id;
                 });
                 $priceCommon = array_pop($priceCommon);
                 $priceCustom = $customPrices->where('length', $period->length)->first();
@@ -368,16 +381,18 @@ class LectureRepository
                 if (is_null($priceCustom)) {
                     $prices[] = [
                         'length' => $period->length,
+                        'period_id' => $period->id,
                         'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => $priceCommon['price_for_one_lecture']
+                        'common_price_for_one_lecture' => (float)self::coinsToRoubles($priceCommon->price_for_one_lecture)
                     ];
                 } else {
-                    $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+                    $priceForOneLecture = self::coinsToRoubles($priceCustom->pivot->price);
 
                     $prices[] = [
                         'length' => $period->length,
-                        'custom_price_for_one_lecture' => $priceForOneLecture,
-                        'common_price_for_one_lecture' => $priceCommon['price_for_one_lecture']
+                        'period_id' => $period->id,
+                        'custom_price_for_one_lecture' => (float)$priceForOneLecture,
+                        'common_price_for_one_lecture' => (float)self::coinsToRoubles($priceCommon->price_for_one_lecture)
                     ];
                 }
             }
