@@ -42,22 +42,26 @@ class LectureResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make([
-                    Forms\Components\TextInput::make('id')
-                        ->label('ID, заполняется автоматически')
-                        ->disabled()
-                        ->visible(false),
-                    Forms\Components\TextInput::make('title')
-                        ->label('Наименование лекции')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\Select::make('lector_id')
-                        ->label('Лектор')
-                        ->relationship('lector', 'name')
-                        ->required(),
-                    Forms\Components\Select::make('category_id')
-                        ->label('Подкатегория лекции')
-                        ->options(Category::subcategories()->get()->pluck('title', 'id'))
-                        ->required(),
+                    Forms\Components\Grid::make(1)
+                        ->columnSpan(1)
+                        ->schema([
+                            Forms\Components\TextInput::make('id')
+                                ->label('ID, заполняется автоматически')
+                                ->disabled()
+                                ->visible(false),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Наименование лекции')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\Select::make('lector_id')
+                                ->label('Лектор')
+                                ->relationship('lector', 'name')
+                                ->required(),
+                            Forms\Components\Select::make('category_id')
+                                ->label('Подкатегория лекции')
+                                ->options(Category::subcategories()->get()->pluck('title', 'id'))
+                                ->required(),
+                        ]),
                     Forms\Components\FileUpload::make('preview_picture')
                         ->directory('images/lectures')
                         ->label('Превью лекции')
