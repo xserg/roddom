@@ -366,7 +366,7 @@ class LectureRepository
             //берем общую цену за одну лекцию у категории
             $categoryId = $lecture->category_id;
             $commonCategoryPrices = DB::select('SELECT period_id, price_for_one_lecture
-                                       FROM `mothers-school`.category_prices
+                                       FROM category_prices
                                       WHERE category_id = ?', [$categoryId]);
             $customPrices = $lecture->pricesForLectures;
 

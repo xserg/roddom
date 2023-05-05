@@ -45,7 +45,7 @@ class PromoRepository
     public function getCommonPriceForOneLectureForPeriod(int $periodId): int|float|string
     {
         $price = DB::select('SELECT price_for_one_lecture
-        FROM `mothers-school`.promo_pack_prices
+        FROM promo_pack_prices
         WHERE period_id=?', [$periodId]);
 
         $price = Arr::first($price);
