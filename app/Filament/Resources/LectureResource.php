@@ -8,9 +8,9 @@ use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
-use App\Models\Promo;
 use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
+use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -25,6 +25,8 @@ use Illuminate\Support\HtmlString;
 
 class LectureResource extends Resource
 {
+    use MoneyConversion;
+
     protected static ?string $model = Lecture::class;
     protected static ?string $navigationIcon = 'heroicon-o-collection';
     protected static ?string $navigationLabel = 'Лекции';
@@ -226,7 +228,7 @@ class LectureResource extends Resource
                                 TextInput::make('custom_price-1')
                                     ->formatStateUsing(function (?Model $record) {
                                         $categoryPrices = $record->category->categoryPrices;
-                                        return $categoryPrices[0]['price_for_one_lecture'];
+                                        return self::coinsToRoubles($categoryPrices[0]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->categoryPrices[0]['length'];
@@ -236,7 +238,7 @@ class LectureResource extends Resource
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-2')
                                     ->formatStateUsing(function (?Model $record) {
-                                        return $record?->category->categoryPrices[1]['price_for_one_lecture'];
+                                        return self::coinsToRoubles($record?->category->categoryPrices[1]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->categoryPrices[1]['length'];
@@ -246,7 +248,7 @@ class LectureResource extends Resource
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-3')
                                     ->formatStateUsing(function (?Model $record) {
-                                        return $record?->category->categoryPrices[2]['price_for_one_lecture'];
+                                        return self::coinsToRoubles($record?->category->categoryPrices[2]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
                                         return "период, дней: " . $record?->category->categoryPrices[2]['length'];
