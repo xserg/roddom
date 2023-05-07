@@ -225,30 +225,31 @@ class LectureResource extends Resource
                             ->schema([
                                 TextInput::make('custom_price-1')
                                     ->formatStateUsing(function (?Model $record) {
-                                        return $record?->category->prices[0]['price_for_one_lecture'];
+                                        $categoryPrices = $record->category->categoryPrices;
+                                        return $categoryPrices[0]['price_for_one_lecture'];
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[0]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[0]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-2')
                                     ->formatStateUsing(function (?Model $record) {
-                                        return $record?->category->prices[1]['price_for_one_lecture'];
+                                        return $record?->category->categoryPrices[1]['price_for_one_lecture'];
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[1]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[1]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-3')
                                     ->formatStateUsing(function (?Model $record) {
-                                        return $record?->category->prices[2]['price_for_one_lecture'];
+                                        return $record?->category->categoryPrices[2]['price_for_one_lecture'];
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[2]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[2]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -274,7 +275,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[0]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[0]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -287,7 +288,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[1]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[1]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -300,7 +301,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->prices[2]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[2]['length'];
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
