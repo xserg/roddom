@@ -226,7 +226,8 @@ class LectureResource extends Resource
                             })
                             ->schema([
                                 TextInput::make('custom_price-1')
-                                    ->formatStateUsing(function (?Model $record) {
+                                    ->formatStateUsing(function (?Model $record, string $context) {
+                                        if($context === 'create') return false;
                                         $categoryPrices = $record->category->categoryPrices;
                                         return self::coinsToRoubles($categoryPrices[0]['price_for_one_lecture']);
                                     })
@@ -237,7 +238,8 @@ class LectureResource extends Resource
                                     ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-2')
-                                    ->formatStateUsing(function (?Model $record) {
+                                    ->formatStateUsing(function (?Model $record, string $context) {
+                                        if($context === 'create') return false;
                                         return self::coinsToRoubles($record?->category->categoryPrices[1]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
@@ -247,7 +249,8 @@ class LectureResource extends Resource
                                     ->columnSpan(2)
                                     ->visible(fn(string $context) => $context != 'create'),
                                 TextInput::make('custom_price-3')
-                                    ->formatStateUsing(function (?Model $record) {
+                                    ->formatStateUsing(function (?Model $record, string $context) {
+                                        if($context === 'create') return false;
                                         return self::coinsToRoubles($record?->category->categoryPrices[2]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
