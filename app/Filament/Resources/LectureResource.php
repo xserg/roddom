@@ -232,7 +232,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($categoryPrices[0]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[0]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -243,7 +243,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($record?->category->categoryPrices[1]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[1]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -254,7 +254,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($record?->category->categoryPrices[2]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[2]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -280,7 +280,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[0]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -293,7 +293,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[1]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -306,7 +306,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[2]['length'];
+                                        return "период, дней: " . $record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
