@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Repositories\CategoryRepository;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +16,6 @@ class Category extends Model
     use HasFactory, MoneyConversion;
 
     protected $appends = [
-        'prices',
         'parent_slug'
     ];
 
@@ -109,39 +107,6 @@ class Category extends Model
     public function scopeSubCategories(Builder $query): void
     {
         $query->where('parent_id', '!=', 0);
-    }
-
-    protected function prices(): Attribute
-    {
-        $prices = $this->categoryPrices;
-        $id = $this->id;
-        $result = [];
-
-        foreach ($prices as $price) {
-            $priceForPackInRoubles = app(CategoryRepository::class)
-                ->getCategoryPriceForPeriodComplex(
-                    $id,
-                    $price->period->id
-                );
-
-            $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
-
-            $result[] = [
-                'title' => $price->period->title,
-                'length' => $price->period->length,
-                'price_for_one_lecture' => (float)$priceForOneLectureInRoubles,
-                'price_for_category' => $priceForPackInRoubles
-            ];
-        }
-
-        if ($result) {
-            return new Attribute(
-                get: fn() => $result,
-            );
-        }
-        return new Attribute(
-            get: fn() => [],
-        );
     }
 
     protected function parentSlug(): Attribute

@@ -61,7 +61,7 @@ class LectureRepository
         return $query;
     }
 
-    public function getAllQuery($relations = []): Builder
+    public function getAllQueryWith($relations = []): Builder
     {
         $builder = Lecture::query()->with($relations);
         return $builder;
@@ -172,6 +172,27 @@ class LectureRepository
 //        return $builder;
 //    }
 
+//    public function setFlagsToLectures(
+
+    /**
+     * Формирует массив типа
+     *
+     *  $lectures = [
+     *      24 => [
+     *           "start_date" = "2023-05-05 11:51:40",
+     *           "end_date" = "2023-05-08 12:51:40"
+     * ],
+     *      44 => [
+     *           "start_date" = "2023-05-05 11:51:40",
+     *           "end_date" = "2023-05-08 12:51:40"
+     * ],
+     *      106 => [
+     *           "start_date" = "2023-05-05 11:51:40"
+     *           "end_date" = "2023-05-08 12:51:40"
+     * ]
+     * @param User|null $user
+     * @return array
+     */
     public function getAllPurchasedLecturesIdsAndTheirDatesByUser(
         ?User $user
     ): array
@@ -183,16 +204,13 @@ class LectureRepository
         }
 
         $lecturesSubscriptions = $user
-            ->subscriptions
-            ->where('subscriptionable_type', Lecture::class);
+            ->lectureSubscriptions;
 
         $categorySubscriptions = $user
-            ->subscriptions
-            ->where('subscriptionable_type', Category::class);
+            ->categorySubscriptions;
 
         $promoSubscriptions = $user
-            ->subscriptions
-            ->where('subscriptionable_type', Promo::class);
+            ->promoSubscriptions;
 
         if ($lecturesSubscriptions && $lecturesSubscriptions->isNotEmpty()) {
             foreach ($lecturesSubscriptions as $lecturesSubscription) {
@@ -238,8 +256,6 @@ class LectureRepository
 
         return $lectures;
     }
-
-//    public function setFlagsToLectures(
 //        Collection $lectures
 //    ): Collection
 //    {
@@ -330,7 +346,10 @@ class LectureRepository
         //чекаем что лекция промо
         if ($lecture->paymentType->id === LecturePaymentType::PROMO) {
             $promoCustomPrices = $lecture->pricesPeriodsInPromoPacks;
-            $promoCommonPrices = Promo::first()->subscriptionPeriodsForPromoPack;
+            $promoCommonPrices = Promo::query()
+                ->with(['subscriptionPeriodsForPromoPack'])
+                ->first()
+                ->subscriptionPeriodsForPromoPack;
 
             foreach ($this->periods as $period) {
                 //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
@@ -364,18 +383,12 @@ class LectureRepository
             //если не промо - то не важно, платная или бесплатная,
             //бесплатную тоже можно купить по ценам платной
             //берем общую цену за одну лекцию у категории
-            $categoryId = $lecture->category_id;
-            $commonCategoryPrices = DB::select('SELECT period_id, price_for_one_lecture
-                                       FROM category_prices
-                                      WHERE category_id = ?', [$categoryId]);
+            $commonCategoryPrices = $lecture->category->categoryPrices;
             $customPrices = $lecture->pricesForLectures;
 
             foreach ($this->periods as $period) {
                 //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
-                $priceCommon = Arr::where($commonCategoryPrices, function ($value) use ($period) {
-                    return $value->period_id == $period->id;
-                });
-                $priceCommon = array_pop($priceCommon);
+                $priceCommon = $commonCategoryPrices->where('period_id', $period->id)->first();
                 $priceCustom = $customPrices->where('length', $period->length)->first();
 
                 if (is_null($priceCustom)) {

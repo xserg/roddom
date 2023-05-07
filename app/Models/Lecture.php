@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Arr;
 
 class Lecture extends Model
 {
@@ -28,7 +28,8 @@ class Lecture extends Model
         'list_watched',
         'id_title',
         'c_type',
-        'p_type'
+        'p_type',
+        'l_rates'
     ];
 
     protected $casts = [
@@ -119,7 +120,7 @@ class Lecture extends Model
 
     public function subscriptions(): MorphMany
     {
-        return $this->morphMany(Subscription::class, 'subscriptions');
+        return $this->morphMany(Subscription::class, 'subscriptionable');
     }
 
     public function promoPacks(): BelongsToMany
@@ -158,6 +159,11 @@ class Lecture extends Model
             'lecture_id',
             'period_id'
         )->withPivot(['promo_id', 'price']);
+    }
+
+    public function rates(): HasMany
+    {
+        return $this->hasMany(LectureRate::class);
     }
 
     public function scopeWatched(Builder $query): void
@@ -316,22 +322,29 @@ class Lecture extends Model
 
     protected function purchaseInfo(): Attribute
     {
-        $purchasedLectures = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $user = auth()->user();
 
-        $isPurchased = (int)array_key_exists($this->id, $purchasedLectures);
+        if (!$user) {
+            return new Attribute(
+                get: fn() => [
+                    'is_purchased' => false,
+                    'end_date' => null
+                ],
+            );
+        }
+
+        $purchasedLectures = $this->lectureRepository
+            ->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+
+        $isPurchased = array_key_exists($this->id, $purchasedLectures);
 
         $purchasedInfo = [
-            'is_purchased' => (int)array_key_exists($this->id, $purchasedLectures),
+            'is_purchased' => array_key_exists($this->id, $purchasedLectures),
             'end_date' => $isPurchased == 1 ? $purchasedLectures[$this->id]['end_date'] : null
         ];
 
-        if ($purchasedLectures) {
-            return new Attribute(
-                get: fn() => $purchasedInfo,
-            );
-        }
         return new Attribute(
-            get: fn() => 0,
+            get: fn() => $purchasedInfo,
         );
     }
 
@@ -344,21 +357,21 @@ class Lecture extends Model
         $prices = $this->lectureRepository->formPricesForLecture($this);
 
         return new Attribute(
-            get: fn() => $prices ?? [],
+            get: fn() => $prices,
         );
     }
 
-    protected function rates(): Attribute
+    protected function lRates(): Attribute
     {
         $rates = [];
 
-        $rates['rate_avg'] = LectureRate::query()
-            ->where('lecture_id', '=', $this->id)
+        $rates['rate_avg'] = $this
+            ->rates
             ->average('rating');
 
         if (auth()->user()) {
-            $rates['rate_user'] = LectureRate::query()
-                ->where('lecture_id', '=', $this->id)
+            $rates['rate_user'] = $this
+                ->rates
                 ->where('user_id', '=', auth()->user()->id)
                 ->average('rating');
         } else {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Category;
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -13,8 +14,8 @@ use OpenApi\Attributes as OA;
     OA\Get(
         path: '/category/{slug}',
         description: "Получение главной категории,
-    всех подкатегорий этой категории лекций,
-    всех лекторов этой категории",
+                      всех подкатегорий этой категории лекций,
+                      всех лекторов этой категории",
         summary: "Получение подкатегорий",
         security: [["bearerAuth" => []]],
         tags: ["category"])
@@ -52,40 +53,33 @@ use OpenApi\Attributes as OA;
                     "slug" => "nazvanie-podkategorii-1",
                     "description" => "Tenetur et vel quis sit ex illo. Qui omnis minima inventore. Animi iste aut ducimus consequuntur est.",
                     "info" => "Hic repellendus aut nihil est et. Eum quasi deleniti consequatur et dolorem tempore. Modi aliquid rem consequuntur quibusdam doloremque tempora. Sit id voluptatem commodi et rerum quaerat.",
-                    "preview_picture" => "https://url/storage/images/categories/1.png"
+                    "preview_picture" => "https://url/storage/images/categories/1.png",
+                    "prices" => [
+                        [
+                            "title" => "day",
+                            "length" => 1,
+                            "price_for_one_lecture" => 115.44,
+                            "price_for_category" => 215.43
+                        ],
+                        [
+                            "title" => "week",
+                            "length" => 14,
+                            "price_for_one_lecture" => 313.52,
+                            "price_for_category" => 413.51
+                        ],
+                        [
+                            "title" => "month",
+                            "length" => 30,
+                            "price_for_one_lecture" => 514.72,
+                            "price_for_category" => 614.71
+                        ]
+                    ]
                 ],
                 [
                     "id" => 12,
+                    "etc" => "etc"
                 ]
             ],
-            'lectors' => [
-                "data" => [
-                    [
-                        "id" => 2,
-                        "name" => "Jeanie Weissnat",
-                        "position" => "Biophysicist",
-                        "description" => "Alias iusto possimus dolores nihil dolor. Omnis est totam distinctio aut veritatis. Asperiores enim est ducimus quidem at a velit. Et quia sit porro doloribus eum dolorem dolorem magni.",
-                        "career_start" => "2021-03-21",
-                        "photo" => "images/lectors/lector1.jpg",
-                        "rates" => [
-                            "rate_avg" => null,
-                            "rate_user" => null
-                        ]
-                    ],
-                    [
-                        "id" => 3,
-                        "name" => "Mr. Lawrence DuBuque PhD",
-                        "position" => "Camera Repairer",
-                        "description" => "Beatae quasi est quisquam est reiciendis. Soluta labore recusandae vero possimus possimus sint dolorem. Sequi aspernatur aut molestias minus magni aperiam consequatur.",
-                        "career_start" => "2000-03-21",
-                        "photo" => "images/lectors/lector2.jpg",
-                        "rates" => [
-                            "rate_avg" => null,
-                            "rate_user" => null
-                        ]
-                    ],
-                ]
-            ]
         ]),
 
 )]
@@ -94,18 +88,35 @@ use OpenApi\Attributes as OA;
 #[OA\Response(response: 500, description: 'Server Error')]
 class RetrieveCategoryController
 {
+    public function __construct(
+        private CategoryRepository $categoryRepository
+    )
+    {
+    }
+
     public function __invoke(Request $request, string $slug): JsonResponse
     {
+        /**
+         * @var Category $mainCategory
+         */
         $mainCategory = Category
             ::query()
             ->where('slug', '=', $slug)
             ->firstOrFail();
+
+        $prices = $this->categoryRepository->formCategoryPrices($mainCategory);
+        $mainCategory->prices = $prices;
 
         $subCategories = Category
             ::subCategories()
             ->where('parent_id', '=', $mainCategory->id)
             ->with('lectures.lector')
             ->get();
+
+        foreach ($subCategories as $category) {
+            $prices = $this->categoryRepository->formCategoryPrices($category);
+            $category->prices = $prices;
+        }
 
         return response()->json(
             [

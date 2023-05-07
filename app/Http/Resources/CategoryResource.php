@@ -33,7 +33,7 @@ class CategoryResource extends JsonResource
             'description' => $this->description,
             'info' => $this->info,
             'preview_picture' => $this->preview_picture,
-            'prices' => $this->prices,
+            'prices' => $this->whenNotNull($this->prices),
         ];
     }
 }

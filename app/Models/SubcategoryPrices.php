@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SubcategoryPrices extends Model
 {
     protected $appends = [
         'period_length'
     ];
+
     protected $table = 'category_prices';
 
     public $timestamps = false;
@@ -22,11 +22,6 @@ class SubcategoryPrices extends Model
         'price_for_one_lecture',
         'period_id'
     ];
-
-    public function subscriptions(): HasMany
-    {
-        return $this->hasMany(Subscription::class);
-    }
 
     public function category(): BelongsTo
     {

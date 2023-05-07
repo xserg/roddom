@@ -182,7 +182,17 @@ class RetrieveAllLecturesController
     public function __invoke(Request $request): JsonResponse
     {
         try {
-            $builder = $this->lectureRepository->getAllQuery();
+            $relations = [
+                'category.parentCategory',
+                'category.categoryPrices',
+                'contentType',
+                'paymentType',
+                'pricesPeriodsInPromoPacks',
+                'pricesForLectures',
+                'rates'
+            ];
+
+            $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
             $lectures = $this->lectureRepository->paginate(
                 $builder,

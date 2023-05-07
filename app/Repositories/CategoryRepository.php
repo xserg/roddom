@@ -4,11 +4,13 @@ namespace App\Repositories;
 
 use App\Models\Category;
 use App\Models\Lecture;
+use App\Traits\MoneyConversion;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class CategoryRepository
 {
+    use MoneyConversion;
     public function __construct()
     {
     }
@@ -46,6 +48,32 @@ class CategoryRepository
         return 0;
     }
 
+    public function formCategoryPrices(Category $category): array
+    {
+        $prices = $category->categoryPrices()->with(['period'])->get();
+        $id = $category->id;
+        $result = [];
+
+        foreach ($prices as $price) {
+            $priceForPackInRoubles = $this
+                ->getCategoryPriceForPeriodComplex(
+                    $id,
+                    $price->period->id
+                );
+
+            $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
+
+            $result[] = [
+                'title' => $price->period->title,
+                'length' => $price->period->length,
+                'price_for_one_lecture' => (float)$priceForOneLectureInRoubles,
+                'price_for_category' => $priceForPackInRoubles
+            ];
+        }
+
+        return $result;
+    }
+
     public function getCategoryPriceForPeriodComplex(
         int $categoryId,
         int $periodId
@@ -53,7 +81,18 @@ class CategoryRepository
     {
         $finalPrice = 0;
 
-        $lectures = Lecture::query()->where('category_id', $categoryId)->get();
+        $lectures = Lecture::query()
+            ->where('category_id', $categoryId)
+            ->with([
+                'category.categoryPrices',
+                'contentType',
+                'paymentType',
+                'pricesPeriodsInPromoPacks',
+                'pricesForLectures',
+                'pricesInPromoPacks'
+            ])
+            ->get();
+
         $lecturesCount = $lectures->count();
 
         if ($lecturesCount == 0) {
@@ -70,7 +109,6 @@ class CategoryRepository
             $lecturePriceForPeriod = Arr::where($lecturePrices, function ($value) use ($periodId) {
                 return $value['period_id'] == $periodId;
             });
-
             $lecturePriceForPeriod = Arr::first($lecturePriceForPeriod);
 
             $customPrice = $lecturePriceForPeriod['custom_price_for_one_lecture'];
@@ -79,7 +117,7 @@ class CategoryRepository
             $finalPrice += $customPrice ?? $commonPrice;
         }
 
-        return $finalPrice;
+        return round($finalPrice, 2);
     }
 
     /**
