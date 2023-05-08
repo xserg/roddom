@@ -194,9 +194,11 @@ class RetrieveAllLecturesController
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
+            $lectures = $builder->get();
+            $lectures = $this->lectureRepository->setPurchaseInfoToLectures($lectures);
             $lectures = $this->lectureRepository->paginate(
-                $builder,
-                $request->per_page,
+                $lectures,
+                $request->per_page ?? 15,
                 $request->page,
             );
         } catch (NotFoundHttpException $exception) {

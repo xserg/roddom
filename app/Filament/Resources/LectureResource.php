@@ -345,7 +345,7 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lecture $record): ?string {
-                            return round($record?->l_rates['rate_avg'], 1) ?: 'нет оценок';
+                            return round($record?->a_rates['rate_avg'], 1) ?: 'нет оценок';
                         }
                     )
                     ->label('Рейтинг, из 10'),

@@ -32,7 +32,6 @@ use App\Http\Controllers\Api\User\PhotoDeleteController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
-use App\Http\Controllers\Api\User\RetrieveAllUsersController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,7 +57,8 @@ Route::prefix('v1')
         Route::post('/user/login', LoginController::class)
             ->name('login');
         Route::post('/user/login/code', LoginCodeController::class)
-            ->name('login.code');
+            ->name('login.code')
+            ->middleware(['throttle:3,1']);
 
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
@@ -117,9 +117,6 @@ Route::prefix('v1')
                 ->name('lecture.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-
-//            Route::get('/diplomas', RetrieveAllDiplomasController::class)
-//                ->name('diplomas');
 
             Route::get('/categories', RetrieveAllCategoriesController::class)
                 ->name('categories');

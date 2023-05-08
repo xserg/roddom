@@ -132,19 +132,32 @@ class RetrieveAllPromoLecturesController extends Controller
     public function __invoke(Request $request)
     {
 //        try {
-            $builder = $this->lectureRepository->getAllPromoQuery();
-            $builder = $this->lectureRepository->addFiltersToQuery($builder);
-            $lectures = $this->lectureRepository->paginate(
-                $builder,
-                $request->per_page,
-                $request->page
-            );
+        $relations = [
+            'category.parentCategory',
+            'category.categoryPrices',
+            'contentType',
+            'paymentType',
+            'pricesPeriodsInPromoPacks',
+            'pricesForLectures',
+            'rates'
+        ];
+        $builder = $this->lectureRepository->getAllPromoQueryWith($relations);
+        $builder = $this->lectureRepository->addFiltersToQuery($builder);
 
-            /**
-             * @var $promo Promo
-             */
-            $promo = Promo::first();
-            $prices = $this->promoRepository->getPrices($promo);
+        $lectures = $builder->get();
+        $lectures = $this->lectureRepository->setPurchaseInfoToLectures($lectures);
+
+        $lectures = $this->lectureRepository->paginate(
+            $lectures,
+            $request->per_page ?? 15,
+            $request->page
+        );
+
+        /**
+         * @var $promo Promo
+         */
+        $promo = Promo::query()->with(['subscriptionPeriodsForPromoPack'])->first();
+        $prices = $this->promoRepository->getPrices($promo);
 
 //        } catch (NotFoundHttpException $exception) {
 //

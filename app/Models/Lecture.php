@@ -23,13 +23,10 @@ class Lecture extends Model
         'is_watched',
         'is_promo',
         'is_free',
-        'purchase_info',
         'prices',
         'list_watched',
         'id_title',
-        'c_type',
-        'p_type',
-        'l_rates'
+        'a_rates'
     ];
 
     protected $casts = [
@@ -37,6 +34,7 @@ class Lecture extends Model
         'show_tariff_1' => 'boolean',
         'show_tariff_2' => 'boolean',
         'show_tariff_3' => 'boolean',
+        'is_recommended' => 'boolean',
     ];
 
     protected $fillable = [
@@ -278,11 +276,11 @@ class Lecture extends Model
             $watchedLectures = $user->watchedLectures;
 
             return new Attribute(
-                get: fn() => (int)$watchedLectures->contains($this->id),
+                get: fn() => $watchedLectures->contains($this->id),
             );
         }
         return new Attribute(
-            get: fn() => 0,
+            get: fn() => false,
         );
     }
 
@@ -294,11 +292,11 @@ class Lecture extends Model
             $savedLectures = $user->savedLectures;
 
             return new Attribute(
-                get: fn() => (int)$savedLectures->contains($this->id),
+                get: fn() => $savedLectures->contains($this->id),
             );
         }
         return new Attribute(
-            get: fn() => 0,
+            get: fn() => false,
         );
     }
 
@@ -315,38 +313,11 @@ class Lecture extends Model
         $listWatchedLectures = $user->listWatchedLectures;
 
         return new Attribute(
-            get: fn() => (int)$listWatchedLectures
+            get: fn() => $listWatchedLectures
                 ->contains($this->id),
         );
     }
 
-    protected function purchaseInfo(): Attribute
-    {
-        $user = auth()->user();
-
-        if (!$user) {
-            return new Attribute(
-                get: fn() => [
-                    'is_purchased' => false,
-                    'end_date' => null
-                ],
-            );
-        }
-
-        $purchasedLectures = $this->lectureRepository
-            ->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
-
-        $isPurchased = array_key_exists($this->id, $purchasedLectures);
-
-        $purchasedInfo = [
-            'is_purchased' => array_key_exists($this->id, $purchasedLectures),
-            'end_date' => $isPurchased == 1 ? $purchasedLectures[$this->id]['end_date'] : null
-        ];
-
-        return new Attribute(
-            get: fn() => $purchasedInfo,
-        );
-    }
 
     /**
      * В этот проперти попадают либо промо цены, либо цены категории
@@ -361,7 +332,7 @@ class Lecture extends Model
         );
     }
 
-    protected function lRates(): Attribute
+    protected function aRates(): Attribute
     {
         $rates = [];
 
@@ -399,26 +370,6 @@ class Lecture extends Model
     {
         return new Attribute(
             get: fn() => $this->payment_type_id === LecturePaymentType::FREE,
-        );
-    }
-
-    public function cType(): Attribute
-    {
-        return new Attribute(
-            get: fn() => [
-                'id' => $this?->contentType?->id,
-                'type' => $this?->contentType?->title,
-            ],
-        );
-    }
-
-    public function pType(): Attribute
-    {
-        return new Attribute(
-            get: fn() => [
-                'id' => $this?->paymentType?->id,
-                'type' => $this?->paymentType?->title,
-            ],
         );
     }
 }

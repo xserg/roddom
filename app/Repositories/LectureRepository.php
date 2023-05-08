@@ -67,7 +67,7 @@ class LectureRepository
         return $builder;
     }
 
-    public function getAllPromoQuery($relations = []): Builder
+    public function getAllPromoQueryWith($relations = []): Builder
     {
         $builder = Lecture::query()->promo()->with($relations);
         return $builder;
@@ -140,39 +140,6 @@ class LectureRepository
         return $lectures;
     }
 
-//    private function withCategories($builder, $categoryId)
-//    {
-//        if ($categoryId) {
-//            $category = LectureCategory::query()
-//                ->where('id', '=', $categoryId)
-//                ->first();
-//
-//            if (!$category) {
-//                throw new NotFoundHttpException('Not found any lecture with such category id: ' . $categoryId);
-//            }
-//
-//            $isSub = $this->categoryService->isCategorySub($category);
-//
-//            if ($isSub) {
-//                $builder = $builder
-//                    ->where('category_id', '=', $category->id);
-//            } else {
-//                $categoryIds = LectureCategory::query()
-//                    ->select('id')
-//                    ->where('parent_id', '=', $category->id)
-//                    ->get()
-//                    ->pluck('id')
-//                    ->toArray();
-//
-//                $builder = $builder
-//                    ->whereIn('category_id', $categoryIds);
-//            }
-//
-//        }
-//        return $builder;
-//    }
-
-//    public function setFlagsToLectures(
 
     /**
      * Формирует массив типа
@@ -239,12 +206,14 @@ class LectureRepository
             }
         }
 
+
+        $promoLectures = Lecture::promo()->get();
+
         if ($promoSubscriptions && $promoSubscriptions->isNotEmpty()) {
             foreach ($promoSubscriptions as $promoSubscription) {
                 if ($promoSubscription['end_date'] < now()) continue;
 
 //                $promo = $this->promoRepository->getById($promoSubscription['subscriptionable_id']);
-                $promoLectures = Lecture::promo()->get();
                 foreach ($promoLectures as $lecture) {
                     $lectures[$lecture->id] = [
                         'start_date' => $promoSubscription['start_date'],
@@ -256,62 +225,31 @@ class LectureRepository
 
         return $lectures;
     }
-//        Collection $lectures
-//    ): Collection
-//    {
-//        $watchedLectures = auth()->user()->watchedLectures;
-//        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
-//        $promoLecturesIds = $this->getAllPromoQuery()->get();
-//
-//        $lectures = $lectures->map(function ($lecture) use ($watchedLectures, $purchasedLectures, $promoLecturesIds) {
-//            /**
-//             * @var $lecture Lecture
-//             */
-//            $lecture->setAppends([]);
-//
-//            $isWatched = $watchedLectures->contains($lecture->id);
-//            $isPromo = $promoLecturesIds->contains($lecture->id);
-//            $isPurchased = (int)array_key_exists($lecture->id, $purchasedLectures);
-//
-//            $purchaseInfo = [
-//                'is_purchased' => (int)array_key_exists($lecture->id, $purchasedLectures),
-//                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null
-//            ];
-//
-//            $categoryPrices = $lecture->category->categoryPrices;
-//            $prices = [];
-//
-//            foreach ($categoryPrices as $price) {
-//                $priceForLecture = number_format($price->price_for_one_lecture / 100, 2);
-//                $prices['price_by_category'][] = [
-//                    'title' => $price->period->title,
-//                    'length' => $price->period->length,
-//                    'price_for_lecture' => $priceForLecture
-//                ];
-//            }
-//
-//            $periods = $lecture->pricesPeriodsInPromoPacks;
-//            if ($periods->isNotEmpty()) {
-//                foreach ($periods as $period) {
-//                    $priceForLecture = number_format($period->pivot->price / 100, 2);
-//                    $prices['price_by_promo'][$period->length] = [
-//                        'title' => $period->title,
-//                        'length' => $period->length,
-//                        'price_for_promo_lecture' => $priceForLecture,
-//                    ];
-//                }
-//            }
-//
-//            $lecture->is_watched = (int)$isWatched;
-//            $lecture->is_promo = (int)$isPromo;
-//            $lecture->purchase_info = $purchaseInfo;
-//            $lecture->prices = $prices;
-//
-//            return $lecture;
-//        });
-//
-//        return $lectures;
-//    }
+
+    public function setPurchaseInfoToLectures(
+        Collection $lectures
+    ): Collection
+    {
+        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+
+        $lectures = $lectures->map(function ($lecture) use ($purchasedLectures) {
+            /**
+             * @var $lecture Lecture
+             */
+            $isPurchased = array_key_exists($lecture->id, $purchasedLectures);
+
+            $purchaseInfo = [
+                'is_purchased' => array_key_exists($lecture->id, $purchasedLectures),
+                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null
+            ];
+
+            $lecture->purchase_info = $purchaseInfo;
+
+            return $lecture;
+        });
+
+        return $lectures;
+    }
 
     public function getPurchasedLecturesByUser(Authenticatable|User $user): Collection
     {
@@ -322,19 +260,15 @@ class LectureRepository
     public function getLecturePrice(Lecture $lecture, int $period): int|float
     {
         $prices = $lecture->prices;
-        if ($lecture->is_promo == 1) {
-            $priceArr = Arr::where(
-                $prices['price_by_promo'],
-                fn($value) => $value['length'] == $period
-            );
-            $price = Arr::first($priceArr)['price_for_promo_lecture'];
-        } else {
-            $priceArr = Arr::where(
-                $prices['price_by_category'],
-                fn($value) => $value['length'] == $period
-            );
-            $price = Arr::first($priceArr)['price_for_lecture'];
-        }
+        $priceArr = Arr::where(
+            $prices,
+            fn($value) => $value['length'] == $period
+        );
+        $priceArr = Arr::first($priceArr);
+
+        $price =
+            $priceArr["custom_price_for_one_lecture"] ??
+            $priceArr["common_price_for_one_lecture"];
 
         return $price;
     }

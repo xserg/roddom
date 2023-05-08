@@ -35,7 +35,7 @@ class PromoRepository
                 'title' => $period->title,
                 'length' => $period->length,
                 'price' => $this->getPriceForPackForPeriod(1, $period->id),
-                'price_for_one_lecture' => number_format($period->pivot->price_for_one_lecture / 100, 2, thousands_separator: '')
+                'price_for_one_lecture' => self::coinsToRoubles($period->pivot->price_for_one_lecture)
             ];
         }
 
@@ -61,8 +61,18 @@ class PromoRepository
          * чтобы дергать лекции у конкретного промопака понадоибся еще одна промежуточная
          * таблица: lecture_id promo_id. Пока дергаем абсолютно все промо лекции, т.к. промопак один
          */
+
+        $relations = [
+            'contentType',
+            'paymentType',
+            'pricesPeriodsInPromoPacks',
+            'pricesForLectures',
+            'rates'
+        ];
+
         $promoLectures = Lecture::query()
             ->where('payment_type_id', LecturePaymentType::PROMO)
+            ->with($relations)
             ->get();
 
         if ($promoLectures->isEmpty()) {
