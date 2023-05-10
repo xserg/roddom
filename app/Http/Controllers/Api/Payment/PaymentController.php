@@ -104,7 +104,7 @@ class PaymentController extends Controller
                     }
 
                     Mail
-                        ::to(User::query()->find($order->user_id))
+                        ::to(User::query()->find($order->user_id)->email)
                         ->send(new \App\Mail\PurchaseSuccess(
                             AppInfo::query()->first()->successful_purchase_text,
                             $entityText,
