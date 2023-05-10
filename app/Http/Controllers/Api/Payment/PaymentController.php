@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Models\AppInfo;
+use App\Models\Category;
+use App\Models\Lecture;
 use App\Models\Order;
-use App\Models\Period;
+use App\Models\Promo;
 use App\Models\Subscription;
 use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
@@ -23,11 +26,12 @@ use YooKassa\Common\Exceptions\UnauthorizedException;
 use YooKassa\Model\Notification\NotificationSucceeded;
 use YooKassa\Model\Notification\NotificationWaitingForCapture;
 use YooKassa\Model\NotificationEventType;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentController extends Controller
 {
     public function __construct(
-        private PaymentService $paymentService,
+        private PaymentService   $paymentService,
         private PeriodRepository $periodRepository
     )
     {
@@ -87,6 +91,25 @@ class PaymentController extends Controller
                     if (!$subscription->save()) {
                         Log::warning($subscription);
                     }
+
+                    $entityText = '';
+
+                    if ($order->subscriptionable_type == Lecture::class) {
+                        $entityText .= 'Лекция ' . Lecture::query()->find($order->subscriptionable_id)->title;
+                    } elseif ($order->subscriptionable_type == Category::class) {
+                        $entityText .= 'Категория ' . Category::query()->find($order->subscriptionable_id)->title;
+                    } elseif ($order->subscriptionable_type == Promo::class) {
+                        $entityText .= 'Промопак лекций';
+                    }
+
+                    Mail
+                        ::to(auth()->user()->email)
+                        ->send(new \App\Mail\PurchaseSuccess(
+                            AppInfo::query()->first()->successful_purchase_text,
+                            $entityText,
+                            $attributes['start_date'],
+                            $attributes['end_date']
+                        ));
                 }
             }
         }
