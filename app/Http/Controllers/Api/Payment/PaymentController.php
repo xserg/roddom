@@ -96,9 +96,9 @@ class PaymentController extends Controller
                     $entityText = '';
 
                     if ($order->subscriptionable_type == Lecture::class) {
-                        $entityText .= 'Лекция ' . Lecture::query()->find($order->subscriptionable_id)->title;
+                        $entityText .= 'Лекция: ' . Lecture::query()->find($order->subscriptionable_id)->title;
                     } elseif ($order->subscriptionable_type == Category::class) {
-                        $entityText .= 'Категория ' . Category::query()->find($order->subscriptionable_id)->title;
+                        $entityText .= 'Категория: ' . Category::query()->find($order->subscriptionable_id)->title;
                     } elseif ($order->subscriptionable_type == Promo::class) {
                         $entityText .= 'Промопак лекций';
                     }
