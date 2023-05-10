@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\User\PhotoDeleteController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
+use App\Http\Controllers\Api\User\ResendLoginCodeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -58,6 +59,9 @@ Route::prefix('v1')
             ->name('login');
         Route::post('/user/login/code', LoginCodeController::class)
             ->name('login.code')
+            ->middleware(['throttle:3,1']);
+        Route::post('/user/resend-login-code', ResendLoginCodeController::class)
+            ->name('resend.login.code')
             ->middleware(['throttle:3,1']);
 
         Route::post('password/forgot', ForgotPasswordController::class);
