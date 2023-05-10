@@ -10,6 +10,7 @@ use App\Models\Lecture;
 use App\Models\Order;
 use App\Models\Promo;
 use App\Models\Subscription;
+use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
@@ -103,7 +104,7 @@ class PaymentController extends Controller
                     }
 
                     Mail
-                        ::to(auth()->user()->email)
+                        ::to(User::query()->find($order->user_id))
                         ->send(new \App\Mail\PurchaseSuccess(
                             AppInfo::query()->first()->successful_purchase_text,
                             $entityText,

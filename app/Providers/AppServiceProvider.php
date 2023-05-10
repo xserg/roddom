@@ -25,17 +25,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        DB::listen(function ($query) {
-            $bindings = implode(", ", $query->bindings); // format the bindings as string
-
-            Log::info("
-                   ------------
-                   Sql: $query->sql
-                   Bindings: $bindings
-                   Time: $query->time
-                   ------------
-            ");
-        });
+//        DB::listen(function ($query) {
+//            $bindings = implode(", ", $query->bindings); // format the bindings as string
+//
+//            Log::info("
+//                   ------------
+//                   Sql: $query->sql
+//                   Bindings: $bindings
+//                   Time: $query->time
+//                   ------------
+//            ");
+//        });
 
         /**
          * Paginate a standard Laravel Collection.
