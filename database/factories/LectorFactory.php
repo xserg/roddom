@@ -22,12 +22,13 @@ class LectorFactory extends Factory
             'images/lectors/lector2.jpg',
             'images/lectors/lector3.jpg',
         ];
+
         return [
             'name' => $this->faker->name,
             'position' => $this->faker->jobTitle,
             'description' => $this->faker->text(200),
             'career_start' => Carbon::today()->subYears(rand(2, 25)),
-            'photo' => $this->faker->randomElement($previewPictures)
+            'photo' => $this->faker->randomElement($previewPictures),
         ];
     }
 }

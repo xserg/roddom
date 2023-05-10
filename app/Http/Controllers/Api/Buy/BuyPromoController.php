@@ -15,10 +15,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/promopack/buy/{period}',
-    description: "Покупка промо пака на период 1, 14, 30 дней",
-    summary: "Покупка промо пака",
-    security: [["bearerAuth" => []]],
-    tags: ["promo"])
+    description: 'Покупка промо пака на период 1, 14, 30 дней',
+    summary: 'Покупка промо пака',
+    security: [['bearerAuth' => []]],
+    tags: ['promo'])
 ]
 #[OA\Parameter(
     name: 'period',
@@ -33,31 +33,29 @@ use OpenApi\Attributes as OA;
     description: 'OK',
     content: new OA\JsonContent(
         example: [
-            "link" => "https://yoomoney.ru/checkout/payments/"
+            'link' => 'https://yoomoney.ru/checkout/payments/',
         ]
     )
 )]
 class BuyPromoController extends Controller
 {
     public function __construct(
-        private PromoService     $promoService,
-        private PromoRepository  $promoRepository,
+        private PromoService $promoService,
+        private PromoRepository $promoRepository,
         private PeriodRepository $periodRepository,
-        private PaymentService   $paymentService
-    )
-    {
+        private PaymentService $paymentService
+    ) {
     }
 
     public function __invoke(
         BuyPromoRequest $request,
-        int             $periodLength
-    )
-    {
+        int $periodLength
+    ) {
         $isPurchased = $this->promoService->isPromoPurchased();
 
         if ($isPurchased) {
             return response()->json([
-                'message' => 'Promo pack is already purchased.'
+                'message' => 'Promo pack is already purchased.',
             ], Response::HTTP_FORBIDDEN);
         }
 
@@ -72,7 +70,7 @@ class BuyPromoController extends Controller
             'price' => $price,
             'subscriptionable_type' => Promo::class,
             'subscriptionable_id' => 1,
-            'period' => $periodLength
+            'period' => $periodLength,
         ]);
 
         if ($order) {
@@ -82,7 +80,7 @@ class BuyPromoController extends Controller
             );
 
             return response()->json([
-                'link' => $link
+                'link' => $link,
             ], Response::HTTP_OK);
         }
     }

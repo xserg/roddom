@@ -8,9 +8,9 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/user/logout',
-    description: "Логаут пользователя",
-    summary: "Логаут пользователя",
-    tags: ["user"])
+    description: 'Логаут пользователя',
+    summary: 'Логаут пользователя',
+    tags: ['user'])
 ]
 #[OA\Response(
     response: Response::HTTP_OK,
@@ -40,7 +40,7 @@ class LogoutController
         auth('sanctum')->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Логаут пользователя прошел успешно'
+            'message' => 'Логаут пользователя прошел успешно',
         ], Response::HTTP_OK);
     }
 }

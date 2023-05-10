@@ -12,10 +12,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/lecture/{id}',
-    description: "Получение ресурса лекции",
-    summary: "Получение ресурса лекции",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Получение ресурса лекции',
+    summary: 'Получение ресурса лекции',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -53,8 +53,7 @@ class RetrieveLectureController
 {
     public function __construct(
         private LectureRepository $repository,
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
@@ -65,7 +64,7 @@ class RetrieveLectureController
 
         if (is_null($lecture)) {
             return response()->json([
-                'message' => 'Lecture with id ' . $id . ' was not found'
+                'message' => 'Lecture with id '.$id.' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 

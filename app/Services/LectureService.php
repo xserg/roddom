@@ -9,9 +9,8 @@ class LectureService
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private UserRepository    $userRepository
-    )
-    {
+        private UserRepository $userRepository
+    ) {
     }
 
     public function isLectureStrictPurchased(int $lectureId): bool
@@ -30,7 +29,9 @@ class LectureService
             ->where('subscriptionable_id', $lectureId);
 
         foreach ($lecturesSubscriptions as $subscription) {
-            if ($subscription->isActual()) return true;
+            if ($subscription->isActual()) {
+                return true;
+            }
         }
 
         return false;
@@ -55,7 +56,9 @@ class LectureService
             ->where('subscriptionable_id', $lectureCategoryId);
 
         foreach ($categoriesSubscriptions as $subscription) {
-            if ($subscription->isActual()) return true;
+            if ($subscription->isActual()) {
+                return true;
+            }
         }
 
         return false;
@@ -75,6 +78,7 @@ class LectureService
 
         if ($lecture->is_promo) {
             $stillActual = $promoSubscription->last()->isActual();
+
             return $stillActual;
         }
 

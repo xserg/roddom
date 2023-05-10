@@ -11,10 +11,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[OA\Put(
     path: '/lecture/{id}/list-watch',
-    description: "Добавить лекцию в просмотренные",
-    summary: "Сохранить лекцию в список просмотренных(list watched)",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Добавить лекцию в просмотренные',
+    summary: 'Сохранить лекцию в список просмотренных(list watched)',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -52,8 +52,7 @@ class AddToListWatchedLectureController
 {
     public function __construct(
         private UserService $userService
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, int $lectureId)
@@ -63,17 +62,17 @@ class AddToListWatchedLectureController
         } catch (NotFoundHttpException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_NOT_FOUND);
         } catch (UserCannotSaveLectureException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_FORBIDDEN);
         }
 
         return response()->json([
-            'message' => 'Лекция успешно добавлена в список просмотренных'
+            'message' => 'Лекция успешно добавлена в список просмотренных',
         ], Response::HTTP_OK);
     }
 }

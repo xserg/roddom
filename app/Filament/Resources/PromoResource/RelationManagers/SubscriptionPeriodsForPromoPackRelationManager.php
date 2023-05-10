@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
     protected static ?string $title = 'Общие цены, акционный пак';
+
     protected static string $relationship = 'subscriptionPeriodsForPromoPack';
+
     protected static ?string $recordTitleAttribute = 'period_id';
 
     protected function isTablePaginationEnabled(): bool
@@ -26,8 +28,8 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(fn(?Model $record, string $context) => [
-                self::priceField('price_for_one_lecture')
+            ->schema(fn (?Model $record, string $context) => [
+                self::priceField('price_for_one_lecture'),
             ]);
     }
 
@@ -35,21 +37,20 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
     {
         return $table
             ->columns([
-//                Tables\Columns\TextColumn::make('lecture title')
-//                    ->formatStateUsing(
-//                        function (callable $get) {
-//                            $lecture_id = $get('lecture_id'); // Store the value of the `email` field in the `$email` variable.
-//                            return Lecture::firstWhere('id', $lecture_id)->title;
-//                        }
-//                    )
-//                    ->searchable()
-//                    ->label('id лекции')
-//                    ->searchable(),
-
+                //                Tables\Columns\TextColumn::make('lecture title')
+                //                    ->formatStateUsing(
+                //                        function (callable $get) {
+                //                            $lecture_id = $get('lecture_id'); // Store the value of the `email` field in the `$email` variable.
+                //                            return Lecture::firstWhere('id', $lecture_id)->title;
+                //                        }
+                //                    )
+                //                    ->searchable()
+                //                    ->label('id лекции')
+                //                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn(string $state): string => Period::firstWhere('id', $state)->length
+                        fn (string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней'),
 
@@ -64,7 +65,7 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('price_for_one_lecture')
                     ->formatStateUsing(
-                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                        fn (string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )
                     ->label('Цена за одну промо лекцию, рублей')
                     ->weight('bold')
@@ -89,9 +90,9 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
             ->afterStateHydrated(function (TextInput $component, $state) {
                 $component->state(number_format($state / 100, 2, thousands_separator: ''));
             })
-            ->dehydrateStateUsing(fn($state) => $state * 100)
+            ->dehydrateStateUsing(fn ($state) => $state * 100)
             ->numeric()
-            ->mask(fn(TextInput\Mask $mask) => $mask
+            ->mask(fn (TextInput\Mask $mask) => $mask
                 ->numeric()
                 ->decimalPlaces(2)
                 ->decimalSeparator('.')

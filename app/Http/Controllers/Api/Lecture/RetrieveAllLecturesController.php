@@ -3,20 +3,19 @@
 namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureCollection;
-use App\Models\Lecture;
 use App\Repositories\LectureRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[OA\Get(
     path: '/lectures',
-    description: "Получение ресурсов лекций, с пагинацией",
-    summary: "Получение ресурсов лекций",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Получение ресурсов лекций, с пагинацией',
+    summary: 'Получение ресурсов лекций',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'per_page',
@@ -100,71 +99,71 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),
     ],
         example: [
-            "data" => [
+            'data' => [
                 [
-                    "id" => 100,
-                    "lector_id" => 10,
-                    "category_id" => 28,
-                    "title" => "Dolor alias nam impedit deserunt.",
-                    "description" => "Error sint asperiores eum magni quis. Harum officiis iste impedit debitis facilis.",
-                    "preview_picture" => "https://via.placeholder.com/640x480.png/004477?text=ut",
-                    "lector" => [],
-                    "is_free" => 1,
-                    "is_promo" => 0,
-                    "is_watched" => 1,
-                    "purchase_info" => [
-                        "is_purchased" => 1,
-                        "end_date" => "2023-03-09 22:32:12"
+                    'id' => 100,
+                    'lector_id' => 10,
+                    'category_id' => 28,
+                    'title' => 'Dolor alias nam impedit deserunt.',
+                    'description' => 'Error sint asperiores eum magni quis. Harum officiis iste impedit debitis facilis.',
+                    'preview_picture' => 'https://via.placeholder.com/640x480.png/004477?text=ut',
+                    'lector' => [],
+                    'is_free' => 1,
+                    'is_promo' => 0,
+                    'is_watched' => 1,
+                    'purchase_info' => [
+                        'is_purchased' => 1,
+                        'end_date' => '2023-03-09 22:32:12',
                     ],
-                    "prices" => [
-                        "price_by_category" => [
+                    'prices' => [
+                        'price_by_category' => [
                             [
-                                "title" => "day",
-                                "length" => 1,
-                                "price_for_lecture" => "109.60"
+                                'title' => 'day',
+                                'length' => 1,
+                                'price_for_lecture' => '109.60',
                             ],
                             [
-                                "title" => "week",
-                                "length" => 14,
-                                "price_for_lecture" => "302.48"
+                                'title' => 'week',
+                                'length' => 14,
+                                'price_for_lecture' => '302.48',
                             ],
                             [
-                                "title" => "month",
-                                "length" => 30,
-                                "price_for_lecture" => "519.83"
-                            ]
+                                'title' => 'month',
+                                'length' => 30,
+                                'price_for_lecture' => '519.83',
+                            ],
                         ],
-                        "price_by_promo" => [
+                        'price_by_promo' => [
                             [
-                                "title" => "day",
-                                "length" => 1,
-                                "price_for_promo_lecture" => "106.51"
+                                'title' => 'day',
+                                'length' => 1,
+                                'price_for_promo_lecture' => '106.51',
                             ],
                             [
-                                "title" => "week",
-                                "length" => 14,
-                                "price_for_promo_lecture" => "209.06"
+                                'title' => 'week',
+                                'length' => 14,
+                                'price_for_promo_lecture' => '209.06',
                             ],
                             [
-                                "title" => "month",
-                                "length" => 30,
-                                "price_for_promo_lecture" => "323.79"
-                            ]
-                        ]
-                    ]
+                                'title' => 'month',
+                                'length' => 30,
+                                'price_for_promo_lecture' => '323.79',
+                            ],
+                        ],
+                    ],
                 ],
             ],
-            "meta" => [
-                "current_page" => 3,
-                "from" => 31,
-                "last_page" => 10,
-                "links" => [],
+            'meta' => [
+                'current_page' => 3,
+                'from' => 31,
+                'last_page' => 10,
+                'links' => [],
             ],
-            "links" => [],
-            "path" => "https://url/v1/lectures",
-            "per_page" => 15,
-            "to" => 45,
-            "total" => 150
+            'links' => [],
+            'path' => 'https://url/v1/lectures',
+            'per_page' => 15,
+            'to' => 45,
+            'total' => 150,
         ]
     )
 )]
@@ -175,8 +174,7 @@ class RetrieveAllLecturesController
 {
     public function __construct(
         private LectureRepository $lectureRepository
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request): JsonResponse
@@ -189,7 +187,7 @@ class RetrieveAllLecturesController
                 'paymentType',
                 'pricesPeriodsInPromoPacks',
                 'pricesForLectures',
-                'rates'
+                'rates',
             ];
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);

@@ -26,7 +26,6 @@ class LectureTypeSeeder extends Seeder
             ['title' => 'akcia', 'title_ru' => 'Акционная'],
         ];
 
-
         foreach ($paymentTypes as $type) {
             (new LecturePaymentType($type))->save();
         }

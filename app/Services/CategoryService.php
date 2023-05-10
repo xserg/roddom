@@ -8,8 +8,7 @@ class CategoryService
 {
     public function __construct(
         private UserRepository $userRepository
-    )
-    {
+    ) {
     }
 
     public function isCategoryPurchased(int $categoryId): bool
@@ -28,7 +27,9 @@ class CategoryService
             ->where('subscriptionable_id', $categoryId);
 
         foreach ($categoriesSubscriptions as $subscription) {
-            if ($subscription->isActual()) return true;
+            if ($subscription->isActual()) {
+                return true;
+            }
         }
 
         return false;

@@ -18,7 +18,6 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
-use Filament\Widgets\StatsOverviewWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
@@ -28,19 +27,25 @@ class LectureResource extends Resource
     use MoneyConversion;
 
     protected static ?string $model = Lecture::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
     protected static ?string $navigationLabel = 'Лекции';
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $label = 'Лекции';
+
     protected static ?string $pluralModelLabel = 'Лекции';
+
     protected static ?string $recordTitleAttribute = 'title';
+
     protected static ?string $modelLabel = 'Лекция';
 
     public function __construct(
         private PeriodRepository $periodRepository,
-        private PromoRepository  $promoRepository
-    )
-    {
+        private PromoRepository $promoRepository
+    ) {
 
     }
 
@@ -90,7 +95,7 @@ class LectureResource extends Resource
                             'redo',
                             'strike',
                             'undo',
-                            'preview'
+                            'preview',
                         ])
                         ->maxLength(65535),
                 ]),
@@ -208,10 +213,12 @@ class LectureResource extends Resource
                         ])->columnSpan(1),
                     ])->columns(2),
 
-
                 Forms\Components\Grid::make(3)
                     ->visible(function (string $context) {
-                        if ($context == 'create') return false;
+                        if ($context == 'create') {
+                            return false;
+                        }
+
                         return true;
                     })
                     ->schema([
@@ -219,46 +226,55 @@ class LectureResource extends Resource
                             ->label(function (?Model $record) {
                                 return new HtmlString(
                                     'общая цена лекции, указывается в <a style="color: #0000EE" href="'
-                                    . route('filament.resources.categories.edit', ['record' => $record->category->id])
-                                    . '" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
+                                    .route('filament.resources.categories.edit', ['record' => $record->category->id])
+                                    .'" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
                                 );
                             })
                             ->schema([
                                 TextInput::make('custom_price-1')
                                     ->formatStateUsing(function (?Model $record, string $context) {
-                                        if($context === 'create') return false;
+                                        if ($context === 'create') {
+                                            return false;
+                                        }
                                         $categoryPrices = $record->category->categoryPrices;
+
                                         return self::coinsToRoubles($categoryPrices[0]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[0]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create'),
+                                    ->visible(fn (string $context) => $context != 'create'),
                                 TextInput::make('custom_price-2')
                                     ->formatStateUsing(function (?Model $record, string $context) {
-                                        if($context === 'create') return false;
+                                        if ($context === 'create') {
+                                            return false;
+                                        }
+
                                         return self::coinsToRoubles($record?->category->categoryPrices[1]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[1]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create'),
+                                    ->visible(fn (string $context) => $context != 'create'),
                                 TextInput::make('custom_price-3')
                                     ->formatStateUsing(function (?Model $record, string $context) {
-                                        if($context === 'create') return false;
+                                        if ($context === 'create') {
+                                            return false;
+                                        }
+
                                         return self::coinsToRoubles($record?->category->categoryPrices[2]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[2]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create')
+                                    ->visible(fn (string $context) => $context != 'create'),
 
                             ])
                             ->columnSpan(1),
@@ -266,8 +282,8 @@ class LectureResource extends Resource
                             ->label(function (?Model $record) {
                                 return new HtmlString(
                                     'общие цены одной промо лекции, указывается в <a style="color: #0000EE" href="'
-                                    . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
-                                    . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
+                                    .route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
+                                    .'" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
                                 );
                             })
@@ -280,11 +296,11 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[0]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create'),
+                                    ->visible(fn (string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-2')
                                     ->formatStateUsing(function () {
                                         $price = app(PromoRepository::class)
@@ -293,11 +309,11 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[1]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create'),
+                                    ->visible(fn (string $context) => $context != 'create'),
                                 TextInput::make('custom_promo_price-3')
                                     ->formatStateUsing(function () {
                                         $price = app(PromoRepository::class)
@@ -306,13 +322,13 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return "период, дней: " . $record?->category->categoryPrices[2]->period->length;
+                                        return 'период, дней: '.$record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
-                                    ->visible(fn(string $context) => $context != 'create')
+                                    ->visible(fn (string $context) => $context != 'create'),
                             ])
-                            ->columnSpan(1)
+                            ->columnSpan(1),
                     ]),
             ]);
     }
@@ -325,18 +341,18 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->label('Наименование')
                     ->limit(25)
-                    ->tooltip(fn(Model $record): string => $record->title)
+                    ->tooltip(fn (Model $record): string => $record->title)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('Подкатегория')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => isset($record->category) ? $record->category->title : '')
+                    ->tooltip(fn (Model $record): string => isset($record->category) ? $record->category->title : '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('Лектор')
                     ->limit(15)
-                    ->tooltip(fn(Model $record): string => isset($record->lector) ? $record->lector->name : '')
+                    ->tooltip(fn (Model $record): string => isset($record->lector) ? $record->lector->name : '')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('contentType.title_ru')
                     ->label('Тип')
@@ -356,25 +372,25 @@ class LectureResource extends Resource
             ])
             ->filters([
                 Filter::make('is_free')
-                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::FREE))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::FREE))
                     ->label('бесплатные'),
                 Filter::make('payed')
-                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PAY))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PAY))
                     ->label('платные'),
                 Filter::make('promo')
-                    ->query(fn(Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PROMO))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PROMO))
                     ->label('промо'),
                 Filter::make('is_recommended')
-                    ->query(fn(Builder $query): Builder => $query->where('is_recommended', true))
+                    ->query(fn (Builder $query): Builder => $query->where('is_recommended', true))
                     ->label('рекомендованные'),
                 Filter::make('kinescope')
-                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::KINESCOPE))
+                    ->query(fn (Builder $query): Builder => $query->where('content_type_id', LectureContentType::KINESCOPE))
                     ->label('kinescope'),
                 Filter::make('pdf')
-                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::PDF))
+                    ->query(fn (Builder $query): Builder => $query->where('content_type_id', LectureContentType::PDF))
                     ->label('pdf'),
                 Filter::make('embed')
-                    ->query(fn(Builder $query): Builder => $query->where('content_type_id', LectureContentType::EMBED))
+                    ->query(fn (Builder $query): Builder => $query->where('content_type_id', LectureContentType::EMBED))
                     ->label('youtube/rutube'),
             ])
             ->actions([
@@ -382,7 +398,7 @@ class LectureResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-//                Tables\Actions\DissociateBulkAction::make(),
+                //                Tables\Actions\DissociateBulkAction::make(),
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }

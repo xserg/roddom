@@ -14,10 +14,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/lecture/{id}/buy/{period}',
-    description: "Покупка отдельной лекции на период 1, 14, 30 дней",
-    summary: "Покупка отдельной лекции",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Покупка отдельной лекции на период 1, 14, 30 дней',
+    summary: 'Покупка отдельной лекции',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -40,7 +40,7 @@ use OpenApi\Attributes as OA;
     description: 'OK',
     content: new OA\JsonContent(
         example: [
-            "link" => "https://yoomoney.ru/checkout/payments/"
+            'link' => 'https://yoomoney.ru/checkout/payments/',
         ]
     )
 )]
@@ -48,42 +48,40 @@ class BuyLectureController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private LectureService    $lectureService,
-        private PaymentService    $paymentService
-    )
-    {
+        private LectureService $lectureService,
+        private PaymentService $paymentService
+    ) {
     }
 
     public function __invoke(
         BuyLectureRequest $request,
-        int               $lectureId,
-        int               $period
-    )
-    {
+        int $lectureId,
+        int $period
+    ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
         $price = $this->lectureRepository->getLecturePrice($lecture, $period);
 
         if ($isPurchasedStrict) {
             return response()->json([
-                'message' => 'Lecture with id ' . $request->id . ' is already purchased.'
+                'message' => 'Lecture with id '.$request->id.' is already purchased.',
             ], Response::HTTP_FORBIDDEN);
         }
 
-//        $isFree = $this->lectureService->isFree($lectureId);
+        //        $isFree = $this->lectureService->isFree($lectureId);
 
-//        if ($isFree) {
-//            return response()->json([
-//                'message' => 'You cannot purchase free lecture'
-//            ], Response::HTTP_FORBIDDEN);
-//        }
+        //        if ($isFree) {
+        //            return response()->json([
+        //                'message' => 'You cannot purchase free lecture'
+        //            ], Response::HTTP_FORBIDDEN);
+        //        }
 
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
             'subscriptionable_type' => Lecture::class,
             'subscriptionable_id' => $lectureId,
-            'period' => $period
+            'period' => $period,
         ]);
 
         if ($order) {
@@ -93,7 +91,7 @@ class BuyLectureController extends Controller
             );
 
             return response()->json([
-                'link' => $link
+                'link' => $link,
             ], Response::HTTP_OK);
         }
     }

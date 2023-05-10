@@ -20,8 +20,7 @@ class SubscriptionSeeder extends Seeder
 
         $randomSubcategory = Category::subCategories()->get()->random();
 
-        $randomLectures = Lecture
-            ::where('category_id', '!=', $randomSubcategory->id)
+        $randomLectures = Lecture::where('category_id', '!=', $randomSubcategory->id)
             ->get()
             ->random(10);
 
@@ -33,7 +32,7 @@ class SubscriptionSeeder extends Seeder
                 'subscriptionable_id' => $lecture->id,
                 'period_id' => $randomPeriod->id,
                 'start_date' => now(),
-                'end_date' => now()->addHours($randomPeriod->length)
+                'end_date' => now()->addHours($randomPeriod->length),
             ];
 
             $subscription = new Subscription($attributes);
@@ -46,7 +45,7 @@ class SubscriptionSeeder extends Seeder
             'subscriptionable_id' => $randomSubcategory->id,
             'period_id' => $randomPeriod->id,
             'start_date' => now(),
-            'end_date' => now()->addHours($randomPeriod->length)
+            'end_date' => now()->addHours($randomPeriod->length),
         ];
 
         $subscription = new Subscription($attributes);
@@ -58,7 +57,7 @@ class SubscriptionSeeder extends Seeder
             'subscriptionable_id' => Promo::first()->id,
             'period_id' => $randomPeriod->id,
             'start_date' => now(),
-            'end_date' => now()->addHours($randomPeriod->length)
+            'end_date' => now()->addHours($randomPeriod->length),
         ];
 
         $subscription = new Subscription($attributes);

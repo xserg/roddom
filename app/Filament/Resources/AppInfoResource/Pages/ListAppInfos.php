@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\AppInfoResource\Pages;
 
 use App\Filament\Resources\AppInfoResource;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAppInfos extends ListRecords

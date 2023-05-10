@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/user/photo',
-    description: "Удаление всех фото юзера",
-    summary: "Удалить фото юзера",
-    security: [["bearerAuth" => []]],
-    tags: ["user"])
+    description: 'Удаление всех фото юзера',
+    summary: 'Удалить фото юзера',
+    security: [['bearerAuth' => []]],
+    tags: ['user'])
 ]
 #[OA\Response(
     response: Response::HTTP_OK,
@@ -35,14 +35,12 @@ class PhotoDeleteController
 {
     public function __construct(
         private UserService $service
-    )
-    {
+    ) {
     }
 
     public function __invoke(
-//        ProfilePhotoRequest $request
-    ): JsonResponse
-    {
+        //        ProfilePhotoRequest $request
+    ): JsonResponse {
         $user = auth()->user();
 
         try {
@@ -52,7 +50,7 @@ class PhotoDeleteController
 
             return response()->json([
                 'data' => '',
-                'message' => 'Что-то пошло не так: ' . $exception->getMessage(),
+                'message' => 'Что-то пошло не так: '.$exception->getMessage(),
             ], 500);
         }
 

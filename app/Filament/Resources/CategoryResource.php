@@ -16,12 +16,19 @@ use Illuminate\Support\Str;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
     protected static ?string $recordTitleAttribute = 'title';
+
     protected static ?string $navigationLabel = 'Категории';
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $label = 'Категории';
+
     protected static ?string $pluralModelLabel = 'Категории';
+
     protected static ?string $modelLabel = 'Категория';
 
     public static function form(Form $form): Form
@@ -70,7 +77,7 @@ class CategoryResource extends Resource
                             'redo',
                             'strike',
                             'undo',
-                            'preview'
+                            'preview',
                         ])
                         ->maxLength(65535)
                         ->label('Описание категории'),
@@ -115,7 +122,7 @@ class CategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CategoryPricesRelationManager::class
+            RelationManagers\CategoryPricesRelationManager::class,
         ];
     }
 

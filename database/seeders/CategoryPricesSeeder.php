@@ -18,7 +18,7 @@ class CategoryPricesSeeder extends Seeder
                     'category_id' => $category->id,
                     'price_for_pack' => mt_rand(100000, 120000),
                     'price_for_one_lecture' => mt_rand(10000, 12000),
-                    'period_id' => 1
+                    'period_id' => 1,
                 ]
             );
             $categoryPrices1->save();
@@ -28,7 +28,7 @@ class CategoryPricesSeeder extends Seeder
                     'category_id' => $category->id,
                     'price_for_pack' => mt_rand(300000, 320000),
                     'price_for_one_lecture' => mt_rand(30000, 32000),
-                    'period_id' => 2
+                    'period_id' => 2,
                 ]
             );
             $categoryPrices1->save();
@@ -38,7 +38,7 @@ class CategoryPricesSeeder extends Seeder
                     'category_id' => $category->id,
                     'price_for_pack' => mt_rand(500000, 520000),
                     'price_for_one_lecture' => mt_rand(50000, 52000),
-                    'period_id' => 3
+                    'period_id' => 3,
                 ]
             );
             $categoryPrices1->save();

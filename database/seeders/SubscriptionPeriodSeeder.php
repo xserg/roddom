@@ -12,15 +12,15 @@ class SubscriptionPeriodSeeder extends Seeder
         $subscriptions = [
             [
                 'title' => 'day',
-                'length' => 1
+                'length' => 1,
             ],
             [
                 'title' => 'week',
-                'length' => 14
+                'length' => 14,
             ],
             [
                 'title' => 'month',
-                'length' => 30
+                'length' => 30,
             ],
         ];
 

@@ -13,7 +13,7 @@ class LectorRate extends Model
     protected $fillable = [
         'user_id',
         'lector_id',
-        'rating'
+        'rating',
     ];
 
     public function lector(): BelongsTo

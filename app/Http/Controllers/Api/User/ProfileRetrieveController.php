@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/user/profile',
-    description: "Получение данных профиля залогиненного пользователя",
-    summary: "Получение данных профиля пользователя",
-    security: [["bearerAuth" => []]],
-    tags: ["user"])
+    description: 'Получение данных профиля залогиненного пользователя',
+    summary: 'Получение данных профиля пользователя',
+    security: [['bearerAuth' => []]],
+    tags: ['user'])
 ]
 #[OA\Response(response: Response::HTTP_OK, description: 'OK',
     content: new OA\JsonContent(properties: [
@@ -34,8 +34,7 @@ class ProfileRetrieveController
 {
     public function __construct(
         private UserService $userService,
-    )
-    {
+    ) {
     }
 
     public function __invoke(): JsonResponse

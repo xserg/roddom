@@ -17,6 +17,7 @@ class User extends Authenticatable implements FilamentUser
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $appends = ['purchased_lectures_counter'];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -31,7 +32,7 @@ class User extends Authenticatable implements FilamentUser
         'is_mother',
         'baby_born',
         'photo',
-        'photo_small'
+        'photo_small',
     ];
 
     /**
@@ -121,8 +122,8 @@ class User extends Authenticatable implements FilamentUser
     protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(
-            get: fn($value) => $value,
-            set: fn($value) => $value
+            get: fn ($value) => $value,
+            set: fn ($value) => $value
         );
     }
 
@@ -133,6 +134,6 @@ class User extends Authenticatable implements FilamentUser
 
     public function isAdmin(): bool
     {
-        return (bool)$this->is_admin;
+        return (bool) $this->is_admin;
     }
 }

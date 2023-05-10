@@ -2,8 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\LectureType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
 use App\Models\Diploma;
 use App\Models\Lector;
@@ -13,6 +11,7 @@ use App\Models\Promo;
 use App\Models\Subscription;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -58,7 +57,7 @@ class DatabaseSeeder extends Seeder
         $this->createUsers(5);
         $this->setRecommendedLectures(20);
 
-//        $this->call(SubscriptionSeeder::class);
+        //        $this->call(SubscriptionSeeder::class);
     }
 
     private function createUsers(int $users)
@@ -69,7 +68,6 @@ class DatabaseSeeder extends Seeder
                 /**
                  * @var User $user
                  */
-
                 $this->setDiffLectureTypes($user);
                 $this->createSubscriptionsForUser($user);
             });
@@ -83,8 +81,7 @@ class DatabaseSeeder extends Seeder
 
         $randomSubcategory = Category::subCategories()->get()->random();
 
-        $randomLectures = Lecture
-            ::where('category_id', '!=', $randomSubcategory->id)
+        $randomLectures = Lecture::where('category_id', '!=', $randomSubcategory->id)
             ->get()
             ->random(10);
 
@@ -96,7 +93,7 @@ class DatabaseSeeder extends Seeder
                 'subscriptionable_id' => $lecture->id,
                 'period_id' => $randomPeriod->id,
                 'start_date' => now(),
-                'end_date' => now()->addHours($randomPeriod->length)
+                'end_date' => now()->addHours($randomPeriod->length),
             ];
 
             $subscription = new Subscription($attributes);
@@ -109,7 +106,7 @@ class DatabaseSeeder extends Seeder
             'subscriptionable_id' => $randomSubcategory->id,
             'period_id' => $randomPeriod->id,
             'start_date' => now(),
-            'end_date' => now()->addHours($randomPeriod->length)
+            'end_date' => now()->addHours($randomPeriod->length),
         ];
 
         $subscription = new Subscription($attributes);
@@ -121,7 +118,7 @@ class DatabaseSeeder extends Seeder
             'subscriptionable_id' => Promo::first()->id,
             'period_id' => $randomPeriod->id,
             'start_date' => now(),
-            'end_date' => now()->addHours($randomPeriod->length)
+            'end_date' => now()->addHours($randomPeriod->length),
         ];
 
         $subscription = new Subscription($attributes);
@@ -154,7 +151,7 @@ class DatabaseSeeder extends Seeder
             'expires_at' => null,
         ]);
 
-        $tokenPlain = new NewAccessToken($token, $user->id . '|' . env('TEST_USER1_PLAIN'));
+        $tokenPlain = new NewAccessToken($token, $user->id.'|'.env('TEST_USER1_PLAIN'));
 
         $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
@@ -173,7 +170,7 @@ class DatabaseSeeder extends Seeder
             'phone' => fake()->phoneNumber,
             'is_mother' => rand(0, 1),
             'remember_token' => Str::random(10),
-            'is_admin' => false
+            'is_admin' => false,
         ];
 
         DB::table('users')->insert($user);
@@ -187,7 +184,7 @@ class DatabaseSeeder extends Seeder
             'expires_at' => null,
         ]);
 
-        $tokenPlain = new NewAccessToken($token, $token->getKey() . '|' . env('TEST_USER2_PLAIN'));
+        $tokenPlain = new NewAccessToken($token, $token->getKey().'|'.env('TEST_USER2_PLAIN'));
 
         $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
@@ -200,7 +197,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make(env('ADMIN_USER_PWD')),
             'remember_token' => Str::random(10),
-            'is_admin' => true
+            'is_admin' => true,
         ];
 
         DB::table('users')->insert($user);
@@ -216,8 +213,7 @@ class DatabaseSeeder extends Seeder
 
     private function setDiffLectureTypes($user)
     {
-        $lectures = Lecture
-            ::all()
+        $lectures = Lecture::all()
             ->random(150);
 
         foreach ($lectures as $lecture) {

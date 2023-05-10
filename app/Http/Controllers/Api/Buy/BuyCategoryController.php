@@ -16,10 +16,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/category/{id}/buy/{period}',
-    description: "Покупка подкатегории лекций(входящие все в нее лекции) на период 1, 14, 30 дней",
-    summary: "Покупка подкатегории",
-    security: [["bearerAuth" => []]],
-    tags: ["category"])
+    description: 'Покупка подкатегории лекций(входящие все в нее лекции) на период 1, 14, 30 дней',
+    summary: 'Покупка подкатегории',
+    security: [['bearerAuth' => []]],
+    tags: ['category'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -42,7 +42,7 @@ use OpenApi\Attributes as OA;
     description: 'OK',
     content: new OA\JsonContent(
         example: [
-            "link" => "https://yoomoney.ru/checkout/payments/"
+            'link' => 'https://yoomoney.ru/checkout/payments/',
         ]
     )
 )]
@@ -53,16 +53,14 @@ class BuyCategoryController extends Controller
         private CategoryRepository $categoryRepository,
         private PaymentService $paymentService,
         private PeriodRepository $periodRepository
-    )
-    {
+    ) {
     }
 
     public function __invoke(
         BuyCategoryRequest $request,
-        int               $categoryId,
-        int               $period
-    )
-    {
+        int $categoryId,
+        int $period
+    ) {
         $periodId = $this->periodRepository->getPeriodByLength($period)->id;
 
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
@@ -70,7 +68,7 @@ class BuyCategoryController extends Controller
 
         if ($isPurchased) {
             return response()->json([
-                'message' => 'Category with id ' . $categoryId . ' is already purchased.'
+                'message' => 'Category with id '.$categoryId.' is already purchased.',
             ], Response::HTTP_FORBIDDEN);
         }
 
@@ -79,7 +77,7 @@ class BuyCategoryController extends Controller
             'price' => $price,
             'subscriptionable_type' => Category::class,
             'subscriptionable_id' => $categoryId,
-            'period' => $period
+            'period' => $period,
         ]);
 
         if ($order) {
@@ -89,33 +87,33 @@ class BuyCategoryController extends Controller
             );
 
             return response()->json([
-                'link' => $link
+                'link' => $link,
             ], Response::HTTP_OK);
         }
 
-//        $paymentSuccess = true;
-//
-//        if($paymentSuccess){
-//            $attributes = [
-//                'user_id' => auth()->user()->id,
-//                'subscriptionable_type' => Category::class,
-//                'subscriptionable_id' => $categoryId,
-//                'period_id' => Period::firstWhere('length', '=', $period)->id,
-//                'start_date' => now(),
-//                'end_date' => now()->addDays($period)
-//            ];
-//
-//            $subscription = new Subscription($attributes);
-//            $subscription->save();
-//
-//            return response()->json([
-//                'message' => 'Подписка на категорию успешно оформлена',
-//                'subscription' => new SubscriptionResource($subscription)
-//            ]);
-//        } else {
-//            return response()->json([
-//                'message' => 'Подписка не была оформлена. ',
-//            ]);
-//        }
+        //        $paymentSuccess = true;
+        //
+        //        if($paymentSuccess){
+        //            $attributes = [
+        //                'user_id' => auth()->user()->id,
+        //                'subscriptionable_type' => Category::class,
+        //                'subscriptionable_id' => $categoryId,
+        //                'period_id' => Period::firstWhere('length', '=', $period)->id,
+        //                'start_date' => now(),
+        //                'end_date' => now()->addDays($period)
+        //            ];
+        //
+        //            $subscription = new Subscription($attributes);
+        //            $subscription->save();
+        //
+        //            return response()->json([
+        //                'message' => 'Подписка на категорию успешно оформлена',
+        //                'subscription' => new SubscriptionResource($subscription)
+        //            ]);
+        //        } else {
+        //            return response()->json([
+        //                'message' => 'Подписка не была оформлена. ',
+        //            ]);
+        //        }
     }
 }

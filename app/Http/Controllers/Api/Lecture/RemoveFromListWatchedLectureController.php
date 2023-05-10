@@ -10,10 +10,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/lecture/{id}/list-watch',
-    description: "Удалить лекцию из списка просмотренных",
-    summary: "Удалить лекцию из списка просмотренных",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Удалить лекцию из списка просмотренных',
+    summary: 'Удалить лекцию из списка просмотренных',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -55,8 +55,7 @@ class RemoveFromListWatchedLectureController
 {
     public function __construct(
         private UserService $userService
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, int $lectureId)
@@ -67,12 +66,12 @@ class RemoveFromListWatchedLectureController
         } catch (UserCannotRemoveFromSavedLectureException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_FORBIDDEN);
         }
 
         return response()->json([
-            'message' => 'Лекция успешно удалена из списка просмотренных'
+            'message' => 'Лекция успешно удалена из списка просмотренных',
         ], Response::HTTP_OK);
     }
 }

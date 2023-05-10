@@ -27,6 +27,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
     protected bool $allowsDuplicates = true;
 
     protected static ?string $title = 'Цены в акционном паке лекций';
+
     protected static ?string $label = 'Цена на отдельную лекцию в промо паке';
 
     public static function form(Form $form): Form
@@ -43,7 +44,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                         Period::all()->pluck('length', 'id')
                     ),
 
-                self::priceField('price')
+                self::priceField('price'),
             ]);
     }
 
@@ -53,13 +54,13 @@ class PromoLecturesPricesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn(string $state): string => Period::firstWhere('id', $state)->length
+                        fn (string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней'),
 
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(
-                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                        fn (string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )->label('Цена за одну лекцию этой категории, рублей'),
             ])
             ->filters([
@@ -76,9 +77,10 @@ class PromoLecturesPricesRelationManager extends RelationManager
                         if ($periods->count() == Period::all()->count()) {
                             return true;
                         }
+
                         return false;
                     })
-                    ->form(fn(AttachAction $action): array => [
+                    ->form(fn (AttachAction $action): array => [
                         Forms\Components\Select::make('period_id')
                             ->required()
                             ->options(function (Livewire $livewire) {
@@ -106,12 +108,12 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 Tables\Actions\DetachAction::make(),
             ])
             ->bulkActions([
-//                Tables\Actions\DetachBulkAction::make()
-//                    ->before(function (Tables\Actions\DetachBulkAction $action, $records) {
-//                        if($records->count() > 3){
-//                            $action->cancel();
-//                        }
-//                    }),
+                //                Tables\Actions\DetachBulkAction::make()
+                //                    ->before(function (Tables\Actions\DetachBulkAction $action, $records) {
+                //                        if($records->count() > 3){
+                //                            $action->cancel();
+                //                        }
+                //                    }),
             ]);
     }
 
@@ -122,9 +124,9 @@ class PromoLecturesPricesRelationManager extends RelationManager
             ->afterStateHydrated(function (TextInput $component, $state) {
                 $component->state(number_format($state / 100, 2, thousands_separator: ''));
             })
-            ->dehydrateStateUsing(fn($state) => $state * 100)
+            ->dehydrateStateUsing(fn ($state) => $state * 100)
             ->numeric()
-            ->mask(fn(TextInput\Mask $mask) => $mask
+            ->mask(fn (TextInput\Mask $mask) => $mask
                 ->numeric()
                 ->decimalPlaces(2) // Set the number of digits after the decimal point.
                 ->decimalSeparator('.') // Add a separator for decimal numbers.

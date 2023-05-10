@@ -12,8 +12,7 @@ class LoginCodeService
 {
     public function __construct(
         private LoginCodeRepository $repository
-    )
-    {
+    ) {
     }
 
     public function deleteWhereEmail($email): bool
@@ -31,7 +30,7 @@ class LoginCodeService
         try {
             $loginCode = LoginCode::create([
                 'email' => $email,
-                'code' => $code
+                'code' => $code,
             ]);
         } catch (Exception) {
             throw new FailedCreateLoginCodeException();
@@ -57,6 +56,7 @@ class LoginCodeService
     public function deleteRecordsWithCode(string|int $code): bool
     {
         $loginCode = $this->repository->allWhereCode($code);
+
         return $loginCode->delete();
     }
 

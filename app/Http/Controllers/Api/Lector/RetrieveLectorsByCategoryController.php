@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/lectors/category/{slug}',
-    description: "Получение лекторов конкретной категории товаров",
-    summary: "Получение лекторов конкретной категории товаров",
-    security: [["bearerAuth" => []]],
-    tags: ["lector"])
+    description: 'Получение лекторов конкретной категории товаров',
+    summary: 'Получение лекторов конкретной категории товаров',
+    security: [['bearerAuth' => []]],
+    tags: ['lector'])
 ]
 #[OA\Parameter(
     name: 'slug',
@@ -40,8 +40,7 @@ class RetrieveLectorsByCategoryController extends Controller
 {
     public function __construct(
         private CategoryRepository $categoryRepository
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, string $slug)

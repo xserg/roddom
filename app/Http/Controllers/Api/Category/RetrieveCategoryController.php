@@ -13,12 +13,12 @@ use OpenApi\Attributes as OA;
 #[
     OA\Get(
         path: '/category/{slug}',
-        description: "Получение главной категории,
+        description: 'Получение главной категории,
                       всех подкатегорий этой категории лекций,
-                      всех лекторов этой категории",
-        summary: "Получение подкатегорий",
-        security: [["bearerAuth" => []]],
-        tags: ["category"])
+                      всех лекторов этой категории',
+        summary: 'Получение подкатегорий',
+        security: [['bearerAuth' => []]],
+        tags: ['category'])
 ]
 #[OA\Parameter(
     name: 'slug',
@@ -35,50 +35,50 @@ use OpenApi\Attributes as OA;
         ],
         example: [
             'category' => [
-                "id" => 1,
-                "title" => "Беременность",
-                "parent_id" => 0,
-                "slug" => "beremennost",
-                "description" => "Ad odio eligendi quae facere est. Facilis aut enim vel excepturi rem voluptatem aut voluptatibus. Sapiente eveniet beatae at autem ut rerum.",
-                "info" => "Expedita incidunt eum sit minima doloremque. Eius magnam explicabo incidunt tempore dolorem et. Laboriosam enim quia tempore. Nam inventore illum illo rerum non et sit.",
-                "preview_picture" => "images/categories/category2.jpg",
-                "prices" => []
+                'id' => 1,
+                'title' => 'Беременность',
+                'parent_id' => 0,
+                'slug' => 'beremennost',
+                'description' => 'Ad odio eligendi quae facere est. Facilis aut enim vel excepturi rem voluptatem aut voluptatibus. Sapiente eveniet beatae at autem ut rerum.',
+                'info' => 'Expedita incidunt eum sit minima doloremque. Eius magnam explicabo incidunt tempore dolorem et. Laboriosam enim quia tempore. Nam inventore illum illo rerum non et sit.',
+                'preview_picture' => 'images/categories/category2.jpg',
+                'prices' => [],
             ],
             'data' => [
                 [
-                    "id" => 8,
-                    "title" => "Название подкатегории - 1",
-                    "parent_id" => 5,
-                    "parent_slug" => "ginekologiia",
-                    "slug" => "nazvanie-podkategorii-1",
-                    "description" => "Tenetur et vel quis sit ex illo. Qui omnis minima inventore. Animi iste aut ducimus consequuntur est.",
-                    "info" => "Hic repellendus aut nihil est et. Eum quasi deleniti consequatur et dolorem tempore. Modi aliquid rem consequuntur quibusdam doloremque tempora. Sit id voluptatem commodi et rerum quaerat.",
-                    "preview_picture" => "https://url/storage/images/categories/1.png",
-                    "prices" => [
+                    'id' => 8,
+                    'title' => 'Название подкатегории - 1',
+                    'parent_id' => 5,
+                    'parent_slug' => 'ginekologiia',
+                    'slug' => 'nazvanie-podkategorii-1',
+                    'description' => 'Tenetur et vel quis sit ex illo. Qui omnis minima inventore. Animi iste aut ducimus consequuntur est.',
+                    'info' => 'Hic repellendus aut nihil est et. Eum quasi deleniti consequatur et dolorem tempore. Modi aliquid rem consequuntur quibusdam doloremque tempora. Sit id voluptatem commodi et rerum quaerat.',
+                    'preview_picture' => 'https://url/storage/images/categories/1.png',
+                    'prices' => [
                         [
-                            "title" => "day",
-                            "length" => 1,
-                            "price_for_one_lecture" => 115.44,
-                            "price_for_category" => 215.43
+                            'title' => 'day',
+                            'length' => 1,
+                            'price_for_one_lecture' => 115.44,
+                            'price_for_category' => 215.43,
                         ],
                         [
-                            "title" => "week",
-                            "length" => 14,
-                            "price_for_one_lecture" => 313.52,
-                            "price_for_category" => 413.51
+                            'title' => 'week',
+                            'length' => 14,
+                            'price_for_one_lecture' => 313.52,
+                            'price_for_category' => 413.51,
                         ],
                         [
-                            "title" => "month",
-                            "length" => 30,
-                            "price_for_one_lecture" => 514.72,
-                            "price_for_category" => 614.71
-                        ]
-                    ]
+                            'title' => 'month',
+                            'length' => 30,
+                            'price_for_one_lecture' => 514.72,
+                            'price_for_category' => 614.71,
+                        ],
+                    ],
                 ],
                 [
-                    "id" => 12,
-                    "etc" => "etc"
-                ]
+                    'id' => 12,
+                    'etc' => 'etc',
+                ],
             ],
         ]),
 
@@ -90,8 +90,7 @@ class RetrieveCategoryController
 {
     public function __construct(
         private CategoryRepository $categoryRepository
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, string $slug): JsonResponse
@@ -99,16 +98,14 @@ class RetrieveCategoryController
         /**
          * @var Category $mainCategory
          */
-        $mainCategory = Category
-            ::query()
+        $mainCategory = Category::query()
             ->where('slug', '=', $slug)
             ->firstOrFail();
 
         $prices = $this->categoryRepository->formCategoryPrices($mainCategory);
         $mainCategory->prices = $prices;
 
-        $subCategories = Category
-            ::subCategories()
+        $subCategories = Category::subCategories()
             ->where('parent_id', '=', $mainCategory->id)
             ->with('lectures.lector')
             ->get();

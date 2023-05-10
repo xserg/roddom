@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Delete(
     path: '/user',
-    description: "Может сделать только залогиненный юзер",
-    summary: "Подать заявку на удаление",
-    security: [["bearerAuth" => []]],
-    tags: ["user"]
+    description: 'Может сделать только залогиненный юзер',
+    summary: 'Подать заявку на удаление',
+    security: [['bearerAuth' => []]],
+    tags: ['user']
 )]
 #[OA\Response(
     response: Response::HTTP_OK,
@@ -40,8 +40,7 @@ class DeleteUserController
 {
     public function __construct(
         private readonly UserService $service
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request): JsonResponse
@@ -52,12 +51,12 @@ class DeleteUserController
         } catch (Exception $exception) {
 
             return response()->json([
-                'message' => 'Заявка на удаление аккаунта не зарегистрирована: ' . $exception->getMessage()
+                'message' => 'Заявка на удаление аккаунта не зарегистрирована: '.$exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
-            'message' => 'Заявка на удаление аккаунта успешно зарегистрирована'
+            'message' => 'Заявка на удаление аккаунта успешно зарегистрирована',
         ], Response::HTTP_OK);
     }
 }

@@ -12,10 +12,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/lector/{id}',
-    description: "Получение ресурса лектора",
-    summary: "Получение ресурса лектора",
-    security: [["bearerAuth" => []]],
-    tags: ["lector"])
+    description: 'Получение ресурса лектора',
+    summary: 'Получение ресурса лектора',
+    security: [['bearerAuth' => []]],
+    tags: ['lector'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -46,9 +46,9 @@ class RetrieveLectorController
             ->where(['id' => $id])
             ->first();
 
-        if (!$lector) {
+        if (! $lector) {
             return response()->json([
-                'message' => 'Lector with id ' . $id . ' was not found'
+                'message' => 'Lector with id '.$id.' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 

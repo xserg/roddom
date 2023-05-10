@@ -23,8 +23,8 @@ class LectorResource extends JsonResource
         items: new OA\Items(ref: '#/components/schemas/DiplomaResource'),
     )]
     #[OA\Property(property: 'rates', example: [
-        "rate_user" => 5,
-        "rate_avg" => "3.2525"
+        'rate_user' => 5,
+        'rate_avg' => '3.2525',
     ])]
     public function toArray(Request $request): array
     {
@@ -36,7 +36,7 @@ class LectorResource extends JsonResource
             'career_start' => $this->career_start,
             'photo' => $this->photo,
             'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas')),
-            'rates' => $this->whenNotNull($this->rates)
+            'rates' => $this->whenNotNull($this->rates),
         ];
     }
 }

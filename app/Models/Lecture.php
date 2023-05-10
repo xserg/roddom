@@ -5,13 +5,13 @@ namespace App\Models;
 use App\Models\Scopes\PublishedScope;
 use App\Repositories\LectureRepository;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Lecture extends Model
 {
@@ -26,7 +26,7 @@ class Lecture extends Model
         'prices',
         'list_watched',
         'id_title',
-        'a_rates'
+        'a_rates',
     ];
 
     protected $casts = [
@@ -264,7 +264,7 @@ class Lecture extends Model
     protected function isPromo(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->payment_type_id === LecturePaymentType::PROMO,
+            get: fn () => $this->payment_type_id === LecturePaymentType::PROMO,
         );
     }
 
@@ -276,11 +276,12 @@ class Lecture extends Model
             $watchedLectures = $user->watchedLectures;
 
             return new Attribute(
-                get: fn() => $watchedLectures->contains($this->id),
+                get: fn () => $watchedLectures->contains($this->id),
             );
         }
+
         return new Attribute(
-            get: fn() => false,
+            get: fn () => false,
         );
     }
 
@@ -292,11 +293,12 @@ class Lecture extends Model
             $savedLectures = $user->savedLectures;
 
             return new Attribute(
-                get: fn() => $savedLectures->contains($this->id),
+                get: fn () => $savedLectures->contains($this->id),
             );
         }
+
         return new Attribute(
-            get: fn() => false,
+            get: fn () => false,
         );
     }
 
@@ -304,31 +306,29 @@ class Lecture extends Model
     {
         $user = auth()->user();
 
-        if (!$user) {
+        if (! $user) {
             return new Attribute(
-                get: fn() => false,
+                get: fn () => false,
             );
         }
 
         $listWatchedLectures = $user->listWatchedLectures;
 
         return new Attribute(
-            get: fn() => $listWatchedLectures
+            get: fn () => $listWatchedLectures
                 ->contains($this->id),
         );
     }
 
-
     /**
      * В этот проперти попадают либо промо цены, либо цены категории
-     * @return Attribute
      */
     protected function prices(): Attribute
     {
         $prices = $this->lectureRepository->formPricesForLecture($this);
 
         return new Attribute(
-            get: fn() => $prices,
+            get: fn () => $prices,
         );
     }
 
@@ -350,14 +350,14 @@ class Lecture extends Model
         }
 
         return new Attribute(
-            get: fn() => $rates,
+            get: fn () => $rates,
         );
     }
 
     protected function idTitle(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->id . ' ' . $this->title,
+            get: fn () => $this->id.' '.$this->title,
         );
     }
 
@@ -369,7 +369,7 @@ class Lecture extends Model
     public function isFree(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->payment_type_id === LecturePaymentType::FREE,
+            get: fn () => $this->payment_type_id === LecturePaymentType::FREE,
         );
     }
 }

@@ -17,8 +17,7 @@ class SendLoginCode extends Mailable
      */
     public function __construct(
         public int $code
-    )
-    {
+    ) {
     }
 
     /**

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use App\Traits\MoneyConversion;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
@@ -16,7 +16,7 @@ class Category extends Model
     use HasFactory, MoneyConversion;
 
     protected $appends = [
-        'parent_slug'
+        'parent_slug',
     ];
 
     protected $fillable = [
@@ -25,8 +25,9 @@ class Category extends Model
         'description',
         'info',
         'slug',
-        'preview_picture'
+        'preview_picture',
     ];
+
     protected $table = 'lecture_categories';
 
     protected static function booted(): void
@@ -42,7 +43,7 @@ class Category extends Model
                     'category_id' => $category->id,
                     'price_for_pack' => null,
                     'price_for_one_lecture' => 10000,
-                    'period_id' => 1
+                    'period_id' => 1,
                 ]
             );
             $categoryPricesDay->save();
@@ -52,7 +53,7 @@ class Category extends Model
                     'category_id' => $category->id,
                     'price_for_pack' => null,
                     'price_for_one_lecture' => 20000,
-                    'period_id' => 2
+                    'period_id' => 2,
                 ]
             );
             $categoryPricesWeek->save();
@@ -62,7 +63,7 @@ class Category extends Model
                     'category_id' => $category->id,
                     'price_for_pack' => null,
                     'price_for_one_lecture' => 50000,
-                    'period_id' => 3
+                    'period_id' => 3,
                 ]
             );
             $categoryPricesMonth->save();
@@ -91,8 +92,6 @@ class Category extends Model
 
     /**
      * Только НЕ подкатегории
-     * @param Builder $query
-     * @return void
      */
     public function scopeMainCategories(Builder $query): void
     {
@@ -101,8 +100,6 @@ class Category extends Model
 
     /**
      * Только подкатегории
-     * @param Builder $query
-     * @return void
      */
     public function scopeSubCategories(Builder $query): void
     {
@@ -113,12 +110,12 @@ class Category extends Model
     {
         if ($this->parent_id != 0) {
             return new Attribute(
-                get: fn() => $this->parentCategory->slug,
+                get: fn () => $this->parentCategory->slug,
             );
         }
 
         return new Attribute(
-            get: fn() => null,
+            get: fn () => null,
         );
     }
 

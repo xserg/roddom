@@ -16,6 +16,6 @@ class Order extends Model
         'status',
         'subscriptionable_type',
         'subscriptionable_id',
-        'period'
+        'period',
     ];
 }

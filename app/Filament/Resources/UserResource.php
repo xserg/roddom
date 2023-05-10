@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Notifications\Notification;
@@ -101,8 +100,8 @@ class UserResource extends Resource
                     ->required()
                     ->minLength(8)
                     ->maxLength(255)
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                    ->visible(fn(Component $livewire): bool => $livewire instanceof Pages\CreateUser),
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->visible(fn (Component $livewire): bool => $livewire instanceof Pages\CreateUser),
             ]);
     }
 
@@ -139,7 +138,7 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
                     ->before(function (Tables\Actions\DeleteBulkAction $action, $records) {
-                        foreach ($records as $record){
+                        foreach ($records as $record) {
                             if ($record->isAdmin()) {
                                 Notification::make()
                                     ->warning()
@@ -155,7 +154,7 @@ class UserResource extends Resource
 
             ])
             ->headerActions([
-                FilamentExportHeaderAction::make('Export')
+                FilamentExportHeaderAction::make('Export'),
             ])
             ->actionsPosition();
     }

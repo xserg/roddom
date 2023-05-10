@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\Lector;
 use App\Models\Category;
+use App\Models\Lector;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,6 +25,7 @@ class LectureFactory extends Factory
             'images/lectures/lecture2.jpg',
             'images/lectures/lecture3.jpg',
         ];
+
         return [
             'lector_id' => Lector::all()->random()->id,
             'title' => $this->faker->sentence(5),
@@ -38,7 +39,7 @@ class LectureFactory extends Factory
             'content' => $this->faker->randomNumber(9, true),
             'is_published' => true,
             'payment_type_id' => LecturePaymentType::query()->get('id')->random()->id,
-            'content_type_id' => LectureContentType::query()->get('id')->random()->id
+            'content_type_id' => LectureContentType::query()->get('id')->random()->id,
         ];
     }
 

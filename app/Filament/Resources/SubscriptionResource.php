@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubscriptionResource\Pages;
-use App\Filament\Resources\SubscriptionResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\Order;
@@ -11,11 +10,11 @@ use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
 use Filament\Forms;
+use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Forms\Components\Component;
 use Illuminate\Support\Carbon;
 
 class SubscriptionResource extends Resource
@@ -25,8 +24,11 @@ class SubscriptionResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $label = 'Подписки';
+
     protected static ?string $pluralModelLabel = 'Подписки';
+
     protected static ?string $modelLabel = 'Подписка';
+
     protected static ?string $navigationGroup = 'Пользователи';
 
     public static function form(Form $form): Form
@@ -62,7 +64,7 @@ class SubscriptionResource extends Resource
                         'App\Models\Category' => 'категория',
                         'App\Models\Promo' => 'промо пак',
                     ])
-                    ->afterStateUpdated(fn(\Closure $set) => $set('subscriptionable_id', null))
+                    ->afterStateUpdated(fn (\Closure $set) => $set('subscriptionable_id', null))
                     ->reactive(),
                 Forms\Components\Select::make('subscriptionable_id')
                     ->label('id объекта подписки')
@@ -78,7 +80,7 @@ class SubscriptionResource extends Resource
                                 ->pluck('id');
                         }
                     })
-                    ->disabled(fn(\Closure $get) => is_null($get('subscriptionable_type')))
+                    ->disabled(fn (\Closure $get) => is_null($get('subscriptionable_type')))
                     ->required(),
                 Forms\Components\DateTimePicker::make('start_date')
                     ->afterStateHydrated(function ($state, Component $component) {
@@ -105,7 +107,7 @@ class SubscriptionResource extends Resource
                     ->label('email'),
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn(string $state): string => Period::firstWhere('id', $state)->length
+                        fn (string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней')
                     ->sortable(),
@@ -134,7 +136,6 @@ class SubscriptionResource extends Resource
                                 ->where('user_id', $record->user->id)
                                 ->first();
 
-
                             return $order?->price ?? 'не смогли рассчитать';
                         }
                     )
@@ -146,23 +147,21 @@ class SubscriptionResource extends Resource
                     ->label('начало подписки'),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
-                    ->dateTime(),])
+                    ->dateTime(), ])
             ->filters([//
             ])
-            ->actions([Tables\Actions\EditAction::make(),])
-            ->bulkActions([Tables\Actions\DeleteBulkAction::make(),]);
+            ->actions([Tables\Actions\EditAction::make()])
+            ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 
-    public
-    static function getRelations(): array
+    public static function getRelations(): array
     {
         return [
             //
         ];
     }
 
-    public
-    static function getPages(): array
+    public static function getPages(): array
     {
         return [
             'index' => Pages\ListSubscriptions::route('/'),

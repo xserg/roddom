@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class AppInfo extends Model
 {
     protected $table = 'app_info';
+
     protected $fillable = [
         'agreement_title',
         'agreement_text',
@@ -41,7 +42,7 @@ class AppInfo extends Model
         'message_sent_error',
         'thanks_for_rate',
         'thanks_for_feedback',
-        'successful_purchase_text'
+        'successful_purchase_text',
     ];
 
     public $timestamps = false;

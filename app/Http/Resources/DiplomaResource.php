@@ -14,7 +14,6 @@ class DiplomaResource extends JsonResource
 {
     #[OA\Property(property: 'id', description: 'id диплома', type: 'integer')]
     #[OA\Property(property: 'preview_picture', description: 'ссылка на превью картинку диплома', type: 'string')]
-
     public function toArray(Request $request): array
     {
         return [

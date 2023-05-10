@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeedbackResource\Pages;
-use App\Filament\Resources\FeedbackResource\RelationManagers;
 use App\Models\Feedback;
 use App\Models\Lector;
 use App\Models\Lecture;
@@ -24,6 +23,7 @@ class FeedbackResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $navigationLabel = 'Отзывы';
+
     protected static ?string $label = 'Отзыв';
 
     protected static ?string $pluralModelLabel = 'Отзывы';
@@ -53,6 +53,7 @@ class FeedbackResource extends Resource
                         })
                         ->hint(function (Feedback $record): string {
                             $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
+
                             return $route;
                         })
                         ->label('Пользователь, оставивший отзыв'),
@@ -63,6 +64,7 @@ class FeedbackResource extends Resource
 
                         ->hint(function (Feedback $record): string {
                             $route = route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
+
                             return $route;
                         })
                         ->label('Лекция'),
@@ -72,13 +74,14 @@ class FeedbackResource extends Resource
                         })
                         ->hint(function (Feedback $record): string {
                             $route = route('filament.resources.lectors.edit', ['record' => $record->lector_id]);
+
                             return url($route);
                         })
                         ->label('Лектор'),
-//                    Forms\Components\TextInput::make('lecture_id')
-//                        ->required(),
-//                    Forms\Components\TextInput::make('lector_id')
-//                        ->required(),
+                    //                    Forms\Components\TextInput::make('lecture_id')
+                    //                        ->required(),
+                    //                    Forms\Components\TextInput::make('lector_id')
+                    //                        ->required(),
                 ])->columns(1),
             ]);
     }
@@ -88,12 +91,13 @@ class FeedbackResource extends Resource
         return $table
             ->defaultSort('id', 'desc')
             ->columns([
-//                Tables\Columns\TextColumn::make('id')
-//                    ->label('id отзыва')
-//                    ->sortable(),
+                //                Tables\Columns\TextColumn::make('id')
+                //                    ->label('id отзыва')
+                //                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
+
                         return $route;
                     })
                     ->label('имя пользователя')
@@ -108,6 +112,7 @@ class FeedbackResource extends Resource
                     ->sortable()
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
+
                         return $route;
                     }),
                 Tables\Columns\TextColumn::make('lector.name')
@@ -115,6 +120,7 @@ class FeedbackResource extends Resource
                     ->sortable()
                     ->url(function (Feedback $record): string {
                         $route = route('filament.resources.lectors.edit', ['record' => $record->lector_id]);
+
                         return $route;
                     })
                     ->searchable(),
@@ -131,7 +137,7 @@ class FeedbackResource extends Resource
             ])
             ->actionsPosition(Position::BeforeCells)
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make()
+                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
@@ -156,9 +162,9 @@ class FeedbackResource extends Resource
     {
         return [
             'index' => Pages\ListFeedback::route('/'),
-//            'create' => Pages\CreateFeedback::route('/create'),
+            //            'create' => Pages\CreateFeedback::route('/create'),
             'view' => Pages\ViewFeedback::route('/{record}'),
-//            'edit' => Pages\EditFeedback::route('/{record}/edit'),
+            //            'edit' => Pages\EditFeedback::route('/{record}/edit'),
         ];
     }
 }

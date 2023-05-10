@@ -3,11 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\FailedCreateFeedbackException;
-use App\Exceptions\FailedCreateResetCodeException;
-use App\Exceptions\ResetCodeExpiredException;
 use App\Models\Feedback;
-use App\Models\PasswordReset;
-use App\Repositories\PasswordResetRepository;
 use Exception;
 
 class FeedbackService
@@ -23,9 +19,8 @@ class FeedbackService
         int|string $user_id,
         int|string $lecture_id,
         int|string $lector_id,
-        string     $content,
-    ): Feedback
-    {
+        string $content,
+    ): Feedback {
         try {
             $feedback = Feedback::create([
                 'user_id' => $user_id,

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SubcategoryPrices extends Model
 {
     protected $appends = [
-        'period_length'
+        'period_length',
     ];
 
     protected $table = 'category_prices';
@@ -20,7 +20,7 @@ class SubcategoryPrices extends Model
         'category_id',
         'price_for_pack',
         'price_for_one_lecture',
-        'period_id'
+        'period_id',
     ];
 
     public function category(): BelongsTo
@@ -36,7 +36,7 @@ class SubcategoryPrices extends Model
     protected function periodLength(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->period->length,
+            get: fn () => $this->period->length,
         );
     }
 }

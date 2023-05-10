@@ -46,8 +46,8 @@ class LectureResource extends JsonResource
         format: 'datetime')
     ]
     #[OA\Property(property: 'rates', example: [
-        "rate_user" => 5,
-        "rate_avg" => "3.2525"
+        'rate_user' => 5,
+        'rate_avg' => '3.2525',
     ])]
     public function toArray(Request $request): array
     {

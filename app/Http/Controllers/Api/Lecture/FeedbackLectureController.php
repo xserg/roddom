@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/lecture/{id}/feedback',
-    description: "Оставить отзыв о лекции",
-    summary: "Оставить отзыв о лекции",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Оставить отзыв о лекции',
+    summary: 'Оставить отзыв о лекции',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -23,8 +23,8 @@ use OpenApi\Attributes as OA;
     required: true,
     schema: new OA\Schema(type: 'integer')
 )]
-#[OA\RequestBody (
-    description: "Данные, необходимые для отзыва",
+#[OA\RequestBody(
+    description: 'Данные, необходимые для отзыва',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/FeedbackRequest')),
@@ -56,17 +56,15 @@ use OpenApi\Attributes as OA;
 class FeedbackLectureController
 {
     public function __construct(
-        private FeedbackService   $feedbackService,
+        private FeedbackService $feedbackService,
         private LectureRepository $lectureRepository
-    )
-    {
+    ) {
     }
 
     public function __invoke(
         FeedbackRequest $request,
-        int             $lectureId
-    ): JsonResponse
-    {
+        int $lectureId
+    ): JsonResponse {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
         $feedback = $this->feedbackService->create(
@@ -77,7 +75,7 @@ class FeedbackLectureController
         );
 
         return response()->json([
-            'message' => 'Feedback created'
+            'message' => 'Feedback created',
         ], Response::HTTP_CREATED);
     }
 }

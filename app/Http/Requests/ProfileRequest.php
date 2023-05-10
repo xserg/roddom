@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 use OpenApi\Attributes as OA;
 
@@ -27,7 +26,7 @@ class ProfileRequest extends FormRequest
             'phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|max:20|min:10',
             'is_mother' => 'boolean',
             'pregnancy_weeks' => 'numeric|min:1|max:40',
-            'baby_born' => 'date'
+            'baby_born' => 'date',
         ];
     }
 }

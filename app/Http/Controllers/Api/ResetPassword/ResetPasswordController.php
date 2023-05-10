@@ -12,13 +12,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/password/reset',
-    description: "Восстановление пароля, шаг третий, пользователь вводит пароль, подтверждение,
-    еще нужен код (в скрытом поле)",
+    description: 'Восстановление пароля, шаг третий, пользователь вводит пароль, подтверждение,
+    еще нужен код (в скрытом поле)',
     summary: "Третий шаг функционала 'восстановление пароля' ",
-    tags: ["reset-password"])
+    tags: ['reset-password'])
 ]
-#[OA\RequestBody (
-    description: "код, пароль, подтверждение пароля",
+#[OA\RequestBody(
+    description: 'код, пароль, подтверждение пароля',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/UpdatePasswordRequest')),
@@ -48,14 +48,12 @@ class ResetPasswordController extends Controller
 {
     public function __construct(
         private UserService $userService
-    )
-    {
+    ) {
     }
 
     public function __invoke(
         UpdatePasswordRequest $request
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $code = $request->input('code');
         $password = $request->input('password');
 
@@ -67,12 +65,12 @@ class ResetPasswordController extends Controller
         } catch (Exception $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 422);
         }
 
         return response()->json([
-            'message' => 'Пароль успешно обновлён'
+            'message' => 'Пароль успешно обновлён',
         ], 200);
     }
 }

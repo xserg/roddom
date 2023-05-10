@@ -15,8 +15,7 @@ class PromoRepository
 
     public function __construct(
         private PeriodRepository $periodRepository
-    )
-    {
+    ) {
     }
 
     public function getById(int $id): ?Promo
@@ -35,7 +34,7 @@ class PromoRepository
                 'title' => $period->title,
                 'length' => $period->length,
                 'price' => $this->getPriceForPackForPeriod(1, $period->id),
-                'price_for_one_lecture' => self::coinsToRoubles($period->pivot->price_for_one_lecture)
+                'price_for_one_lecture' => self::coinsToRoubles($period->pivot->price_for_one_lecture),
             ];
         }
 
@@ -67,7 +66,7 @@ class PromoRepository
             'paymentType',
             'pricesPeriodsInPromoPacks',
             'pricesForLectures',
-            'rates'
+            'rates',
         ];
 
         $promoLectures = Lecture::query()
@@ -77,7 +76,7 @@ class PromoRepository
 
         if ($promoLectures->isEmpty()) {
             return $finalPrice;
-        };
+        }
 
         foreach ($promoLectures as $promoLecture) {
             $lecturePrices = $promoLecture->prices;

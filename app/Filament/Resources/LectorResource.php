@@ -15,12 +15,19 @@ use Illuminate\Database\Eloquent\Model;
 class LectorResource extends Resource
 {
     protected static ?string $model = Lector::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
     protected static ?string $navigationLabel = 'Лекторы';
+
     protected static ?int $navigationSort = 2;
+
     protected static ?string $label = 'Лекторы';
+
     protected static ?string $pluralModelLabel = 'Лекторы';
+
     protected static ?string $modelLabel = 'Лектор';
+
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -68,11 +75,11 @@ class LectorResource extends Resource
                             'redo',
                             'strike',
                             'undo',
-                            'preview'
+                            'preview',
                         ])
                         ->required()
                         ->maxLength(65535),
-                ])
+                ]),
             ]);
     }
 
@@ -87,12 +94,12 @@ class LectorResource extends Resource
                 Tables\Columns\TextColumn::make('position')
                     ->label('Должность, позиция')
                     ->limit(35)
-                    ->tooltip(fn(?Model $record): string => $record->position),
+                    ->tooltip(fn (?Model $record): string => $record->position),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
-//                Tables\Columns\TextColumn::make('career_start')
-//                    ->label('Начало карьеры')
-//                    ->sortable(),
+                //                Tables\Columns\TextColumn::make('career_start')
+                //                    ->label('Начало карьеры')
+                //                    ->sortable(),
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lector $record): ?string {
@@ -106,7 +113,7 @@ class LectorResource extends Resource
             ])
             ->headerActions([
                 // ...
-//                Tables\Actions\AssociateAction::make(),
+                //                Tables\Actions\AssociateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -114,14 +121,14 @@ class LectorResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-//                Tables\Actions\DissociateBulkAction::make(),
+                //                Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 
     public static function getRelations(): array
     {
         return [
-            DiplomasRelationManager::class
+            DiplomasRelationManager::class,
         ];
     }
 

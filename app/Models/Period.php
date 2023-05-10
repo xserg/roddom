@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Period extends Model
 {
     const DAY = 'day';
+
     const WEEK = 'week';
+
     const MONTH = 'month';
 
     protected $fillable = [
-        'length'
+        'length',
     ];
 
     protected $table = 'subscription_periods';

@@ -10,8 +10,7 @@ class LectorRepository
     public function getAllWithPaginator(
         ?int $perPage,
         ?int $page
-    ): LengthAwarePaginator
-    {
+    ): LengthAwarePaginator {
         $lectors = Lector::query()
             ->with('diplomas')
             ->paginate(

@@ -13,8 +13,8 @@ class BuyLectureRequest extends FormRequest
         return array_merge(parent::messages(),
             [
                 'id.exists' => 'Не существует лекции с id :input',
-                'period.exists' => 'Можно покупать только на периоды(в днях): ' .
-                    Period::all()->pluck('length')->implode(', ')
+                'period.exists' => 'Можно покупать только на периоды(в днях): '.
+                    Period::all()->pluck('length')->implode(', '),
             ]
         );
     }

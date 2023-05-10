@@ -19,8 +19,7 @@ class WatchLecture extends ShouldQueue
     public function __construct(
         private int $lectureId,
         private User $currentUser
-    )
-    {
+    ) {
         //
     }
 

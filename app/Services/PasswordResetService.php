@@ -12,8 +12,7 @@ class PasswordResetService
 {
     public function __construct(
         private PasswordResetRepository $repository
-    )
-    {
+    ) {
     }
 
     public function deleteWhereEmail($email): bool
@@ -31,7 +30,7 @@ class PasswordResetService
         try {
             $passwordReset = PasswordReset::create([
                 'email' => $email,
-                'code' => $code
+                'code' => $code,
             ]);
         } catch (Exception) {
             throw new FailedCreateResetCodeException();
@@ -57,6 +56,7 @@ class PasswordResetService
     public function deleteCode(string|int $code): bool
     {
         $passwordReset = $this->repository->firstWhereCode($code);
+
         return $passwordReset->delete();
     }
 

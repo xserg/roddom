@@ -13,7 +13,7 @@ class LectureRate extends Model
     protected $fillable = [
         'user_id',
         'lecture_id',
-        'rating'
+        'rating',
     ];
 
     public function lecture(): BelongsTo

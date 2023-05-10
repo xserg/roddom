@@ -38,7 +38,7 @@ class SubscriptionResource extends JsonResource
                 $promoSubscription,
                 'Акционный пакет лекций'
             ),
-            'period' => Period::find($this->period_id)->length . ' day/days',
+            'period' => Period::find($this->period_id)->length.' day/days',
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
         ];

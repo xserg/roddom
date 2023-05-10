@@ -14,12 +14,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[OA\Post(
     path: '/lecture/{id}/watch',
-    description: "Кидаем id лекции, получаем в ответе id видео в kinescope, теперь лекция просмотренная, если ещё не была.
+    description: 'Кидаем id лекции, получаем в ответе id видео в kinescope, теперь лекция просмотренная, если ещё не была.
     Когда юзер может посмотреть лекцию: 1. платная и купленная, 2. бесплатная, уже открытая, срок доступа к ней не вышел,
-    3. бесплатная, сегодня юзер ещё не открывал бесплатную лекцию",
-    summary: "Посмотреть лекцию",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    3. бесплатная, сегодня юзер ещё не открывал бесплатную лекцию',
+    summary: 'Посмотреть лекцию',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -31,7 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[OA\Response(response: 200, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', example: [
-            'kinescope-id' => '837933399'
+            'kinescope-id' => '837933399',
         ]),
     ])
 )]
@@ -54,7 +54,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
                 property: 'cant_watch_for_seconds',
                 type: 'integer',
                 example: '81593'
-            )
+            ),
         ])
 )]
 #[OA\Response(
@@ -77,8 +77,7 @@ class WatchLectureController
 {
     public function __construct(
         private UserService $userService,
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
@@ -88,24 +87,24 @@ class WatchLectureController
         } catch (UserCannotWatchFreeLectureException $exception) {
 
             return response()->json([
-                'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage(),
-                'next_free_lecture_available' => auth()->user()->next_free_lecture_available
+                'message' => 'Пользователь не может смотреть лекцию с id: '.$id.'. '.$exception->getMessage(),
+                'next_free_lecture_available' => auth()->user()->next_free_lecture_available,
             ], Response::HTTP_FORBIDDEN);
 
         } catch (
-        NotFoundHttpException|
-        UserCannotWatchPaidLectureException $exception
+            NotFoundHttpException|
+            UserCannotWatchPaidLectureException $exception
         ) {
             return response()->json([
-                'message' => 'Пользователь не может смотреть лекцию с id: ' . $id . '. ' . $exception->getMessage()
+                'message' => 'Пользователь не может смотреть лекцию с id: '.$id.'. '.$exception->getMessage(),
             ], Response::HTTP_FORBIDDEN);
         }
 
         return response()->json(
             [
                 'data' => [
-                    'content' => $videoId
-                ]
+                    'content' => $videoId,
+                ],
             ],
             Response::HTTP_OK
         );

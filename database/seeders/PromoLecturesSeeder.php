@@ -10,8 +10,7 @@ class PromoLecturesSeeder extends Seeder
 {
     public function run(): void
     {
-        $lectures = Lecture
-            ::payed()
+        $lectures = Lecture::payed()
             ->get()
             ->random(20);
         $promo = Promo::first();

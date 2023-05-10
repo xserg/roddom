@@ -26,12 +26,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class UserService
 {
     public function __construct(
-        private PasswordResetService    $passwordResetService,
+        private PasswordResetService $passwordResetService,
         private PasswordResetRepository $passwordResetRepository,
-        private LectureService          $lectureService,
-        private LectureRepository       $lectureRepository
-    )
-    {
+        private LectureService $lectureService,
+        private LectureRepository $lectureRepository
+    ) {
     }
 
     public function getUserByEmail($email): User
@@ -71,8 +70,7 @@ class UserService
     public function updateUsersPassword(
         string $code,
         string $password
-    ): User
-    {
+    ): User {
         $passwordReset = $this
             ->passwordResetRepository
             ->firstWhereCode($code);
@@ -100,11 +98,10 @@ class UserService
     }
 
     public function addLectureToWatched(
-        int  $lectureId,
+        int $lectureId,
         User $user,
         bool $setAvailableUntil = false
-    ): void
-    {
+    ): void {
         if ($setAvailableUntil) {
             $hoursAvailableToWatch = AppInfo::query()->first()?->free_lecture_hours ?? 24;
 
@@ -123,14 +120,13 @@ class UserService
      * @throws UserCannotWatchPaidLectureException
      */
     public function watchLecture(
-        int                  $lectureId,
+        int $lectureId,
         Authenticatable|User $user
-    ): string
-    {
+    ): string {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
-        if (!$lecture) {
-            throw new NotFoundHttpException('Лекция с id ' . $lectureId . ' не найдена');
+        if (! $lecture) {
+            throw new NotFoundHttpException('Лекция с id '.$lectureId.' не найдена');
         }
 
         if ($this->lectureService->isFree($lectureId)) {
@@ -144,6 +140,7 @@ class UserService
 
                 $user = $this->setFreeLectureWatchedNow($user);
                 $this->saveUserGuard($user);
+
                 return $lecture->content;
             }
 
@@ -154,6 +151,7 @@ class UserService
             if ($this->isLecturePurchased($lectureId, $user)) {
                 $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user);
+
                 return $lecture->content;
             }
 
@@ -166,7 +164,7 @@ class UserService
      */
     public function saveUsersPhoto(
         Authenticatable|User $user,
-        UploadedFile         $file): array
+        UploadedFile $file): array
     {
         $manager = new ImageManager(['driver' => 'imagick']);
         $image = $manager->make($file)->fit(300, 300);
@@ -174,21 +172,21 @@ class UserService
 
         $dirCreated = Storage::makeDirectory('images/users/');
 
-        if (!$dirCreated) {
+        if (! $dirCreated) {
             throw new Exception('Directory could not be created');
         }
 
         if (
-            !$image->save(storage_path('app/public/images/users/' . $user->id . '.jpg'))
-            || !$imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'))
+            ! $image->save(storage_path('app/public/images/users/'.$user->id.'.jpg'))
+            || ! $imageSmall->save(storage_path('app/public/images/users/'.$user->id.'-small'.'.jpg'))
         ) {
             throw new Exception('Could not upload image');
         }
 
-        $user->photo = 'images/users/' . $user->id . '.jpg';
-        $user->photo_small = 'images/users/' . $user->id . '-small' . '.jpg';
+        $user->photo = 'images/users/'.$user->id.'.jpg';
+        $user->photo_small = 'images/users/'.$user->id.'-small'.'.jpg';
 
-        if (!$user->save()) {
+        if (! $user->save()) {
             throw new Exception('Could not save user in database');
         }
 
@@ -202,8 +200,8 @@ class UserService
     public function deletePhoto(Authenticatable|User $user): void
     {
         if (isset($user->id)) {
-            Storage::delete('images/users/' . $user->id . '.jpg');
-            Storage::delete('images/users/' . $user->id . '-small' . '.jpg');
+            Storage::delete('images/users/'.$user->id.'.jpg');
+            Storage::delete('images/users/'.$user->id.'-small'.'.jpg');
 
             $user->photo = null;
             $user->photo_small = null;
@@ -232,7 +230,6 @@ class UserService
 
         return $user;
     }
-
 
     public function userCanWatchNewFreeLecture(User|Authenticatable $user): bool
     {
@@ -263,15 +260,14 @@ class UserService
      * @throws NotFoundHttpException
      */
     public function addLectureToSaved(
-        int                  $lectureId,
+        int $lectureId,
         User|Authenticatable $user
-    ): void
-    {
+    ): void {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $alreadySaved = $user->savedLectures->contains($lectureId);
 
         if ($alreadySaved) {
-            throw new UserCannotSaveLectureException('Лекция c id ' . $lectureId . ' уже в сохраненных');
+            throw new UserCannotSaveLectureException('Лекция c id '.$lectureId.' уже в сохраненных');
         }
 
         $user->savedLectures()->attach($lectureId);
@@ -282,12 +278,11 @@ class UserService
      * @throws NotFoundHttpException
      */
     public function removeLectureFromSaved(
-        int                       $lectureId,
+        int $lectureId,
         User|Authenticatable|null $user
-    ): void
-    {
+    ): void {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $alreadyRemoved = !$user->savedLectures->contains($lectureId);
+        $alreadyRemoved = ! $user->savedLectures->contains($lectureId);
 
         if ($alreadyRemoved) {
             throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в сохраненных');
@@ -301,15 +296,14 @@ class UserService
      * @throws NotFoundHttpException
      */
     public function addLectureToListWatched(
-        int                  $lectureId,
+        int $lectureId,
         User|Authenticatable $user
-    ): void
-    {
+    ): void {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $alreadySaved = $user->listWatchedLectures->contains($lectureId);
 
         if ($alreadySaved) {
-            throw new UserCannotSaveLectureException('Лекция c id ' . $lectureId . ' уже в списке просмотренных');
+            throw new UserCannotSaveLectureException('Лекция c id '.$lectureId.' уже в списке просмотренных');
         }
 
         $user->listWatchedLectures()->attach($lectureId);
@@ -320,12 +314,11 @@ class UserService
      * @throws NotFoundHttpException
      */
     public function removeLectureFromListWatched(
-        int                       $lectureId,
+        int $lectureId,
         User|Authenticatable|null $user
-    ): void
-    {
+    ): void {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $alreadyRemoved = !$user->listWatchedLectures->contains($lectureId);
+        $alreadyRemoved = ! $user->listWatchedLectures->contains($lectureId);
 
         if ($alreadyRemoved) {
             throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в списке просмотренных');
@@ -366,7 +359,7 @@ class UserService
             ->watchedLectures
             ->firstWhere('id', $lectureId);
 
-        if (!$lecture) {
+        if (! $lecture) {
             return false;
         }
 
@@ -382,7 +375,7 @@ class UserService
      */
     private function saveUserGuard(User $user): void
     {
-        if (!$user->save()) {
+        if (! $user->save()) {
             throw new FailedSaveUserException();
         }
     }

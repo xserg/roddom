@@ -15,11 +15,11 @@ use OpenApi\Attributes as OA;
 #[OA\Post(
     path: '/password/forgot',
     description: "Первый шаг функционала 'восстановление пароля'. Пользователь вводит свой email, на него отправляется шестизначный код",
-    summary: "Восстановление пароля, шаг первый, пользователь вводит свой email",
-    tags: ["reset-password"])
+    summary: 'Восстановление пароля, шаг первый, пользователь вводит свой email',
+    tags: ['reset-password'])
 ]
-#[OA\RequestBody (
-    description: "Forgot password, user email required",
+#[OA\RequestBody(
+    description: 'Forgot password, user email required',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ForgotPasswordRequest')),
@@ -49,14 +49,12 @@ class ForgotPasswordController extends Controller
 {
     public function __construct(
         private PasswordResetService $passwordResetService
-    )
-    {
+    ) {
     }
 
     public function __invoke(
         ForgotPasswordRequest $request
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $email = $request->input('email');
         $this->passwordResetService->deleteWhereEmail($email);
 
@@ -67,7 +65,7 @@ class ForgotPasswordController extends Controller
         } catch (FailedCreateResetCodeException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 500);
         }
 
@@ -76,18 +74,17 @@ class ForgotPasswordController extends Controller
 //            $passwordReset->code
 //        );
 
-        $sent = Mail
-            ::to($email)
+        $sent = Mail::to($email)
             ->send(new SendCodeResetPassword($passwordReset->code));
 
-        if (!$sent) {
+        if (! $sent) {
             return response()->json([
-                'message' => 'Невозможно отослать код на email'
+                'message' => 'Невозможно отослать код на email',
             ], 422);
         }
 
         return response()->json([
-            'message' => 'Код отослан на ваш email'
+            'message' => 'Код отослан на ваш email',
         ], 200);
     }
 }

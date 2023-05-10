@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Period;
 use App\Models\Promo;
 use Illuminate\Database\Seeder;
 

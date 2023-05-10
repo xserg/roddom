@@ -14,7 +14,7 @@ class Feedback extends Model
         'user_id',
         'lecture_id',
         'lector_id',
-        'content'
+        'content',
     ];
 
     public function user(): HasOne

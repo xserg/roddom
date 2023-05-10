@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Api\Diploma;
 
 use App\Http\Resources\DiplomaCollection;
-use App\Http\Resources\DiplomaResource;
 use App\Models\Diploma;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 

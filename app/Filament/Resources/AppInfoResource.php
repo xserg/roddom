@@ -3,28 +3,30 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AppInfoResource\Pages;
-use App\Filament\Resources\AppInfoResource\RelationManagers;
 use App\Models\AppInfo;
-use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Livewire\TemporaryUploadedFile;
 
 class AppInfoResource extends Resource
 {
     protected static ?string $model = AppInfo::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+
     protected static ?string $recordTitleAttribute = 'id';
+
     protected static ?string $navigationLabel = 'Динамические заголовки';
+
     protected static ?int $navigationSort = 5;
+
     protected static ?string $navigationGroup = 'Приложение';
+
     protected static ?string $label = 'Динамические заголовки';
+
     protected static ?string $pluralLabel = 'Динамические заголовки';
 
     public static function form(Form $form): Form
@@ -70,7 +72,7 @@ class AppInfoResource extends Resource
                                 'redo',
                                 'strike',
                                 'undo',
-                                'preview'
+                                'preview',
                             ])
                             ->maxLength(65535)
                             ->label('текст соглашения'),
@@ -166,7 +168,7 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Спасибо за обратную связь! Ваше сообщение успено отправлено.'),
-                            ])->columns(2)
+                            ])->columns(2),
                     ])
                     ->collapsible()
                     ->collapsed(),
@@ -182,7 +184,7 @@ class AppInfoResource extends Resource
                                 'redo',
                                 'strike',
                                 'undo',
-                                'preview'
+                                'preview',
                             ])
                             ->maxLength(65535)
                             ->columnSpan(2)
@@ -215,10 +217,10 @@ class AppInfoResource extends Resource
                                 function (): string {
                                     return 'qr.jpeg';
                                 })
-                            ->label('qr код линка приложения')
+                            ->label('qr код линка приложения'),
                     ])
                     ->collapsible()
-                    ->collapsed()
+                    ->collapsed(),
             ]);
     }
 

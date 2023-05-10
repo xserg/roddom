@@ -14,11 +14,11 @@ use OpenApi\Attributes as OA;
     path: '/password/check',
     description: "Второй шаг функционала 'восстановление пароля', пользователь вводит шестизначный код, который ему
     прислали в email, для того чтобы перейти к следующему шагу - задать новый пароль на свой аккаунт",
-    summary: "Восстановление пароля, шаг второй, пользователь вводит шестизначный код",
-    tags: ["reset-password"])
+    summary: 'Восстановление пароля, шаг второй, пользователь вводит шестизначный код',
+    tags: ['reset-password'])
 ]
-#[OA\RequestBody (
-    description: "Code",
+#[OA\RequestBody(
+    description: 'Code',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/CodeRequest')),
@@ -51,8 +51,7 @@ class CodeCheckController extends Controller
 {
     public function __construct(
         private PasswordResetService $passwordResetService
-    )
-    {
+    ) {
     }
 
     public function __invoke(CodeRequest $request)
@@ -69,19 +68,19 @@ class CodeCheckController extends Controller
             $this->passwordResetService->deleteCode($requestCode);
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 422);
 
         } catch (Exception $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 422);
         }
 
         return response([
             'code' => $code,
-            'message' => 'Код валидный'
+            'message' => 'Код валидный',
         ], 200);
     }
 }

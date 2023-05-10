@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Mail;
 class ResendLoginCodeController extends Controller
 {
     public function __construct(
-        private LoginCodeService    $loginCodeService,
-    )
-    {
+        private LoginCodeService $loginCodeService,
+    ) {
     }
 
     public function __invoke(EmailResendLoginCodeRequest $request)
@@ -31,16 +30,16 @@ class ResendLoginCodeController extends Controller
         } catch (FailedCreateLoginCodeException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $sent = Mail::to($email)
             ->send(new SendLoginCode($code));
 
-        if (!$sent) {
+        if (! $sent) {
             return response()->json([
-                'message' => 'Невозможно послать email с кодом логина'
+                'message' => 'Невозможно послать email с кодом логина',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

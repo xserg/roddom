@@ -25,7 +25,7 @@ class ValidationErrors
         property: 'message',
         description: 'summary всех ошибок',
         type: 'string',
-        example: "The email has already been taken. (and 1 more error)"
+        example: 'The email has already been taken. (and 1 more error)'
     )]
     public string $message;
 

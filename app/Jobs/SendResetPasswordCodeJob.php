@@ -14,10 +14,9 @@ class SendResetPasswordCodeJob extends ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        private string     $email,
+        private string $email,
         private string|int $code
-    )
-    {
+    ) {
     }
 
     public function handle(): void

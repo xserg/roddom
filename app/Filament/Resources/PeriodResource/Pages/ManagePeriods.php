@@ -13,9 +13,10 @@ class ManagePeriods extends ManageRecords
     protected function getActions(): array
     {
         return [
-//            Actions\CreateAction::make(),
+            //            Actions\CreateAction::make(),
         ];
     }
+
     protected function isTablePaginationEnabled(): bool
     {
         return false;

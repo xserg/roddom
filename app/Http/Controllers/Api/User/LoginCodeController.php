@@ -16,12 +16,12 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/user/login/code',
-    description: "Логин юзера с помощью почты и пароля",
-    summary: "Логин юзера",
-    tags: ["user"])
+    description: 'Логин юзера с помощью почты и пароля',
+    summary: 'Логин юзера',
+    tags: ['user'])
 ]
-#[OA\RequestBody (
-    description: "Code",
+#[OA\RequestBody(
+    description: 'Code',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/LoginCodeRequest')),
@@ -40,11 +40,10 @@ class LoginCodeController extends Controller
 {
     public function __construct(
         private LoginCodeRepository $loginCodeRepository,
-        private LoginCodeService    $loginCodeService,
-        private UserRepository      $userRepository,
-        private UserService         $userService
-    )
-    {
+        private LoginCodeService $loginCodeService,
+        private UserRepository $userRepository,
+        private UserService $userService
+    ) {
     }
 
     public function __invoke(LoginCodeRequest $request)
@@ -61,13 +60,13 @@ class LoginCodeController extends Controller
             $this->loginCodeService->deleteRecordsWithCode($code);
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 422);
 
         } catch (Exception $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], 422);
         }
 
@@ -93,7 +92,7 @@ class LoginCodeController extends Controller
         return response()->json([
             'user' => new UserResource($user),
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
         ]);
     }
 }

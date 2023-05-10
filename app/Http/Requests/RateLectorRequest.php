@@ -16,7 +16,7 @@ class RateLectorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rate' => 'required|integer|min:1|max:10'
+            'rate' => 'required|integer|min:1|max:10',
         ];
     }
 }

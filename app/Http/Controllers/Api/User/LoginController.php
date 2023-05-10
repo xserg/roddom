@@ -14,12 +14,12 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/user/login',
-    description: "Логин юзера с помощью почты и пароля",
-    summary: "Логин юзера",
-    tags: ["user"])
+    description: 'Логин юзера с помощью почты и пароля',
+    summary: 'Логин юзера',
+    tags: ['user'])
 ]
-#[OA\RequestBody (
-    description: "Login credentials",
+#[OA\RequestBody(
+    description: 'Login credentials',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/LoginRequest')),
@@ -40,8 +40,7 @@ class LoginController
 {
     public function __construct(
         private LoginCodeService $loginCodeService
-    )
-    {
+    ) {
     }
 
     public function __invoke(LoginRequest $request): JsonResponse
@@ -50,13 +49,13 @@ class LoginController
             $request->only(['email', 'password'])
         );
 
-        if (!$authenticated) {
+        if (! $authenticated) {
             $errors = [
                 'message' => 'Email or password is invalid',
                 'errors' => [
                     'email' => ['Email or password is invalid'],
-                    'password' => ['Email or password is invalid']
-                ]
+                    'password' => ['Email or password is invalid'],
+                ],
             ];
 
             return response()->json(
@@ -75,16 +74,16 @@ class LoginController
         } catch (FailedCreateLoginCodeException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         $sent = Mail::to($email)
             ->send(new SendLoginCode($code));
 
-        if (!$sent) {
+        if (! $sent) {
             return response()->json([
-                'message' => 'Невозможно послать email с кодом логина'
+                'message' => 'Невозможно послать email с кодом логина',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

@@ -11,10 +11,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 #[OA\Put(
     path: '/lecture/{id}/save',
-    description: "Добавить лекцию в сохраненные",
-    summary: "Сохранить лекцию",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Добавить лекцию в сохраненные',
+    summary: 'Сохранить лекцию',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -52,8 +52,7 @@ class SaveLectureController
 {
     public function __construct(
         private UserService $userService
-    )
-    {
+    ) {
     }
 
     public function __invoke(Request $request, int $lectureId)
@@ -63,17 +62,17 @@ class SaveLectureController
         } catch (NotFoundHttpException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_NOT_FOUND);
         } catch (UserCannotSaveLectureException $exception) {
 
             return response()->json([
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ], Response::HTTP_FORBIDDEN);
         }
 
         return response()->json([
-            'message' => 'Лекция успешно добавлена в сохраненные'
+            'message' => 'Лекция успешно добавлена в сохраненные',
         ], Response::HTTP_OK);
     }
 }

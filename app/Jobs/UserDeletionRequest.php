@@ -17,8 +17,7 @@ class UserDeletionRequest extends ShouldQueue
      */
     public function __construct(
         private User $user
-    )
-    {
+    ) {
         //
     }
 

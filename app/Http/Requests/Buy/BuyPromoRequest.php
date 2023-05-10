@@ -12,8 +12,8 @@ class BuyPromoRequest extends FormRequest
     {
         return array_merge(parent::messages(),
             [
-                'period.exists' => 'Можно покупать только на периоды(в днях): ' .
-                    Period::all()->pluck('length')->implode(', ')
+                'period.exists' => 'Можно покупать только на периоды(в днях): '.
+                    Period::all()->pluck('length')->implode(', '),
             ]
         );
     }

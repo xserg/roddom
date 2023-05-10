@@ -15,10 +15,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 #[
     OA\Get(
         path: '/promopack',
-        description: "Получение всех акционных лекций, с пагинацией",
-        summary: "Получение всех акционных лекций",
-        security: [["bearerAuth" => []]],
-        tags: ["promo"])
+        description: 'Получение всех акционных лекций, с пагинацией',
+        summary: 'Получение всех акционных лекций',
+        security: [['bearerAuth' => []]],
+        tags: ['promo'])
 ]
 #[OA\Parameter(
     name: 'per_page',
@@ -91,29 +91,29 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
         new OA\Property(property: 'data', ref: '#/components/schemas/LectureResource'),
     ],
         example: [
-            "prices" => [
+            'prices' => [
                 [
-                    "title" => "day",
-                    "length" => 1,
-                    "price" => "1,037.73"
+                    'title' => 'day',
+                    'length' => 1,
+                    'price' => '1,037.73',
                 ],
                 [
-                    "title" => "week",
-                    "length" => 14,
-                    "price" => "2,058.62"
+                    'title' => 'week',
+                    'length' => 14,
+                    'price' => '2,058.62',
                 ],
                 [
-                    "title" => "month",
-                    "length" => 30,
-                    "price" => "3,131.13"
-                ]
+                    'title' => 'month',
+                    'length' => 30,
+                    'price' => '3,131.13',
+                ],
             ],
-            "data" => [
+            'data' => [
                 [
-                    "id" => 5,
-                    "lector_id" => 16,
-                ]
-            ]
+                    'id' => 5,
+                    'lector_id' => 16,
+                ],
+            ],
         ]
     )
 )]
@@ -124,14 +124,13 @@ class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private PromoRepository   $promoRepository
-    )
-    {
+        private PromoRepository $promoRepository
+    ) {
     }
 
     public function __invoke(Request $request)
     {
-//        try {
+        //        try {
         $relations = [
             'category.parentCategory',
             'category.categoryPrices',
@@ -139,7 +138,7 @@ class RetrieveAllPromoLecturesController extends Controller
             'paymentType',
             'pricesPeriodsInPromoPacks',
             'pricesForLectures',
-            'rates'
+            'rates',
         ];
         $builder = $this->lectureRepository->getAllPromoQueryWith($relations);
         $builder = $this->lectureRepository->addFiltersToQuery($builder);
@@ -159,19 +158,19 @@ class RetrieveAllPromoLecturesController extends Controller
         $promo = Promo::query()->with(['subscriptionPeriodsForPromoPack'])->first();
         $prices = $this->promoRepository->getPrices($promo);
 
-//        } catch (NotFoundHttpException $exception) {
-//
-//            return response()->json(
-//                ['message' => $exception->getMessage()],
-//                Response::HTTP_NOT_FOUND
-//            );
-//        }
+        //        } catch (NotFoundHttpException $exception) {
+        //
+        //            return response()->json(
+        //                ['message' => $exception->getMessage()],
+        //                Response::HTTP_NOT_FOUND
+        //            );
+        //        }
         return response()->json(
             [
                 'prices' => $prices,
                 ...(new LectureCollection($lectures))
                     ->response()
-                    ->getData(true)
+                    ->getData(true),
             ]
         );
     }

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class SubCategorySeeder extends Seeder
@@ -24,8 +23,8 @@ class SubCategorySeeder extends Seeder
             $category = [
                 'parent_id' => $parentCategory->id,
                 'preview_picture' => fake()->randomElement($previewPictures),
-                'title' => 'Название подкатегории - ' . $i,
-                'slug' => Str::slug('Название подкатегории - ' . $i),
+                'title' => 'Название подкатегории - '.$i,
+                'slug' => Str::slug('Название подкатегории - '.$i),
                 'description' => fake()->text(150),
                 'info' => fake()->text(),
             ];

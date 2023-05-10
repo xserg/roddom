@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PromoLecturePrices extends Model
 {
     protected $appends = ['period_length'];
+
     protected $table = 'promo_lectures_prices';
 
     public $timestamps = false;
@@ -17,13 +18,13 @@ class PromoLecturePrices extends Model
         'lecture_id',
         'price',
         'period_id',
-        'promo_id'
+        'promo_id',
     ];
 
     protected function periodLength(): Attribute
     {
         return new Attribute(
-            get: fn() => 'цену за ' . $this->period->length . ' дня/дней',
+            get: fn () => 'цену за '.$this->period->length.' дня/дней',
         );
     }
 

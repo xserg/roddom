@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
+
     protected static ?string $navigationLabel = 'Пользователи';
 
     protected function getActions(): array

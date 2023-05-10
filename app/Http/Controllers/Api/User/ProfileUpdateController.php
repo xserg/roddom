@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Repositories\LectureRepository;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,13 +13,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/user/profile',
-    description: "Обновление профиля пользователя",
-    summary: "Обновление профиля пользователя",
-    security: [["bearerAuth" => []]],
-    tags: ["user"])
+    description: 'Обновление профиля пользователя',
+    summary: 'Обновление профиля пользователя',
+    security: [['bearerAuth' => []]],
+    tags: ['user'])
 ]
-#[OA\RequestBody (
-    description: "Данные профиля",
+#[OA\RequestBody(
+    description: 'Данные профиля',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/ProfileRequest')),
@@ -50,8 +49,7 @@ class ProfileUpdateController
 {
     public function __construct(
         private UserService $userService,
-    )
-    {
+    ) {
     }
 
     /**
@@ -59,8 +57,7 @@ class ProfileUpdateController
      */
     public function __invoke(
         ProfileRequest $request
-    ): JsonResponse
-    {
+    ): JsonResponse {
         /**
          * @var $user User
          */
@@ -73,7 +70,7 @@ class ProfileUpdateController
         } catch (Exception $exception) {
             return response()->json([
                 'data' => [],
-                'message' => $exception->getMessage()
+                'message' => $exception->getMessage(),
             ]);
         }
 

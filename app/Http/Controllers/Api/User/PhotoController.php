@@ -11,13 +11,13 @@ use OpenApi\Attributes as OA;
 
 #[OA\Put(
     path: '/user/photo',
-    description: "Обновление фото юзера. Максимум 10 мб, форматы: jpeg,jpg,png",
-    summary: "Загрузить фото юзера",
-    security: [["bearerAuth" => []]],
-    tags: ["user"])
+    description: 'Обновление фото юзера. Максимум 10 мб, форматы: jpeg,jpg,png',
+    summary: 'Загрузить фото юзера',
+    security: [['bearerAuth' => []]],
+    tags: ['user'])
 ]
-#[OA\RequestBody (
-    description: "Photo file",
+#[OA\RequestBody(
+    description: 'Photo file',
     required: true,
     content: [
         new OA\MediaType(
@@ -35,11 +35,11 @@ use OpenApi\Attributes as OA;
             description: 'массив с двумя url: на маленькую и большую фото пользователя',
             type: 'object',
             example: [
-                "data" => [
-                    "http://url/storage/images/users/2/2.jpg",
-                    "http://url/storage/images/users/2/2-small.jpg"
+                'data' => [
+                    'http://url/storage/images/users/2/2.jpg',
+                    'http://url/storage/images/users/2/2-small.jpg',
                 ],
-                "message" => "Photo updated successfully"
+                'message' => 'Photo updated successfully',
             ]
         ),
         new OA\Property(
@@ -68,18 +68,16 @@ class PhotoController
 {
     public function __construct(
         private UserService $service
-    )
-    {
+    ) {
     }
 
     public function __invoke(
         ProfilePhotoRequest $request
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $user = auth()->user();
         $file = $request->file('photo');
 
-        if(is_null($file)){
+        if (is_null($file)) {
             return response()->json([
                 'data' => '',
                 'message' => 'Требуется передать поле \'photo\' в теле запроса с файлом фото',
@@ -93,7 +91,7 @@ class PhotoController
 
             return response()->json([
                 'data' => '',
-                'message' => 'Что-то пошло не так: ' . $exception->getMessage(),
+                'message' => 'Что-то пошло не так: '.$exception->getMessage(),
             ], 500);
         }
 

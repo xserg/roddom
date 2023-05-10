@@ -3,16 +3,13 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AppHelpPageResource\Pages;
-use App\Filament\Resources\AppHelpPageResource\RelationManagers;
 use App\Models\AppHelpPage;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AppHelpPageResource extends Resource
 {
@@ -27,7 +24,9 @@ class AppHelpPageResource extends Resource
     protected static ?string $navigationGroup = 'Приложение';
 
     protected static ?string $label = 'Страница "Помощь"';
+
     protected static ?string $pluralModelLabel = 'Страница "Помощь"';
+
     protected static ?string $modelLabel = 'Страница "Помощь"';
 
     public static function form(Form $form): Form
@@ -54,7 +53,7 @@ class AppHelpPageResource extends Resource
                 Tables\Columns\TextColumn::make('text')
                     ->label('текст')
                     ->limit(25)
-                    ->tooltip(fn(Model $record): string => $record->text),
+                    ->tooltip(fn (Model $record): string => $record->text),
             ])
             ->filters([
                 //

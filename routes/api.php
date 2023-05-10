@@ -131,7 +131,6 @@ Route::prefix('v1')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
 
-
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
                 ->where('id', '[0-9]+')

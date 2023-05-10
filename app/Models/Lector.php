@@ -16,7 +16,7 @@ class Lector extends Model
         'position',
         'career_start',
         'photo',
-        'description'
+        'description',
     ];
 
     public function lectures(): HasMany
@@ -46,13 +46,13 @@ class Lector extends Model
             $rates['rate_user'] = null;
         }
 
-//        if ($rates) {
-//            return new Attribute(
-//                get: fn() => $rates,
-//            );
-//        }
+        //        if ($rates) {
+        //            return new Attribute(
+        //                get: fn() => $rates,
+        //            );
+        //        }
         return new Attribute(
-            get: fn() => $rates,
+            get: fn () => $rates,
         );
     }
 }

@@ -10,6 +10,7 @@ class PaymentService
     {
         $client = new Client();
         $client->setAuth(config('services.yookassa.shop_id'), config('services.yookassa.secret_key'));
+
         return $client;
     }
 
@@ -19,16 +20,16 @@ class PaymentService
             ->createPayment([
                 'amount' => [
                     'value' => $amount,
-                    'currency' => 'RUB'
+                    'currency' => 'RUB',
                 ],
                 'capture' => false,
                 'confirmation' => [
                     'type' => 'redirect',
-                    'return_url' => config('app.back2site')
+                    'return_url' => config('app.back2site'),
                 ],
                 'metadata' => [
-                    'order_id' => $options['order_id']
-                ]
+                    'order_id' => $options['order_id'],
+                ],
             ], uniqid('', true));
 
         return $client->getConfirmation()->getConfirmationUrl();

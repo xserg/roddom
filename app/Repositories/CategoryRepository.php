@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 class CategoryRepository
 {
     use MoneyConversion;
+
     public function __construct()
     {
     }
@@ -22,15 +23,12 @@ class CategoryRepository
 
     /**
      * Считать цену учитывая только общую цену на лекции и количество лекций в категории
-     * @param int $categoryId
-     * @param int $periodId
-     * @return int|string
      */
     public function getCategoryPrice(int $categoryId, int $periodId): int|string
     {
         $category = $this->getCategoryById($categoryId);
 
-        if (!is_null($category)) {
+        if (! is_null($category)) {
             return 0;
         }
 
@@ -45,6 +43,7 @@ class CategoryRepository
                 return $priceForPackInRoubles;
             }
         }
+
         return 0;
     }
 
@@ -66,8 +65,8 @@ class CategoryRepository
             $result[] = [
                 'title' => $price->period->title,
                 'length' => $price->period->length,
-                'price_for_one_lecture' => (float)$priceForOneLectureInRoubles,
-                'price_for_category' => $priceForPackInRoubles
+                'price_for_one_lecture' => (float) $priceForOneLectureInRoubles,
+                'price_for_category' => $priceForPackInRoubles,
             ];
         }
 
@@ -77,8 +76,7 @@ class CategoryRepository
     public function getCategoryPriceForPeriodComplex(
         int $categoryId,
         int $periodId
-    ): int|string|float
-    {
+    ): int|string|float {
         $finalPrice = 0;
 
         $lectures = Lecture::query()
@@ -89,7 +87,7 @@ class CategoryRepository
                 'paymentType',
                 'pricesPeriodsInPromoPacks',
                 'pricesForLectures',
-                'pricesInPromoPacks'
+                'pricesInPromoPacks',
             ])
             ->get();
 
@@ -102,7 +100,7 @@ class CategoryRepository
         foreach ($lectures as $lecture) {
             $lecturePrices = $lecture->prices;
 
-            if (!$lecturePrices) {
+            if (! $lecturePrices) {
                 continue;
             }
 
@@ -122,9 +120,6 @@ class CategoryRepository
 
     /**
      * @deprecated
-     * @param Category|null $category
-     * @param int $period
-     * @return string|int|float
      */
     public function getCategoryPriceForPeriodLength(?Category $category, int $period): string|int|float
     {
@@ -133,7 +128,7 @@ class CategoryRepository
         if ($prices) {
             $priceForExactPeriod = Arr::where(
                 $prices,
-                fn($value) => $value['length'] == $period
+                fn ($value) => $value['length'] == $period
             );
             $price = Arr::first($priceForExactPeriod)['price_for_category'];
         }
@@ -143,15 +138,13 @@ class CategoryRepository
 
     public function getAllLectorsByCategory(string $slug): Collection|array
     {
-        $category = Category
-            ::query()
+        $category = Category::query()
             ->where('slug', '=', $slug)
             ->firstOrFail();
 
         $lectors = [];
         if ($category->parent_id === 0) {
-            $subCategories = Category
-                ::subCategories()
+            $subCategories = Category::subCategories()
                 ->where('parent_id', '=', $category->id)
                 ->with('lectures.lector')
                 ->get();

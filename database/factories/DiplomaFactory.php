@@ -22,9 +22,10 @@ class DiplomaFactory extends Factory
             'images/diplomas/diploma2.jpg',
             'images/diplomas/diploma3.jpg',
         ];
+
         return [
             'preview_picture' => fake()->randomElement($previewPictures),
-            'lector_id' => Lector::all()->random()
+            'lector_id' => Lector::all()->random(),
         ];
     }
 }

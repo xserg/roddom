@@ -13,12 +13,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/user/register',
-    description: "Регистрация нового юзера с помощью почты и пароля",
-    summary: "Регистрация нового юзера",
-    tags: ["user"])
+    description: 'Регистрация нового юзера с помощью почты и пароля',
+    summary: 'Регистрация нового юзера',
+    tags: ['user'])
 ]
-#[OA\RequestBody (
-    description: "Register credentials",
+#[OA\RequestBody(
+    description: 'Register credentials',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/RegisterRequest')),
@@ -35,10 +35,9 @@ use Symfony\Component\HttpFoundation\Response;
 class RegisterController
 {
     public function __construct(
-        private UserService      $userService,
+        private UserService $userService,
         private LoginCodeService $loginCodeService
-    )
-    {
+    ) {
     }
 
     public function __invoke(RegisterRequest $request): JsonResponse
@@ -60,9 +59,9 @@ class RegisterController
         $sent = Mail::to($email)
             ->send(new SendLoginCode($code));
 
-        if (!$sent) {
+        if (! $sent) {
             return response()->json([
-                'message' => 'Невозможно послать email с кодом логина'
+                'message' => 'Невозможно послать email с кодом логина',
             ], \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 

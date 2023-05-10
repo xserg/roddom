@@ -5,8 +5,8 @@ namespace App\Filament\Resources\PromoResource\RelationManagers;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
-use App\Repositories\PromoRepository;
 use App\Traits\MoneyConversion;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -16,7 +16,6 @@ use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Closure;
 use Livewire\Component as Livewire;
 
 class PromoLecturesPricesRelationManager extends RelationManager
@@ -24,9 +23,13 @@ class PromoLecturesPricesRelationManager extends RelationManager
     use MoneyConversion;
 
     protected static ?string $title = 'Цены подписки на акционную лекцию, за один период';
+
     protected static string $relationship = 'pricesForPromoLectures';
+
     protected static ?string $inverseRelationship = 'pricesInPromoPacks';
+
     protected static ?string $recordTitleAttribute = 'id';
+
     protected static ?string $label = 'Цена за период';
 
     protected bool $allowsDuplicates = true;
@@ -39,8 +42,8 @@ class PromoLecturesPricesRelationManager extends RelationManager
     public static function form(Form $form): Form
     {
         return $form
-            ->schema(fn(?Model $record, string $context) => [
-                self::priceField('price')
+            ->schema(fn (?Model $record, string $context) => [
+                self::priceField('price'),
             ]);
     }
 
@@ -50,7 +53,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('lecture_id')
                     ->label('Название лекции')
-                    ->formatStateUsing(fn(Lecture $record, string $state): string => $record->title)
+                    ->formatStateUsing(fn (Lecture $record, string $state): string => $record->title)
                     ->sortable(query: function (Builder $query, string $direction): Builder {
                         return $query
                             ->orderBy('title', $direction)
@@ -63,13 +66,13 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn(string $state): string => Period::firstWhere('id', $state)->length
+                        fn (string $state): string => Period::firstWhere('id', $state)->length
                     )
                     ->label('Период покупки, дней'),
 
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(
-                        fn(string $state): string => number_format($state / 100, 2, thousands_separator: '')
+                        fn (string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )
                     ->label('Цена, рублей')
                     ->sortable(),
@@ -82,7 +85,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                     ->label('добавить лекцию, период и цену')
                     ->disableAttachAnother()
                     ->preloadRecordSelect()
-                    ->form(fn(AttachAction $action): array => [
+                    ->form(fn (AttachAction $action): array => [
 
                         Forms\Components\Select::make('lecture_id')
                             ->label('лекция')
@@ -122,7 +125,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                                     ->get()
                                     ->pluck('pivot.period_id');
 
-                                if (!$periodsExisting) {
+                                if (! $periodsExisting) {
                                     return Period::all()->pluck('length', 'id');
                                 }
 
@@ -138,11 +141,11 @@ class PromoLecturesPricesRelationManager extends RelationManager
                             ->label('цена в рублях')
                             ->required()
                             ->afterStateHydrated(
-                                fn(TextInput $component, $state) => $component->state(number_format($state / 100, 2, thousands_separator: ''))
+                                fn (TextInput $component, $state) => $component->state(number_format($state / 100, 2, thousands_separator: ''))
                             )
-                            ->dehydrateStateUsing(fn($state) => $state * 100)
+                            ->dehydrateStateUsing(fn ($state) => $state * 100)
                             ->numeric()
-                            ->mask(fn(TextInput\Mask $mask) => $mask
+                            ->mask(fn (TextInput\Mask $mask) => $mask
                                 ->numeric()
                                 ->decimalPlaces(2) // Set the number of digits after the decimal point.
                                 ->decimalSeparator('.') // Add a separator for decimal numbers.
@@ -162,7 +165,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
     protected function getTableRecordUrlUsing(): ?Closure
     {
-        return fn(Model $record): string => route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
+        return fn (Model $record): string => route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
     }
 
     public static function priceField(string $name): Forms\Components\Field
@@ -172,9 +175,9 @@ class PromoLecturesPricesRelationManager extends RelationManager
             ->afterStateHydrated(function (TextInput $component, $state) {
                 $component->state(number_format($state / 100, 2, thousands_separator: ''));
             })
-            ->dehydrateStateUsing(fn($state) => $state * 100)
+            ->dehydrateStateUsing(fn ($state) => $state * 100)
             ->numeric()
-            ->mask(fn(TextInput\Mask $mask) => $mask
+            ->mask(fn (TextInput\Mask $mask) => $mask
                 ->numeric()
                 ->decimalPlaces(2)
                 ->decimalSeparator('.')

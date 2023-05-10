@@ -11,10 +11,10 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/lecture/{id}/rate',
-    description: "Оценить лекцию",
-    summary: "Оценить лекцию",
-    security: [["bearerAuth" => []]],
-    tags: ["lecture"])
+    description: 'Оценить лекцию',
+    summary: 'Оценить лекцию',
+    security: [['bearerAuth' => []]],
+    tags: ['lecture'])
 ]
 #[OA\Parameter(
     name: 'id',
@@ -24,7 +24,7 @@ use OpenApi\Attributes as OA;
     schema: new OA\Schema(type: 'integer')
 )]
 #[OA\RequestBody(
-    description: "рейт, передаваемый",
+    description: 'рейт, передаваемый',
     required: true,
     content: [
         new OA\MediaType(mediaType: 'application/json', schema: new OA\Schema(ref: '#/components/schemas/RateLectureRequest')),
@@ -55,10 +55,10 @@ use OpenApi\Attributes as OA;
     response: Response::HTTP_OK,
     description: 'OK',
     content: new OA\JsonContent(properties: [
-        new OA\Property(property: 'message', example: "Your rate was updated"),
+        new OA\Property(property: 'message', example: 'Your rate was updated'),
         new OA\Property(property: 'rates', example: [
-            "rate_user" => 5,
-            "rate_avg" => "3.2525"
+            'rate_user' => 5,
+            'rate_avg' => '3.2525',
         ]),
     ]),
 )]
@@ -66,14 +66,13 @@ class RateLectureController extends Controller
 {
     public function __invoke(
         RateLectureRequest $rateLectureRequest,
-        int                $lectureId
-    )
-    {
+        int $lectureId
+    ) {
         $lecture = Lecture::find($lectureId);
 
         if (is_null($lecture)) {
             return response()->json([
-                'message' => 'Lecture with id ' . $lectureId . ' was not found'
+                'message' => 'Lecture with id '.$lectureId.' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 
@@ -94,8 +93,8 @@ class RateLectureController extends Controller
             'message' => 'Your rate was updated',
             'rates' => [
                 'rate_user' => $rateLectureRequest->rate,
-                'rate_avg' => $rateAverage
-            ]
+                'rate_avg' => $rateAverage,
+            ],
         ], Response::HTTP_OK);
     }
 }
