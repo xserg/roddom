@@ -176,8 +176,8 @@ class Lecture extends Model
             $ids = implode(',', $watchedIds) ?? '';
 
             $query
-                ->whereIn('id', $watchedIds)
-                ->orderByRaw("FIELD(id, $ids)");
+                ->whereIn('id', $watchedIds);
+//                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -193,8 +193,8 @@ class Lecture extends Model
             $ids = implode(',', $listWatchedIds) ?? '';
 
             $query
-                ->whereIn('id', $listWatchedIds)
-                ->orderByRaw("FIELD(id, $ids)");
+                ->whereIn('id', $listWatchedIds);
+//                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -220,8 +220,8 @@ class Lecture extends Model
             $ids = implode(',', $savedIds) ?? '';
 
             $query
-                ->whereIn('id', $savedIds)
-                ->orderByRaw("FIELD(id, $ids)");
+                ->whereIn('id', $savedIds);
+//                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -232,8 +232,8 @@ class Lecture extends Model
         $ids = implode(',', array_keys($purchasedIds)) ?? '';
 
         $query
-            ->whereIn('id', array_keys($purchasedIds))
-            ->orderByRaw("FIELD(id, $ids)");
+            ->whereIn('id', array_keys($purchasedIds));
+//            ->orderByRaw("FIELD(id, $ids)");
     }
 
     public function scopeFree(Builder $query): void
