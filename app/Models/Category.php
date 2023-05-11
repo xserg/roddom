@@ -110,7 +110,7 @@ class Category extends Model
     {
         if ($this->parent_id != 0) {
             return new Attribute(
-                get: fn () => $this->parentCategory->slug,
+                get: fn () => $this->parentCategory?->slug,
             );
         }
 
