@@ -54,7 +54,6 @@ class CategoryResource extends Resource
                                         Category::mainCategories()->pluck('title', 'id')
                                     )
                                     ->default(0)
-                                    ->required()
                                     ->columnSpan(1),
                             ])
                             ->columnSpan(1),
