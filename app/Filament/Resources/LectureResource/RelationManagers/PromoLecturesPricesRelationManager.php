@@ -26,7 +26,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
     protected bool $allowsDuplicates = true;
 
-    protected static ?string $title = 'Цены в акционном паке лекций';
+    protected static ?string $title = 'Цены акционной лекции';
 
     protected static ?string $label = 'Цена на отдельную лекцию в промо паке';
 

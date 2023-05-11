@@ -19,7 +19,7 @@ class PricesForLecturesRelationManager extends RelationManager
 
     protected static string $relationship = 'pricesForLectures';
 
-    protected static ?string $title = 'Цены лекций';
+    protected static ?string $title = 'Цены лекции';
 
     protected static ?string $recordTitleAttribute = 'id';
 
