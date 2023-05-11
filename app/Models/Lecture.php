@@ -173,7 +173,7 @@ class Lecture extends Model
                 ->pluck('id')
                 ->toArray();
 
-            $ids = implode(',', $watchedIds);
+            $ids = implode(',', $watchedIds) ?? '';
 
             $query
                 ->whereIn('id', $watchedIds)
@@ -190,7 +190,7 @@ class Lecture extends Model
                 ->pluck('id')
                 ->toArray();
 
-            $ids = implode(',', $listWatchedIds);
+            $ids = implode(',', $listWatchedIds) ?? '';
 
             $query
                 ->whereIn('id', $listWatchedIds)
@@ -217,7 +217,7 @@ class Lecture extends Model
                 ->pluck('id')
                 ->toArray();
 
-            $ids = implode(',', $savedIds);
+            $ids = implode(',', $savedIds) ?? '';
 
             $query
                 ->whereIn('id', $savedIds)
@@ -229,7 +229,7 @@ class Lecture extends Model
     {
         $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
-        $ids = implode(',', array_keys($purchasedIds));
+        $ids = implode(',', array_keys($purchasedIds)) ?? '';
 
         $query
             ->whereIn('id', array_keys($purchasedIds))
