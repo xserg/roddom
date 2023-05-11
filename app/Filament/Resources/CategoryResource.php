@@ -54,6 +54,7 @@ class CategoryResource extends Resource
                                         Category::mainCategories()->pluck('title', 'id')
                                     )
                                     ->default(0)
+                                    ->required()
                                     ->columnSpan(1),
                             ])
                             ->columnSpan(1),
@@ -87,7 +88,7 @@ class CategoryResource extends Resource
                 ])->columns(2),
                 Forms\Components\TextInput::make('slug')
                     ->label('Слаг категории, заполняется автоматически с наименования')
-                    ->unique(table: Category::class)
+                    ->unique(table: Category::class, ignoreRecord: true)
                     ->validationAttribute('"Слаг категории"')
                     ->required()
                     ->maxLength(255),
