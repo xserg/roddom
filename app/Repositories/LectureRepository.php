@@ -295,7 +295,7 @@ class LectureRepository
                         'length' => $period->length,
                         'period_id' => $period->id,
                         'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => (float) $priceCommonForOneLecture,
+                        'common_price_for_one_lecture' => $priceCommonForOneLecture,
                     ];
                 } else {
                     //а если есть, то преобразовываем в формат рубли.копейки и ставим
@@ -306,8 +306,8 @@ class LectureRepository
                     $prices[] = [
                         'length' => $period->length,
                         'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => (float) $priceForOneLecture,
-                        'common_price_for_one_lecture' => (float) $priceCommonForOneLecture,
+                        'custom_price_for_one_lecture' => $priceForOneLecture,
+                        'common_price_for_one_lecture' => $priceCommonForOneLecture,
                     ];
                 }
             }
@@ -328,7 +328,7 @@ class LectureRepository
                         'length' => $period->length,
                         'period_id' => $period->id,
                         'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => (float) self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                        'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
                     ];
                 } else {
                     $priceForOneLecture = self::coinsToRoubles($priceCustom->pivot->price);
@@ -336,8 +336,8 @@ class LectureRepository
                     $prices[] = [
                         'length' => $period->length,
                         'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => (float) $priceForOneLecture,
-                        'common_price_for_one_lecture' => (float) self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                        'custom_price_for_one_lecture' => $priceForOneLecture,
+                        'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
                     ];
                 }
             }
