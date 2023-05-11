@@ -44,6 +44,7 @@ class RegisterController
     {
         $email = $request->email;
         $password = $request->password;
+        $this->loginCodeService->deleteWhereEmail($email);
 
         try {
             $user = $this->userService->create(compact('email', 'password'));
