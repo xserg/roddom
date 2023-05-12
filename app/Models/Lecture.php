@@ -177,7 +177,7 @@ class Lecture extends Model
 
             $query
                 ->whereIn('id', $watchedIds);
-//                ->orderByRaw("FIELD(id, $ids)");
+            //                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -194,7 +194,7 @@ class Lecture extends Model
 
             $query
                 ->whereIn('id', $listWatchedIds);
-//                ->orderByRaw("FIELD(id, $ids)");
+            //                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -221,7 +221,7 @@ class Lecture extends Model
 
             $query
                 ->whereIn('id', $savedIds);
-//                ->orderByRaw("FIELD(id, $ids)");
+            //                ->orderByRaw("FIELD(id, $ids)");
         }
     }
 
@@ -233,7 +233,7 @@ class Lecture extends Model
 
         $query
             ->whereIn('id', array_keys($purchasedIds));
-//            ->orderByRaw("FIELD(id, $ids)");
+        //            ->orderByRaw("FIELD(id, $ids)");
     }
 
     public function scopeFree(Builder $query): void
