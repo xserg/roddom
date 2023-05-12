@@ -47,7 +47,7 @@ class UserResource extends JsonResource
             'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, default: 0),
             'purchased_lectures_count' => $this->whenNotNull($this->purchased_lectures_counter, default: 0),
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'updated_at' => $this->profile_fulfilled_at,
         ];
     }
 }

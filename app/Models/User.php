@@ -52,6 +52,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'profile_fulfilled_at' => 'datetime',
     ];
 
     public function watchedLectures(): BelongsToMany

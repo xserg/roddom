@@ -226,6 +226,8 @@ class UserService
                 ->toDateString();
         }
 
+        $user->profile_fulfilled_at = now();
+
         $this->saveUserGuard($user);
 
         return $user;
