@@ -151,7 +151,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                                 ->decimalSeparator('.') // Add a separator for decimal numbers.
                             ),
 
-                        $action->getRecordSelect()->visible(false)->default(Promo::first()->id)->disabled(),
+                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
 
                     ]),
             ])
