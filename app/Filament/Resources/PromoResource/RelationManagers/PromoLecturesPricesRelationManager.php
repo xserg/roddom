@@ -77,37 +77,44 @@ class PromoLecturesPricesRelationManager extends RelationManager
                     ->preloadRecordSelect()
                     ->form(fn (AttachAction $action): array => [
 
-                        Forms\Components\Select::make('lecture_id')
-                            ->label('лекция')
-                            ->options(function (Livewire $livewire) {
-                                $promo = $livewire->ownerRecord;
-
-                                $promoLectures = $promo->pricesForPromoLectures
-                                    ->pluck('id')
-                                    ->countBy()
-                                    ->filter(function (int $value, int $key) {
-                                        return $value == 3;
-                                    })
-                                    ->keys();
-
-                                $filtered = Lecture::all()
-                                    ->whereNotIn('id', $promoLectures)
-                                    ->pluck('title', 'id');
-
-                                return $filtered;
-                            })
-                            ->required()
+                        $action->getRecordSelect()
                             ->reactive()
+                            ->required()
                             ->afterStateUpdated(function (callable $set) {
                                 $set('period_id', null);
                             }),
+
+//                        Forms\Components\Select::make('lecture_id')
+//                            ->label('лекция')
+//                            ->options(function (Livewire $livewire) {
+//                                $promo = $livewire->ownerRecord;
+//
+//                                $promoLectures = $promo->pricesForPromoLectures
+//                                    ->pluck('id')
+//                                    ->countBy()
+//                                    ->filter(function (int $value, int $key) {
+//                                        return $value == 3;
+//                                    })
+//                                    ->keys();
+//
+//                                $filtered = Lecture::all()
+//                                    ->whereNotIn('id', $promoLectures)
+//                                    ->pluck('title', 'id');
+//
+//                                return $filtered;
+//                            })
+//                            ->required()
+//                            ->reactive()
+//                            ->afterStateUpdated(function (callable $set) {
+//                                $set('period_id', null);
+//                            }),
 
                         Forms\Components\Select::make('period_id')
                             ->label('период подписки')
                             ->required()
                             ->options(function (callable $get, Livewire $livewire) {
                                 $promo = $livewire->ownerRecord;
-                                $lectureId = $get('lecture_id');
+                                $lectureId = $get('recordId');
 
                                 $periodsExisting = $promo
                                     ->pricesForPromoLectures()
@@ -140,9 +147,6 @@ class PromoLecturesPricesRelationManager extends RelationManager
                                 ->decimalPlaces(2) // Set the number of digits after the decimal point.
                                 ->decimalSeparator('.') // Add a separator for decimal numbers.
                             ),
-
-                        $action->getRecordSelect()->default(Promo::first()->id)->disabled(),
-
                     ]),
             ])
             ->actions([
@@ -176,6 +180,6 @@ class PromoLecturesPricesRelationManager extends RelationManager
 
     public function getTableRecordTitle(?Model $record): string
     {
-        return 'цена на промо лекцию';
+        return $record->title;
     }
 }
