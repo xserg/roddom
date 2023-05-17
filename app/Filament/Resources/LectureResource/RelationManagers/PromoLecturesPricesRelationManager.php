@@ -18,17 +18,12 @@ class PromoLecturesPricesRelationManager extends RelationManager
 {
     use MoneyConversion;
 
-    protected static string $relationship = 'pricesInPromoPacks';
-
-    protected static ?string $inverseRelationship = 'pricesForPromoLectures';
-
-    protected static ?string $recordTitleAttribute = 'id';
-
-    protected bool $allowsDuplicates = true;
-
     protected static ?string $title = 'Цены акционной лекции';
-
     protected static ?string $label = 'Цена на отдельную лекцию в промо паке';
+    protected static string $relationship = 'pricesInPromoPacks';
+    protected static ?string $inverseRelationship = 'pricesForPromoLectures';
+    protected static ?string $recordTitleAttribute = 'id';
+    protected bool $allowsDuplicates = true;
 
     public static function form(Form $form): Form
     {
