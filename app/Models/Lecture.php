@@ -169,15 +169,16 @@ class Lecture extends Model
         if (auth()->user()) {
             $watchedIds = auth()
                 ->user()
-                ->watchedLectures
+                ->watchedLectures()
                 ->pluck('id')
                 ->toArray();
 
-            $ids = implode(',', $watchedIds) ?? '';
+            $query->whereIn('id', $watchedIds);
 
-            $query
-                ->whereIn('id', $watchedIds);
-            //                ->orderByRaw("FIELD(id, $ids)");
+            if (! empty($watchedIds)) {
+                $ids = implode(',', $watchedIds) ?? '';
+                $query->orderByRaw("FIELD(id, $ids)");
+            }
         }
     }
 
@@ -186,15 +187,34 @@ class Lecture extends Model
         if (auth()->user()) {
             $listWatchedIds = auth()
                 ->user()
-                ->listWatchedLectures
+                ->listWatchedLectures()
                 ->pluck('id')
                 ->toArray();
 
-            $ids = implode(',', $listWatchedIds) ?? '';
+            $query->whereIn('id', $listWatchedIds);
 
-            $query
-                ->whereIn('id', $listWatchedIds);
-            //                ->orderByRaw("FIELD(id, $ids)");
+            if (! empty($listWatchedIds)) {
+                $ids = implode(',', $listWatchedIds) ?? '';
+                $query->orderByRaw("FIELD(id, $ids)");
+            }
+        }
+    }
+
+    public function scopeSaved(Builder $query): void
+    {
+        if (auth()->user()) {
+            $savedIds = auth()
+                ->user()
+                ->savedLectures()
+                ->pluck('id')
+                ->toArray();
+
+            $query->whereIn('id', $savedIds);
+
+            if (! empty($savedIds)) {
+                $ids = implode(',', $savedIds) ?? '';
+                $query->orderByRaw("FIELD(id, $ids)");
+            }
         }
     }
 
@@ -206,23 +226,6 @@ class Lecture extends Model
     public function scopeNotPromo(Builder $query): void
     {
         $query->where('payment_type_id', '!=', LecturePaymentType::PROMO);
-    }
-
-    public function scopeSaved(Builder $query): void
-    {
-        if (auth()->user()) {
-            $savedIds = auth()
-                ->user()
-                ->savedLectures
-                ->pluck('id')
-                ->toArray();
-
-            $ids = implode(',', $savedIds) ?? '';
-
-            $query
-                ->whereIn('id', $savedIds);
-            //                ->orderByRaw("FIELD(id, $ids)");
-        }
     }
 
     public function scopePurchased(Builder $query): void
@@ -357,7 +360,7 @@ class Lecture extends Model
     protected function idTitle(): Attribute
     {
         return new Attribute(
-            get: fn () => $this->id.' '.$this->title,
+            get: fn () => $this->id . ' ' . $this->title,
         );
     }
 
