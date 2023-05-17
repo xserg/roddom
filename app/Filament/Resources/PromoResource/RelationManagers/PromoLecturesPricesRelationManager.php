@@ -173,4 +173,9 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 ->decimalSeparator('.')
             );
     }
+
+    public function getTableRecordTitle(?Model $record): string
+    {
+        return 'цена на промо лекцию';
+    }
 }
