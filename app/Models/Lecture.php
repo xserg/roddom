@@ -170,7 +170,7 @@ class Lecture extends Model
             $watchedIds = auth()
                 ->user()
                 ->watchedLectures()
-                ->pluck($this->getTable() . 'id')
+                ->pluck($this->getTable() . '.id')
                 ->toArray();
 
             $query->whereIn('id', $watchedIds);
@@ -188,7 +188,7 @@ class Lecture extends Model
             $listWatchedIds = auth()
                 ->user()
                 ->listWatchedLectures()
-                ->pluck($this->getTable() . 'id')
+                ->pluck($this->getTable() . '.id')
                 ->toArray();
 
             $query->whereIn('id', $listWatchedIds);
@@ -206,7 +206,7 @@ class Lecture extends Model
             $savedIds = auth()
                 ->user()
                 ->savedLectures()
-                ->pluck($this->getTable() . 'id')
+                ->pluck($this->getTable() . '.id')
                 ->toArray();
 
             $query->whereIn('id', $savedIds);
