@@ -16,10 +16,11 @@ class PurchaseSuccess extends Mailable
      * Create a new message instance.
      */
     public function __construct(
+        public        $subject,
         public string $text,
         public string $entity,
         public string $dateStart,
-        public string $dateEnd
+        public string $dateEnd,
     ) {
         //
     }
@@ -30,7 +31,7 @@ class PurchaseSuccess extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Purchase Success',
+            subject: $this->subject,
         );
     }
 
