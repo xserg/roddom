@@ -15,7 +15,8 @@ class Subscription extends Model
         'subscriptionable_id',
         'start_date',
         'end_date',
-        'total_price'
+        'total_price',
+        'entity_title'
     ];
 
     public function subscriptionable(): MorphTo

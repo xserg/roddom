@@ -80,6 +80,7 @@ class PaymentController extends Controller
                         //тут создаем подписку
 
                         $period = $this->periodRepository->getPeriodByLength($order->period);
+                        $subscriptionableName = $this->getSubscriptionableName($order);
 
                         $attributes = [
                             'user_id' => $order->user_id,
@@ -87,6 +88,7 @@ class PaymentController extends Controller
                             'subscriptionable_id' => $order->subscriptionable_id,
                             'period_id' => $period->id,
                             'total_price' => $order->price,
+                            'entity_title' => $subscriptionableName,
                             'start_date' => now(),
                             'end_date' => now()->addDays($period->length),
                         ];
@@ -95,8 +97,6 @@ class PaymentController extends Controller
                         if (! $subscription->save()) {
                             Log::warning($subscription);
                         }
-
-                        $subscriptionableName = $this->getSubscriptionableName($order);
 
                         Mail::to(User::query()->find($order->user_id)->email)
                             ->send(new \App\Mail\PurchaseSuccess(
@@ -122,6 +122,6 @@ class PaymentController extends Controller
             return 'Промопак лекций';
         }
 
-        return 'Лекция';
+        return 'Заголовок лекции не определён';
     }
 }

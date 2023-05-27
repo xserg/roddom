@@ -111,24 +111,10 @@ class SubscriptionResource extends Resource
                     )
                     ->label('Период покупки, дней')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('subscriptionable_type')
-                    ->formatStateUsing(
-                        function ($state): string {
-                            if ($state == 'App\Models\Lecture') {
-                                return 'лекция';
-                            } elseif ($state == 'App\Models\Category') {
-                                return 'категория';
-                            } elseif ($state == 'App\Models\Promo') {
-                                return 'промо пак лекций';
-                            }
-                        }
-                    )
-                    ->label('тип подписки')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('entity_title')
+                    ->label('подписка на'),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('цена подписки'),
-                Tables\Columns\TextColumn::make('subscriptionable_id')
-                    ->label('id объекта подписки'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->dateTime()
                     ->label('начало подписки'),
