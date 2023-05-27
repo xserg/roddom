@@ -125,21 +125,8 @@ class SubscriptionResource extends Resource
                     )
                     ->label('тип подписки')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('spent')
-                    ->getStateUsing(
-                        function (?Subscription $record): string {
-                            $type = $record->subscriptionable_type;
-                            $id = $record->subscriptionable_id;
-                            $order = Order::query()
-                                ->where('subscriptionable_type', $type)
-                                ->where('subscriptionable_id', $id)
-                                ->where('user_id', $record->user->id)
-                                ->first();
-
-                            return $order?->price ?? 'не смогли рассчитать';
-                        }
-                    )
-                    ->label('сумма подписки'),
+                Tables\Columns\TextColumn::make('total_price')
+                    ->label('цена подписки'),
                 Tables\Columns\TextColumn::make('subscriptionable_id')
                     ->label('id объекта подписки'),
                 Tables\Columns\TextColumn::make('start_date')

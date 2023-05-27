@@ -32,7 +32,7 @@ use YooKassa\Model\NotificationEventType;
 class PaymentController extends Controller
 {
     public function __construct(
-        private PaymentService $paymentService,
+        private PaymentService   $paymentService,
         private PeriodRepository $periodRepository
     ) {
     }
@@ -83,6 +83,7 @@ class PaymentController extends Controller
                         'subscriptionable_type' => $order->subscriptionable_type,
                         'subscriptionable_id' => $order->subscriptionable_id,
                         'period_id' => $period->id,
+                        'price' => $order->price,
                         'start_date' => now(),
                         'end_date' => now()->addDays($period->length),
                     ];
@@ -95,9 +96,9 @@ class PaymentController extends Controller
                     $entityText = '';
 
                     if ($order->subscriptionable_type == Lecture::class) {
-                        $entityText .= 'Лекция: '.Lecture::query()->find($order->subscriptionable_id)->title;
+                        $entityText .= 'Лекция: ' . Lecture::query()->find($order->subscriptionable_id)->title;
                     } elseif ($order->subscriptionable_type == Category::class) {
-                        $entityText .= 'Категория: '.Category::query()->find($order->subscriptionable_id)->title;
+                        $entityText .= 'Категория: ' . Category::query()->find($order->subscriptionable_id)->title;
                     } elseif ($order->subscriptionable_type == Promo::class) {
                         $entityText .= 'Промопак лекций';
                     }
