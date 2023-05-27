@@ -126,7 +126,7 @@ class PaymentController extends Controller
         Period $period,
         string $subscriptionableName
     ): array {
-        [
+        return [
             'user_id' => $order->user_id,
             'subscriptionable_type' => $order->subscriptionable_type,
             'subscriptionable_id' => $order->subscriptionable_id,
