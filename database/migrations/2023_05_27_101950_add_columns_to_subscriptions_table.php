@@ -11,7 +11,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('subscriptions', function (Blueprint $table) {
-            $table->decimal('total_price')->unsigned()->nullable()->default(null);
+            $table->decimal('total_price', 10, 2)->unsigned()->nullable()->default(null);
         });
     }
 
