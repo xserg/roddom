@@ -15,6 +15,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 class SubscriptionResource extends Resource
@@ -112,7 +113,9 @@ class SubscriptionResource extends Resource
                     ->label('Период покупки, дней')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('entity_title')
-                    ->label('подписка на'),
+                    ->label('подписка на')
+                    ->limit(25)
+                    ->tooltip(fn (?Model $record): string => $record?->entity_title),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('цена подписки'),
                 Tables\Columns\TextColumn::make('start_date')
@@ -120,7 +123,7 @@ class SubscriptionResource extends Resource
                     ->label('начало подписки'),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
-                    ->dateTime(), ])
+                    ->dateTime(),])
             ->filters([//
             ])
             ->actions([Tables\Actions\EditAction::make()])
