@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use YooKassa\Common\Exceptions\ApiException;
@@ -69,29 +70,31 @@ class PaymentController extends Controller
                 $metadata = (object) $payment->metadata;
 
                 if (isset($metadata->order_id)) {
-                    $orderId = (int) $metadata->order_id;
-                    $order = Order::query()->findOrFail($orderId);
-                    $order->status = PaymentStatusEnum::CONFIRMED;
-                    $order->save();
+                    DB::transaction(function () {
+                        $orderId = (int) $metadata->order_id;
+                        $order = Order::query()->findOrFail($orderId);
+                        $order->status = PaymentStatusEnum::CONFIRMED;
+                        $order->save();
 
-                    //тут создаем подписку
+                        //тут создаем подписку
 
-                    $period = $this->periodRepository->getPeriodByLength($order->period);
+                        $period = $this->periodRepository->getPeriodByLength($order->period);
 
-                    $attributes = [
-                        'user_id' => $order->user_id,
-                        'subscriptionable_type' => $order->subscriptionable_type,
-                        'subscriptionable_id' => $order->subscriptionable_id,
-                        'period_id' => $period->id,
-                        'total_price' => $order->price,
-                        'start_date' => now(),
-                        'end_date' => now()->addDays($period->length),
-                    ];
+                        $attributes = [
+                            'user_id' => $order->user_id,
+                            'subscriptionable_type' => $order->subscriptionable_type,
+                            'subscriptionable_id' => $order->subscriptionable_id,
+                            'period_id' => $period->id,
+                            'total_price' => $order->price,
+                            'start_date' => now(),
+                            'end_date' => now()->addDays($period->length),
+                        ];
 
-                    $subscription = new Subscription($attributes);
-                    if (! $subscription->save()) {
-                        Log::warning($subscription);
-                    }
+                        $subscription = new Subscription($attributes);
+                        if (! $subscription->save()) {
+                            Log::warning($subscription);
+                        }
+                    });
 
                     $entityText = '';
 
