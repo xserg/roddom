@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,5 +29,10 @@ class Order extends Model
     public function userEmail(): string
     {
         return $this->user->email;
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->status === PaymentStatusEnum::CONFIRMED->value;
     }
 }

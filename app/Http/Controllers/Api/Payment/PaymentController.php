@@ -73,7 +73,7 @@ class PaymentController extends Controller
                     $orderId = (int) $metadata->order_id;
                     $order = Order::query()->findOrFail($orderId);
 
-                    if($order->status === PaymentStatusEnum::CONFIRMED){
+                    if($order->isConfirmed()){
                         return;
                     }
 
