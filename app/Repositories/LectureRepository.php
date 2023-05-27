@@ -25,7 +25,7 @@ class LectureRepository
 
     public function __construct(
         private CategoryRepository $categoryRepository,
-        private PromoRepository $promoRepository
+        private PromoRepository    $promoRepository
     ) {
         $this->periods = Period::all();
     }
@@ -41,7 +41,7 @@ class LectureRepository
             ->first();
 
         if (! $lecture) {
-            throw new NotFoundHttpException('Лекция c id '.$id.' не найдена');
+            throw new NotFoundHttpException('Лекция c id ' . $id . ' не найдена');
         }
 
         return $lecture;
@@ -117,8 +117,8 @@ class LectureRepository
 
     public function paginate(
         QueryBuilder|Builder|Collection $builder,
-        ?int $perPage,
-        ?int $page,
+        ?int                            $perPage,
+        ?int                            $page,
     ): LengthAwarePaginator {
         $lectures = $builder
             ->paginate(

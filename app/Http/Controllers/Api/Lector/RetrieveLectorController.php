@@ -39,7 +39,7 @@ use OpenApi\Attributes as OA;
 )]
 class RetrieveLectorController
 {
-    public function __invoke(Request $request, int $id): JsonResource|JsonResponse
+    public function __invoke(Request $request, int $id): JsonResponse
     {
         $lector = Lector::query()
             ->with(['diplomas'])
@@ -48,7 +48,7 @@ class RetrieveLectorController
 
         if (! $lector) {
             return response()->json([
-                'message' => 'Lector with id '.$id.' was not found',
+                'message' => 'Lector with id ' . $id . ' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 
