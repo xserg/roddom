@@ -83,7 +83,7 @@ class PaymentController extends Controller
                         'subscriptionable_type' => $order->subscriptionable_type,
                         'subscriptionable_id' => $order->subscriptionable_id,
                         'period_id' => $period->id,
-                        'price' => $order->price,
+                        'total_price' => $order->price,
                         'start_date' => now(),
                         'end_date' => now()->addDays($period->length),
                     ];
