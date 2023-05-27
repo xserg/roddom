@@ -115,7 +115,7 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('entity_title')
                     ->label('подписка на')
                     ->limit(25)
-                    ->tooltip(fn (?Model $record): string => $record?->entity_title),
+                    ->tooltip(fn (?Model $record): ?string => $record?->entity_title),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('цена подписки'),
                 Tables\Columns\TextColumn::make('start_date')
