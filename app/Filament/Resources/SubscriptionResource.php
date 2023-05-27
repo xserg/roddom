@@ -103,9 +103,13 @@ class SubscriptionResource extends Resource
             ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('имя'),
+                    ->label('имя')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('user.email')
-                    ->label('email'),
+                    ->label('email')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
                         fn (string $state): string => Period::firstWhere('id', $state)->length
@@ -117,13 +121,17 @@ class SubscriptionResource extends Resource
                     ->limit(25)
                     ->tooltip(fn (?Model $record): ?string => $record?->entity_title),
                 Tables\Columns\TextColumn::make('total_price')
-                    ->label('цена подписки'),
+                    ->label('цена подписки')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->dateTime()
-                    ->label('начало подписки'),
+                    ->label('начало подписки')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
-                    ->dateTime(),])
+                    ->dateTime()
+                    ->sortable(),
+            ])
             ->filters([//
             ])
             ->actions([Tables\Actions\EditAction::make()])

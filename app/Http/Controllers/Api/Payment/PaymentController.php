@@ -72,6 +72,11 @@ class PaymentController extends Controller
                 if (isset($metadata->order_id)) {
                     $orderId = (int) $metadata->order_id;
                     $order = Order::query()->findOrFail($orderId);
+
+                    if($order->status === PaymentStatusEnum::CONFIRMED){
+                        return;
+                    }
+
                     $period = $this->periodRepository->getPeriodByLength($order->period);
                     $subscriptionableName = $this->getSubscriptionableName($order);
 
