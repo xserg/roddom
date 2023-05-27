@@ -100,6 +100,7 @@ class PaymentController extends Controller
 
                         Mail::to(User::query()->find($order->user_id)->email)
                             ->send(new \App\Mail\PurchaseSuccess(
+                                'Успешная покупка',
                                 AppInfo::query()->first()->successful_purchase_text,
                                 $subscriptionableName,
                                 $attributes['start_date'],
