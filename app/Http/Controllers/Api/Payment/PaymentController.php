@@ -8,9 +8,9 @@ use App\Models\AppInfo;
 use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\Order;
+use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
-use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
@@ -70,43 +70,39 @@ class PaymentController extends Controller
                 $metadata = (object) $payment->metadata;
 
                 if (isset($metadata->order_id)) {
+                    $orderId = (int) $metadata->order_id;
+                    $order = Order::query()->findOrFail($orderId);
+                    $period = $this->periodRepository->getPeriodByLength($order->period);
+                    $subscriptionableName = $this->getSubscriptionableName($order);
 
-                    DB::transaction(function () use ($metadata) {
-                        $orderId = (int) $metadata->order_id;
-                        $order = Order::query()->findOrFail($orderId);
+                    $subscriptionAttributes = $this->getSubscriptionAttributes(
+                        $order, $period, $subscriptionableName
+                    );
+
+                    $subscription = new Subscription($subscriptionAttributes);
+
+                    DB::transaction(function () use (
+                        $order,
+                        $subscriptionableName,
+                        $subscription,
+                    ) {
                         $order->status = PaymentStatusEnum::CONFIRMED;
                         $order->save();
-
-                        //тут создаем подписку
-
-                        $period = $this->periodRepository->getPeriodByLength($order->period);
-                        $subscriptionableName = $this->getSubscriptionableName($order);
-
-                        $attributes = [
-                            'user_id' => $order->user_id,
-                            'subscriptionable_type' => $order->subscriptionable_type,
-                            'subscriptionable_id' => $order->subscriptionable_id,
-                            'period_id' => $period->id,
-                            'total_price' => $order->price,
-                            'entity_title' => $subscriptionableName,
-                            'start_date' => now(),
-                            'end_date' => now()->addDays($period->length),
-                        ];
-
-                        $subscription = new Subscription($attributes);
-                        if (! $subscription->save()) {
-                            Log::warning($subscription);
-                        }
-
-                        Mail::to(User::query()->find($order->user_id)->email)
-                            ->send(new \App\Mail\PurchaseSuccess(
-                                'Успешная покупка',
-                                AppInfo::query()->first()->successful_purchase_text,
-                                $subscriptionableName,
-                                $attributes['start_date'],
-                                $attributes['end_date']
-                            ));
+                        $subscription->save();
                     });
+
+                    $successfulPurchaseText = AppInfo::query()->first()
+                        ?->successful_purchase_text ?? 'Спасибо за покупку';
+                    $email = $order->userEmail();
+
+                    Mail::to($email)
+                        ->send(new \App\Mail\PurchaseSuccess(
+                            'Успешная покупка',
+                            $successfulPurchaseText,
+                            $subscriptionableName,
+                            $subscription->start_date,
+                            $subscription->end_date
+                        ));
                 }
             }
         }
@@ -123,5 +119,22 @@ class PaymentController extends Controller
         }
 
         return 'Заголовок лекции не определён';
+    }
+
+    private function getSubscriptionAttributes(
+        Order  $order,
+        Period $period,
+        string $subscriptionableName
+    ): array {
+        [
+            'user_id' => $order->user_id,
+            'subscriptionable_type' => $order->subscriptionable_type,
+            'subscriptionable_id' => $order->subscriptionable_id,
+            'period_id' => $period->id,
+            'total_price' => $order->price,
+            'entity_title' => $subscriptionableName,
+            'start_date' => now(),
+            'end_date' => now()->addDays($period->length),
+        ];
     }
 }
