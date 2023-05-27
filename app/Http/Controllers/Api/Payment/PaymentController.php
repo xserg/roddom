@@ -70,7 +70,8 @@ class PaymentController extends Controller
                 $metadata = (object) $payment->metadata;
 
                 if (isset($metadata->order_id)) {
-                    DB::transaction(function () {
+
+                    DB::transaction(function () use ($metadata) {
                         $orderId = (int) $metadata->order_id;
                         $order = Order::query()->findOrFail($orderId);
                         $order->status = PaymentStatusEnum::CONFIRMED;
@@ -94,27 +95,32 @@ class PaymentController extends Controller
                         if (! $subscription->save()) {
                             Log::warning($subscription);
                         }
+
+                        $subscriptionableName = $this->getSubscriptionableName($order);
+
+                        Mail::to(User::query()->find($order->user_id)->email)
+                            ->send(new \App\Mail\PurchaseSuccess(
+                                AppInfo::query()->first()->successful_purchase_text,
+                                $subscriptionableName,
+                                $attributes['start_date'],
+                                $attributes['end_date']
+                            ));
                     });
-
-                    $entityText = '';
-
-                    if ($order->subscriptionable_type == Lecture::class) {
-                        $entityText .= 'Лекция: ' . Lecture::query()->find($order->subscriptionable_id)->title;
-                    } elseif ($order->subscriptionable_type == Category::class) {
-                        $entityText .= 'Категория: ' . Category::query()->find($order->subscriptionable_id)->title;
-                    } elseif ($order->subscriptionable_type == Promo::class) {
-                        $entityText .= 'Промопак лекций';
-                    }
-
-                    Mail::to(User::query()->find($order->user_id)->email)
-                        ->send(new \App\Mail\PurchaseSuccess(
-                            AppInfo::query()->first()->successful_purchase_text,
-                            $entityText,
-                            $attributes['start_date'],
-                            $attributes['end_date']
-                        ));
                 }
             }
         }
+    }
+
+    private function getSubscriptionableName(Order $order): string
+    {
+        if ($order->subscriptionable_type == Lecture::class) {
+            return 'Лекция: ' . Lecture::query()->find($order->subscriptionable_id)->title;
+        } elseif ($order->subscriptionable_type == Category::class) {
+            return 'Категория: ' . Category::query()->find($order->subscriptionable_id)->title;
+        } elseif ($order->subscriptionable_type == Promo::class) {
+            return 'Промопак лекций';
+        }
+
+        return 'Лекция';
     }
 }
