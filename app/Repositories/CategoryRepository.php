@@ -136,6 +136,11 @@ class CategoryRepository
         return $price;
     }
 
+    /**
+     * Возвращает лекторов лекций, относящихся к категории/подкатегории
+     * @param string $slug
+     * @return Collection|array
+     */
     public function getAllLectorsByCategory(string $slug): Collection|array
     {
         $category = Category::query()
@@ -143,21 +148,24 @@ class CategoryRepository
             ->firstOrFail();
 
         $lectors = [];
-        if ($category->parent_id === 0) {
+
+        if ($category->isMain()) {
             $subCategories = Category::subCategories()
                 ->where('parent_id', '=', $category->id)
                 ->with('lectures.lector')
                 ->get();
 
-            if ($subCategories->isNotEmpty()) {
-                $subCategories->each(function ($subCategory) use (&$lectors) {
-                    $lectures = $subCategory->lectures;
-                    $lectures->each(function ($lecture) use (&$lectors) {
-                        $lector = $lecture->lector;
-                        $lectors[] = $lector;
-                    });
-                });
+            if ($subCategories->isEmpty()) {
+                return $lectors;
             }
+
+            $subCategories->each(function ($subCategory) use (&$lectors) {
+                $lectures = $subCategory->lectures;
+                $lectures->each(function ($lecture) use (&$lectors) {
+                    $lector = $lecture->lector;
+                    $lectors[] = $lector;
+                });
+            });
         } else {
             $lectures = $category->lectures;
             $lectures->each(function ($lecture) use (&$lectors) {
