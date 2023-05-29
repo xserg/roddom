@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\Category;
+use App\Models\Lector;
 use App\Models\Lecture;
 use App\Traits\MoneyConversion;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -147,36 +149,30 @@ class CategoryRepository
             ->where('slug', '=', $slug)
             ->firstOrFail();
 
-        $lectors = [];
-
         if ($category->isMain()) {
-            $subCategories = Category::subCategories()
+            $subCategoriesIds = Category::subCategories()
                 ->where('parent_id', '=', $category->id)
-                ->with('lectures.lector')
-                ->get();
+                ->pluck('id');
 
-            if ($subCategories->isEmpty()) {
-                return collect($lectors);
+            if ($subCategoriesIds->isEmpty()) {
+                return collect();
             }
 
-            $subCategories->each(function ($subCategory) use (&$lectors) {
-                $lectures = $subCategory->lectures;
-                $lectures->each(function ($lecture) use (&$lectors) {
-                    $lector = $lecture->lector;
-                    $lectors[] = $lector;
-                });
-            });
-        } else {
-            $lectures = $category->lectures;
-            $lectures->each(function ($lecture) use (&$lectors) {
-                $lector = $lecture->lector;
-                $lectors[] = $lector;
-            });
+            return Lector::whereHas(
+                'lectures',
+                function (Builder $query) use ($subCategoriesIds) {
+                    $query->whereIn('category_id', $subCategoriesIds);
+                })
+                ->orderBy('id')
+                ->get();
         }
 
-        return collect($lectors)
-            ->unique()
-            ->sort()
-            ->values();
+        return Lector::whereHas(
+            'lectures',
+            function (Builder $query) use ($category) {
+                $query->where('category_id', $category->id);
+            })
+            ->orderBy('id')
+            ->get();
     }
 }
