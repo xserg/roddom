@@ -141,7 +141,7 @@ class CategoryRepository
      * @param string $slug
      * @return Collection|array
      */
-    public function getAllLectorsByCategory(string $slug): Collection|array
+    public function getAllLectorsByCategory(string $slug): Collection
     {
         $category = Category::query()
             ->where('slug', '=', $slug)
@@ -156,7 +156,7 @@ class CategoryRepository
                 ->get();
 
             if ($subCategories->isEmpty()) {
-                return $lectors;
+                return collect($lectors);
             }
 
             $subCategories->each(function ($subCategory) use (&$lectors) {

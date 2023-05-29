@@ -47,6 +47,10 @@ class RetrieveLectorsByCategoryController extends Controller
     {
         $lectors = $this->categoryRepository->getAllLectorsByCategory($slug);
 
+        if ($lectors->isEmpty()) {
+            return response()->json(['data' => []], Response::HTTP_NOT_FOUND);
+        }
+
         return response()->json(new LectorCollection($lectors));
     }
 }
