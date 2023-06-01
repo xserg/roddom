@@ -102,7 +102,7 @@ class Lecture extends Model
     {
         return $this->belongsToMany(
             User::class,
-            'user_to_saved_lectures',
+            'user_to_list_watched_lectures',
             'lecture_id',
             'user_id'
         );
@@ -275,53 +275,55 @@ class Lecture extends Model
 
     protected function isWatched(): Attribute
     {
-        $user = auth()->user();
-
-        if ($user) {
-            $watchedLectures = $user->watchedLectures;
-
-            return new Attribute(
-                get: fn () => $watchedLectures->contains($this->id),
-            );
-        }
-
-        return new Attribute(
-            get: fn () => false,
-        );
-    }
-
-    protected function isSaved(): Attribute
-    {
-        $user = auth()->user();
-
-        if ($user) {
-            $savedLectures = $user->savedLectures;
-
-            return new Attribute(
-                get: fn () => $savedLectures->contains($this->id),
-            );
-        }
-
-        return new Attribute(
-            get: fn () => false,
-        );
-    }
-
-    protected function listWatched(): Attribute
-    {
-        $user = auth()->user();
-
-        if (! $user) {
+        if (! auth()->user()) {
             return new Attribute(
                 get: fn () => false,
             );
         }
 
-        $listWatchedLectures = $user->listWatchedLectures;
+        return new Attribute(
+            get: fn () => Lecture::query()
+                ->whereHas('watchedUsers', function ($query) {
+                    $query
+                        ->where('user_id', auth()->id())
+                        ->where('lecture_id', $this->id);
+                })->exists(),
+        );
+    }
+
+    protected function isSaved(): Attribute
+    {
+        if (! auth()->user()) {
+            return new Attribute(
+                get: fn () => false,
+            );
+        }
 
         return new Attribute(
-            get: fn () => $listWatchedLectures
-                ->contains($this->id),
+            get: fn () => Lecture::query()
+                ->whereHas('savedUsers', function ($query) {
+                    $query
+                        ->where('user_id', auth()->id())
+                        ->where('lecture_id', $this->id);
+                })->exists(),
+        );
+    }
+
+    protected function listWatched(): Attribute
+    {
+        if (! auth()->user()) {
+            return new Attribute(
+                get: fn () => false,
+            );
+        }
+
+        return new Attribute(
+            get: fn () => Lecture::query()
+                ->whereHas('listWatchedUsers', function ($query) {
+                    $query
+                        ->where('user_id', auth()->id())
+                        ->where('lecture_id', $this->id);
+                })->exists(),
         );
     }
 
@@ -366,15 +368,15 @@ class Lecture extends Model
         );
     }
 
-    public function setRecommended(): void
-    {
-        $this->is_recommended = true;
-    }
-
     public function isFree(): Attribute
     {
         return new Attribute(
             get: fn () => $this->payment_type_id === LecturePaymentType::FREE,
         );
+    }
+
+    public function setRecommended(): void
+    {
+        $this->is_recommended = true;
     }
 }
