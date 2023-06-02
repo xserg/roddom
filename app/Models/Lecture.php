@@ -63,7 +63,7 @@ class Lecture extends Model
         $this->lectureRepository = app(LectureRepository::class);
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
         static::addGlobalScope(new PublishedScope);
     }
@@ -115,7 +115,7 @@ class Lecture extends Model
             'user_to_saved_lectures',
             'lecture_id',
             'user_id'
-        );
+        )->withTimestamps();
     }
 
     public function subscriptions(): MorphMany
@@ -172,13 +172,13 @@ class Lecture extends Model
             $watchedIds = auth()
                 ->user()
                 ->watchedLectures()
-                ->pluck($this->getTable() . '.id')
+                ->pluck($this->getTable() . '.' . $this->getKeyName())
                 ->toArray();
 
             $query->whereIn('id', $watchedIds);
 
             if (! empty($watchedIds)) {
-                $ids = implode(',', $watchedIds) ?? '';
+                $ids = implode(',', $watchedIds);
                 $query->orderByRaw("FIELD(id, $ids)");
             }
         }
@@ -190,13 +190,13 @@ class Lecture extends Model
             $listWatchedIds = auth()
                 ->user()
                 ->listWatchedLectures()
-                ->pluck($this->getTable() . '.id')
+                ->pluck($this->getTable() . '.' . $this->getKeyName())
                 ->toArray();
 
             $query->whereIn('id', $listWatchedIds);
 
             if (! empty($listWatchedIds)) {
-                $ids = implode(',', $listWatchedIds) ?? '';
+                $ids = implode(',', $listWatchedIds);
                 $query->orderByRaw("FIELD(id, $ids)");
             }
         }
@@ -208,13 +208,13 @@ class Lecture extends Model
             $savedIds = auth()
                 ->user()
                 ->savedLectures()
-                ->pluck($this->getTable() . '.id')
+                ->pluck($this->getTable() . '.' . $this->getKeyName())
                 ->toArray();
 
             $query->whereIn('id', $savedIds);
 
             if (! empty($savedIds)) {
-                $ids = implode(',', $savedIds) ?? '';
+                $ids = implode(',', $savedIds);
                 $query->orderByRaw("FIELD(id, $ids)");
             }
         }
@@ -255,9 +255,9 @@ class Lecture extends Model
     {
         $user = auth()->user();
         if ($user) {
-            $watchedIds = $user->watchedLectures->pluck('id')->toArray();
-
-            $query->whereNotIn('id', $watchedIds);
+            $query->whereDoesntHave('watchedUsers', function (Builder $query) {
+                $query->where('user_id', auth()->id());
+            });
         }
     }
 
@@ -350,7 +350,7 @@ class Lecture extends Model
         if (auth()->user()) {
             $rates['rate_user'] = $this
                 ->rates
-                ->where('user_id', '=', auth()->user()->id)
+                ->where('user_id', '=', auth()->id())
                 ->average('rating');
         } else {
             $rates['rate_user'] = null;

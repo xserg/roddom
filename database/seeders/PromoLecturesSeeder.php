@@ -16,7 +16,7 @@ class PromoLecturesSeeder extends Seeder
         $promo = Promo::first();
 
         foreach ($lectures as $lecture) {
-            $promo->promoLectures()->attach($lecture->id);
+            $promo->pricesForPromoLectures()->attach($lecture->id);
         }
     }
 }

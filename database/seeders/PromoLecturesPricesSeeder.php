@@ -13,7 +13,7 @@ class PromoLecturesPricesSeeder extends Seeder
         $periods = Period::all();
         $promo = Promo::first();
 
-        foreach ($promo->promoLectures as $lecture) {
+        foreach ($promo->pricesForPromoLectures as $lecture) {
             foreach ($periods as $period) {
                 $lecture->pricesInPromoPacks()->attach($promo->id, [
                     'lecture_id' => $lecture->id,

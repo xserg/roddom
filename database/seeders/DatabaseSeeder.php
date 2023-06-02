@@ -41,13 +41,13 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(SubCategorySeeder::class);
         $this->call(LectureTypeSeeder::class);
-        Lecture::factory(150)->create();
+        Lecture::factory(1050)->create();
         Lecture::factory(30)->notPublished()->create();
 
         $this->call(PromoSeeder::class);
         $this->call(PromoPackPricesSeeder::class);
         $this->call(CategoryPricesSeeder::class);
-        $this->call(PromoLecturesSeeder::class);
+//        $this->call(PromoLecturesSeeder::class);
         $this->call(PromoLecturesPricesSeeder::class);
         $this->call(AppInfoSeeder::class);
 

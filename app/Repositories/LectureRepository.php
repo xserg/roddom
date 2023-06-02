@@ -74,7 +74,6 @@ class LectureRepository
         Builder|QueryBuilder $builder,
     ): Builder|QueryBuilder {
         $builder = QueryBuilder::for($builder)
-//            ->defaultSort('-created_at')
             ->allowedSorts(['created_at'])
             ->allowedIncludes(['category', 'lector', 'lector.diplomas'])
             ->allowedFilters([
@@ -89,30 +88,6 @@ class LectureRepository
             ]);
 
         return $builder;
-    }
-
-    public function getAllWithFlags(Builder|QueryBuilder $builder): Collection
-    {
-        $lectures = $builder->get();
-        $purchasedLectureIds = $this
-            ->getAllPurchasedLecturesIdsAndTheirDatesByUser(
-                auth()->user()
-            );
-        $watchedLectures = auth()->user()->watchedLectures;
-
-        $lectures = $lectures->map(function ($lecture) use ($purchasedLectureIds, $watchedLectures) {
-            $isPurchased = in_array($lecture->id, $purchasedLectureIds);
-            $isWatched = $watchedLectures->contains($lecture->id);
-            $isPromo = $lecture->promoPacks->isNotEmpty();
-
-            $lecture->is_watched = (int) $isWatched;
-            $lecture->is_promo = (int) $isPromo;
-            $lecture->is_purchased = (int) $isPurchased;
-
-            return $lecture;
-        });
-
-        return $lectures;
     }
 
     public function paginate(
@@ -136,6 +111,9 @@ class LectureRepository
     }
 
     /**
+     * это надо хранить в бд
+     * сейчас истина - subscriptions в бд и цены в аксесорах каждой лекции
+     *
      * Формирует массив типа
      *
      *  $lectures = [
@@ -237,7 +215,7 @@ class LectureRepository
 
             $purchaseInfo = [
                 'is_purchased' => array_key_exists($lecture->id, $purchasedLectures),
-                'end_date' => $isPurchased == 1 ? $purchasedLectures[$lecture->id]['end_date'] : null,
+                'end_date' => $isPurchased ? $purchasedLectures[$lecture->id]['end_date'] : null,
             ];
 
             $lecture->purchase_info = $purchaseInfo;
