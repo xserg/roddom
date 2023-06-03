@@ -15,19 +15,12 @@ use Illuminate\Database\Eloquent\Model;
 class LectorResource extends Resource
 {
     protected static ?string $model = Lector::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
     protected static ?string $navigationLabel = 'Лекторы';
-
     protected static ?int $navigationSort = 2;
-
     protected static ?string $label = 'Лекторы';
-
     protected static ?string $pluralModelLabel = 'Лекторы';
-
     protected static ?string $modelLabel = 'Лектор';
-
     protected static ?string $recordTitleAttribute = 'name';
 
     public static function form(Form $form): Form
@@ -103,7 +96,7 @@ class LectorResource extends Resource
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lector $record): ?string {
-                            return round($record->rates['rate_avg'], 1) ?: 'нет оценок';
+                            return round($record->rates['rate_avg'] ?? 0, 1) ?: 'нет оценок';
                         }
                     )
                     ->label('Рейтинг, из 10'),
