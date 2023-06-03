@@ -362,7 +362,7 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lecture $record): ?string {
-                            return round($record?->a_rates['rate_avg'], 1) ?: 'нет оценок';
+                            return round($record?->a_rates['rate_avg'] ?? 0, 1) ?: 'нет оценок';
                         }
                     )
                     ->label('Рейтинг, из 10'),
@@ -372,7 +372,7 @@ class LectureResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Filter::make('is_free')
+                Filter::make('free')
                     ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::FREE))
                     ->label('бесплатные'),
                 Filter::make('payed')

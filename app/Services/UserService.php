@@ -129,7 +129,7 @@ class UserService
             throw new NotFoundHttpException('Лекция с id '.$lectureId.' не найдена');
         }
 
-        if ($this->lectureService->isFree($lectureId)) {
+        if ($lecture->isFree()) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
                 return $lecture->content;
             }
@@ -148,7 +148,7 @@ class UserService
                 'Пользователь не сможет посмотреть новую бесплатную лекцию'
             );
         } else {
-            if ($this->isLecturePurchased($lectureId, $user)) {
+            if ($this->isLecturePurchased($lectureId)) {
                 $user->watchedLectures()->detach($lectureId);
                 $this->addLectureToWatched($lectureId, $user);
 
@@ -338,11 +338,6 @@ class UserService
         $user->purchased_lectures_counter = $purchasedLecturesCount;
 
         return $user;
-    }
-
-    private function codeIsOlderThanHour($createdAt): bool
-    {
-        return now()->subHour() > $createdAt;
     }
 
     /**

@@ -76,17 +76,12 @@ class LectureService
             return false;
         }
 
-        if ($lecture->is_promo) {
+        if ($lecture->isPromo()) {
             $stillActual = $promoSubscription->last()->isActual();
 
             return $stillActual;
         }
 
         return false;
-    }
-
-    public function isFree(int $id): bool
-    {
-        return $this->lectureRepository->getLectureById($id)->is_free;
     }
 }

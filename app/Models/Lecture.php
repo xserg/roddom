@@ -21,8 +21,6 @@ class Lecture extends Model
 
     protected $appends = [
         'is_watched',
-        'is_promo',
-        'is_free',
         'prices',
         'is_saved',
         'list_watched',
@@ -266,13 +264,6 @@ class Lecture extends Model
         $query->where('is_recommended', '=', true);
     }
 
-    protected function isPromo(): Attribute
-    {
-        return new Attribute(
-            get: fn () => $this->payment_type_id === LecturePaymentType::PROMO,
-        );
-    }
-
     protected function isWatched(): Attribute
     {
         if (! auth()->user()) {
@@ -332,7 +323,7 @@ class Lecture extends Model
      */
     protected function prices(): Attribute
     {
-        if ($this->payment_type_id === LecturePaymentType::PROMO) {
+        if ($this->isPromo()) {
             $prices = $this->lectureRepository->formPricesForPromoLecture($this);
         } else {
             $prices = $this->lectureRepository->formPricesForPayedLecture($this);
@@ -372,11 +363,14 @@ class Lecture extends Model
         );
     }
 
-    public function isFree(): Attribute
+    public function isFree(): bool
     {
-        return new Attribute(
-            get: fn () => $this->payment_type_id === LecturePaymentType::FREE,
-        );
+        return $this->payment_type_id === LecturePaymentType::FREE;
+    }
+
+    public function isPromo(): bool
+    {
+        return $this->payment_type_id === LecturePaymentType::PROMO;
     }
 
     public function setRecommended(): void
