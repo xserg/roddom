@@ -100,6 +100,8 @@ class CategoryRepository
         }
 
         foreach ($lectures as $lecture) {
+
+            // !аксессор лекции
             $lecturePrices = $lecture->prices;
 
             if (! $lecturePrices) {

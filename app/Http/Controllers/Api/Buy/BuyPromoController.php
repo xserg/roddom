@@ -63,7 +63,7 @@ class BuyPromoController extends Controller
             ->getPeriodByLength($periodLength)
             ->id;
         $price = $this->promoRepository
-            ->getPriceForPackForPeriod(1, $periodId);
+            ->calculatePromoPackPriceForPeriod(1, $periodId);
 
         $order = Order::create([
             'user_id' => auth()->user()->id,

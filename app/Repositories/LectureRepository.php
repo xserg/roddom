@@ -22,12 +22,18 @@ class LectureRepository
     use MoneyConversion;
 
     private $periods;
+    private $promoCommonPrices;
 
     public function __construct(
         private CategoryRepository $categoryRepository,
         private PromoRepository    $promoRepository
     ) {
         $this->periods = Period::all();
+
+        $this->promoCommonPrices = Promo::query()
+            ->with(['subscriptionPeriodsForPromoPack'])
+            ->first()
+            ->subscriptionPeriodsForPromoPack;
     }
 
     /**
@@ -249,75 +255,77 @@ class LectureRepository
         return $price;
     }
 
-    public function formPricesForLecture(Lecture $lecture): array
+    public function formPricesForPromoLecture(Lecture $lecture): array
     {
         $prices = [];
 
-        //чекаем что лекция промо
-        if ($lecture->paymentType->id === LecturePaymentType::PROMO) {
-            $promoCustomPrices = $lecture->pricesPeriodsInPromoPacks;
-            $promoCommonPrices = Promo::query()
-                ->with(['subscriptionPeriodsForPromoPack'])
-                ->first()
-                ->subscriptionPeriodsForPromoPack;
+        $promoCustomPrices = $lecture->pricesPeriodsInPromoPacks;
+        $promoCommonPrices = $this->promoCommonPrices;
 
-            foreach ($this->periods as $period) {
-                //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
-                $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
-                $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
-                $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
-                //а вот кастомной может не быть цены, поэтому проверяем
-                if (is_null($priceCustom)) {
-                    //если нет кастомной цены для конкретного периода, ставим null
-                    $prices[] = [
-                        'length' => $period->length,
-                        'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => $priceCommonForOneLecture,
-                    ];
-                } else {
-                    //а если есть, то преобразовываем в формат рубли.копейки и ставим
-                    //а common_price_for_one_lecture одна и таже в обоих случаях
+        foreach ($this->periods as $period) {
+            //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
+            $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
+            $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
+            $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
 
-                    $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+            //а вот кастомной цены может не быть, поэтому проверяем
+            if (is_null($priceCustom)) {
+                //если нет кастомной цены для конкретного периода, ставим null
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => null,
+                    'common_price_for_one_lecture' => $priceCommonForOneLecture,
+                ];
+            } else {
+                //а если есть, то преобразовываем в формат рубли.копейки и ставим
+                //а common_price_for_one_lecture одна и таже в обоих случаях
 
-                    $prices[] = [
-                        'length' => $period->length,
-                        'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => $priceForOneLecture,
-                        'common_price_for_one_lecture' => $priceCommonForOneLecture,
-                    ];
-                }
+                $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => $priceForOneLecture,
+                    'common_price_for_one_lecture' => $priceCommonForOneLecture,
+                ];
             }
-        } else {
-            //если не промо - то не важно, платная или бесплатная,
-            //бесплатную тоже можно купить по ценам платной
-            //берем общую цену за одну лекцию у категории
-            $commonCategoryPrices = $lecture->category->categoryPrices;
-            $customPrices = $lecture->pricesForLectures;
+        }
 
-            foreach ($this->periods as $period) {
-                //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
-                $priceCommon = $commonCategoryPrices->where('period_id', $period->id)->first();
-                $priceCustom = $customPrices->where('length', $period->length)->first();
+        return $prices;
+    }
 
-                if (is_null($priceCustom)) {
-                    $prices[] = [
-                        'length' => $period->length,
-                        'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => null,
-                        'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
-                    ];
-                } else {
-                    $priceForOneLecture = self::coinsToRoubles($priceCustom->pivot->price);
+    public function formPricesForPayedLecture(Lecture $lecture): array
+    {
+        $prices = [];
 
-                    $prices[] = [
-                        'length' => $period->length,
-                        'period_id' => $period->id,
-                        'custom_price_for_one_lecture' => $priceForOneLecture,
-                        'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
-                    ];
-                }
+        //если не промо - то не важно, платная или бесплатная,
+        //бесплатную тоже можно купить по ценам платной
+        //берем общую цену за одну лекцию у категории
+        $commonCategoryPrices = $lecture->category->categoryPrices;
+        $customPrices = $lecture->pricesForLectures;
+
+        foreach ($this->periods as $period) {
+            //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
+            $priceCommon = $commonCategoryPrices->where('period_id', $period->id)->first();
+            $priceCustom = $customPrices->where('length', $period->length)->first();
+
+            if (is_null($priceCustom)) {
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => null,
+                    'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                ];
+            } else {
+                $priceForOneLecture = self::coinsToRoubles($priceCustom->pivot->price);
+
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => $priceForOneLecture,
+                    'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                ];
             }
         }
 

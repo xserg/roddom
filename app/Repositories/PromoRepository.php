@@ -33,7 +33,7 @@ class PromoRepository
             $prices[] = [
                 'title' => $period->title,
                 'length' => $period->length,
-                'price' => $this->getPriceForPackForPeriod(1, $period->id),
+                'price' => $this->calculatePromoPackPriceForPeriod(1, $period->id),
                 'price_for_one_lecture' => self::coinsToRoubles($period->pivot->price_for_one_lecture),
             ];
         }
@@ -52,7 +52,7 @@ class PromoRepository
         return self::coinsToRoubles($price->price_for_one_lecture);
     }
 
-    public function getPriceForPackForPeriod(int $promoId, int $periodId): int|float|string
+    public function calculatePromoPackPriceForPeriod(int $promoId, int $periodId): int|float|string
     {
         $finalPrice = 0;
 

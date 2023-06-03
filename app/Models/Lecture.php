@@ -332,7 +332,11 @@ class Lecture extends Model
      */
     protected function prices(): Attribute
     {
-        $prices = $this->lectureRepository->formPricesForLecture($this);
+        if ($this->payment_type_id === LecturePaymentType::PROMO) {
+            $prices = $this->lectureRepository->formPricesForPromoLecture($this);
+        } else {
+            $prices = $this->lectureRepository->formPricesForPayedLecture($this);
+        }
 
         return new Attribute(
             get: fn () => $prices,

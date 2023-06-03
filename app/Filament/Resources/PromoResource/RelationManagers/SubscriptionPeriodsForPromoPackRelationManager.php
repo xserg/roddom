@@ -58,7 +58,7 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                     ->getStateUsing(
                         function (?Model $record) {
                             return app(PromoRepository::class)
-                                ->getPriceForPackForPeriod(1, $record->period_id);
+                                ->calculatePromoPackPriceForPeriod(1, $record->period_id);
                         }
                     )
                     ->label('Цена, рублей'),
