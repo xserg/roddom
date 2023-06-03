@@ -11,6 +11,10 @@ class Lector extends Model
 {
     use HasFactory;
 
+    protected $appends = [
+        'a_rates'
+    ];
+
     protected $fillable = [
         'name',
         'position',
@@ -29,28 +33,28 @@ class Lector extends Model
         return $this->hasMany(Diploma::class);
     }
 
-    protected function rates(): Attribute
+    public function rates(): HasMany
+    {
+        return $this->hasMany(LectorRate::class);
+    }
+
+    protected function aRates(): Attribute
     {
         $rates = [];
 
-        $rates['rate_avg'] = LectorRate::query()
-            ->where('lector_id', '=', $this->id)
+        $rates['rate_avg'] = $this
+            ->rates
             ->average('rating');
 
         if (auth()->user()) {
-            $rates['rate_user'] = LectorRate::query()
-                ->where('lector_id', '=', $this->id)
-                ->where('user_id', '=', auth()->user()->id)
+            $rates['rate_user'] = $this
+                ->rates
+                ->where('user_id', '=', auth()->id())
                 ->average('rating');
         } else {
             $rates['rate_user'] = null;
         }
 
-        //        if ($rates) {
-        //            return new Attribute(
-        //                get: fn() => $rates,
-        //            );
-        //        }
         return new Attribute(
             get: fn () => $rates,
         );

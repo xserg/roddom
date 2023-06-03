@@ -36,7 +36,7 @@ class LectorResource extends JsonResource
             'career_start' => $this->career_start,
             'photo' => $this->photo,
             'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas')),
-            'rates' => $this->whenNotNull($this->rates),
+            'rates' => $this->whenNotNull($this->aRates),
         ];
     }
 }

@@ -273,12 +273,9 @@ class Lecture extends Model
         }
 
         return new Attribute(
-            get: fn () => Lecture::query()
-                ->whereHas('watchedUsers', function ($query) {
-                    $query
-                        ->where('user_id', auth()->id())
-                        ->where('lecture_id', $this->id);
-                })->exists(),
+            get: fn () => $this
+                ->watchedUsers
+                ->contains('user_id', auth()->id())
         );
     }
 
@@ -291,12 +288,9 @@ class Lecture extends Model
         }
 
         return new Attribute(
-            get: fn () => Lecture::query()
-                ->whereHas('savedUsers', function ($query) {
-                    $query
-                        ->where('user_id', auth()->id())
-                        ->where('lecture_id', $this->id);
-                })->exists(),
+            get: fn () => $this
+                ->savedUsers
+                ->contains('user_id', auth()->id())
         );
     }
 
@@ -309,12 +303,9 @@ class Lecture extends Model
         }
 
         return new Attribute(
-            get: fn () => Lecture::query()
-                ->whereHas('listWatchedUsers', function ($query) {
-                    $query
-                        ->where('user_id', auth()->id())
-                        ->where('lecture_id', $this->id);
-                })->exists(),
+            get: fn () => $this
+                ->listWatchedUsers
+                ->contains('user_id', auth()->id())
         );
     }
 

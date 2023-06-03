@@ -188,6 +188,9 @@ class RetrieveAllLecturesController
                 'pricesPeriodsInPromoPacks',
                 'pricesForLectures',
                 'rates',
+                'watchedUsers',
+                'savedUsers',
+                'listWatchedUsers'
             ];
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);

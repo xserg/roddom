@@ -27,27 +27,18 @@ class LectureResource extends Resource
     use MoneyConversion;
 
     protected static ?string $model = Lecture::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
     protected static ?string $navigationLabel = 'Лекции';
-
     protected static ?int $navigationSort = 2;
-
     protected static ?string $label = 'Лекции';
-
     protected static ?string $pluralModelLabel = 'Лекции';
-
     protected static ?string $recordTitleAttribute = 'title';
-
     protected static ?string $modelLabel = 'Лекция';
 
     public function __construct(
         private PeriodRepository $periodRepository,
-        private PromoRepository $promoRepository
-    ) {
-
-    }
+        private PromoRepository  $promoRepository
+    ) {}
 
     public static function form(Form $form): Form
     {
@@ -227,8 +218,8 @@ class LectureResource extends Resource
                             ->label(function (?Model $record) {
                                 return new HtmlString(
                                     'общая цена лекции, указывается в <a style="color: #0000EE" href="'
-                                    .route('filament.resources.categories.edit', ['record' => $record->category->id])
-                                    .'" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
+                                    . route('filament.resources.categories.edit', ['record' => $record->category->id])
+                                    . '" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
                                 );
                             })
@@ -243,7 +234,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($categoryPrices[0]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[0]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -257,7 +248,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($record?->category->categoryPrices[1]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[1]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -271,7 +262,7 @@ class LectureResource extends Resource
                                         return self::coinsToRoubles($record?->category->categoryPrices[2]['price_for_one_lecture']);
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[2]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -283,8 +274,8 @@ class LectureResource extends Resource
                             ->label(function (?Model $record) {
                                 return new HtmlString(
                                     'общие цены одной промо лекции, указывается в <a style="color: #0000EE" href="'
-                                    .route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
-                                    .'" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
+                                    . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
+                                    . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
  страницу категории/промо пака и смотреть общие цены'
                                 );
                             })
@@ -297,7 +288,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[0]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[0]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -310,7 +301,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[1]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[1]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)
@@ -323,7 +314,7 @@ class LectureResource extends Resource
                                         return $price;
                                     })
                                     ->label(function (?Model $record) {
-                                        return 'период, дней: '.$record?->category->categoryPrices[2]->period->length;
+                                        return 'период, дней: ' . $record?->category->categoryPrices[2]->period->length;
                                     })
                                     ->disabled()
                                     ->columnSpan(2)

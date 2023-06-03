@@ -239,7 +239,7 @@ class LectureRepository
         return Lecture::whereIn('id', array_keys($purchasedLectureIds))->get();
     }
 
-    public function getLecturePrice(Lecture $lecture, int $period): int|float
+    public function calculateLecturePrice(Lecture $lecture, int $period): int|float
     {
         // аксесор лекции
         $prices = $lecture->prices;
