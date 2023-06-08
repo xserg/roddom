@@ -29,16 +29,6 @@ class PromoLecturesPricesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('lecture_id')
-                    ->required()
-                    ->maxLength(255),
-
-                Forms\Components\Select::make('period_id')
-                    ->required()
-                    ->options(
-                        Period::all()->pluck('length', 'id')
-                    ),
-
                 self::priceField('price'),
             ]);
     }

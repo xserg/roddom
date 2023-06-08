@@ -18,21 +18,13 @@ class PricesForLecturesRelationManager extends RelationManager
     use MoneyConversion;
 
     protected static string $relationship = 'pricesForLectures';
-
     protected static ?string $title = 'Цены лекции';
-
     protected static ?string $recordTitleAttribute = 'id';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('period_id')
-                    ->required()
-                    ->options(
-                        Period::all()->pluck('length', 'id')
-                    ),
-
                 self::priceField('price'),
             ]);
     }
