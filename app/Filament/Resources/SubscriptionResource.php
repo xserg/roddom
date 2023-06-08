@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
@@ -21,15 +22,10 @@ use Illuminate\Support\Carbon;
 class SubscriptionResource extends Resource
 {
     protected static ?string $model = Subscription::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
-
     protected static ?string $label = 'Подписки';
-
     protected static ?string $pluralModelLabel = 'Подписки';
-
     protected static ?string $modelLabel = 'Подписка';
-
     protected static ?string $navigationGroup = 'Пользователи';
 
     public static function form(Form $form): Form
@@ -37,8 +33,11 @@ class SubscriptionResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'email')
                     ->required()
+                    ->multiple()
+                    ->options(function () {
+                        return User::pluck('name', 'id');
+                    })
                     ->disabled(function (string $context) {
                         return $context === 'edit';
                     })
