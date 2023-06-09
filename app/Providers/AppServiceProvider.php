@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Repositories\LectureRepository;
+use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
