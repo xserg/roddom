@@ -47,7 +47,7 @@ class CategoryPricesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price_pack')
                     ->getStateUsing(
                         function (?SubcategoryPrices $record): ?string {
-                            $periodId = $record->periitod_id;
+                            $periodId = $record->period_id;
                             $price = app(CategoryRepository::class)
                                 ->calculateSubCategoryPriceForPeriod(
                                     $record->category,
