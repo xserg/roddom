@@ -102,26 +102,13 @@ class PaymentController extends Controller
                         ->send(new \App\Mail\PurchaseSuccess(
                             'Успешная покупка',
                             $successfulPurchaseText,
-                            $subscriptionableName,
+                            $subscription->entity_title,
                             $subscription->start_date,
                             $subscription->end_date
                         ));
                 }
             }
         }
-    }
-
-    private function getSubscriptionableName(Order $order): string
-    {
-        if ($order->subscriptionable_type == Lecture::class) {
-            return 'Лекция: ' . Lecture::query()->find($order->subscriptionable_id)->title;
-        } elseif ($order->subscriptionable_type == Category::class) {
-            return 'Категория: ' . Category::query()->find($order->subscriptionable_id)->title;
-        } elseif ($order->subscriptionable_type == Promo::class) {
-            return 'Промопак лекций';
-        }
-
-        return 'Заголовок лекции не определён';
     }
 
     private function getSubscriptionAttributes(
