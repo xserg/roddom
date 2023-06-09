@@ -68,7 +68,7 @@ class PromoRepository
 
         $relations = [
             'category',
-            'category.categoryPrices',
+            'category.categoryPrices.period',
             'pricesPeriodsInPromoPacks',
             'pricesForLectures',
         ];
@@ -120,7 +120,9 @@ class PromoRepository
         $commonCategoryPrices = $lecture->category->categoryPrices;
         $customPrices = $lecture->pricesForLectures;
 
-        foreach (Period::all() as $period) {
+        foreach ($commonCategoryPrices as $commonCategoryPrice) {
+            $period = $commonCategoryPrice->period;
+
             //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
             $priceCommon = $commonCategoryPrices->where('period_id', $period->id)->first();
             $priceCustom = $customPrices->where('length', $period->length)->first();

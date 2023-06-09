@@ -139,6 +139,9 @@ class RetrieveAllPromoLecturesController extends Controller
             'pricesPeriodsInPromoPacks',
             'pricesForLectures',
             'rates',
+            'watchedUsers',
+            'savedUsers',
+            'listWatchedUsers'
         ];
         $builder = $this->lectureRepository->getAllPromoQueryWith($relations);
         $builder = $this->lectureRepository->addFiltersToQuery($builder);
