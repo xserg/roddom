@@ -47,11 +47,10 @@ class CategoryPricesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price_pack')
                     ->getStateUsing(
                         function (?SubcategoryPrices $record): ?string {
-                            $categoryId = $record->category_id;
-                            $periodId = $record->period_id;
+                            $periodId = $record->periitod_id;
                             $price = app(CategoryRepository::class)
                                 ->calculateSubCategoryPriceForPeriod(
-                                    $categoryId,
+                                    $record->category,
                                     $periodId);
 
                             return self::coinsToRoubles($price);

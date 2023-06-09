@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
 use App\Repositories\LectureRepository;
+use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,10 +13,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Support\Facades\Log;
 
 class Lecture extends Model
 {
-    use HasFactory;
+    use HasFactory, MoneyConversion;
 
     private $lectureRepository;
 
@@ -323,6 +325,20 @@ class Lecture extends Model
         return new Attribute(
             get: fn () => $prices,
         );
+    }
+
+    public function convertPrices(array $prices): array
+    {
+        foreach ($prices as &$priceForOnePeriod) {
+            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
+                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
+            }
+            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
+                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
+            }
+        }
+
+        return $prices;
     }
 
     protected function aRates(): Attribute

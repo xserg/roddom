@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PromoResource\RelationManagers;
 
 use App\Models\Period;
 use App\Repositories\PromoRepository;
+use App\Traits\MoneyConversion;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Form;
@@ -14,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
+    use MoneyConversion;
+
     protected static ?string $title = 'Общие цены, акционный пак';
     protected static string $relationship = 'subscriptionPeriodsForPromoPack';
     protected static ?string $recordTitleAttribute = 'period_id';
@@ -55,8 +58,8 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->getStateUsing(
                         function (?Model $record) {
-                            return app(PromoRepository::class)
-                                ->calculatePromoPackPriceForPeriod(1, $record->period_id);
+                            return self::coinsToRoubles(app(PromoRepository::class)
+                                ->calculatePromoPackPriceForPeriod(1, $record->period_id));
                         }
                     )
                     ->label('Цена, рублей'),

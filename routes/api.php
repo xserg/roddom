@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AppInfo\AppInfo;
 use App\Http\Controllers\Api\Buy\BuyCategoryController;
+use App\Http\Controllers\Api\Buy\BuyAllLecturesController;
 use App\Http\Controllers\Api\Buy\BuyLectureController;
 use App\Http\Controllers\Api\Buy\BuyPromoController;
 use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorsByCategoryController;
 use App\Http\Controllers\Api\Lecture\AddToListWatchedLectureController;
+use App\Http\Controllers\Api\Lecture\AllLecturesPricesController;
 use App\Http\Controllers\Api\Lecture\FeedbackLectureController;
 use App\Http\Controllers\Api\Lecture\RemoveFromListWatchedLectureController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
@@ -34,17 +36,6 @@ use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\ResendLoginCodeController;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::prefix('v1')
     ->name('v1.')
@@ -122,6 +113,13 @@ Route::prefix('v1')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
 
+            Route::post('/lecture/all/buy/{period}', BuyAllLecturesController::class)
+                ->name('lecture.buy.all')
+                ->where('period', '[0-9]+');
+
+            Route::get('/lecture/all/prices', AllLecturesPricesController::class)
+                ->name('lecture.all.price');
+
             Route::get('/categories', RetrieveAllCategoriesController::class)
                 ->name('categories');
             Route::get('/category/{slug}', RetrieveCategoryController::class)
@@ -133,8 +131,9 @@ Route::prefix('v1')
 
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
-                ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
+
+
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
         });

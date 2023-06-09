@@ -2,14 +2,22 @@
 
 namespace App\Services;
 
+use App\Models\Category;
+use App\Models\Period;
+use App\Repositories\CategoryRepository;
 use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
+use App\Traits\MoneyConversion;
+use Illuminate\Database\Eloquent\Collection;
 
 class LectureService
 {
+    use MoneyConversion;
+
     public function __construct(
-        private LectureRepository $lectureRepository,
-        private UserRepository $userRepository
+        private LectureRepository  $lectureRepository,
+        private UserRepository     $userRepository,
+        private CategoryRepository $categoryRepository
     ) {
     }
 
@@ -83,5 +91,43 @@ class LectureService
         }
 
         return false;
+    }
+
+    public function formAllLecturePrices(): array
+    {
+        $prices = [];
+
+        $mainCategories = Category::mainCategories()->with([
+            'childrenCategories.categoryPrices.period',
+            'childrenCategories.parentCategory',
+            'childrenCategories.categoryPrices',
+            'childrenCategories.lectures.category.categoryPrices',
+            'childrenCategories.lectures.pricesInPromoPacks',
+            'childrenCategories.lectures.pricesForLectures',
+            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+            'childrenCategories.lectures.paymentType',
+            'childrenCategories.lectures.contentType',
+        ])->get();
+
+        foreach (Period::all() as $period) {
+            $prices[] = [
+                'period_id' => $period->id,
+                'period_length' => $period->length,
+                'price' => self::coinsToRoubles($this->calculateEverythingPriceByPeriod($mainCategories, $period->id))
+            ];
+        }
+
+        return $prices;
+    }
+
+    public function calculateEverythingPriceByPeriod(Collection $mainCategories, int $periodId): int
+    {
+        $price = 0;
+
+        foreach ($mainCategories as $category) {
+            $price += $this->categoryRepository->calculateMainCategoryPriceForPeriod($category, $periodId);
+        }
+
+        return $price;
     }
 }

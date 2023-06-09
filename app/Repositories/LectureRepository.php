@@ -173,7 +173,7 @@ class LectureRepository
                     continue;
                 }
 
-                $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id']);
+                $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id'], ['lectures']);
                 if (is_null($category)) {
                     continue;
                 }
@@ -267,7 +267,8 @@ class LectureRepository
             //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
             $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
             $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
-            $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
+//            $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
+            $priceCommonForOneLecture = (int)$priceCommon->pivot->price_for_one_lecture ;
 
             //а вот кастомной цены может не быть, поэтому проверяем
             if (is_null($priceCustom)) {
@@ -282,7 +283,8 @@ class LectureRepository
                 //а если есть, то преобразовываем в формат рубли.копейки и ставим
                 //а common_price_for_one_lecture одна и таже в обоих случаях
 
-                $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+//                $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+                $priceForOneLecture = (int)$priceCustom->pivot->price;
 
                 $prices[] = [
                     'length' => $period->length,
@@ -316,16 +318,16 @@ class LectureRepository
                     'length' => $period->length,
                     'period_id' => $period->id,
                     'custom_price_for_one_lecture' => null,
-                    'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                    'common_price_for_one_lecture' => (int)$priceCommon->price_for_one_lecture,
                 ];
             } else {
-                $priceForOneLecture = self::coinsToRoubles($priceCustom->pivot->price);
+                $priceForOneLecture = $priceCustom->pivot->price;
 
                 $prices[] = [
                     'length' => $period->length,
                     'period_id' => $period->id,
-                    'custom_price_for_one_lecture' => $priceForOneLecture,
-                    'common_price_for_one_lecture' => self::coinsToRoubles($priceCommon->price_for_one_lecture),
+                    'custom_price_for_one_lecture' => (int)$priceForOneLecture,
+                    'common_price_for_one_lecture' => (int)$priceCommon->price_for_one_lecture,
                 ];
             }
         }

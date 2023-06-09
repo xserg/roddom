@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Lecture;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -52,7 +53,9 @@ class LectureResource extends JsonResource
     public function toArray(Request $request): array
     {
         $loadCategory = $this->resource->relationLoaded('category');
-
+        /**
+         * @var Lecture $this
+         */
         return [
             'id' => $this->id,
             'lector_id' => $this->lector_id,
@@ -74,7 +77,7 @@ class LectureResource extends JsonResource
             'is_promo' => $this->isPromo(),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
-            'prices' => $this->whenNotNull($this->prices),
+            'prices' => $this->convertPrices($this->prices),
             'rates' => $this->whenNotNull($this->a_rates),
             'content_type' => $this->whenNotNull(new LectureContentTypeResource($this->contentType)),
             'payment_type' => $this->whenNotNull(new LecturePaymentTypeResource($this->paymentType)),

@@ -10,6 +10,7 @@ use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use App\Services\PaymentService;
 use App\Services\PromoService;
+use App\Traits\MoneyConversion;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -39,6 +40,8 @@ use OpenApi\Attributes as OA;
 )]
 class BuyPromoController extends Controller
 {
+    use MoneyConversion;
+
     public function __construct(
         private PromoService $promoService,
         private PromoRepository $promoRepository,
@@ -62,8 +65,8 @@ class BuyPromoController extends Controller
         $periodId = $this->periodRepository
             ->getPeriodByLength($periodLength)
             ->id;
-        $price = $this->promoRepository
-            ->calculatePromoPackPriceForPeriod(1, $periodId);
+        $price = self::coinsToRoubles($this->promoRepository
+            ->calculatePromoPackPriceForPeriod(1, $periodId));
 
         $order = Order::create([
             'user_id' => auth()->user()->id,

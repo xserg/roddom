@@ -79,6 +79,7 @@ class PromoRepository
         }
 
         foreach ($promoLectures as $promoLecture) {
+            // аксессор модели!
             $lecturePrices = $promoLecture->prices;
 
             $lecturePriceForPeriod = Arr::where($lecturePrices, function ($value) use ($periodId) {
@@ -92,6 +93,6 @@ class PromoRepository
             $finalPrice += $customPrice ?? $commonPrice;
         }
 
-        return round($finalPrice, 2);
+        return $finalPrice;
     }
 }

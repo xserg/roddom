@@ -23,6 +23,10 @@ class SubcategoryPrices extends Model
         'period_id',
     ];
 
+    protected $casts = [
+        'price_for_one_lecture' => 'integer',
+    ];
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);

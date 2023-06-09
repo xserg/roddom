@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Category;
 use App\Models\Lector;
 use App\Models\Lecture;
+use App\Models\Period;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -18,88 +19,81 @@ class CategoryRepository
     {
     }
 
-    public function getCategoryById(int $id): ?Category
+    public function getCategoryById(int $id, array $relations = []): ?Category
     {
-        return Category::find($id);
+        return Category::with($relations)->find($id);
     }
 
-    /**
-     * Считать цену учитывая только общую цену на лекции и количество лекций в категории
-     */
-    public function getCategoryPrice(int $categoryId, int $periodId): int|string
+    public function formMainCategoryPrices(Category $category): array
     {
-        $category = $this->getCategoryById($categoryId);
-
-        if (! is_null($category)) {
-            return 0;
-        }
-
-        $prices = $category->categoryPrices;
-        $lecturesCount = $category->lectures->count();
-
-        foreach ($prices as $price) {
-            $priceForPackInRoubles =
-                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
-
-            if ($price->period->id == $periodId) {
-                return $priceForPackInRoubles;
-            }
-        }
-
-        return 0;
-    }
-
-    public function formCategoryPrices(Category $category): array
-    {
-        $prices = $category->categoryPrices()->with(['period'])->get();
-        $id = $category->id;
         $result = [];
 
-        foreach ($prices as $price) {
-            $priceForPackInRoubles = $this
-                ->getCategoryPriceForPeriodComplex(
-                    $id,
-                    $price->period->id
-                );
+        foreach (Period::all() as $period) {
+            $categoryPrice = $this->calculateMainCategoryPriceForPeriod($category, $period->id);
 
-            $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
+            $categoryPriceInRoubles = self::coinsToRoubles($categoryPrice);
 
             $result[] = [
-                'title' => $price->period->title,
-                'length' => $price->period->length,
-                'price_for_one_lecture' => (float) $priceForOneLectureInRoubles,
-                'price_for_category' => $priceForPackInRoubles,
+                'title' => $period->title,
+                'length' => $period->length,
+                'price_for_category' => $categoryPriceInRoubles,
             ];
         }
 
         return $result;
     }
 
-    public function getCategoryPriceForPeriodComplex(
-        int $categoryId,
+    public function formSubCategoryPrices(Category $category): array
+    {
+        $prices = $category->categoryPrices;
+        $result = [];
+
+        foreach ($prices as $price) {
+            $categoryPrice = $this->calculateSubCategoryPriceForPeriod($category, $price->period->id);
+
+            $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
+            $categoryPriceInRoubles = self::coinsToRoubles($categoryPrice);
+
+            $result[] = [
+                'title' => $price->period->title,
+                'length' => $price->period->length,
+                'price_for_one_lecture' => $priceForOneLectureInRoubles,
+                'price_for_category' => $categoryPriceInRoubles,
+            ];
+        }
+
+        return $result;
+    }
+
+    public function calculateMainCategoryPriceForPeriod(
+        Category $mainCategory,
         int $periodId
-    ): int|string|float {
+    ): int {
+        $price = 0;
+
+        foreach ($mainCategory->childrenCategories as $subCategory) {
+            $price += $this->calculateSubCategoryPriceForPeriod($subCategory, $periodId);
+        }
+
+        return $price;
+    }
+
+    /**
+     * Считает цену сабкатегории в копейках за период
+     */
+    public function calculateSubCategoryPriceForPeriod(
+        Category $category,
+        int $periodId
+    ): int {
         $finalPrice = 0;
 
-        $lectures = Lecture::query()
-            ->where('category_id', $categoryId)
-            ->with([
-                'category.categoryPrices',
-                'contentType',
-                'paymentType',
-                'pricesPeriodsInPromoPacks',
-                'pricesForLectures',
-                'pricesInPromoPacks',
-            ])
-            ->get();
+        $lecturesCount = $category->lectures->count();
 
-        $lecturesCount = $lectures->count();
-
-        if ($lecturesCount == 0) {
+        if ($lecturesCount === 0) {
             return $finalPrice;
         }
 
-        foreach ($lectures as $lecture) {
+        foreach ($category->lectures as $lecture) {
 
             // !аксессор лекции
             $lecturePrices = $lecture->prices;
@@ -119,31 +113,11 @@ class CategoryRepository
             $finalPrice += $customPrice ?? $commonPrice;
         }
 
-        return round($finalPrice, 2);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function getCategoryPriceForPeriodLength(?Category $category, int $period): string|int|float
-    {
-        $prices = $category->prices;
-
-        if ($prices) {
-            $priceForExactPeriod = Arr::where(
-                $prices,
-                fn ($value) => $value['length'] == $period
-            );
-            $price = Arr::first($priceForExactPeriod)['price_for_category'];
-        }
-
-        return $price;
+        return $finalPrice;
     }
 
     /**
      * Возвращает лекторов лекций, относящихся к категории/подкатегории
-     * @param string $slug
-     * @return Collection
      */
     public function getAllLectorsByCategory(string $slug): Collection
     {
@@ -176,5 +150,31 @@ class CategoryRepository
             })
             ->orderBy('id')
             ->get();
+    }
+
+    /**
+     * Считать цену учитывая только общую цену на лекции и количество лекций в категории
+     */
+    public function getCategoryPrice(int $categoryId, int $periodId): int|string
+    {
+        $category = $this->getCategoryById($categoryId);
+
+        if (! is_null($category)) {
+            return 0;
+        }
+
+        $prices = $category->categoryPrices;
+        $lecturesCount = $category->lectures->count();
+
+        foreach ($prices as $price) {
+            $priceForPackInRoubles =
+                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
+
+            if ($price->period->id == $periodId) {
+                return $priceForPackInRoubles;
+            }
+        }
+
+        return 0;
     }
 }

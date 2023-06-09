@@ -11,6 +11,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\PeriodRepository;
 use App\Services\CategoryService;
 use App\Services\PaymentService;
+use App\Traits\MoneyConversion;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -48,32 +49,50 @@ use OpenApi\Attributes as OA;
 )]
 class BuyCategoryController extends Controller
 {
+    use MoneyConversion;
+
     public function __construct(
-        private CategoryService $categoryService,
+        private CategoryService    $categoryService,
         private CategoryRepository $categoryRepository,
-        private PaymentService $paymentService,
-        private PeriodRepository $periodRepository
+        private PaymentService     $paymentService,
+        private PeriodRepository   $periodRepository
     ) {
     }
 
     public function __invoke(
         BuyCategoryRequest $request,
-        int $categoryId,
-        int $period
+        int                $categoryId,
+        int                $period
     ) {
         $periodId = $this->periodRepository->getPeriodByLength($period)->id;
-
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
-        $price = $this->categoryRepository->getCategoryPriceForPeriodComplex($categoryId, $periodId);
+        $relations = [
+            'childrenCategories.categoryPrices.period',
+            'childrenCategories.parentCategory',
+            'childrenCategories.categoryPrices',
+            'childrenCategories.lectures.category.categoryPrices',
+            'childrenCategories.lectures.pricesInPromoPacks',
+            'childrenCategories.lectures.pricesForLectures',
+            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+            'childrenCategories.lectures.paymentType',
+            'childrenCategories.lectures.contentType',
+        ];
+        $category = $this->categoryRepository->getCategoryById($categoryId, $relations);
+
+        if ($category->isSub()) {
+            $price = self::coinsToRoubles($this->categoryRepository->calculateSubCategoryPriceForPeriod($category, $periodId));
+        } else {
+            $price = self::coinsToRoubles($this->categoryRepository->calculateMainCategoryPriceForPeriod($category, $periodId));
+        }
 
         if ($isPurchased) {
             return response()->json([
-                'message' => 'Category with id '.$categoryId.' is already purchased.',
+                'message' => 'Category with id ' . $categoryId . ' is already purchased.',
             ], Response::HTTP_FORBIDDEN);
         }
 
         $order = Order::create([
-            'user_id' => auth()->user()->id,
+            'user_id' => auth()->id(),
             'price' => $price,
             'subscriptionable_type' => Category::class,
             'subscriptionable_id' => $categoryId,

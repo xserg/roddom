@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Services\PaymentService;
+use App\Traits\MoneyConversion;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
 
@@ -46,6 +47,8 @@ use OpenApi\Attributes as OA;
 )]
 class BuyLectureController extends Controller
 {
+    use MoneyConversion;
+
     public function __construct(
         private LectureRepository $lectureRepository,
         private LectureService $lectureService,
@@ -60,7 +63,7 @@ class BuyLectureController extends Controller
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
-        $price = $this->lectureRepository->calculateLecturePrice($lecture, $period);
+        $price = self::coinsToRoubles($this->lectureRepository->calculateLecturePrice($lecture, $period));
 
         if ($isPurchasedStrict) {
             return response()->json([
