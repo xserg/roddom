@@ -43,16 +43,16 @@ class BuyPromoController extends Controller
     use MoneyConversion;
 
     public function __construct(
-        private PromoService $promoService,
-        private PromoRepository $promoRepository,
+        private PromoService     $promoService,
+        private PromoRepository  $promoRepository,
         private PeriodRepository $periodRepository,
-        private PaymentService $paymentService
+        private PaymentService   $paymentService
     ) {
     }
 
     public function __invoke(
         BuyPromoRequest $request,
-        int $periodLength
+        int             $periodLength
     ) {
         $isPurchased = $this->promoService->isPromoPurchased();
 
@@ -65,8 +65,9 @@ class BuyPromoController extends Controller
         $periodId = $this->periodRepository
             ->getPeriodByLength($periodLength)
             ->id;
-        $price = self::coinsToRoubles($this->promoRepository
-            ->calculatePromoPackPriceForPeriod(1, $periodId));
+        $prices = $this->promoRepository
+            ->calculatePromoPackPriceForPeriod(1, $periodId);
+        $price = self::coinsToRoubles($prices['final_price']);
 
         $order = Order::create([
             'user_id' => auth()->user()->id,

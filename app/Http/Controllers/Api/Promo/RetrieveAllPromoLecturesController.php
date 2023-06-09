@@ -124,7 +124,7 @@ class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private PromoRepository $promoRepository
+        private PromoRepository   $promoRepository
     ) {
     }
 

@@ -58,8 +58,9 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->getStateUsing(
                         function (?Model $record) {
-                            return self::coinsToRoubles(app(PromoRepository::class)
-                                ->calculatePromoPackPriceForPeriod(1, $record->period_id));
+                            $prices = app(PromoRepository::class)
+                                ->calculatePromoPackPriceForPeriod(1, $record->period_id);
+                            return self::coinsToRoubles($prices['final_price']);
                         }
                     )
                     ->label('Цена, рублей'),
