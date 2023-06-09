@@ -59,5 +59,16 @@ class AppServiceProvider extends ServiceProvider
                 ]
             );
         });
+
+        Filament::serving(function () {
+            Filament::registerNavigationGroups([
+                NavigationGroup::make()
+                    ->label('Лекции'),
+                NavigationGroup::make()
+                    ->label('Пользователи'),
+                NavigationGroup::make()
+                    ->label('Приложение'),
+            ]);
+        });
     }
 }
