@@ -78,17 +78,15 @@ class PaymentController extends Controller
                     }
 
                     $period = $this->periodRepository->getPeriodByLength($order->period);
-                    $subscriptionableName = $this->getSubscriptionableName($order);
 
                     $subscriptionAttributes = $this->getSubscriptionAttributes(
-                        $order, $period, $subscriptionableName
+                        $order, $period
                     );
 
                     $subscription = new Subscription($subscriptionAttributes);
 
                     DB::transaction(function () use (
                         $order,
-                        $subscriptionableName,
                         $subscription,
                     ) {
                         $order->status = PaymentStatusEnum::CONFIRMED;
@@ -129,7 +127,6 @@ class PaymentController extends Controller
     private function getSubscriptionAttributes(
         Order  $order,
         Period $period,
-        string $subscriptionableName
     ): array {
         return [
             'user_id' => $order->user_id,
@@ -137,7 +134,6 @@ class PaymentController extends Controller
             'subscriptionable_id' => $order->subscriptionable_id,
             'period_id' => $period->id,
             'total_price' => $order->price,
-            'entity_title' => $subscriptionableName,
             'start_date' => now(),
             'end_date' => now()->addDays($period->length),
         ];

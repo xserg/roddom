@@ -19,6 +19,26 @@ class Subscription extends Model
         'entity_title'
     ];
 
+    protected static function booted()
+    {
+        static::creating(function (Subscription $subscription) {
+
+            if ($subscription->subscriptionable_type == Lecture::class) {
+                $entityTitle = 'Лекция: ' . Lecture::query()->find($subscription->subscriptionable_id)->title;
+            } elseif ($subscription->subscriptionable_type == Category::class) {
+                $entityTitle = 'Категория: ' . Category::query()->find($subscription->subscriptionable_id)->title;
+            } elseif ($subscription->subscriptionable_type == Promo::class) {
+                $entityTitle = 'Промопак лекций';
+            } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
+                $entityTitle = 'Все лекции';
+            } else {
+                $entityTitle = 'Заголовок лекции не определён';
+            }
+
+            $subscription->entity_title = $entityTitle;
+        });
+    }
+
     public function subscriptionable(): MorphTo
     {
         return $this->morphTo();
