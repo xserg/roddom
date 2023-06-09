@@ -16,6 +16,9 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -38,6 +41,7 @@ class SubscriptionResource extends Resource
                     ->options(function () {
                         return User::pluck('name', 'id');
                     })
+                    ->getSearchResultsUsing(fn (string $search) => User::where('name', 'like', "%{$search}%")->limit(10)->pluck('name', 'id'))
                     ->disabled(function (string $context) {
                         return $context === 'edit';
                     })
@@ -101,23 +105,29 @@ class SubscriptionResource extends Resource
         return $table
             ->defaultSort('id', 'desc')
             ->columns([
+
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('имя')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('email')
+                    ->toggleable()
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('user.phone')->label('номер телефона')->toggleable()->searchable(),
+
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn (string $state): string => Period::firstWhere('id', $state)->length
+                        fn (?Model $record): string => $record?->period->length
                     )
-                    ->label('Период покупки, дней')
+                    ->label('период покупки, дней')
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('entity_title')
                     ->label('подписка на')
                     ->limit(25)
+                    ->toggleable()
                     ->tooltip(fn (?Model $record): ?string => $record?->entity_title),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('цена подписки')
@@ -125,10 +135,12 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('start_date')
                     ->dateTime()
                     ->label('начало подписки')
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
                     ->dateTime()
+                    ->toggleable()
                     ->sortable(),
             ])
             ->filters([//

@@ -78,6 +78,7 @@ class PromoLecturesPricesRelationManager extends RelationManager
                     ->form(fn (AttachAction $action): array => [
 
                         $action->getRecordSelect()
+                            ->getSearchResultsUsing(fn (string $search) => Lecture::where('title', 'like', "%{$search}%")->limit(250)->pluck('title', 'id'))
                             ->reactive()
                             ->required()
                             ->afterStateUpdated(function (callable $set) {
@@ -175,7 +176,8 @@ class PromoLecturesPricesRelationManager extends RelationManager
                 ->numeric()
                 ->decimalPlaces(2)
                 ->decimalSeparator('.')
-            );
+            )
+            ->label('цена');
     }
 
     public function getTableRecordTitle(?Model $record): string

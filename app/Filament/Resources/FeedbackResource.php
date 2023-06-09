@@ -14,21 +14,20 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
+use Filament\Tables\Columns\Layout\Panel;
+use Filament\Tables\Columns\Layout\Stack;
+use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 
 class FeedbackResource extends Resource
 {
     protected static ?string $model = Feedback::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-mail-open';
     protected static ?string $navigationLabel = 'Отзывы';
-
     protected static ?string $label = 'Отзыв';
-
     protected static ?string $pluralModelLabel = 'Отзывы';
-
     protected static ?int $navigationSort = 4;
+    protected static ?string $navigationGroup = 'Лекции';
 
     public static function form(Form $form): Form
     {
@@ -103,6 +102,7 @@ class FeedbackResource extends Resource
                     ->label('имя пользователя')
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('email пользователя')
                     ->sortable()

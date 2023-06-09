@@ -13,20 +13,14 @@ use Filament\Tables;
 class PromoResource extends Resource
 {
     protected static ?string $model = Promo::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
     protected static ?string $recordTitleAttribute = 'id';
-
     protected static ?string $navigationLabel = 'Акционный пак лекций';
-
     protected static ?int $navigationSort = 2;
-
     protected static ?string $label = 'Акционный пак лекций';
-
     protected static ?string $pluralModelLabel = 'Акции';
-
     protected static ?string $modelLabel = 'Акция';
+    protected static ?string $navigationGroup = 'Лекции';
 
     public static function form(Form $form): Form
     {

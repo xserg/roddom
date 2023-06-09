@@ -65,6 +65,7 @@ class PricesForLecturesRelationManager extends RelationManager
                     ->form(fn (AttachAction $action): array => [
                         $action
                             ->getRecordSelect()
+                            ->searchable(false)
                             ->options(function (Livewire $livewire) {
                                 $lecture = $livewire->ownerRecord;
                                 $periodsAlreadyAttached = $lecture

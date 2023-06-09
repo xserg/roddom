@@ -15,13 +15,14 @@ use Illuminate\Database\Eloquent\Model;
 class LectorResource extends Resource
 {
     protected static ?string $model = Lector::class;
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     protected static ?string $navigationLabel = 'Лекторы';
     protected static ?int $navigationSort = 2;
     protected static ?string $label = 'Лекторы';
     protected static ?string $pluralModelLabel = 'Лекторы';
     protected static ?string $modelLabel = 'Лектор';
     protected static ?string $recordTitleAttribute = 'name';
+    protected static ?string $navigationGroup = 'Лекции';
 
     public static function form(Form $form): Form
     {

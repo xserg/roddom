@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
+use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use App\Traits\MoneyConversion;
@@ -34,11 +35,13 @@ class LectureResource extends Resource
     protected static ?string $pluralModelLabel = 'Лекции';
     protected static ?string $recordTitleAttribute = 'title';
     protected static ?string $modelLabel = 'Лекция';
+    protected static ?string $navigationGroup = 'Лекции';
 
     public function __construct(
         private PeriodRepository $periodRepository,
         private PromoRepository  $promoRepository
-    ) {}
+    ) {
+    }
 
     public static function form(Form $form): Form
     {
@@ -332,24 +335,31 @@ class LectureResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Наименование')
-                    ->limit(25)
+                    ->limit(35)
                     ->tooltip(fn (Model $record): string => $record->title)
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('Подкатегория')
-                    ->limit(15)
+                    ->limit(25)
                     ->tooltip(fn (Model $record): string => isset($record->category) ? $record->category->title : '')
+                    ->toggleable()
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('Лектор')
-                    ->limit(15)
+                    ->limit(20)
                     ->tooltip(fn (Model $record): string => isset($record->lector) ? $record->lector->name : '')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('contentType.title_ru')
                     ->label('Тип')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
+                Tables\Columns\ImageColumn::make('preview_picture')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Превью изображение лекции'),
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lecture $record): ?string {
@@ -358,9 +368,10 @@ class LectureResource extends Resource
                     )
                     ->label('Рейтинг, из 10'),
                 Tables\Columns\IconColumn::make('is_published')
-                    ->label('Опубликована')
+                    ->label('Опубликована ли')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
             ])
             ->filters([
                 Filter::make('free')

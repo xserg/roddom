@@ -50,11 +50,11 @@ class CategoryPricesRelationManager extends RelationManager
                             $categoryId = $record->category_id;
                             $periodId = $record->period_id;
                             $price = app(CategoryRepository::class)
-                                ->getCategoryPriceForPeriodComplex(
+                                ->calculateSubCategoryPriceForPeriod(
                                     $categoryId,
                                     $periodId);
 
-                            return $price;
+                            return self::coinsToRoubles($price);
                         }
                     )
                     ->label('Цена за всю категорию, рублей'),

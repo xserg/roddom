@@ -17,7 +17,7 @@ class PeriodResource extends Resource
 
     protected static ?string $navigationGroup = 'Приложение';
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-clock';
 
     protected static ?string $navigationLabel = 'Периоды подписок';
 

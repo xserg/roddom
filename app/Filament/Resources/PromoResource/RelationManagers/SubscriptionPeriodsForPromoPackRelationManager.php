@@ -15,9 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
 {
     protected static ?string $title = 'Общие цены, акционный пак';
-
     protected static string $relationship = 'subscriptionPeriodsForPromoPack';
-
     protected static ?string $recordTitleAttribute = 'period_id';
 
     protected function isTablePaginationEnabled(): bool

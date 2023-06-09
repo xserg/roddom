@@ -41,13 +41,14 @@ class PromoLecturesPricesRelationManager extends RelationManager
                     ->formatStateUsing(
                         fn (string $state): string => Period::firstWhere('id', $state)->length
                     )
-                    ->label('Период покупки, дней'),
+                    ->label('Период покупки, дней')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(
                         fn (string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )->label('Цена за одну лекцию этой категории, рублей'),
-            ])
+            ])->defaultSort('period_id', 'asc')
             ->filters([
                 //
             ])

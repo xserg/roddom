@@ -16,20 +16,14 @@ use Illuminate\Support\Str;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $recordTitleAttribute = 'title';
-
     protected static ?string $navigationLabel = 'Категории';
-
-    protected static ?int $navigationSort = 2;
-
+    protected static ?int $navigationSort = 1;
     protected static ?string $label = 'Категории';
-
     protected static ?string $pluralModelLabel = 'Категории';
-
     protected static ?string $modelLabel = 'Категория';
+    protected static ?string $navigationGroup = 'Лекции';
 
     public static function form(Form $form): Form
     {

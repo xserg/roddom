@@ -17,19 +17,12 @@ use Livewire\Component;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationLabel = 'Пользователи';
-
     protected static ?int $navigationSort = 1;
-
     protected static ?string $label = 'Пользователи';
-
     protected static ?string $pluralModelLabel = 'Пользователи';
-
     protected static ?string $modelLabel = 'Пользователь';
-
     protected static ?string $navigationGroup = 'Пользователи';
 
     public static function form(Form $form): Form
@@ -109,12 +102,17 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('email')->searchable(),
-                Tables\Columns\ImageColumn::make('photo'),
+                Tables\Columns\TextColumn::make('name')->label('имя')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('email')->label('email')->sortable()->searchable(),
+                Tables\Columns\ImageColumn::make('photo')->label('фото')->toggleable(),
                 Tables\Columns\TextColumn::make('birthdate')
-                    ->date(),
-                Tables\Columns\TextColumn::make('phone'),
+                    ->date()
+                    ->label('дата рождения')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('phone')->label('телефон')->toggleable(),
+                Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
+                Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
             ])
             ->filters([
                 //
