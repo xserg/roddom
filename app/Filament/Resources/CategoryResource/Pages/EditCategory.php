@@ -16,4 +16,10 @@ class EditCategory extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getFooterWidgets(): array
+    {
+        return [CategoryResource\Widgets\CategoryPrices::class];
+    }
+
 }

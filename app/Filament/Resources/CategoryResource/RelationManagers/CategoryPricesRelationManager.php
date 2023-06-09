@@ -12,26 +12,31 @@ use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 class CategoryPricesRelationManager extends RelationManager
 {
     use MoneyConversion;
 
     protected static string $relationship = 'categoryPrices';
-
     protected static ?string $inverseRelationship = 'category';
-
     protected static ?string $recordTitleAttribute = 'id';
-
     protected static ?string $title = 'Цены категории';
+
+    protected function getTableQuery(): Builder|Relation
+    {
+        return parent::getTableQuery()->with([
+            'period',
+        ]);
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //                self::priceField('price_for_pack'),
-                self::priceField('price_for_one_lecture')
-                    ->label('цена за одну лекцию данной подкатегории'),
+                self::priceField('price_for_one_lecture')->label('цена за одну лекцию данной подкатегории'),
             ]);
     }
 
@@ -41,31 +46,31 @@ class CategoryPricesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('period_id')
                     ->formatStateUsing(
-                        fn (string $state): string => Period::firstWhere('id', $state)->length
+                        fn (?Model $record): string => $record->period->length
                     )
                     ->label('Период покупки, дней'),
-                Tables\Columns\TextColumn::make('price_pack')
-                    ->getStateUsing(
-                        function (?SubcategoryPrices $record): ?string {
-                            $periodId = $record->period_id;
-                            $price = app(CategoryRepository::class)
-                                ->calculateSubCategoryPriceForPeriod(
-                                    $record->category,
-                                    $periodId);
-
-                            return self::coinsToRoubles($price);
-                        }
-                    )
-                    ->label('Цена за всю категорию, рублей'),
-                Tables\Columns\TextColumn::make('lectures_count')
-                    ->getStateUsing(
-                        function (?SubcategoryPrices $record): string {
-                            $category = $record->category;
-                            $lecturesCount = $category->lectures()->count();
-
-                            return $lecturesCount;
-                        }
-                    )->label('Количество лекций'),
+//                Tables\Columns\TextColumn::make('price_pack')
+//                    ->getStateUsing(
+//                        function (?SubcategoryPrices $record): ?string {
+//                            $periodId = $record->period_id;
+//                            $price = app(CategoryRepository::class)
+//                                ->calculateSubCategoryPriceForPeriod(
+//                                    $record->category,
+//                                    $periodId);
+//
+//                            return self::coinsToRoubles($price);
+//                        }
+//                    )
+//                    ->label('Цена за всю категорию, рублей'),
+//                Tables\Columns\TextColumn::make('lectures_count')
+//                    ->getStateUsing(
+//                        function (?SubcategoryPrices $record): string {
+//                            $category = $record->category;
+//                            $lecturesCount = $category->lectures->count();
+//
+//                            return $lecturesCount;
+//                        }
+//                    )->label('Количество лекций'),
                 Tables\Columns\TextColumn::make('price_for_one_lecture')
                     ->formatStateUsing(
                         fn (string $state): string => self::coinsToRoubles($state)

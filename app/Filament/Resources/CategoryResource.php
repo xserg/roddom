@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Filament\Resources\CategoryResource\Widgets\MainCategoryPrice;
+use App\Filament\Resources\CategoryResource\Widgets\CategoryPrices;
 use App\Models\Category;
 use Closure;
 use Filament\Forms;
@@ -11,6 +13,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
@@ -113,10 +116,49 @@ class CategoryResource extends Resource
             ]);
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(
+            [
+                'categoryPrices.period',
+                'lectures.category.categoryPrices.period',
+                'lectures.category.parentCategory',
+                'lectures.category.categoryPrices',
+                'lectures.contentType',
+                'lectures.paymentType',
+                'lectures.pricesPeriodsInPromoPacks',
+                'lectures.pricesForLectures',
+                'lectures.rates',
+                'lectures.watchedUsers',
+                'lectures.savedUsers',
+                'lectures.listWatchedUsers',
+                'childrenCategories.parentCategory',
+                'childrenCategories.categoryPrices.period',
+                'childrenCategories.lectures.category.categoryPrices.period',
+                'childrenCategories.lectures.pricesInPromoPacks',
+                'childrenCategories.lectures.pricesForLectures',
+                'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+                'childrenCategories.lectures.paymentType',
+                'childrenCategories.lectures.contentType',
+                'childrenCategories.lectures.watchedUsers',
+                'childrenCategories.lectures.savedUsers',
+                'childrenCategories.lectures.listWatchedUsers',
+                'childrenCategories.lectures.rates'
+            ]
+        );
+    }
+
     public static function getRelations(): array
     {
         return [
             RelationManagers\CategoryPricesRelationManager::class,
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            CategoryPrices::class
         ];
     }
 
