@@ -21,14 +21,14 @@ class Lecture extends Model
 
     private $lectureRepository;
 
-    protected $appends = [
-        'is_watched',
-        'prices',
-        'is_saved',
-        'list_watched',
-        'id_title',
-        'a_rates',
-    ];
+//    protected $appends = [
+//        'is_watched',
+//        'prices',
+//        'is_saved',
+//        'list_watched',
+//        'id_title',
+//        'a_rates',
+//    ];
 
     protected $casts = [
         'created_at' => 'datetime',
@@ -277,7 +277,7 @@ class Lecture extends Model
         return new Attribute(
             get: fn () => $this
                 ->watchedUsers
-                ->contains('user_id', auth()->id())
+                ->contains('id', auth()->id())
         );
     }
 
@@ -292,7 +292,7 @@ class Lecture extends Model
         return new Attribute(
             get: fn () => $this
                 ->savedUsers
-                ->contains('user_id', auth()->id())
+                ->contains('id', auth()->id())
         );
     }
 
@@ -307,7 +307,7 @@ class Lecture extends Model
         return new Attribute(
             get: fn () => $this
                 ->listWatchedUsers
-                ->contains('user_id', auth()->id())
+                ->contains('id', auth()->id())
         );
     }
 

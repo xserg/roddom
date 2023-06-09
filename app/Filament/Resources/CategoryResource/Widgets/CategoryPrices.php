@@ -14,12 +14,17 @@ class CategoryPrices extends Widget
 
     protected function getViewData(): array
     {
-        $form = $this->record->isSub() ?
-            app(CategoryRepository::class)->formSubCategoryPrices($this->record) :
-            app(CategoryRepository::class)->formMainCategoryPrices($this->record);
+        if ($this->record->isSub()) {
+            $lecturesCount = $this->record->lectures()->count();
+            $form = app(CategoryRepository::class)->formSubCategoryPrices($this->record);
+        } else {
+            $lecturesCount = $this->record->childrenCategories()->withCount('lectures')->get()->sum('lectures_count');
+            $form = app(CategoryRepository::class)->formMainCategoryPrices($this->record);
+        }
 
         return [
-            'form' => $form
+            'form' => $form,
+            'lectures_count' => $lecturesCount
         ];
     }
 }

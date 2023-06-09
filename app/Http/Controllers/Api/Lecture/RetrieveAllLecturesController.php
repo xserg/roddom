@@ -199,7 +199,7 @@ class RetrieveAllLecturesController
             $lectures = $this->lectureRepository->setPurchaseInfoToLectures($lectures);
             $lectures = $this->lectureRepository->paginate(
                 $lectures,
-                $request->per_page ?? 15,
+                (int) $request->per_page ?? 15,
                 $request->page,
             );
         } catch (NotFoundHttpException $exception) {

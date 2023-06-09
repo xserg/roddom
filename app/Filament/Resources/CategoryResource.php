@@ -120,6 +120,7 @@ class CategoryResource extends Resource
     {
         return parent::getEloquentQuery()->with(
             [
+                'parentCategory',
                 'categoryPrices.period',
                 'lectures.category.categoryPrices.period',
                 'lectures.category.parentCategory',
@@ -128,22 +129,14 @@ class CategoryResource extends Resource
                 'lectures.paymentType',
                 'lectures.pricesPeriodsInPromoPacks',
                 'lectures.pricesForLectures',
-                'lectures.rates',
-                'lectures.watchedUsers',
-                'lectures.savedUsers',
-                'lectures.listWatchedUsers',
                 'childrenCategories.parentCategory',
                 'childrenCategories.categoryPrices.period',
                 'childrenCategories.lectures.category.categoryPrices.period',
-                'childrenCategories.lectures.pricesInPromoPacks',
+                'childrenCategories.lectures.category.parentCategory',
                 'childrenCategories.lectures.pricesForLectures',
                 'childrenCategories.lectures.pricesPeriodsInPromoPacks',
                 'childrenCategories.lectures.paymentType',
                 'childrenCategories.lectures.contentType',
-                'childrenCategories.lectures.watchedUsers',
-                'childrenCategories.lectures.savedUsers',
-                'childrenCategories.lectures.listWatchedUsers',
-                'childrenCategories.lectures.rates'
             ]
         );
     }
