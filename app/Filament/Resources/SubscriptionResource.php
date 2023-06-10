@@ -112,14 +112,14 @@ class SubscriptionResource extends Resource
                             default => null
                         };
                     })
-                    ->multiple(function (Closure $get) {
-                        $type = $get('subscriptionable_type');
-                        if ($type === Lecture::class ||
-                            $type === Category::class) {
-                            return true;
-                        }
-                        return false;
-                    })
+//                    ->multiple(function (Closure $get) {
+//                        $type = $get('subscriptionable_type');
+//                        if ($type === Lecture::class ||
+//                            $type === Category::class) {
+//                            return true;
+//                        }
+//                        return false;
+//                    })
                     ->optionsLimit(0)
                     ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
                         $get('subscriptionable_type') === Promo::class ||

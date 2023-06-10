@@ -131,6 +131,7 @@ class UserResource extends Resource
                                         $set('start_date', now());
                                         $set('end_date', now()->addDays($periodLength));
                                     } elseif ($context === 'edit') {
+                                        $set('start_date', now());
                                         $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength));
                                     }
                                 })
