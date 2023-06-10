@@ -112,7 +112,33 @@ class RetrieveCategoryController
                 'childrenCategories.lectures.paymentType',
                 'childrenCategories.lectures.contentType',
             ])
-            ->firstOrFail();
+            ->first();
+
+        if (is_null($mainCategory)) {
+            $mainCategory = Category::query()
+                ->where('slug', '=', $slug)
+                ->where('parent_id', 1)
+                ->with([
+                    'categoryPrices.period',
+                    'parentCategory',
+                    'categoryPrices',
+                    'lectures.category.categoryPrices',
+                    'lectures.pricesInPromoPacks',
+                    'lectures.pricesForLectures',
+                    'lectures.pricesPeriodsInPromoPacks',
+                    'lectures.paymentType',
+                    'lectures.contentType',
+                ])
+                ->first();
+            $prices = $this->categoryRepository->formSubCategoryPrices($category);
+            $category->prices = $prices;
+            return response()->json(
+                [
+                    'category' => new CategoryResource($mainCategory),
+                    'data' => [],
+                ]
+            );
+        }
 
         $prices = $this->categoryRepository->formMainCategoryPrices($mainCategory);
         $mainCategory->prices = $prices;
