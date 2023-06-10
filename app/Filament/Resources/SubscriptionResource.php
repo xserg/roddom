@@ -4,14 +4,17 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Models\Category;
+use App\Models\EverythingPack;
 use App\Models\Lecture;
 use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
 use App\Models\User;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\MorphToSelect;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -39,7 +42,12 @@ class SubscriptionResource extends Resource
                     ->required()
                     ->multiple()
                     ->options(function () {
-                        return User::pluck('name', 'id');
+                        $users = User::select(['name', 'email', 'id'])->get();
+                        $options = [];
+                        foreach ($users as $user) {
+                            $options[$user->id] = $user->name ?? $user->email;
+                        }
+                        return $options;
                     })
                     ->getSearchResultsUsing(fn (string $search) => User::where('name', 'like', "%{$search}%")->limit(10)->pluck('name', 'id'))
                     ->disabled(function (string $context) {
@@ -49,7 +57,7 @@ class SubscriptionResource extends Resource
                 Forms\Components\Select::make('period_id')
                     ->relationship('period', 'length')
                     ->label('период подписки, дней')
-                    ->afterStateUpdated(function (\Closure $set, $context, $state, \Closure $get) {
+                    ->afterStateUpdated(function (Closure $set, $context, $state, Closure $get) {
                         if ($context == 'create') {
                             $periodLength = Period::query()->firstWhere('id', '=', $state)->length;
                             $set('end_date', Carbon::now()->timezone('Europe/Moscow')->addDays($periodLength));
@@ -64,27 +72,37 @@ class SubscriptionResource extends Resource
                     ->required()
                     ->label('подписка на')
                     ->options([
-                        'App\Models\Lecture' => 'лекция',
-                        'App\Models\Category' => 'категория',
-                        'App\Models\Promo' => 'промо пак',
+                        Lecture::class => 'Лекция',
+                        Category::class => 'Категория',
+                        Promo::class => 'Промопак лекций',
+                        EverythingPack::class => 'Все лекции',
                     ])
-                    ->afterStateUpdated(fn (\Closure $set) => $set('subscriptionable_id', null))
+                    ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
+                        if (
+                            $component->getState() === Promo::class ||
+                            $component->getState() === EverythingPack::class
+                        ) {
+                            $set('subscriptionable_id', 1);
+                        } else {
+                            $set('subscriptionable_id', null);
+                        }
+                    })
                     ->reactive(),
                 Forms\Components\Select::make('subscriptionable_id')
                     ->label('id объекта подписки')
-                    ->options(function (\Closure $set, \Closure $get) {
-                        if ($get('subscriptionable_type') == 'App\Models\Lecture') {
-                            return Lecture::all()
-                                ->pluck('id_title', 'id');
-                        } elseif ($get('subscriptionable_type') == 'App\Models\Category') {
-                            return Category::subCategories()
-                                ->pluck('title', 'id');
-                        } elseif ($get('subscriptionable_type') == 'App\Models\Promo') {
-                            return Promo::all()
-                                ->pluck('id');
-                        }
+                    ->options(function (Closure $set, Closure $get) {
+                        $type = $get('subscriptionable_type');
+                        return match ($type) {
+                            Category::class => Category::orderBy('title')->pluck('title', 'id'),
+                            Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
+                            Promo::class => Promo::all()->pluck('id', 'id'),
+                            EverythingPack::class => [1 => 1],
+                            default => null
+                        };
                     })
-                    ->disabled(fn (\Closure $get) => is_null($get('subscriptionable_type')))
+                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
+                        $get('subscriptionable_type') === Promo::class ||
+                        $get('subscriptionable_type') === EverythingPack::class)
                     ->required(),
                 Forms\Components\DateTimePicker::make('start_date')
                     ->afterStateHydrated(function ($state, Component $component) {
