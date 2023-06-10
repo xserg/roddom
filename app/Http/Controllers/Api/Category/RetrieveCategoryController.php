@@ -115,9 +115,8 @@ class RetrieveCategoryController
             ->first();
 
         if (is_null($mainCategory)) {
-            $mainCategory = Category::query()
+            $subCategory = Category::query()
                 ->where('slug', '=', $slug)
-                ->where('parent_id', 1)
                 ->with([
                     'categoryPrices.period',
                     'parentCategory',
@@ -130,11 +129,11 @@ class RetrieveCategoryController
                     'lectures.contentType',
                 ])
                 ->first();
-            $prices = $this->categoryRepository->formSubCategoryPrices($category);
-            $category->prices = $prices;
+            $prices = $this->categoryRepository->formSubCategoryPrices($subCategory);
+            $subCategory->prices = $prices;
             return response()->json(
                 [
-                    'category' => new CategoryResource($mainCategory),
+                    'category' => new CategoryResource($subCategory),
                     'data' => [],
                 ]
             );
@@ -143,9 +142,9 @@ class RetrieveCategoryController
         $prices = $this->categoryRepository->formMainCategoryPrices($mainCategory);
         $mainCategory->prices = $prices;
 
-        foreach ($mainCategory->childrenCategories as $category) {
-            $prices = $this->categoryRepository->formSubCategoryPrices($category);
-            $category->prices = $prices;
+        foreach ($mainCategory->childrenCategories as $subCategory) {
+            $prices = $this->categoryRepository->formSubCategoryPrices($subCategory);
+            $subCategory->prices = $prices;
         }
 
         return response()->json(
