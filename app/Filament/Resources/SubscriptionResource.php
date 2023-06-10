@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Models\Category;
 use App\Models\EverythingPack;
+use App\Models\Feedback;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
@@ -45,7 +46,21 @@ class SubscriptionResource extends Resource
                         }
                         return $options;
                     })
-                    ->getSearchResultsUsing(fn (string $search) => User::where('name', 'like', "%{$search}%")->limit(10)->pluck('name', 'id'))
+                    ->getSearchResultsUsing(function (string $search) {
+                        $usersByNames = User::where('name', 'like', "%$search%")
+                            ->limit(10)
+                            ->get();
+                        if ($usersByNames->isNotEmpty()) {
+                            return $usersByNames->pluck('name', 'id');
+                        }
+
+                        $usersByEmails = User::orWhere('email', 'like', "%$search%")
+                            ->limit(10)
+                            ->get();
+                        if ($usersByEmails->isNotEmpty()) {
+                            return $usersByEmails->pluck('email', 'id');
+                        }
+                    })
                     ->disabled(function (string $context) {
                         return $context === 'edit';
                     })
@@ -97,6 +112,15 @@ class SubscriptionResource extends Resource
                             default => null
                         };
                     })
+                    ->multiple(function (Closure $get) {
+                        $type = $get('subscriptionable_type');
+                        if ($type === Lecture::class ||
+                            $type === Category::class) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    ->optionsLimit(0)
                     ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
                         $get('subscriptionable_type') === Promo::class ||
                         $get('subscriptionable_type') === EverythingPack::class)
@@ -120,10 +144,13 @@ class SubscriptionResource extends Resource
         return $table
             ->defaultSort('id', 'desc')
             ->columns([
-
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('имя')
                     ->sortable()
+                    ->url(function (Subscription $record): string {
+                        $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
+                        return $route;
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.email')
                     ->label('email')

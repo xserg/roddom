@@ -4,13 +4,21 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
+use App\Models\Category;
+use App\Models\EverythingPack;
+use App\Models\Lecture;
+use App\Models\Period;
+use App\Models\Promo;
 use App\Models\User;
+use Closure;
 use Filament\Forms;
+use Filament\Forms\Components\Repeater;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
@@ -29,22 +37,13 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('birthdate'),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(20),
-                Forms\Components\Toggle::make('is_mother')
-                    ->required(),
-                Forms\Components\DatePicker::make('pregnancy_start'),
-                Forms\Components\DatePicker::make('baby_born'),
-                Forms\Components\FileUpload::make('photo')
-                    ->directory('images/users')
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('name')
+                        ->maxLength(255)
+                        ->label('Имя'),
+                    Forms\Components\FileUpload::make('photo')
+                        ->directory('images/users')
+                        ->label('Фото пользователя')
 //                        if ($context == 'create') {
 //                            $nextId = DB::select("show table status like 'users'")[0]->Auto_increment;
 //                            return 'images/users' . '/' . $nextId;
@@ -75,26 +74,113 @@ class UserResource extends Resource
 //                        }
 //                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
 //                    })
-                    ->maxSize(10240)
-                    ->image()
-                    ->imageResizeMode('force')
-                    ->imageCropAspectRatio('1:1')
-                    ->imageResizeTargetWidth('300')
-                    ->imageResizeTargetHeight('300'),
+                        ->maxSize(10240)
+                        ->image()
+                        ->imageResizeMode('force')
+                        ->imageCropAspectRatio('1:1')
+                        ->imageResizeTargetWidth('300')
+                        ->imageResizeTargetHeight('300'),
+                    Forms\Components\TextInput::make('email')
+                        ->email()
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\DatePicker::make('birthdate')->label('Дата рождения пользователя'),
+                    Forms\Components\TextInput::make('phone')
+                        ->tel()
+                        ->maxLength(20)
+                        ->label('Номер телефона'),
+                    Forms\Components\Toggle::make('is_mother')
+                        ->required()
+                        ->label('Родился ли ребёнок'),
+                    Forms\Components\DatePicker::make('pregnancy_start')
+                        ->label('Начало беременности'),
+                    Forms\Components\DatePicker::make('baby_born')
+                        ->label('Дата рождения ребёнка'),
+                    Forms\Components\TextInput::make('phone')
+                        ->tel()
+                        ->maxLength(20)
+                        ->visible(false),
+                    Forms\Components\DateTimePicker::make('next_free_lecture_available')
+                        ->label('Дата, когда можно смотреть бесплатную лекцию'),
 
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(20)
-                    ->visible(false),
-                Forms\Components\DateTimePicker::make('next_free_lecture_available'),
+                    Forms\Components\TextInput::make('password')
+                        ->password()
+                        ->required()
+                        ->minLength(8)
+                        ->maxLength(255)
+                        ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                        ->visible(fn (Component $livewire): bool => $livewire instanceof Pages\CreateUser),
+                ])->columns(2),
 
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->minLength(8)
-                    ->maxLength(255)
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    ->visible(fn (Component $livewire): bool => $livewire instanceof Pages\CreateUser),
+                /*
+                 * SUBSCRIPTIONS - REPEATER
+                 */
+                Forms\Components\Card::make([
+                    Repeater::make('subscriptions')
+                        ->relationship('subscriptions')
+                        ->label('Подписки')
+                        ->columnSpan(1)
+                        ->schema([
+                            Forms\Components\Select::make('period_id')
+                                ->relationship('period', 'length')
+                                ->label('период подписки, дней')
+                                ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                                    $periodLength = Period::query()->firstWhere('id', $state)->length;
+
+                                    if ($context === 'create') {
+                                        $set('start_date', now());
+                                        $set('end_date', now()->addDays($periodLength));
+                                    } elseif ($context === 'edit') {
+                                        $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength));
+                                    }
+                                })
+                                ->reactive()
+                                ->required(),
+                            Forms\Components\Select::make('subscriptionable_type')
+                                ->required()
+                                ->label('тип подписки')
+                                ->options([
+                                    Lecture::class => 'Лекция',
+                                    Category::class => 'Категория',
+                                    Promo::class => 'Промопак лекций',
+                                    EverythingPack::class => 'Все лекции',
+                                ])
+                                ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
+                                    if (
+                                        $component->getState() === Promo::class ||
+                                        $component->getState() === EverythingPack::class
+                                    ) {
+                                        $set('subscriptionable_id', 1);
+                                    } else {
+                                        $set('subscriptionable_id', null);
+                                    }
+                                })
+                                ->reactive(),
+                            Forms\Components\Select::make('subscriptionable_id')
+                                ->label('объект подписки')
+                                ->options(function (Closure $set, Closure $get) {
+                                    $type = $get('subscriptionable_type');
+                                    return match ($type) {
+                                        Category::class => Category::orderBy('title')->pluck('title', 'id'),
+                                        Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
+                                        Promo::class => Promo::all()->pluck('id', 'id'),
+                                        EverythingPack::class => [1 => 1],
+                                        default => null
+                                    };
+                                })
+                                ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
+                                    $get('subscriptionable_type') === Promo::class ||
+                                    $get('subscriptionable_type') === EverythingPack::class)
+                                ->required()
+                                ->columnSpan(2),
+                            Forms\Components\DateTimePicker::make('start_date')
+                                ->label('начало подписки')
+                                ->required(),
+                            Forms\Components\DateTimePicker::make('end_date')
+                                ->label('окончание подписки')
+                                ->required(),
+                        ])
+                ])->columns(2)
             ]);
     }
 
