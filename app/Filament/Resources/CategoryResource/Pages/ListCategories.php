@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListCategories extends ListRecords
 {
     protected static string $resource = CategoryResource::class;
+    protected int $defaultTableRecordsPerPageSelectOption = 50;
 
     protected function getActions(): array
     {

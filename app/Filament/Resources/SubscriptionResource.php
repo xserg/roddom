@@ -6,7 +6,6 @@ use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\Lecture;
-use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
@@ -14,13 +13,10 @@ use App\Models\User;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\MorphToSelect;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Filament\Tables\Columns\Layout\Panel;
-use Filament\Tables\Columns\Layout\Stack;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -57,12 +53,13 @@ class SubscriptionResource extends Resource
                 Forms\Components\Select::make('period_id')
                     ->relationship('period', 'length')
                     ->label('период подписки, дней')
-                    ->afterStateUpdated(function (Closure $set, $context, $state, Closure $get) {
-                        if ($context == 'create') {
-                            $periodLength = Period::query()->firstWhere('id', '=', $state)->length;
-                            $set('end_date', Carbon::now()->timezone('Europe/Moscow')->addDays($periodLength));
-                        } elseif ($context == 'edit') {
-                            $periodLength = Period::query()->firstWhere('id', '=', $state)->length;
+                    ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                        $periodLength = Period::query()->firstWhere('id', $state)->length;
+
+                        if ($context === 'create') {
+                            $set('start_date', now());
+                            $set('end_date', now()->addDays($periodLength));
+                        } elseif ($context === 'edit') {
                             $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength));
                         }
                     })
@@ -105,11 +102,11 @@ class SubscriptionResource extends Resource
                         $get('subscriptionable_type') === EverythingPack::class)
                     ->required(),
                 Forms\Components\DateTimePicker::make('start_date')
-                    ->afterStateHydrated(function ($state, Component $component) {
-                        if (is_null($state)) {
-                            $component->state(Carbon::now()->timezone('Europe/Moscow'));
-                        }
-                    })
+//                    ->afterStateHydrated(function ($state, Component $component) {
+//                        if (is_null($state)) {
+//                            $component->state(Carbon::now());
+//                        }
+//                    })
                     ->label('начало подписки')
                     ->required(),
                 Forms\Components\DateTimePicker::make('end_date')
@@ -151,19 +148,19 @@ class SubscriptionResource extends Resource
                     ->label('цена подписки')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->dateTime()
+                    ->dateTime('j F Y, h:i')
                     ->label('начало подписки')
                     ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
-                    ->dateTime()
+                    ->dateTime('j F Y, h:i')
                     ->toggleable()
                     ->sortable(),
             ])
             ->filters([//
             ])
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 

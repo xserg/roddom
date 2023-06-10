@@ -9,11 +9,18 @@ use Filament\Resources\Pages\ListRecords;
 class ListSubscriptions extends ListRecords
 {
     protected static string $resource = SubscriptionResource::class;
+    protected int $defaultTableRecordsPerPageSelectOption = 25;
 
     protected function getActions(): array
     {
         return [
             Actions\CreateAction::make(),
         ];
+    }
+
+
+    protected function getTableRecordsPerPageSelectOptions(): array
+    {
+        return [25, 50, 100];
     }
 }

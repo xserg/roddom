@@ -94,6 +94,7 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('parent_id')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Наименование')

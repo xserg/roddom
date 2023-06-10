@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ListLectors extends ListRecords
 {
     protected static string $resource = LectorResource::class;
+    protected int $defaultTableRecordsPerPageSelectOption = 50;
 
     protected function getActions(): array
     {

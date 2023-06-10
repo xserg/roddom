@@ -126,7 +126,7 @@ class FeedbackResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('создано')
-                    ->dateTime()
+                    ->dateTime('j F Y, h:i')
                     ->sortable(),
             ])
             ->filters([
