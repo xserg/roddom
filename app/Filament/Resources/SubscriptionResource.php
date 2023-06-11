@@ -71,6 +71,10 @@ class SubscriptionResource extends Resource
                     ->relationship('period', 'length')
                     ->label('период подписки, дней')
                     ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                        if (is_null($state)) {
+                            return;
+                        }
+
                         $periodLength = Period::query()->firstWhere('id', $state)->length;
 
                         if ($context === 'create') {

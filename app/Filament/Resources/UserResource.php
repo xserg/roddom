@@ -126,6 +126,10 @@ class UserResource extends Resource
                                     ->placeholder('период, дней')
                                     ->disableLabel()
                                     ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                                        if (is_null($state)) {
+                                            return;
+                                        }
+
                                         $periodLength = Period::query()->firstWhere('id', $state)->length;
                                         $set('start_date', now()->toDateTimeString());
                                         $set('end_date', now()->addDays($periodLength)->toDateTimeString());
