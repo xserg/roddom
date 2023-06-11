@@ -158,11 +158,9 @@ class UserResource extends Resource
                                 Forms\Components\DateTimePicker::make('start_date')
                                     ->placeholder('начало подписки')
                                     ->disableLabel()
-                                    ->required()
-                                    ->timezone('UTC'),
+                                    ->required(),
                                 Forms\Components\DateTimePicker::make('end_date')
                                     ->placeholder('окончание подписки')
-                                    ->timezone('UTC')
                                     ->disableLabel()
                                     ->required(),
                             ])
