@@ -37,7 +37,9 @@ class SubscriptionResource extends Resource
             ->schema([
                 Forms\Components\Select::make('user_id')
                     ->required()
-                    ->multiple()
+                    ->multiple(function (string $context) {
+                        return $context !== 'edit';
+                    })
                     ->options(function () {
                         $users = User::select(['name', 'email', 'id'])->get();
                         $options = [];
@@ -124,8 +126,7 @@ class SubscriptionResource extends Resource
 //                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
 //                        $get('subscriptionable_type') === Promo::class ||
 //                        $get('subscriptionable_type') === EverythingPack::class)
-                    ->visible(fn (Closure $get) =>
-                        $get('subscriptionable_type') === Lecture::class ||
+                    ->visible(fn (Closure $get) => $get('subscriptionable_type') === Lecture::class ||
                         $get('subscriptionable_type') === Category::class
                     )
                     ->saveRelationshipsWhenHidden()
