@@ -223,7 +223,7 @@ class Lecture extends Model
 
     public function scopePurchased(Builder $query): void
     {
-        $purchasedIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $purchasedIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
 
         $ids = implode(',', array_keys($purchasedIds)) ?? '';
 

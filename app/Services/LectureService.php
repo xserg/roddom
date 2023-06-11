@@ -206,12 +206,27 @@ class LectureService
                 if (is_null($category)) {
                     continue;
                 }
-                $categoryLectures = $category->lectures;
-                foreach ($categoryLectures as $lecture) {
-                    $lectures[$lecture->id] = [
-                        'start_date' => $categorySubscription['start_date'],
-                        'end_date' => $categorySubscription['end_date'],
-                    ];
+                if ($category->isSub()) {
+                    $categoryLectures = $category->lectures;
+                    foreach ($categoryLectures as $lecture) {
+                        $lectures[$lecture->id] = [
+                            'start_date' => $categorySubscription['start_date'],
+                            'end_date' => $categorySubscription['end_date'],
+                        ];
+                    }
+                }
+                if ($category->isMain()) {
+                    $childrenCategories = $category->childrenCategories;
+
+                    foreach ($childrenCategories as $childCategory) {
+                        $categoryLectures = $childCategory->lectures;
+                        foreach ($categoryLectures as $lecture) {
+                            $lectures[$lecture->id] = [
+                                'start_date' => $categorySubscription['start_date'],
+                                'end_date' => $categorySubscription['end_date'],
+                            ];
+                        }
+                    }
                 }
             }
         }
@@ -347,7 +362,7 @@ class LectureService
                     'length' => $period->length,
                     'period_id' => $period->id,
                     'custom_price_for_one_lecture' => null,
-                    'common_price_for_one_lecture' => (int)$priceCommon->price_for_one_lecture,
+                    'common_price_for_one_lecture' => (int) $priceCommon->price_for_one_lecture,
                 ];
             } else {
                 $priceForOneLecture = $priceCustom->pivot->price;
@@ -355,8 +370,8 @@ class LectureService
                 $prices[] = [
                     'length' => $period->length,
                     'period_id' => $period->id,
-                    'custom_price_for_one_lecture' => (int)$priceForOneLecture,
-                    'common_price_for_one_lecture' => (int)$priceCommon->price_for_one_lecture,
+                    'custom_price_for_one_lecture' => (int) $priceForOneLecture,
+                    'common_price_for_one_lecture' => (int) $priceCommon->price_for_one_lecture,
                 ];
             }
         }
