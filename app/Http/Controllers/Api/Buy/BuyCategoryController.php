@@ -80,9 +80,9 @@ class BuyCategoryController extends Controller
         $category = $this->categoryRepository->getCategoryById($categoryId, $relations);
 
         if ($category->isSub()) {
-            $price = self::coinsToRoubles($this->categoryRepository->calculateSubCategoryPriceForPeriod($category, $periodId));
+            $price = self::coinsToRoubles($this->categoryService->calculateSubCategoryPriceForPeriod($category, $periodId));
         } else {
-            $price = self::coinsToRoubles($this->categoryRepository->calculateMainCategoryPriceForPeriod($category, $periodId));
+            $price = self::coinsToRoubles($this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId));
         }
 
         if ($isPurchased) {

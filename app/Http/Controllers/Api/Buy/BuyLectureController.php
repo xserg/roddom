@@ -63,7 +63,7 @@ class BuyLectureController extends Controller
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
-        $price = self::coinsToRoubles($this->lectureRepository->calculateLecturePrice($lecture, $period));
+        $price = self::coinsToRoubles($this->lectureService->calculateLecturePrice($lecture, $period));
 
         if ($isPurchasedStrict) {
             return response()->json([

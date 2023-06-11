@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Repositories\LectureRepository;
+use App\Services\LectureService;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(LectureRepository::class, LectureRepository::class);
+        $this->app->singleton(LectureService::class, LectureService::class);
     }
 
     /**

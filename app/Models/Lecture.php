@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
-use App\Repositories\LectureRepository;
+use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +20,7 @@ class Lecture extends Model
 {
     use HasFactory, MoneyConversion;
 
-    private $lectureRepository;
+    private $lectureService;
 
 //    protected $appends = [
 //        'is_watched',
@@ -60,7 +61,7 @@ class Lecture extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->lectureRepository = app(LectureRepository::class);
+        $this->lectureService = app(LectureService::class);
     }
 
     protected static function booted(): void
@@ -121,16 +122,6 @@ class Lecture extends Model
     public function subscriptions(): MorphMany
     {
         return $this->morphMany(Subscription::class, 'subscriptionable');
-    }
-
-    public function promoPacks(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Promo::class,
-            'lectures_to_promo',
-            'lecture_id',
-            'promo_id'
-        );
     }
 
     public function pricesForLectures(): BelongsToMany
@@ -317,9 +308,9 @@ class Lecture extends Model
     protected function prices(): Attribute
     {
         if ($this->isPromo()) {
-            $prices = $this->lectureRepository->formPricesForPromoLecture($this);
+            $prices = $this->lectureService->formPricesForPromoLecture($this);
         } else {
-            $prices = $this->lectureRepository->formPricesForPayedLecture($this);
+            $prices = $this->lectureService->formPricesForPayedLecture($this);
         }
 
         return new Attribute(

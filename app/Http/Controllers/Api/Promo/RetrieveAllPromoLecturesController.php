@@ -7,6 +7,7 @@ use App\Http\Resources\LectureCollection;
 use App\Models\Promo;
 use App\Repositories\LectureRepository;
 use App\Repositories\PromoRepository;
+use App\Services\LectureService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
@@ -124,6 +125,7 @@ class RetrieveAllPromoLecturesController extends Controller
 {
     public function __construct(
         private LectureRepository $lectureRepository,
+        private LectureService    $lectureService,
         private PromoRepository   $promoRepository
     ) {
     }
@@ -147,7 +149,7 @@ class RetrieveAllPromoLecturesController extends Controller
         $builder = $this->lectureRepository->addFiltersToQuery($builder);
 
         $lectures = $builder->get();
-        $lectures = $this->lectureRepository->setPurchaseInfoToLectures($lectures);
+        $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
 
         $lectures = $this->lectureRepository->paginate(
             $lectures,

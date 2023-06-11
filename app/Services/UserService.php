@@ -344,7 +344,7 @@ class UserService
     {
         $user = $user->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures');
 
-        $purchasedLectureIds = $this->lectureRepository->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
+        $purchasedLectureIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
         $purchasedLecturesCount = count($purchasedLectureIds);
         $user->purchased_lectures_counter = $purchasedLecturesCount;
 

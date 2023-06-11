@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CategoryResource\Widgets;
 
 use App\Models\Category;
-use App\Repositories\CategoryRepository;
+use App\Services\CategoryService;
 use Filament\Widgets\Widget;
 
 class CategoryPrices extends Widget
@@ -16,10 +16,10 @@ class CategoryPrices extends Widget
     {
         if ($this->record->isSub()) {
             $lecturesCount = $this->record->lectures()->count();
-            $form = app(CategoryRepository::class)->formSubCategoryPrices($this->record);
+            $form = app(CategoryService::class)->formSubCategoryPrices($this->record);
         } else {
             $lecturesCount = $this->record->childrenCategories()->withCount('lectures')->get()->sum('lectures_count');
-            $form = app(CategoryRepository::class)->formMainCategoryPrices($this->record);
+            $form = app(CategoryService::class)->formMainCategoryPrices($this->record);
         }
 
         return [

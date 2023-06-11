@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Category;
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use App\Repositories\CategoryRepository;
+use App\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
@@ -89,7 +89,7 @@ use OpenApi\Attributes as OA;
 class RetrieveCategoryController
 {
     public function __construct(
-        private CategoryRepository $categoryRepository
+        private CategoryService $categoryService
     ) {
     }
 
@@ -129,7 +129,7 @@ class RetrieveCategoryController
                     'lectures.contentType',
                 ])
                 ->first();
-            $prices = $this->categoryRepository->formSubCategoryPrices($subCategory);
+            $prices = $this->categoryService->formSubCategoryPrices($subCategory);
             $subCategory->prices = $prices;
             return response()->json(
                 [
@@ -139,11 +139,11 @@ class RetrieveCategoryController
             );
         }
 
-        $prices = $this->categoryRepository->formMainCategoryPrices($mainCategory);
+        $prices = $this->categoryService->formMainCategoryPrices($mainCategory);
         $mainCategory->prices = $prices;
 
         foreach ($mainCategory->childrenCategories as $subCategory) {
-            $prices = $this->categoryRepository->formSubCategoryPrices($subCategory);
+            $prices = $this->categoryService->formSubCategoryPrices($subCategory);
             $subCategory->prices = $prices;
         }
 

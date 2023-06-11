@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureCollection;
 use App\Repositories\LectureRepository;
+use App\Services\LectureService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -173,7 +174,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class RetrieveAllLecturesController
 {
     public function __construct(
-        private LectureRepository $lectureRepository
+        private LectureRepository $lectureRepository,
+        private LectureService    $lectureService
     ) {
     }
 
@@ -196,7 +198,7 @@ class RetrieveAllLecturesController
             $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
             $lectures = $builder->get();
-            $lectures = $this->lectureRepository->setPurchaseInfoToLectures($lectures);
+            $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
             $lectures = $this->lectureRepository->paginate(
                 $lectures,
                 (int) $request->per_page ?? 15,

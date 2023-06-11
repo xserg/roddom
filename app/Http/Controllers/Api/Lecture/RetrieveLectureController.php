@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureResource;
 use App\Repositories\LectureRepository;
+use App\Services\LectureService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -52,19 +53,20 @@ use OpenApi\Attributes as OA;
 class RetrieveLectureController
 {
     public function __construct(
-        private LectureRepository $repository,
+        private LectureRepository $lectureRepository,
+        private LectureService    $lectureService
     ) {
     }
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
-        $builder = $this->repository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
+        $builder = $this->lectureRepository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
         $lecture = $builder->get();
-        $lecture = $this->repository->setPurchaseInfoToLectures($lecture)->first();
+        $lecture = $this->lectureService->setPurchaseInfoToLectures($lecture)->first();
 
         if (is_null($lecture)) {
             return response()->json([
-                'message' => 'Lecture with id '.$id.' was not found',
+                'message' => 'Lecture with id ' . $id . ' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 
