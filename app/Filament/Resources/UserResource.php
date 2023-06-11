@@ -18,7 +18,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
@@ -33,6 +33,11 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Пользователь';
     protected static ?string $navigationGroup = 'Пользователи';
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->where('is_admin', 0);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -44,36 +49,6 @@ class UserResource extends Resource
                     Forms\Components\FileUpload::make('photo')
                         ->directory('images/users')
                         ->label('Фото пользователя')
-//                        if ($context == 'create') {
-//                            $nextId = DB::select("show table status like 'users'")[0]->Auto_increment;
-//                            return 'images/users' . '/' . $nextId;
-//                        }
-//                        return 'images/users' . '/' . $get('id');
-//                    })
-//                    ->afterStateHydrated(function (Closure $set, Forms\Components\FileUpload $component, $state) {
-//                        $redundantStr = config('app.url') . '/storage/';
-//
-//                        if (is_null($state)) {
-//                            return;
-//                        }
-//
-//                        if (Str::contains($state, $redundantStr)) {
-//                            $component->state([Str::remove($redundantStr, $state)]);
-//                        } else {
-//                            $component->state([$state]);
-//                        }
-//                    })
-//                    ->dehydrateStateUsing(
-//                        function (Closure $set, $state, Closure $get) {
-//                            return config('app.url') . '/storage/' . Arr::first($state);
-//                        })
-//                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, Closure $get, string $context): string {
-//                        if ($context == 'create') {
-//                            $nextId = DB::select("show table status like 'users'")[0]->Auto_increment;
-//                            return (string)$nextId . '.' . $file->getClientOriginalExtension();
-//                        }
-//                        return (string)$get('id') . '.' . $file->getClientOriginalExtension();
-//                    })
                         ->maxSize(10240)
                         ->image()
                         ->imageResizeMode('force')
@@ -115,73 +90,83 @@ class UserResource extends Resource
                 /*
                  * SUBSCRIPTIONS - REPEATER
                  */
-                Forms\Components\Card::make([
-                    Repeater::make('subscriptions')
-                        ->relationship('subscriptions')
-                        ->label('Подписки')
-                        ->columnSpan(1)
-                        ->schema([
-                            Forms\Components\Select::make('period_id')
-                                ->relationship('period', 'length')
-                                ->label('период подписки, дней')
-                                ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
-                                    $periodLength = Period::query()->firstWhere('id', $state)->length;
-
-                                    if ($context === 'create') {
-                                        $set('start_date', now());
-                                        $set('end_date', now()->addDays($periodLength));
-                                    } elseif ($context === 'edit') {
-                                        $set('start_date', now());
-                                        $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength));
-                                    }
-                                })
-                                ->reactive()
-                                ->required(),
-                            Forms\Components\Select::make('subscriptionable_type')
-                                ->required()
-                                ->label('тип подписки')
-                                ->options([
-                                    Lecture::class => 'Лекция',
-                                    Category::class => 'Категория',
-                                    Promo::class => 'Промопак лекций',
-                                    EverythingPack::class => 'Все лекции',
-                                ])
-                                ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
-                                    if (
-                                        $component->getState() === Promo::class ||
-                                        $component->getState() === EverythingPack::class
-                                    ) {
-                                        $set('subscriptionable_id', 1);
-                                    } else {
-                                        $set('subscriptionable_id', null);
-                                    }
-                                })
-                                ->reactive(),
-                            Forms\Components\Select::make('subscriptionable_id')
-                                ->label('объект подписки')
-                                ->options(function (Closure $set, Closure $get) {
-                                    $type = $get('subscriptionable_type');
-                                    return match ($type) {
-                                        Category::class => Category::orderBy('title')->pluck('title', 'id'),
-                                        Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
-                                        Promo::class => Promo::all()->pluck('id', 'id'),
-                                        EverythingPack::class => [1 => 1],
-                                        default => null
-                                    };
-                                })
-                                ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
-                                    $get('subscriptionable_type') === Promo::class ||
-                                    $get('subscriptionable_type') === EverythingPack::class)
-                                ->required()
-                                ->columnSpan(2),
-                            Forms\Components\DateTimePicker::make('start_date')
-                                ->label('начало подписки')
-                                ->required(),
-                            Forms\Components\DateTimePicker::make('end_date')
-                                ->label('окончание подписки')
-                                ->required(),
-                        ])
-                ])->columns(2)
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Repeater::make('subscriptions')
+                            ->relationship('subscriptions')
+                            ->label('Подписки')
+                            ->columnSpan(1)
+                            ->columns(2)
+                            ->createItemButtonLabel('Добавить подписку')
+                            ->schema([
+                                Forms\Components\Select::make('subscriptionable_type')
+                                    ->required()
+                                    ->disableLabel()
+                                    ->placeholder('тип подписки')
+                                    ->options([
+                                        Lecture::class => 'Лекция',
+                                        Category::class => 'Категория',
+                                        Promo::class => 'Промопак лекций',
+                                        EverythingPack::class => 'Все лекции',
+                                    ])
+                                    ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
+                                        if (
+                                            $component->getState() === Promo::class ||
+                                            $component->getState() === EverythingPack::class
+                                        ) {
+                                            $set('subscriptionable_id', 1);
+                                        } else {
+                                            $set('subscriptionable_id', null);
+                                        }
+                                    })
+                                    ->reactive(),
+                                Forms\Components\Select::make('period_id')
+                                    ->relationship('period', 'length')
+                                    ->getOptionLabelFromRecordUsing(fn (?Model $record) => "дней: {$record->length}")
+                                    ->placeholder('период, дней')
+                                    ->disableLabel()
+                                    ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                                        $periodLength = Period::query()->firstWhere('id', $state)->length;
+                                        $set('start_date', now()->toDateTimeString());
+                                        $set('end_date', now()->addDays($periodLength)->toDateTimeString());
+                                    })
+                                    ->reactive()
+                                    ->required(),
+                                Forms\Components\Select::make('subscriptionable_id')
+                                    ->placeholder('объект подписки')
+                                    ->options(function (Closure $set, Closure $get) {
+                                        $type = $get('subscriptionable_type');
+                                        return match ($type) {
+                                            Category::class => Category::orderBy('title')->pluck('title', 'id'),
+                                            Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
+                                            Promo::class => Promo::all()->pluck('id', 'id'),
+                                            EverythingPack::class => [1 => 1],
+                                            default => null
+                                        };
+                                    })
+                                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
+                                        $get('subscriptionable_type') === Promo::class ||
+                                        $get('subscriptionable_type') === EverythingPack::class)
+//                                    ->visible(fn (Closure $get) =>
+//                                        $get('subscriptionable_type') === Lecture::class ||
+//                                        $get('subscriptionable_type') === Category::class
+//                                    )
+                                    ->dehydrated()
+                                    ->required()
+                                    ->disableLabel()
+                                    ->columnSpan(2),
+                                Forms\Components\DateTimePicker::make('start_date')
+                                    ->placeholder('начало подписки')
+                                    ->disableLabel()
+                                    ->required()
+                                    ->timezone('UTC'),
+                                Forms\Components\DateTimePicker::make('end_date')
+                                    ->placeholder('окончание подписки')
+                                    ->timezone('UTC')
+                                    ->disableLabel()
+                                    ->required(),
+                            ])
+                    ])
             ]);
     }
 

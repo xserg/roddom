@@ -12,6 +12,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
+use Illuminate\Contracts\Support\Htmlable;
 use Livewire\Component as Livewire;
 
 class PromoLecturesPricesRelationManager extends RelationManager
@@ -24,6 +25,11 @@ class PromoLecturesPricesRelationManager extends RelationManager
     protected static ?string $inverseRelationship = 'pricesForPromoLectures';
     protected static ?string $recordTitleAttribute = 'id';
     protected bool $allowsDuplicates = true;
+
+    protected function getTableDescription(): string|Htmlable|null
+    {
+        return 'Приоритет выше чем у "общих" цен';
+    }
 
     public static function form(Form $form): Form
     {

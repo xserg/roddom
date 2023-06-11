@@ -220,10 +220,9 @@ class LectureResource extends Resource
                         Forms\Components\Fieldset::make('общие цены, категория')
                             ->label(function (?Model $record) {
                                 return new HtmlString(
-                                    'общая цена лекции, указывается в <a style="color: #0000EE" href="'
+                                    '"общие" цены лекции, указываются в <a style="color: #0000EE" href="'
                                     . route('filament.resources.categories.edit', ['record' => $record->category->id])
-                                    . '" target="_blank">категории</a>. Эти карточки для информации. Для того чтобы не переходить на
- страницу категории/промо пака и смотреть общие цены'
+                                    . '" target="_blank">категории</a>'
                                 );
                             })
                             ->schema([
@@ -276,10 +275,9 @@ class LectureResource extends Resource
                         Forms\Components\Fieldset::make('общие цены, промо')
                             ->label(function (?Model $record) {
                                 return new HtmlString(
-                                    'общие цены одной промо лекции, указывается в <a style="color: #0000EE" href="'
+                                    '"общие" цены промо лекции, указываются в <a style="color: #0000EE" href="'
                                     . route('filament.resources.promos.edit', ['record' => 1, 'activeRelationManager' => 0])
-                                    . '" target="_blank">акционном паке</a>. Эти карточки для информации. Для того чтобы не переходить на
- страницу категории/промо пака и смотреть общие цены'
+                                    . '" target="_blank">акционном паке</a>'
                                 );
                             })
                             ->schema([

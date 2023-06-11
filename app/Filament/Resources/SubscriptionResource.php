@@ -72,10 +72,10 @@ class SubscriptionResource extends Resource
                         $periodLength = Period::query()->firstWhere('id', $state)->length;
 
                         if ($context === 'create') {
-                            $set('start_date', now());
-                            $set('end_date', now()->addDays($periodLength));
+                            $set('start_date', now()->toDateTimeString());
+                            $set('end_date', now()->addDays($periodLength)->toDateTimeString());
                         } elseif ($context === 'edit') {
-                            $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength));
+                            $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength)->toDateTimeString());
                         }
                     })
                     ->reactive()
@@ -121,9 +121,14 @@ class SubscriptionResource extends Resource
 //                        return false;
 //                    })
                     ->optionsLimit(0)
-                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
-                        $get('subscriptionable_type') === Promo::class ||
-                        $get('subscriptionable_type') === EverythingPack::class)
+//                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
+//                        $get('subscriptionable_type') === Promo::class ||
+//                        $get('subscriptionable_type') === EverythingPack::class)
+                    ->visible(fn (Closure $get) =>
+                        $get('subscriptionable_type') === Lecture::class ||
+                        $get('subscriptionable_type') === Category::class
+                    )
+                    ->saveRelationshipsWhenHidden()
                     ->required(),
                 Forms\Components\DateTimePicker::make('start_date')
 //                    ->afterStateHydrated(function ($state, Component $component) {
@@ -145,44 +150,44 @@ class SubscriptionResource extends Resource
             ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('имя')
+                    ->label('Пользователь')
                     ->sortable()
                     ->url(function (Subscription $record): string {
                         $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
                         return $route;
                     })
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.email')
-                    ->label('email')
-                    ->toggleable()
-                    ->sortable()
-                    ->searchable(),
-                TextColumn::make('user.phone')->label('номер телефона')->toggleable()->searchable(),
-
-                Tables\Columns\TextColumn::make('period_id')
-                    ->formatStateUsing(
-                        fn (?Model $record): string => $record?->period->length
-                    )
-                    ->label('период покупки, дней')
-                    ->toggleable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('entity_title')
                     ->label('подписка на')
                     ->limit(25)
                     ->toggleable()
                     ->tooltip(fn (?Model $record): ?string => $record?->entity_title),
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label('email')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('user.phone')->label('номер телефона')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('period_id')
+                    ->formatStateUsing(
+                        fn (?Model $record): string => $record?->period->length
+                    )
+                    ->label('период покупки, дней')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('цена подписки')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')
-                    ->dateTime('j F Y, h:i')
                     ->label('начало подписки')
                     ->toggleable()
+                    ->dateTime()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('end_date')
                     ->label('конец подписки')
-                    ->dateTime('j F Y, h:i')
                     ->toggleable()
+                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([//

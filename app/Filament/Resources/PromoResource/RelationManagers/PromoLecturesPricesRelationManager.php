@@ -14,6 +14,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\AttachAction;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component as Livewire;
@@ -22,12 +23,17 @@ class PromoLecturesPricesRelationManager extends RelationManager
 {
     use MoneyConversion;
 
-    protected static ?string $title = 'Цены подписки на акционную лекцию, за один период';
+    protected static ?string $title = 'Кастомные цены, акционный пак';
     protected static ?string $label = 'Цена за период';
     protected static string $relationship = 'pricesForPromoLectures';
     protected static ?string $inverseRelationship = 'pricesInPromoPacks';
     protected static ?string $recordTitleAttribute = 'id';
     protected bool $allowsDuplicates = true;
+
+    protected function getTableDescription(): string|Htmlable|null
+    {
+        return 'Приоритет выше чем у "общих" цен. Также их можно указывать на странице редактирования каждой лекции.';
+    }
 
     public static function form(Form $form): Form
     {

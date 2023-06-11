@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -21,8 +22,13 @@ class Subscription extends Model
 
     protected static function booted()
     {
-        static::creating(function (Subscription $subscription) {
+        static::creating(self::makeEntityTitle());
+        static::updating(self::makeEntityTitle());
+    }
 
+    private static function makeEntityTitle(): Closure
+    {
+        return function (Subscription $subscription) {
             if ($subscription->subscriptionable_type == Lecture::class) {
                 $entityTitle = 'Лекция: ' . Lecture::query()->find($subscription->subscriptionable_id)->title;
             } elseif ($subscription->subscriptionable_type == Category::class) {
@@ -36,7 +42,7 @@ class Subscription extends Model
             }
 
             $subscription->entity_title = $entityTitle;
-        });
+        };
     }
 
     public function subscriptionable(): MorphTo

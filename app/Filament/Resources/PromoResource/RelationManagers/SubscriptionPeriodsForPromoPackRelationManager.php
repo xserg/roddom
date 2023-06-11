@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\PromoResource\RelationManagers;
 
+use App\Models\Lecture;
 use App\Models\Period;
+use App\Models\Promo;
 use App\Repositories\PromoRepository;
 use App\Traits\MoneyConversion;
 use Filament\Forms;
@@ -55,6 +57,12 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                     )
                     ->label('Период покупки, дней'),
 
+                Tables\Columns\TextColumn::make('lectures_count_num')
+                    ->formatStateUsing(
+                        fn (): string => Lecture::promo()->count()
+                    )
+                    ->label('Количество лекций'),
+
                 Tables\Columns\TextColumn::make('price')
                     ->getStateUsing(
                         function (?Model $record) {
@@ -63,13 +71,13 @@ class SubscriptionPeriodsForPromoPackRelationManager extends RelationManager
                             return self::coinsToRoubles($prices['final_price']);
                         }
                     )
-                    ->label('Цена, рублей'),
+                    ->label('Суммарная стоимость, рублей'),
 
                 Tables\Columns\TextColumn::make('price_for_one_lecture')
                     ->formatStateUsing(
                         fn (string $state): string => number_format($state / 100, 2, thousands_separator: '')
                     )
-                    ->label('Цена за одну промо лекцию, рублей')
+                    ->label('Общая цена одной промо лекции, рублей')
                     ->weight('bold')
                     ->sortable(),
             ])

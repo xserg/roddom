@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Models\Category;
 use App\Models\Period;
 use App\Models\SubcategoryPrices;
 use App\Repositories\CategoryRepository;
@@ -30,6 +31,14 @@ class CategoryPricesRelationManager extends RelationManager
         return parent::getTableQuery()->with([
             'period',
         ]);
+    }
+
+    public static function canViewForRecord(?Model $ownerRecord): bool
+    {
+        /**
+         * @var Category $ownerRecord
+         */
+        return $ownerRecord->isSub();
     }
 
     public static function form(Form $form): Form
@@ -75,7 +84,7 @@ class CategoryPricesRelationManager extends RelationManager
                     ->formatStateUsing(
                         fn (string $state): string => self::coinsToRoubles($state)
                     )
-                    ->label('Цена за одну лекцию этой категории, рублей')
+                    ->label('Общая цена одной лекции этой категории, рублей')
                     ->weight('bold'),
             ])
             ->filters([
