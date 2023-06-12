@@ -6,14 +6,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Lector extends Model
 {
     use HasFactory;
-
-    protected $appends = [
-        'a_rates'
-    ];
 
     protected $fillable = [
         'name',
@@ -37,26 +34,13 @@ class Lector extends Model
     {
         return $this->hasMany(LectorRate::class);
     }
-
-    protected function aRates(): Attribute
+    public function ratesWhereUser(int $userId): HasMany
     {
-        $rates = [];
+        return $this->rates()->where('user_id', $userId);
+    }
 
-        $rates['rate_avg'] = $this
-            ->rates
-            ->average('rating');
-
-        if (auth()->user()) {
-            $rates['rate_user'] = $this
-                ->rates
-                ->where('user_id', '=', auth()->id())
-                ->average('rating');
-        } else {
-            $rates['rate_user'] = null;
-        }
-
-        return new Attribute(
-            get: fn () => $rates,
-        );
+    public function averageRate(): HasOne
+    {
+        return $this->hasOne(LectorAverageRate::class);
     }
 }

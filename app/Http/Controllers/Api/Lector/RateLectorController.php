@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lector;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RateLectorRequest;
+use App\Jobs\UpdateAverageLectorRateJob;
 use App\Models\Lector;
 use App\Models\LectorRate;
 use Illuminate\Http\Response;
@@ -66,34 +67,32 @@ class RateLectorController extends Controller
 {
     public function __invoke(
         RateLectorRequest $rateLectorRequest,
-        int $lectorId
+        int               $lectorId
     ) {
         $lector = Lector::find($lectorId);
 
         if (is_null($lector)) {
             return response()->json([
-                'message' => 'Lector with id '.$lectorId.' was not found',
+                'message' => 'Lector with id ' . $lectorId . ' was not found',
             ], Response::HTTP_NOT_FOUND);
         }
 
         $lectorRate = LectorRate::query()
             ->firstOrCreate([
-                'user_id' => auth()->user()->id,
+                'user_id' => auth()->id(),
                 'lector_id' => $lectorId,
             ]);
 
         $lectorRate->rating = $rateLectorRequest->rate;
         $lectorRate->save();
 
-        $rateAverage = LectorRate::query()
-            ->where('lector_id', '=', $lectorId)
-            ->average('rating');
+        dispatch(new UpdateAverageLectorRateJob($lector));
 
         return response()->json([
             'message' => 'Your rate was updated',
             'rates' => [
-                'rate_user' => $rateLectorRequest->rate,
-                'rate_avg' => $rateAverage,
+                'rate_user' => $rateLectorRequest->validated('rate'),
+                'rate_avg' => $lector->averageRate?->rating,
             ],
         ], Response::HTTP_OK);
     }

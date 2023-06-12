@@ -91,16 +91,14 @@ class LectorResource extends Resource
                     ->tooltip(fn (?Model $record): string => $record->position),
                 Tables\Columns\ImageColumn::make('photo')
                     ->label('Фото лектора'),
-                //                Tables\Columns\TextColumn::make('career_start')
-                //                    ->label('Начало карьеры')
-                //                    ->sortable(),
-                Tables\Columns\TextColumn::make('rate_avg')
-                    ->getStateUsing(
-                        function (?Lector $record): ?string {
-                            return round($record->rates['rate_avg'] ?? 0, 1) ?: 'нет оценок';
-                        }
-                    )
-                    ->label('Рейтинг, из 10'),
+                Tables\Columns\TextColumn::make('career_start')
+                    ->label('Начало карьеры')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('averageRate.rating')
+                    ->default('пока нет оценок')
+                    ->label('Рейтинг, из 10')
+                    ->sortable(),
             ])
             ->filters([
                 //
