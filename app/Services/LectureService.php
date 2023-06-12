@@ -61,26 +61,25 @@ class LectureService
 
     public function isLecturesCategoryPurchased(int $lectureId): bool
     {
-        $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $lectureCategoryId = $lecture->category_id;
-
-        $categoriesSubscriptions = $this->userRepository
-            ->categorySubscriptions();
+        $categoriesSubscriptions = auth()->user()->actualCategorySubscriptions;
 
         if (
-            is_null($categoriesSubscriptions)
-            || $categoriesSubscriptions->isEmpty()
+            is_null($categoriesSubscriptions) ||
+            $categoriesSubscriptions->isEmpty()
         ) {
             return false;
         }
 
-        $categoriesSubscriptions = $categoriesSubscriptions
-            ->where('subscriptionable_id', $lectureCategoryId);
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+        $lectureCategoryId = $lecture->category_id;
+        $lectureParentCategoryId = $lecture->category->parentCategory?->id;
 
-        foreach ($categoriesSubscriptions as $subscription) {
-            if ($subscription->isActual()) {
-                return true;
-            }
+        if (
+            $categoriesSubscriptions
+                ->whereIn('subscriptionable_id', [$lectureCategoryId, $lectureParentCategoryId])
+                ->first()
+        ) {
+            return true;
         }
 
         return false;

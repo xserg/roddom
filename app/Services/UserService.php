@@ -130,12 +130,14 @@ class UserService
             throw new NotFoundHttpException('Лекция с id ' . $lectureId . ' не найдена');
         }
 
+        $allLectureSubscription = $user
+            ->subscriptions()
+            ->latest('id')
+            ->firstWhere('subscriptionable_type', EverythingPack::class);
+
         if (
-            $allLectureSubscription = $user
-                ->subscriptions()
-                ->latest('id')
-                ->firstWhere('subscriptionable_type', EverythingPack::class)
-                ->isActual()
+            $allLectureSubscription &&
+            $allLectureSubscription->isActual()
         ) {
             return $lecture->content;
         }
