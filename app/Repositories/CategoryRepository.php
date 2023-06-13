@@ -29,6 +29,7 @@ class CategoryRepository
      */
     public function getAllLectorsByCategory(string $slug): Collection
     {
+        $relationships = ['userRate', 'averageRate'];
         $category = Category::query()
             ->where('slug', '=', $slug)
             ->firstOrFail();
@@ -47,6 +48,7 @@ class CategoryRepository
                 function (Builder $query) use ($subCategoriesIds) {
                     $query->whereIn('category_id', $subCategoriesIds);
                 })
+                ->with($relationships)
                 ->orderBy('id')
                 ->get();
         }
@@ -56,6 +58,7 @@ class CategoryRepository
             function (Builder $query) use ($category) {
                 $query->where('category_id', $category->id);
             })
+            ->with($relationships)
             ->orderBy('id')
             ->get();
     }

@@ -37,7 +37,7 @@ class LectorResource extends JsonResource
             'photo' => $this->photo,
             'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas')),
             'rates' => [
-                'rate_user' => $this->ratesWhereUser(auth()->id())->first()?->rating,
+                'rate_user' => $this->userRate?->rating,
                 'rate_avg' => $this->averageRate?->rating
             ],
         ];

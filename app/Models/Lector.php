@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,9 +33,10 @@ class Lector extends Model
     {
         return $this->hasMany(LectorRate::class);
     }
-    public function ratesWhereUser(int $userId): HasMany
+
+    public function userRate(): HasOne
     {
-        return $this->rates()->where('user_id', $userId);
+        return $this->hasOne(LectorRate::class)->where('user_id', auth()->id());
     }
 
     public function averageRate(): HasOne

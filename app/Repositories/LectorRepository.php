@@ -12,7 +12,7 @@ class LectorRepository
         ?int $page
     ): LengthAwarePaginator {
         $lectors = Lector::query()
-            ->with('diplomas')
+            ->with(['diplomas', 'userRate', 'averageRate'])
             ->paginate(
                 perPage: $perPage,
                 page: $page

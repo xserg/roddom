@@ -42,7 +42,7 @@ class RetrieveLectorController
     public function __invoke(Request $request, int $id): JsonResponse
     {
         $lector = Lector::query()
-            ->with(['diplomas'])
+            ->with(['diplomas', 'averageRate', 'userRate'])
             ->where(['id' => $id])
             ->first();
 
