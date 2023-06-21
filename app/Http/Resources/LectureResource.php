@@ -3,6 +3,8 @@
 namespace App\Http\Resources;
 
 use App\Models\Lecture;
+use App\Services\LectureService;
+use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -54,7 +56,7 @@ class LectureResource extends JsonResource
     {
         $loadCategory = $this->resource->relationLoaded('category');
         /**
-         * @var Lecture $this
+         * @var Lecture|LectureResource $this
          */
         return [
             'id' => $this->id,
@@ -77,7 +79,7 @@ class LectureResource extends JsonResource
             'is_promo' => $this->isPromo(),
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
-            'prices' => $this->convertPrices($this->prices),
+            'prices' => $this->whenAppended('prices', $this->formPrices()),
             'rates' => $this->whenNotNull($this->a_rates),
             'content_type' => $this->whenNotNull(new LectureContentTypeResource($this->contentType)),
             'payment_type' => $this->whenNotNull(new LecturePaymentTypeResource($this->paymentType)),
@@ -85,5 +87,16 @@ class LectureResource extends JsonResource
             'show_tariff_2' => $this->whenNotNull($this->show_tariff_2),
             'show_tariff_3' => $this->whenNotNull($this->show_tariff_3),
         ];
+    }
+
+    private function formPrices(): Closure
+    {
+        return function () {
+            if ($this->isPromo()) {
+                return $this->convertPrices(app(LectureService::class)->formPromoLecturePricesPromoPack($this));
+            } else {
+                return $this->convertPrices(app(LectureService::class)->formLecturePricesSubCategory($this));
+            }
+        };
     }
 }

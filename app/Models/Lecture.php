@@ -124,6 +124,9 @@ class Lecture extends Model
         return $this->morphMany(Subscription::class, 'subscriptionable');
     }
 
+    /**
+     * Кастомные цены на платную лекцию
+     */
     public function pricesForLectures(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -132,6 +135,9 @@ class Lecture extends Model
         )->withPivot(['id', 'price']);
     }
 
+    /**
+     * Кастомные цены на промо лекцию
+     */
     public function pricesInPromoPacks(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -142,6 +148,9 @@ class Lecture extends Model
         )->withPivot(['price', 'id', 'period_id']);
     }
 
+    /**
+     * Кастомные цены на промо лекцию тоже, только через период
+     */
     public function pricesPeriodsInPromoPacks(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -302,21 +311,22 @@ class Lecture extends Model
         );
     }
 
-    /**
-     * В этот проперти попадают либо промо цены, либо цены категории
-     */
-    protected function prices(): Attribute
-    {
-        if ($this->isPromo()) {
-            $prices = $this->lectureService->formPricesForPromoLecture($this);
-        } else {
-            $prices = $this->lectureService->formPricesForPayedLecture($this);
-        }
-
-        return new Attribute(
-            get: fn () => $prices,
-        );
-    }
+//    /**
+//     * В этот аксессор попадают либо промо цены, либо цены категории - общие и кастомные
+//     * на каждый период
+//     */
+//    protected function prices(): Attribute
+//    {
+//        if ($this->isPromo()) {
+//            $prices = $this->lectureService->formPromoLecturePricesPromoPack($this);
+//        } else {
+//            $prices = $this->lectureService->formLecturePricesSubCategory($this);
+//        }
+//
+//        return new Attribute(
+//            get: fn () => $prices,
+//        );
+//    }
 
     public function convertPrices(array $prices): array
     {

@@ -15,6 +15,9 @@ class Promo extends Model
         );
     }
 
+    /**
+     * Общие цены промо лекций
+     */
     public function subscriptionPeriodsForPromoPack(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -25,6 +28,9 @@ class Promo extends Model
         )->withPivot(['period_id', 'price', 'price_for_one_lecture']);
     }
 
+    /**
+     * Кастомные цены промо лекций
+     */
     public function pricesForPromoLectures(): BelongsToMany
     {
         return $this->belongsToMany(

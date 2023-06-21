@@ -28,6 +28,9 @@ class BuyAllLecturesController
     ) {
         $period = Period::firstWhere('length', $periodLength);
         $mainCategories = Category::mainCategories()->with([
+            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
+            'childrenCategoriesLectures.pricesForLectures',
+            'childrenCategories.lectures.category.parentCategory.categoryPrices',
             'childrenCategories.categoryPrices.period',
             'childrenCategories.parentCategory',
             'childrenCategories.categoryPrices',

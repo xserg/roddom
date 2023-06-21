@@ -33,19 +33,14 @@ class CategoryPricesRelationManager extends RelationManager
         ]);
     }
 
-    public static function canViewForRecord(?Model $ownerRecord): bool
-    {
-        /**
-         * @var Category $ownerRecord
-         */
-        return $ownerRecord->isSub();
-    }
-
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                self::priceField('price_for_one_lecture')->label('цена за одну лекцию данной подкатегории'),
+                self::priceField('price_for_one_lecture')
+                    ->label('Общая цена лекции, рублей'),
+                self::priceField('price_for_one_lecture_promo')
+                    ->label('Общая цена лекции, акционная, рублей'),
             ]);
     }
 
@@ -58,40 +53,23 @@ class CategoryPricesRelationManager extends RelationManager
                         fn (?Model $record): string => $record->period->length
                     )
                     ->label('Период покупки, дней'),
-//                Tables\Columns\TextColumn::make('price_pack')
-//                    ->getStateUsing(
-//                        function (?SubcategoryPrices $record): ?string {
-//                            $periodId = $record->period_id;
-//                            $price = app(CategoryRepository::class)
-//                                ->calculateSubCategoryPriceForPeriod(
-//                                    $record->category,
-//                                    $periodId);
-//
-//                            return self::coinsToRoubles($price);
-//                        }
-//                    )
-//                    ->label('Цена за всю категорию, рублей'),
-//                Tables\Columns\TextColumn::make('lectures_count')
-//                    ->getStateUsing(
-//                        function (?SubcategoryPrices $record): string {
-//                            $category = $record->category;
-//                            $lecturesCount = $category->lectures->count();
-//
-//                            return $lecturesCount;
-//                        }
-//                    )->label('Количество лекций'),
                 Tables\Columns\TextColumn::make('price_for_one_lecture')
                     ->formatStateUsing(
-                        fn (string $state): string => self::coinsToRoubles($state)
+                        fn (?string $state): string => self::coinsToRoubles($state)
                     )
-                    ->label('Общая цена одной лекции этой категории, рублей')
+                    ->label('Общая цена лекции, рублей')
+                    ->weight('bold'),
+                Tables\Columns\TextColumn::make('price_for_one_lecture_promo')
+                    ->formatStateUsing(
+                        fn (?string $state): string => $state ? self::coinsToRoubles($state) : 'не указана'
+                    )
+                    ->label('Общая цена лекции, акционная, рублей')
                     ->weight('bold'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                //                Tables\Actions\AssociateAction::make()->preloadRecordSelect()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

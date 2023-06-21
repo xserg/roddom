@@ -197,7 +197,7 @@ class RetrieveAllLecturesController
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
-            $lectures = $builder->get();
+            $lectures = $builder->get()->append('prices');
             $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
             $lectures = $this->lectureRepository->paginate(
                 $lectures,

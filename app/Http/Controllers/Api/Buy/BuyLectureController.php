@@ -51,33 +51,31 @@ class BuyLectureController extends Controller
 
     public function __construct(
         private LectureRepository $lectureRepository,
-        private LectureService $lectureService,
-        private PaymentService $paymentService
+        private LectureService    $lectureService,
+        private PaymentService    $paymentService
     ) {
     }
 
     public function __invoke(
         BuyLectureRequest $request,
-        int $lectureId,
-        int $period
+        int               $lectureId,
+        int               $period
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId, auth()->user());
+        $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId);
         $price = self::coinsToRoubles($this->lectureService->calculateLecturePrice($lecture, $period));
 
         if ($isPurchasedStrict) {
             return response()->json([
-                'message' => 'Lecture with id '.$request->id.' is already purchased.',
+                'message' => 'Lecture with id ' . $request->id . ' is already purchased.',
             ], Response::HTTP_FORBIDDEN);
         }
 
-        //        $isFree = $this->lectureService->isFree($lectureId);
-
-        //        if ($isFree) {
-        //            return response()->json([
-        //                'message' => 'You cannot purchase free lecture'
-        //            ], Response::HTTP_FORBIDDEN);
-        //        }
+        if ($lecture->isFree()) {
+            return response()->json([
+                'message' => 'You cannot purchase free lecture'
+            ], Response::HTTP_FORBIDDEN);
+        }
 
         $order = Order::create([
             'user_id' => auth()->user()->id,

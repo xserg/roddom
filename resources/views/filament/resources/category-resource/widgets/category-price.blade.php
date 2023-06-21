@@ -12,6 +12,9 @@
                     <th scope="col" class="px-6 py-3">
                         Суммарная стоимость
                     </th>
+                    <th scope="col" class="px-6 py-3">
+                        Суммарная стоимость, промо
+                    </th>
                 </tr>
                 </thead>
                 <tbody class="text-lg font-mono">
@@ -22,6 +25,9 @@
                         </td>
                         <td class="px-6 py-4">
                             {{$value['price_for_category']}} р.
+                        </td>
+                        <td class="px-6 py-4">
+                            {{$value['price_for_category_promo']}} р.
                         </td>
                     </tr>
                 @endforeach

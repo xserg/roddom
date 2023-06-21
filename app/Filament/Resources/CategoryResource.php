@@ -82,12 +82,16 @@ class CategoryResource extends Resource
                         ->maxLength(65535)
                         ->label('Блок "инфо" категории'),
                 ])->columns(2),
-                Forms\Components\TextInput::make('slug')
-                    ->label('Слаг категории, заполняется автоматически с наименования')
-                    ->unique(table: Category::class, ignoreRecord: true)
-                    ->validationAttribute('"Слаг категории"')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Card::make([
+                    Forms\Components\Toggle::make('is_promo')
+                        ->label('Акционная'),
+                    Forms\Components\TextInput::make('slug')
+                        ->label('Слаг категории, заполняется автоматически с наименования')
+                        ->unique(table: Category::class, ignoreRecord: true)
+                        ->validationAttribute('"Слаг категории"')
+                        ->required()
+                        ->maxLength(255),
+                ])->columns(2)
             ]);
     }
 
@@ -130,6 +134,8 @@ class CategoryResource extends Resource
                 'lectures.paymentType',
                 'lectures.pricesPeriodsInPromoPacks',
                 'lectures.pricesForLectures',
+                'childrenCategoriesLectures.category.categoryPrices',
+                'childrenCategoriesLectures.pricesForLectures',
                 'childrenCategories.parentCategory',
                 'childrenCategories.categoryPrices.period',
                 'childrenCategories.lectures.category.categoryPrices.period',

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\LectureResource;
 use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\Period;
@@ -41,8 +42,8 @@ class LectureService
             ->lectureSubscriptions();
 
         if (
-            is_null($lecturesSubscriptions)
-            || $lecturesSubscriptions->isEmpty()
+            is_null($lecturesSubscriptions) ||
+            $lecturesSubscriptions->isEmpty()
         ) {
             return false;
         }
@@ -91,8 +92,8 @@ class LectureService
         $promoSubscription = $this->userRepository->promoSubscriptions();
 
         if (
-            is_null($promoSubscription)
-            || $promoSubscription->isEmpty()
+            is_null($promoSubscription) ||
+            $promoSubscription->isEmpty()
         ) {
             return false;
         }
@@ -109,12 +110,14 @@ class LectureService
     public function formAllLecturePrices(): array
     {
         $prices = [];
-
         $mainCategories = Category::mainCategories()->with([
+            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
+            'childrenCategoriesLectures.pricesForLectures',
             'childrenCategories.categoryPrices.period',
             'childrenCategories.parentCategory',
             'childrenCategories.categoryPrices',
             'childrenCategories.lectures.category.categoryPrices',
+            'childrenCategories.lectures.category.parentCategory.categoryPrices',
             'childrenCategories.lectures.pricesInPromoPacks',
             'childrenCategories.lectures.pricesForLectures',
             'childrenCategories.lectures.pricesPeriodsInPromoPacks',
@@ -138,7 +141,12 @@ class LectureService
         $price = 0;
 
         foreach ($mainCategories as $category) {
-            $price += $this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId);
+            $pricesDto = $this->categoryService
+                ->calculateMainCategoryPriceForPeriod($category, $periodId);
+
+            $price += $category->isPromo() ?
+                $pricesDto->getPromoPrice() :
+                $pricesDto->getPrice();
         }
 
         return $price;
@@ -201,10 +209,15 @@ class LectureService
                     continue;
                 }
 
-                $category = $this->categoryRepository->getCategoryById($categorySubscription['subscriptionable_id'], ['lectures']);
+                $category = $this->categoryRepository->getCategoryById(
+                    $categorySubscription['subscriptionable_id'],
+                    ['lectures', 'childrenCategories.lectures']
+                );
+
                 if (is_null($category)) {
                     continue;
                 }
+
                 if ($category->isSub()) {
                     $categoryLectures = $category->lectures;
                     foreach ($categoryLectures as $lecture) {
@@ -284,8 +297,16 @@ class LectureService
 
     public function calculateLecturePrice(Lecture $lecture, int $period): int|float
     {
-        // аксесор лекции
-        $prices = $lecture->prices;
+        if ($lecture->isFree()) {
+            return 0;
+        }
+
+        if ($lecture->isPromo()) {
+            $prices = $this->formPromoLecturePricesPromoPack($lecture);
+        } else {
+            $prices = $this->formLecturePricesSubCategory($lecture);
+        }
+
         $priceArr = Arr::where(
             $prices,
             fn ($value) => $value['length'] == $period
@@ -299,7 +320,7 @@ class LectureService
         return $price;
     }
 
-    public function formPricesForPromoLecture(Lecture $lecture): array
+    public function formPromoLecturePricesPromoPack(Lecture|LectureResource $lecture): array
     {
         $prices = [];
 
@@ -307,10 +328,10 @@ class LectureService
         $promoCommonPrices = $this->promoCommonPrices;
 
         foreach ($this->periods as $period) {
-            //общие цены всегда находятся, по идее тут всегда будет указана цена - в priceCommon
-            $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
+            //общие цены всегда находятся, по идее в priceCommon всегда будет указана цена
             $priceCommon = $promoCommonPrices->where('length', $period->length)->first();
-//            $priceCommonForOneLecture = number_format($priceCommon->pivot->price_for_one_lecture / 100, 2, thousands_separator: '');
+            $priceCustom = $promoCustomPrices->where('length', $period->length)->first();
+
             $priceCommonForOneLecture = (int) $priceCommon->pivot->price_for_one_lecture;
 
             //а вот кастомной цены может не быть, поэтому проверяем
@@ -323,10 +344,7 @@ class LectureService
                     'common_price_for_one_lecture' => $priceCommonForOneLecture,
                 ];
             } else {
-                //а если есть, то преобразовываем в формат рубли.копейки и ставим
-                //а common_price_for_one_lecture одна и таже в обоих случаях
-
-//                $priceForOneLecture = number_format($priceCustom->pivot->price / 100, 2, thousands_separator: '');
+                //common_price_for_one_lecture одна и таже в обоих случаях
                 $priceForOneLecture = (int) $priceCustom->pivot->price;
 
                 $prices[] = [
@@ -341,12 +359,10 @@ class LectureService
         return $prices;
     }
 
-    public function formPricesForPayedLecture(Lecture $lecture): array
+    public function formLecturePricesSubCategory(Lecture|LectureResource $lecture): array
     {
         $prices = [];
 
-        //если не промо - то не важно, платная или бесплатная,
-        //бесплатную тоже можно купить по ценам платной
         //берем общую цену за одну лекцию у категории
         $commonCategoryPrices = $lecture->category->categoryPrices;
         $customPrices = $lecture->pricesForLectures;
@@ -373,6 +389,111 @@ class LectureService
                     'common_price_for_one_lecture' => (int) $priceCommon->price_for_one_lecture,
                 ];
             }
+        }
+
+        return $prices;
+    }
+
+    public function formPricesPromoLectureSubCategory(Lecture $lecture): array
+    {
+        $prices = [];
+
+        // всегда будут установлены общие цены в рамках сабкатегории
+        $subCategoryCommonPrices = $lecture->category->categoryPrices;
+
+        // кастомные цены в рамках лекции
+        $lectureCustomPrices = $lecture->pricesForLectures;
+
+        foreach ($this->periods as $period) {
+            //общие цены всегда находятся, по идее в priceCommon всегда будет указана цена
+            $priceCommon = $subCategoryCommonPrices->where('period_id', $period->id)->first();
+            $priceCustom = $lectureCustomPrices->where('period_id', $period->id)->first();
+            $priceCommonForOneLecture = $priceCommon->price_for_one_lecture_promo;
+
+            //а вот кастомной цены может не быть, поэтому проверяем
+            if (is_null($priceCustom)) {
+                //если нет кастомной цены для конкретного периода, ставим null
+                $customPriceForOneLecture = null;
+            } else {
+                $customPriceForOneLecture = (int) $priceCustom->pivot->price;
+            }
+
+            $prices[] = [
+                'length' => $period->length,
+                'period_id' => $period->id,
+                'custom_price_for_one_lecture' => $customPriceForOneLecture,
+                'common_price_for_one_lecture' => $priceCommonForOneLecture,
+            ];
+        }
+
+        return $prices;
+    }
+
+    public function formLecturePricesMainCategory(Lecture|LectureResource $lecture): array
+    {
+        $prices = [];
+
+        //берем общую цену за одну лекцию у категории
+        $commonCategoryPrices = $lecture->category->parentCategory->categoryPrices;
+        $customPrices = $lecture->pricesForLectures;
+
+        foreach ($this->periods as $period) {
+            //общие цены всегда находятся, по идее тут всегда будет указана цена в priceCommon
+            $priceCommon = $commonCategoryPrices->where('period_id', $period->id)->first();
+            $priceCustom = $customPrices->where('length', $period->length)->first();
+
+            if (is_null($priceCustom)) {
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => null,
+                    'common_price_for_one_lecture' => (int) $priceCommon->price_for_one_lecture,
+                ];
+            } else {
+                $priceForOneLecture = $priceCustom->pivot->price;
+
+                $prices[] = [
+                    'length' => $period->length,
+                    'period_id' => $period->id,
+                    'custom_price_for_one_lecture' => (int) $priceForOneLecture,
+                    'common_price_for_one_lecture' => (int) $priceCommon->price_for_one_lecture,
+                ];
+            }
+        }
+
+        return $prices;
+    }
+
+    public function formPromoLecturePricesMainCategory(Lecture $lecture): array
+    {
+        $prices = [];
+
+        // всегда будут установлены общие цены в рамках сабкатегории
+        $subCategoryCommonPrices = $lecture->category->parentCategory->categoryPrices;
+
+        // кастомные цены в рамках лекции
+        $lectureCustomPrices = $lecture->pricesForLectures;
+
+        foreach ($this->periods as $period) {
+            //общие цены всегда находятся, по идее в priceCommon всегда будет указана цена
+            $priceCommon = $subCategoryCommonPrices->where('period_id', $period->id)->first();
+            $priceCustom = $lectureCustomPrices->where('period_id', $period->id)->first();
+            $priceCommonForOneLecture = $priceCommon->price_for_one_lecture_promo;
+
+            //а вот кастомной цены может не быть, поэтому проверяем
+            if (is_null($priceCustom)) {
+                //если нет кастомной цены для конкретного периода, ставим null
+                $customPriceForOneLecture = null;
+            } else {
+                $customPriceForOneLecture = (int) $priceCustom->pivot->price;
+            }
+
+            $prices[] = [
+                'length' => $period->length,
+                'period_id' => $period->id,
+                'custom_price_for_one_lecture' => $customPriceForOneLecture,
+                'common_price_for_one_lecture' => $priceCommonForOneLecture,
+            ];
         }
 
         return $prices;

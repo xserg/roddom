@@ -101,7 +101,9 @@ class RetrieveCategoryController
         $mainCategory = Category::query()
             ->where('slug', '=', $slug)
             ->where('parent_id', 0)
+            ->withCount(['childrenCategoriesLectures'])
             ->with([
+                'childrenCategories' => fn ($query) => $query->withCount('lectures'),
                 'childrenCategories.categoryPrices.period',
                 'childrenCategories.parentCategory',
                 'childrenCategories.categoryPrices',
@@ -117,6 +119,7 @@ class RetrieveCategoryController
         if (is_null($mainCategory)) {
             $subCategory = Category::query()
                 ->where('slug', '=', $slug)
+                ->withCount(['lectures'])
                 ->with([
                     'categoryPrices.period',
                     'parentCategory',

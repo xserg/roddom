@@ -148,7 +148,7 @@ class RetrieveAllPromoLecturesController extends Controller
         $builder = $this->lectureRepository->getAllPromoQueryWith($relations);
         $builder = $this->lectureRepository->addFiltersToQuery($builder);
 
-        $lectures = $builder->get();
+        $lectures = $builder->get()->append('prices');
         $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
 
         $lectures = $this->lectureRepository->paginate(
@@ -157,19 +157,9 @@ class RetrieveAllPromoLecturesController extends Controller
             $request->page
         );
 
-        /**
-         * @var $promo Promo
-         */
         $promo = Promo::query()->with(['subscriptionPeriodsForPromoPack'])->first();
         $prices = $this->promoRepository->getPrices($promo);
 
-        //        } catch (NotFoundHttpException $exception) {
-        //
-        //            return response()->json(
-        //                ['message' => $exception->getMessage()],
-        //                Response::HTTP_NOT_FOUND
-        //            );
-        //        }
         return response()->json(
             [
                 'prices' => $prices,

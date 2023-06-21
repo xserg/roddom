@@ -67,6 +67,9 @@ class BuyCategoryController extends Controller
         $periodId = $this->periodRepository->getPeriodByLength($period)->id;
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
         $relations = [
+            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
+            'childrenCategoriesLectures.pricesForLectures',
+            'childrenCategories.lectures.category.parentCategory.categoryPrices',
             'childrenCategories.categoryPrices.period',
             'childrenCategories.parentCategory',
             'childrenCategories.categoryPrices',
@@ -80,9 +83,19 @@ class BuyCategoryController extends Controller
         $category = $this->categoryRepository->getCategoryById($categoryId, $relations);
 
         if ($category->isSub()) {
-            $price = self::coinsToRoubles($this->categoryService->calculateSubCategoryPriceForPeriod($category, $periodId));
+            $subCategoryPricesDto = $this->categoryService->calculateSubCategoryPriceForPeriod($category, $periodId);
+            $price = self::coinsToRoubles(
+                $category->isPromo() ?
+                    $subCategoryPricesDto->getPromoPrice() :
+                    $subCategoryPricesDto->getPrice()
+            );
         } else {
-            $price = self::coinsToRoubles($this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId));
+            $categoryPricesDto = $this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId);
+            $price = self::coinsToRoubles(
+                $category->isPromo() ?
+                    $categoryPricesDto->getPromoPrice() :
+                    $categoryPricesDto->getPrice()
+            );
         }
 
         if ($isPurchased) {
@@ -109,30 +122,5 @@ class BuyCategoryController extends Controller
                 'link' => $link,
             ], Response::HTTP_OK);
         }
-
-        //        $paymentSuccess = true;
-        //
-        //        if($paymentSuccess){
-        //            $attributes = [
-        //                'user_id' => auth()->user()->id,
-        //                'subscriptionable_type' => Category::class,
-        //                'subscriptionable_id' => $categoryId,
-        //                'period_id' => Period::firstWhere('length', '=', $period)->id,
-        //                'start_date' => now(),
-        //                'end_date' => now()->addDays($period)
-        //            ];
-        //
-        //            $subscription = new Subscription($attributes);
-        //            $subscription->save();
-        //
-        //            return response()->json([
-        //                'message' => 'Подписка на категорию успешно оформлена',
-        //                'subscription' => new SubscriptionResource($subscription)
-        //            ]);
-        //        } else {
-        //            return response()->json([
-        //                'message' => 'Подписка не была оформлена. ',
-        //            ]);
-        //        }
     }
 }

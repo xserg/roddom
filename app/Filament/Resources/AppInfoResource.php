@@ -14,19 +14,12 @@ use Filament\Tables\Actions\Position;
 class AppInfoResource extends Resource
 {
     protected static ?string $model = AppInfo::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-presentation-chart-line';
-
     protected static ?string $recordTitleAttribute = 'id';
-
     protected static ?string $navigationLabel = 'Динамические заголовки';
-
     protected static ?int $navigationSort = 5;
-
     protected static ?string $navigationGroup = 'Приложение';
-
     protected static ?string $label = 'Динамические заголовки';
-
     protected static ?string $pluralLabel = 'Динамические заголовки';
 
     public static function form(Form $form): Form
@@ -152,8 +145,9 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Удалили из «Просмотренных»'),
-                                Forms\Components\TextInput::make('message_sent')
+                                Forms\Components\Textarea::make('message_sent')
                                     ->required()
+                                    ->rows(3)
                                     ->maxLength(255)
                                     ->label('Ваше сообщение успешно отправлено.'),
                                 Forms\Components\TextInput::make('message_sent_error')
@@ -164,10 +158,46 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Спасибо за вашу оценку!'),
-                                Forms\Components\TextInput::make('thanks_for_feedback')
+                                Forms\Components\Textarea::make('thanks_for_feedback')
+                                    ->required()
+                                    ->rows(3)
+                                    ->maxLength(255)
+                                    ->label('Спасибо за обратную связь! Ваше сообщение успешно отправлено.'),
+
+                                /**
+                                 * add last
+                                 */
+
+                                Forms\Components\Textarea::make('buy_page_under_btn_description')
+                                    ->required()
+                                    ->rows(2)
+                                    ->maxLength(510)
+                                    ->label('Выбранный материал будет доступен Вам для просмотра в течение x дней с момента покупки.'),
+                                Forms\Components\Textarea::make('buy_page_description')
+                                    ->required()
+                                    ->rows(3)
+                                    ->maxLength(255)
+                                    ->label('Вы можете приобрести доступ к этому материалу на необходимый Вам промежуток времени.'),
+                                Forms\Components\TextInput::make('buy_category')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('Спасибо за обратную связь! Ваше сообщение успено отправлено.'),
+                                    ->label('Купить категорию со скидкой'),
+                                Forms\Components\TextInput::make('buy_subcategory')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Купить подкатегорию со скидкой'),
+                                Forms\Components\TextInput::make('view_schedule')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('График просмотра'),
+                                Forms\Components\TextInput::make('watched_already')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Вы уже посмотрели материал на сегодня'),
+                                Forms\Components\TextInput::make('next_free_lecture_available_at')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Следующий бесплатный будет доступен через'),
                             ])->columns(2),
                     ])
                     ->collapsible()
