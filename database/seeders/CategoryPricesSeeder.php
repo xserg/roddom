@@ -10,7 +10,7 @@ class CategoryPricesSeeder extends Seeder
 {
     public function run(): void
     {
-        $categoryIdsWhichAlreadyHasPrices = SubcategoryPrices::query()->pluck('id');
+        $categoryIdsWhichAlreadyHasPrices = SubcategoryPrices::query()->pluck('category_id');
         $categories = Category::whereNotIn('id', $categoryIdsWhichAlreadyHasPrices)->get();
 
         foreach ($categories as $category) {
