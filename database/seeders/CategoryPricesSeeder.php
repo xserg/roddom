@@ -10,38 +10,42 @@ class CategoryPricesSeeder extends Seeder
 {
     public function run(): void
     {
-        $categories = Category::subCategories()->get();
+        $categoryIdsWhichAlreadyHasPrices = SubcategoryPrices::query()->pluck('id');
+        $categories = Category::whereNotIn('id', $categoryIdsWhichAlreadyHasPrices)->get();
 
         foreach ($categories as $category) {
-            $categoryPrices1 = new SubcategoryPrices(
+            $categoryPricesDay = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => mt_rand(100000, 120000),
-                    'price_for_one_lecture' => mt_rand(10000, 12000),
+                    'price_for_pack' => null,
+                    'price_for_one_lecture' => 10000,
+                    'price_for_one_lecture_promo' => 9000,
                     'period_id' => 1,
                 ]
             );
-            $categoryPrices1->save();
+            $categoryPricesDay->save();
 
-            $categoryPrices1 = new SubcategoryPrices(
+            $categoryPricesWeek = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => mt_rand(300000, 320000),
-                    'price_for_one_lecture' => mt_rand(30000, 32000),
+                    'price_for_pack' => null,
+                    'price_for_one_lecture' => 20000,
+                    'price_for_one_lecture_promo' => 15000,
                     'period_id' => 2,
                 ]
             );
-            $categoryPrices1->save();
+            $categoryPricesWeek->save();
 
-            $categoryPrices1 = new SubcategoryPrices(
+            $categoryPricesMonth = new SubcategoryPrices(
                 [
                     'category_id' => $category->id,
-                    'price_for_pack' => mt_rand(500000, 520000),
-                    'price_for_one_lecture' => mt_rand(50000, 52000),
+                    'price_for_pack' => null,
+                    'price_for_one_lecture' => 50000,
+                    'price_for_one_lecture_promo' => 40000,
                     'period_id' => 3,
                 ]
             );
-            $categoryPrices1->save();
+            $categoryPricesMonth->save();
         }
     }
 }

@@ -21,10 +21,12 @@ class SubcategoryPrices extends Model
         'price_for_pack',
         'price_for_one_lecture',
         'period_id',
+        'price_for_one_lecture_promo',
     ];
 
     protected $casts = [
         'price_for_one_lecture' => 'integer',
+        'price_for_one_lecture_promo' => 'integer',
     ];
 
     public function category(): BelongsTo

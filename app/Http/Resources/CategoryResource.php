@@ -10,7 +10,6 @@ use OpenApi\Attributes as OA;
     schema: 'CategoryResource',
     title: 'CategoryResource'
 )]
-
 class CategoryResource extends JsonResource
 {
     #[OA\Property(property: 'id', description: 'id категории', type: 'integer')]
@@ -33,6 +32,10 @@ class CategoryResource extends JsonResource
             'description' => $this->description,
             'info' => $this->info,
             'preview_picture' => $this->preview_picture,
+            'is_promo' => $this->is_promo,
+            'lectures_count' => $this->isMain() ?
+                $this->whenCounted('childrenCategoriesLectures') :
+                $this->whenCounted('lectures'),
             'prices' => $this->whenNotNull($this->prices),
         ];
     }
