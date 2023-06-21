@@ -126,6 +126,10 @@ class CategoryService
         }
 
         foreach ($category->lectures as $lecture) {
+            if($lecture->isFree()){
+                return new CategoryPricesDto($price, $pricePromo);
+            }
+
             $lecturePrices = app(LectureService::class)
                 ->formLecturePricesSubCategory($lecture);
             $lecturePromoPrices = app(LectureService::class)
@@ -174,6 +178,10 @@ class CategoryService
         }
 
         foreach ($category->childrenCategoriesLectures as $lecture) {
+            if($lecture->isFree()){
+                return new CategoryPricesDto($price, $pricePromo);
+            }
+
             $lecturePrices = app(LectureService::class)
                 ->formLecturePricesMainCategory($lecture);
             $lecturePromoPrices = app(LectureService::class)
