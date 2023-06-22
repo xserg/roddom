@@ -25,7 +25,11 @@ class DiplomasRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\FileUpload::make('preview_picture')
-                    ->label('превью диплома'),
+                    ->label('превью диплома')
+                    ->directory('images/diplomas')
+                    ->maxSize(10240)
+                    ->image()
+                    ->required()
             ]);
     }
 
@@ -33,7 +37,6 @@ class DiplomasRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                //                Tables\Columns\TextColumn::make('id'),
                 Tables\Columns\ImageColumn::make('preview_picture')
                     ->label('превью диплома'),
             ])
@@ -47,12 +50,9 @@ class DiplomasRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                //                Tables\Actions\DissociateAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                //                Tables\Actions\DissociateBulkAction::make(),
-                //                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 }
