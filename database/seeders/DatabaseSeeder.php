@@ -35,29 +35,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Lector::factory(25)->create();
-        Diploma::factory(50)->create();
-        $this->call(SubscriptionPeriodSeeder::class);
-        $this->call(CategorySeeder::class);
-        $this->call(SubCategorySeeder::class);
-        $this->call(LectureTypeSeeder::class);
-        $this->call(PromoSeeder::class);
-        Lecture::factory(1050)->create();
-        Lecture::factory(30)->notPublished()->create();
-
-        $this->call(PromoPackPricesSeeder::class);
-        $this->call(CategoryPricesSeeder::class);
-//        $this->call(PromoLecturesSeeder::class);
-        $this->call(PromoLecturesPricesSeeder::class);
-        $this->call(AppInfoSeeder::class);
-
-        $this->createFirstTestUser();
-        $this->createSecondTestUser();
-        $this->createAnotherUser();
-        $this->createUsers(5);
-        $this->setRecommendedLectures(20);
-
-        //        $this->call(SubscriptionSeeder::class);
+//        Lector::factory(25)->create();
+//        Diploma::factory(50)->create();
+//        $this->call(SubscriptionPeriodSeeder::class);
+//        $this->call(CategorySeeder::class);
+//        $this->call(SubCategorySeeder::class);
+//        $this->call(LectureTypeSeeder::class);
+//        $this->call(PromoSeeder::class);
+//        Lecture::factory(1050)->create();
+//        Lecture::factory(30)->notPublished()->create();
+//
+//        $this->call(PromoPackPricesSeeder::class);
+//        $this->call(CategoryPricesSeeder::class);
+////        $this->call(PromoLecturesSeeder::class);
+//        $this->call(PromoLecturesPricesSeeder::class);
+//        $this->call(AppInfoSeeder::class);
+//
+//        $this->createFirstTestUser();
+//        $this->createSecondTestUser();
+//        $this->createAnotherUser();
+//        $this->createUsers(1000);
+//        $this->setRecommendedLectures(20);
     }
 
     private function createUsers(int $users)
