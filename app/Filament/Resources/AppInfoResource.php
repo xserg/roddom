@@ -193,11 +193,27 @@ class AppInfoResource extends Resource
                                 Forms\Components\TextInput::make('watched_already')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('Вы уже посмотрели материал на сегодня'),
+                                    ->label('Строка "Вы уже посмотрели материал на сегодня"'),
                                 Forms\Components\TextInput::make('next_free_lecture_available_at')
                                     ->required()
                                     ->maxLength(255)
-                                    ->label('Следующий бесплатный будет доступен через'),
+                                    ->label('Строка "Следующий бесплатный будет доступен через"'),
+                                Forms\Components\TextInput::make('buy_all')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Строка "Купить весь каталог со скидкой"'),
+                                Forms\Components\TextInput::make('watch_from')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Строка "Смотреть от"'),
+                                Forms\Components\TextInput::make('chosen_category_contains_lectures')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Строка "Выбранная категория содержит х лекций."'),
+                                Forms\Components\TextInput::make('your_profit_is_roubles')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Строка "Ваша экономия составит х рублей."'),
                             ])->columns(2),
                     ])
                     ->collapsible()
