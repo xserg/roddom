@@ -74,24 +74,17 @@ class PhotoController
     public function __invoke(
         ProfilePhotoRequest $request
     ): JsonResponse {
-        $user = auth()->user();
-        $file = $request->file('photo');
-
-        if (is_null($file)) {
-            return response()->json([
-                'data' => '',
-                'message' => 'Требуется передать поле \'photo\' в теле запроса с файлом фото',
-            ], 422);
-        }
-
         try {
-            $paths = $this->service->saveUsersPhoto($user, $file);
+            $paths = $this->service->saveUsersPhoto(
+                auth()->user(),
+                $request->validated('photo')
+            );
 
         } catch (Exception $exception) {
 
             return response()->json([
                 'data' => '',
-                'message' => 'Что-то пошло не так: '.$exception->getMessage(),
+                'message' => 'Что-то пошло не так: ' . $exception->getMessage(),
             ], 500);
         }
 

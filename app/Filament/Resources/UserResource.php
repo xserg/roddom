@@ -58,7 +58,8 @@ class UserResource extends Resource
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->unique(table: User::class, ignoreRecord: true),
                     Forms\Components\DatePicker::make('birthdate')->label('Дата рождения пользователя'),
                     Forms\Components\TextInput::make('phone')
                         ->tel()
@@ -71,10 +72,6 @@ class UserResource extends Resource
                         ->label('Начало беременности'),
                     Forms\Components\DatePicker::make('baby_born')
                         ->label('Дата рождения ребёнка'),
-                    Forms\Components\TextInput::make('phone')
-                        ->tel()
-                        ->maxLength(20)
-                        ->visible(false),
                     Forms\Components\DateTimePicker::make('next_free_lecture_available')
                         ->label('Дата, когда можно смотреть бесплатную лекцию'),
 

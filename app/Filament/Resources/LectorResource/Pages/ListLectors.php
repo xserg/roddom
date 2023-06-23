@@ -22,8 +22,7 @@ class ListLectors extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        return Lector::query()
-            ->with(['rates']);
+        return Lector::query();
     }
 
     protected function getTableRecordsPerPageSelectOptions(): array

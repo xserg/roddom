@@ -190,8 +190,8 @@ class UserService
         }
 
         if (
-            ! $image->save(storage_path('app/public/images/users/' . $user->id . '.jpg'))
-            || ! $imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'))
+            ! $image->save(storage_path('app/public/images/users/' . $user->id . '.jpg')) ||
+            ! $imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'))
         ) {
             throw new Exception('Could not upload image');
         }
