@@ -239,7 +239,9 @@ class UserService
                 ->toDateString();
         }
 
-        $user->profile_fulfilled_at = now();
+        if (! $user->isProfileFulfilled()) {
+            $user->setProfileFulfilled();
+        }
 
         $this->saveUserGuard($user);
 

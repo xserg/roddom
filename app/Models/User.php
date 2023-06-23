@@ -128,4 +128,14 @@ class User extends Authenticatable implements FilamentUser
     {
         return (bool) $this->is_admin;
     }
+
+    public function isProfileFulfilled(): bool
+    {
+        return (bool) $this->profile_fulfilled_at;
+    }
+
+    public function setProfileFulfilled(): void
+    {
+        $this->profile_fulfilled_at = now();
+    }
 }
