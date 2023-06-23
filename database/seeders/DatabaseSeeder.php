@@ -56,6 +56,9 @@ class DatabaseSeeder extends Seeder
 //        $this->createAnotherUser();
 //        $this->createUsers(1000);
 //        $this->setRecommendedLectures(20);
+        User::query()->update([
+            'ref_token' => Str::uuid(4)
+        ]);
     }
 
     private function createUsers(int $users)
