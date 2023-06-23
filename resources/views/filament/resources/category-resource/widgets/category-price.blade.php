@@ -1,33 +1,34 @@
 <x-filament::widget>
     <x-filament::card>
-        <x-filament::card.heading><span class="text-gray-500">количество лекций:</span> {{ $lectures_count }}</x-filament::card.heading>
+        <x-filament::card.heading><span class="font-sans">количество лекций:</span> {{ $lectures_count }}
+        </x-filament::card.heading>
         <x-filament::hr/>
         <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    <th scope="col" class="px-6 py-3">
+            <table class="w-full text-sm text-left font-sans">
+                <thead class="">
+                <tr class="">
+                    <th scope="col" class="px-6 py-3 font-medium">
                         Период, дней
                     </th>
-                    <th scope="col" class="px-6 py-3">
-                        Суммарная стоимость
+                    <th scope="col" class="px-6 py-3 font-medium">
+                        Суммарная стоимость, рублей
                     </th>
-                    <th scope="col" class="px-6 py-3">
-                        Суммарная стоимость, промо
+                    <th scope="col" class="px-6 py-3 font-medium">
+                        Суммарная акционная стоимость, рублей
                     </th>
                 </tr>
                 </thead>
-                <tbody class="text-lg font-mono">
+                <tbody class="">
                 @foreach($form as $value)
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <tr class="text-base bg-white border-t dark:bg-gray-800 dark:border-gray-700 font-light">
                         <td class="px-6 py-4">
                             {{$value['length']}}
                         </td>
-                        <td class="px-6 py-4">
-                            {{$value['price_for_category']}} р.
+                        <td class="px-6 py-4 font-bold">
+                            {{$value['price_for_category']}}
                         </td>
-                        <td class="px-6 py-4">
-                            {{$value['price_for_category_promo']}} р.
+                        <td class="px-6 py-4 font-bold">
+                            {{$value['price_for_category_promo']}}
                         </td>
                     </tr>
                 @endforeach
