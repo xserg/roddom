@@ -21,9 +21,9 @@ class ProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'string|max:255',
-            'birthdate' => 'date',
-            'phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|max:20|min:10',
+            'name' => 'required|string|max:255',
+            'birthdate' => 'required|date',
+            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|max:20|min:10',
             'is_mother' => 'boolean',
             'pregnancy_weeks' => 'numeric|min:1|max:40',
             'baby_born' => 'date',

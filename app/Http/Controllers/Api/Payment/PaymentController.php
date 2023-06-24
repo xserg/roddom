@@ -26,6 +26,7 @@ use YooKassa\Common\Exceptions\NotFoundException;
 use YooKassa\Common\Exceptions\ResponseProcessingException;
 use YooKassa\Common\Exceptions\TooManyRequestsException;
 use YooKassa\Common\Exceptions\UnauthorizedException;
+use YooKassa\Model\Notification\NotificationCanceled;
 use YooKassa\Model\Notification\NotificationSucceeded;
 use YooKassa\Model\Notification\NotificationWaitingForCapture;
 use YooKassa\Model\NotificationEventType;
@@ -54,10 +55,25 @@ class PaymentController extends Controller
         $source = file_get_contents('php://input');
         $requestBody = json_decode($source, true);
 
-        $notification = ($requestBody['event'] === NotificationEventType::PAYMENT_SUCCEEDED)
-            ? new NotificationSucceeded($requestBody)
-            : new NotificationWaitingForCapture($requestBody);
+        $notification = match ($requestBody['event']) {
+            NotificationEventType::PAYMENT_SUCCEEDED => new NotificationSucceeded($requestBody),
+            NotificationEventType::PAYMENT_WAITING_FOR_CAPTURE => new NotificationWaitingForCapture($requestBody),
+            NotificationEventType::PAYMENT_CANCELED => new NotificationCanceled($requestBody),
+        };
+
         $payment = $notification->getObject();
+
+        if (isset($payment->status) && $payment->status === 'canceled') {
+            $metadata = $payment->metadata;
+
+            if (isset($metadata->order_id)) {
+                $orderId = (int) $metadata->order_id;
+                $order = Order::query()->findOrFail($orderId);
+
+                $order->status = PaymentStatusEnum::FAILED;
+                $order->save();
+            }
+        }
 
         if (isset($payment->status) && $payment->status === 'waiting_for_capture') {
             $this->paymentService->getClient()->capturePayment([
@@ -66,14 +82,14 @@ class PaymentController extends Controller
         }
 
         if (isset($payment->status) && $payment->status === 'succeeded') {
-            if ((bool) $payment->paid === true) {
-                $metadata = (object) $payment->metadata;
+            if ($payment->paid === true) {
+                $metadata = $payment->metadata;
 
                 if (isset($metadata->order_id)) {
                     $orderId = (int) $metadata->order_id;
                     $order = Order::query()->findOrFail($orderId);
 
-                    if($order->isConfirmed()){
+                    if ($order->isConfirmed()) {
                         return;
                     }
 
