@@ -259,9 +259,13 @@ class UserResource extends Resource
                     ->label('дата рождения')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('phone')->label('телефон')->toggleable(),
-                Tables\Columns\TextColumn::make('refPoints.points')->label('реф поинты')->toggleable(isToggledHiddenByDefault: true)
+                Tables\Columns\TextColumn::make('refPoints.points')->label('реф поинты')->toggleable()
                     ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
                     ->sortable(),
+//                Tables\Columns\TextColumn::make('referrer.id')
+//                    ->label('реферер')->toggleable()
+//                    ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
+//                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),

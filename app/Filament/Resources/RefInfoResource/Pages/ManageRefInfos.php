@@ -13,7 +13,11 @@ class ManageRefInfos extends ManageRecords
     protected function getActions(): array
     {
         return [
-            Actions\CreateAction::make(),
         ];
+    }
+
+    protected function isTablePaginationEnabled(): bool
+    {
+        return false;
     }
 }
