@@ -28,7 +28,6 @@ class BuyCategoryRequest extends FormRequest
             'id' => 'required|exists:lecture_categories,id',
             'period' => 'required|exists:subscription_periods,length',
             'ref_points' => [
-                'required',
                 'numeric',
                 'min:0',
                 new UserPointsLte

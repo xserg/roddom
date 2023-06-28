@@ -26,7 +26,6 @@ class BuyLectureRequest extends FormRequest
             'id' => 'required|exists:lectures,id',
             'period' => 'required|exists:subscription_periods,length',
             'ref_points' => [
-                'required',
                 'numeric',
                 'min:0',
                 new UserPointsLte
