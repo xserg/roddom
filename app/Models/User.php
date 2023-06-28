@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
@@ -45,6 +46,15 @@ class User extends Authenticatable implements FilamentUser
         'profile_fulfilled_at' => 'datetime',
         'is_admin' => 'bool'
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (is_null($user->ref_token)) {
+                $user->ref_token = Str::uuid();
+            }
+        });
+    }
 
     public function watchedLectures(): BelongsToMany
     {

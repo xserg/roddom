@@ -84,18 +84,14 @@ class BuyCategoryController extends Controller
 
         if ($category->isSub()) {
             $subCategoryPricesDto = $this->categoryService->calculateSubCategoryPriceForPeriod($category, $periodId);
-            $price = self::coinsToRoubles(
-                $category->isPromo() ?
-                    $subCategoryPricesDto->getPromoPrice() :
-                    $subCategoryPricesDto->getPrice()
-            );
+            $price = $category->isPromo() ?
+                $subCategoryPricesDto->getPromoPrice() :
+                $subCategoryPricesDto->getPrice();
         } else {
             $categoryPricesDto = $this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId);
-            $price = self::coinsToRoubles(
-                $category->isPromo() ?
-                    $categoryPricesDto->getPromoPrice() :
-                    $categoryPricesDto->getPrice()
-            );
+            $price = $category->isPromo() ?
+                $categoryPricesDto->getPromoPrice() :
+                $categoryPricesDto->getPrice();
         }
 
         if ($isPurchased) {
@@ -104,9 +100,12 @@ class BuyCategoryController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
+        $refPointsToSpend = $request->validated('ref_points');
+
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
+            'points' => $refPointsToSpend,
             'subscriptionable_type' => Category::class,
             'subscriptionable_id' => $categoryId,
             'period' => $period,
@@ -114,7 +113,11 @@ class BuyCategoryController extends Controller
 
         if ($order) {
             $link = $this->paymentService->createPayment(
-                $price,
+                self::coinsToRoubles(
+                    $refPointsToSpend ?
+                        $price - self::roublesToCoins($refPointsToSpend) :
+                        $price
+                ),
                 ['order_id' => $order->id]
             );
 

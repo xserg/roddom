@@ -42,13 +42,14 @@ class BuyAllLecturesController
             'childrenCategories.lectures.contentType',
         ])->get();
 
-        $price = self::coinsToRoubles(
-            $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id)
-        );
+        $refPointsToSpend = $request->validated('ref_points');
+
+        $price = $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id);
 
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
+            'points' => $refPointsToSpend,
             'subscriptionable_type' => EverythingPack::class,
             'subscriptionable_id' => 1,
             'period' => $periodLength,
@@ -56,7 +57,11 @@ class BuyAllLecturesController
 
         if ($order) {
             $link = $this->paymentService->createPayment(
-                $price,
+                self::coinsToRoubles(
+                    $refPointsToSpend ?
+                        $price - self::roublesToCoins($refPointsToSpend) :
+                        $price
+                ),
                 ['order_id' => $order->id]
             );
 

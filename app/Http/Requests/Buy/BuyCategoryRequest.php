@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Buy;
 
 use App\Models\Period;
+use App\Rules\UserPointsLte;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,12 @@ class BuyCategoryRequest extends FormRequest
         return [
             'id' => 'required|exists:lecture_categories,id',
             'period' => 'required|exists:subscription_periods,length',
+            'ref_points' => [
+                'required',
+                'numeric',
+                'min:0',
+                new UserPointsLte
+            ]
         ];
     }
 

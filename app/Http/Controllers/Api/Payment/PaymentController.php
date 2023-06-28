@@ -10,7 +10,9 @@ use App\Models\Lecture;
 use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
+use App\Models\RefInfo;
 use App\Models\Subscription;
+use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Services\PaymentService;
 use Illuminate\Http\Request;
@@ -73,7 +75,7 @@ class PaymentController extends Controller
                     $orderId = (int) $metadata->order_id;
                     $order = Order::query()->findOrFail($orderId);
 
-                    if($order->isConfirmed()){
+                    if ($order->isConfirmed()) {
                         return;
                     }
 
@@ -84,12 +86,24 @@ class PaymentController extends Controller
                     );
 
                     $subscription = new Subscription($subscriptionAttributes);
+                    $refInfo = RefInfo::query()->first();
 
                     DB::transaction(function () use (
                         $order,
                         $subscription,
+                        $refInfo
                     ) {
                         $order->status = PaymentStatusEnum::CONFIRMED;
+                        /**
+                         * @var User $orderedUser
+                         */
+                        $orderedUser = $order->user();
+                        if ($order->points) {
+                            $orderedUser->refPoints()->decrement('points', $order->points);
+                        } else {
+                            $orderedUser->referrer?->refPoints()->increment($order->price * $refInfo->depth_1);
+                            $orderedUser->referrer?->referrer?->refPoints()->increment($order->price * $refInfo->depth_2);
+                        }
                         $order->save();
                         $subscription->save();
                     });
@@ -121,6 +135,7 @@ class PaymentController extends Controller
             'subscriptionable_id' => $order->subscriptionable_id,
             'period_id' => $period->id,
             'total_price' => $order->price,
+            'points' => $order->points,
             'start_date' => now(),
             'end_date' => now()->addDays($period->length),
         ];

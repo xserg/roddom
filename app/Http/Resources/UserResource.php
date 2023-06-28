@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Traits\MoneyConversion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -12,6 +13,8 @@ use OpenApi\Attributes as OA;
 )]
 class UserResource extends JsonResource
 {
+    use MoneyConversion;
+
     #[OA\Property(property: 'id', description: 'id юзера', type: 'integer')]
     #[OA\Property(property: 'name', type: 'string')]
     #[OA\Property(property: 'email', type: 'string')]
@@ -42,6 +45,11 @@ class UserResource extends JsonResource
             'photo' => $this->photo,
             'photo_small' => $this->photo_small,
             'next_free_lecture_available' => $this->next_free_lecture_available,
+            'ref' => [
+                'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
+                'link' => route('v1.register', ['ref' => $this->ref_token]),
+                'referer_id' => $this->referer_id
+            ],
             'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, default: 0),
             'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, default: 0),
             'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, default: 0),

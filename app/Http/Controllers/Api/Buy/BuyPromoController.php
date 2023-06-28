@@ -67,11 +67,14 @@ class BuyPromoController extends Controller
             ->id;
         $prices = $this->promoRepository
             ->calculatePromoPackPriceForPeriod(1, $periodId);
-        $price = self::coinsToRoubles($prices['final_price']);
+        $price = $prices['final_price'];
+
+        $refPointsToSpend = $request->validated('ref_points');
 
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
+            'points' => $refPointsToSpend,
             'subscriptionable_type' => Promo::class,
             'subscriptionable_id' => 1,
             'period' => $periodLength,
@@ -79,7 +82,11 @@ class BuyPromoController extends Controller
 
         if ($order) {
             $link = $this->paymentService->createPayment(
-                $price,
+                self::coinsToRoubles(
+                    $refPointsToSpend ?
+                        $price - self::roublesToCoins($refPointsToSpend) :
+                        $price
+                ),
                 ['order_id' => $order->id]
             );
 

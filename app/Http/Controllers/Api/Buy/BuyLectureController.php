@@ -63,7 +63,7 @@ class BuyLectureController extends Controller
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId);
-        $price = self::coinsToRoubles($this->lectureService->calculateLecturePrice($lecture, $period));
+        $price = $this->lectureService->calculateLecturePrice($lecture, $period);
 
         if ($isPurchasedStrict) {
             return response()->json([
@@ -77,9 +77,12 @@ class BuyLectureController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
+        $refPointsToSpend = $request->validated('ref_points');
+
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
+            'points' => $refPointsToSpend,
             'subscriptionable_type' => Lecture::class,
             'subscriptionable_id' => $lectureId,
             'period' => $period,
@@ -87,7 +90,11 @@ class BuyLectureController extends Controller
 
         if ($order) {
             $link = $this->paymentService->createPayment(
-                $price,
+                self::coinsToRoubles(
+                    $refPointsToSpend ?
+                        $price - self::roublesToCoins($refPointsToSpend) :
+                        $price
+                ),
                 ['order_id' => $order->id]
             );
 
