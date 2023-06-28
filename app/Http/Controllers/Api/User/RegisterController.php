@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\RegisterRequest;
 use App\Mail\SendLoginCode;
+use App\Models\RefLink;
+use App\Models\User;
 use App\Services\LoginCodeService;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
@@ -35,19 +37,37 @@ use Symfony\Component\HttpFoundation\Response;
 class RegisterController
 {
     public function __construct(
-        private UserService $userService,
+        private UserService      $userService,
         private LoginCodeService $loginCodeService
     ) {
     }
 
     public function __invoke(RegisterRequest $request): JsonResponse
     {
-        $email = $request->email;
-        $password = $request->password;
+        $email = $request->validated('email');
+        $password = $request->validated('password');
+        $ref = $request->validated('ref');
+
         $this->loginCodeService->deleteWhereEmail($email);
 
         try {
-            $user = $this->userService->create(compact('email', 'password'));
+            $referer = User::where('ref_token', $ref)->first();
+
+            if ($referer) {
+                $points = $referer->refPoints()->firstOrCreate();
+                $points->increment('points', 250);
+
+                if ($referer->has('referrer')) {
+                    $referer->referrer->refPoints()->firstOrCreate()->increment('points', 350);
+                }
+            }
+
+            $user = $this->userService->create([
+                'email' => $email,
+                'password' => $password,
+                'referer_id' => $referer?->id
+            ]);
+
             $code = mt_rand(100000, 999999);
             $this->loginCodeService->create($email, $code);
 

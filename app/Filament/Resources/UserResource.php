@@ -4,15 +4,18 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers\ReferralsRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
+use App\Models\RefPoints;
 use App\Models\User;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -20,7 +23,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Component;
+use Illuminate\Support\Str;
 
 class UserResource extends Resource
 {
@@ -32,6 +35,7 @@ class UserResource extends Resource
     protected static ?string $pluralModelLabel = 'Пользователи';
     protected static ?string $modelLabel = 'Пользователь';
     protected static ?string $navigationGroup = 'Пользователи';
+    protected static ?string $recordTitleAttribute = 'name';
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
@@ -40,6 +44,8 @@ class UserResource extends Resource
 
     public static function form(Form $form): Form
     {
+        $uuid = Str::uuid();
+
         return $form
             ->schema([
                 Forms\Components\Card::make([
@@ -74,15 +80,85 @@ class UserResource extends Resource
                         ->label('Дата рождения ребёнка'),
                     Forms\Components\DateTimePicker::make('next_free_lecture_available')
                         ->label('Дата, когда можно смотреть бесплатную лекцию'),
+                ])->columns(2),
 
+                Forms\Components\Card::make([
                     Forms\Components\TextInput::make('password')
                         ->password()
+                        ->confirmed()
                         ->required()
-                        ->minLength(8)
                         ->maxLength(255)
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                        ->visible(fn (Component $livewire): bool => $livewire instanceof Pages\CreateUser),
+                        ->visible(fn (string $context): bool => $context === 'create')
+                        ->label('Пароль'),
+                    Forms\Components\TextInput::make('password_confirmation')
+                        ->password()
+                        ->required()
+                        ->label('Подтверждение пароля')
+                        ->visible(fn (string $context): bool => $context === 'create')
+                ])
+                    ->visible(fn (string $context): bool => $context === 'create')
+                    ->columns(2),
+
+                Forms\Components\Card::make([
+//                    Forms\Components\TextInput::make('ref_token')
+//                        ->unique('users', 'ref_token', ignoreRecord: true)
+//                        ->formatStateUsing(function (string $context, Closure $set) use($uuid) {
+//                            if ($context === 'create') {
+//                                return $uuid;
+//                            }
+//                        })
+//                        ->afterStateUpdated(function(Closure $set, string $state){
+//                            $set('r1', route('v1.register', ['ref' => $state]));
+//                        })
+//                        ->maxLength(255)
+//                        ->label('токен для реферальной ссылки')
+//                        ->reactive()
+//                        ->required(),
+                    Forms\Components\Select::make('referer_id')
+                        ->options(function () {
+                            $users = User::select(['name', 'email', 'id'])->get();
+                            $options = [];
+                            foreach ($users as $user) {
+                                $options[$user->id] = $user->name ?? $user->email;
+                            }
+                            return $options;
+                        })
+                        ->label('Реферер, если есть'),
+                    Forms\Components\TextInput::make('r1')
+                        ->formatStateUsing(function (Closure $get, string $context, ?User $record) use ($uuid) {
+                            if ($context === 'create') {
+                                return route('v1.register', ['ref' => $uuid->toString()]);
+                            }
+                            return route('v1.register', ['ref' => $record->ref_token]);
+                        })
+                        ->label('Реферальная ссылка')
+                        ->disabled()
+                        ->reactive()
+                        ->required()
+                        ->columnSpan(2),
                 ])->columns(2),
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('points')
+                        ->afterStateHydrated(function (?RefPoints $record, TextInput $component) {
+                            if (is_null($record?->points)) {
+                                $component->state(0);
+                            }
+                            $component->state(number_format($record?->points / 100, 2, thousands_separator: ''));
+                        })
+                        ->dehydrateStateUsing(fn ($state) => $state * 100)
+                        ->mask(fn (TextInput\Mask $mask) => $mask
+                            ->numeric()
+                            ->decimalPlaces(2) // Set the number of digits after the decimal point.
+                            ->decimalSeparator('.') // Add a separator for decimal numbers.
+                        )
+                        ->numeric()
+                        ->minValue(0)
+                        ->nullable()
+                        ->label('Реф поинты')
+                ])
+                    ->relationship('refPoints')
+                    ->columnSpan(1),
 
                 /*
                  * SUBSCRIPTIONS - REPEATER
@@ -165,6 +241,7 @@ class UserResource extends Resource
                                     ->disableLabel()
                                     ->required(),
                             ])
+                            ->visible(fn (string $context) => $context === 'edit')
                     ])
             ]);
     }
@@ -182,6 +259,9 @@ class UserResource extends Resource
                     ->label('дата рождения')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('phone')->label('телефон')->toggleable(),
+                Tables\Columns\TextColumn::make('refPoints.points')->label('реф поинты')->toggleable(isToggledHiddenByDefault: true)
+                    ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
@@ -232,7 +312,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ReferralsRelationManager::class
         ];
     }
 

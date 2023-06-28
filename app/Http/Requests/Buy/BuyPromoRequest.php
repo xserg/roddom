@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Buy;
 
 use App\Models\Period;
+use App\Rules\UserPointsLte;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,7 @@ class BuyPromoRequest extends FormRequest
     {
         return array_merge(parent::messages(),
             [
-                'period.exists' => 'Можно покупать только на периоды(в днях): '.
+                'period.exists' => 'Можно покупать только на периоды(в днях): ' .
                     Period::all()->pluck('length')->implode(', '),
             ]
         );
@@ -22,6 +23,12 @@ class BuyPromoRequest extends FormRequest
     {
         return [
             'period' => 'required|exists:subscription_periods,length',
+            'ref_points' => [
+                'required',
+                'numeric',
+                'min:0',
+                new UserPointsLte
+            ]
         ];
     }
 

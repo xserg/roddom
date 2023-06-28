@@ -6,10 +6,14 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser
@@ -28,6 +32,8 @@ class User extends Authenticatable implements FilamentUser
         'baby_born',
         'photo',
         'photo_small',
+        'referer_id',
+        'ref_token'
     ];
 
     protected $hidden = [
@@ -38,7 +44,17 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'profile_fulfilled_at' => 'datetime',
+        'is_admin' => 'bool'
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (User $user) {
+            if (is_null($user->ref_token)) {
+                $user->ref_token = Str::uuid();
+            }
+        });
+    }
 
     public function watchedLectures(): BelongsToMany
     {
@@ -111,6 +127,28 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Feedback::class);
     }
 
+    public function refPoints(): HasOne
+    {
+        return $this->hasOne(RefPoints::class);
+    }
+
+    public function referrer(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'referer_id'
+        )->withDefault();
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(
+            User::class,
+            'referer_id',
+            'id'
+        );
+    }
+
     protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(
@@ -121,12 +159,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessFilament(): bool
     {
-        return $this->is_admin;
+        return $this->isAdmin();
     }
 
     public function isAdmin(): bool
     {
-        return (bool) $this->is_admin;
+        return $this->is_admin;
     }
 
     public function isProfileFulfilled(): bool

@@ -26,4 +26,9 @@ class EditUser extends EditRecord
                 }),
         ];
     }
+
+    public function hasCombinedRelationManagerTabsWithForm(): bool
+    {
+        return true;
+    }
 }

@@ -3,8 +3,12 @@
 namespace App\Http\Requests\Buy;
 
 use App\Models\Period;
+use App\Models\User;
+use App\Rules\UserPointsLte;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 
 class BuyAllLecturesRequest extends FormRequest
 {
@@ -22,6 +26,12 @@ class BuyAllLecturesRequest extends FormRequest
     {
         return [
             'period' => 'required|exists:subscription_periods,length',
+            'ref_points' => [
+                'required',
+                'numeric',
+                'min:0',
+                new UserPointsLte
+            ]
         ];
     }
 

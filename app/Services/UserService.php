@@ -21,6 +21,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -45,6 +46,9 @@ class UserService
     public function create(array $attributes): User
     {
         $attributes['password'] = Hash::make($attributes['password']);
+
+        $refToken = Str::uuid();
+        $attributes['ref_token'] = $refToken;
 
         $user = new User($attributes);
 

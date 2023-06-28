@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\AppInfo;
 
 use App\Models\Period;
+use App\Models\RefInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
@@ -72,6 +73,7 @@ class AppInfo
                     ->select('*')
                     ->get(),
                 'app_periods' => Period::all()->pluck('length'),
+                'ref_info' => RefInfo::all(['depth_level', 'percent'])
             ],
         ]);
     }
