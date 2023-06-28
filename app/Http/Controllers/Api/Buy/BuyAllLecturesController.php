@@ -49,7 +49,7 @@ class BuyAllLecturesController
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
+            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
             'subscriptionable_type' => EverythingPack::class,
             'subscriptionable_id' => 1,
             'period' => $periodLength,

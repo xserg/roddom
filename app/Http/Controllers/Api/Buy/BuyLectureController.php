@@ -82,7 +82,7 @@ class BuyLectureController extends Controller
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
+            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
             'subscriptionable_type' => Lecture::class,
             'subscriptionable_id' => $lectureId,
             'period' => $period,

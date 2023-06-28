@@ -105,7 +105,7 @@ class BuyCategoryController extends Controller
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
+            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
             'subscriptionable_type' => Category::class,
             'subscriptionable_id' => $categoryId,
             'period' => $period,

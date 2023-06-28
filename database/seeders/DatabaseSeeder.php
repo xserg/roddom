@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Diploma;
 use App\Models\Lector;
 use App\Models\Lecture;
+use App\Models\Order;
 use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
@@ -59,6 +60,12 @@ class DatabaseSeeder extends Seeder
         User::query()->update([
             'ref_token' => Str::uuid(4)
         ]);
+
+        $orders = Order::all();
+        $orders->each(function ($order) {
+            $order->price = $order->price * 100;
+            $order->save();
+        });
     }
 
     private function createUsers(int $users)
@@ -152,7 +159,7 @@ class DatabaseSeeder extends Seeder
             'expires_at' => null,
         ]);
 
-        $tokenPlain = new NewAccessToken($token, $user->id.'|'.env('TEST_USER1_PLAIN'));
+        $tokenPlain = new NewAccessToken($token, $user->id . '|' . env('TEST_USER1_PLAIN'));
 
         $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);
@@ -185,7 +192,7 @@ class DatabaseSeeder extends Seeder
             'expires_at' => null,
         ]);
 
-        $tokenPlain = new NewAccessToken($token, $token->getKey().'|'.env('TEST_USER2_PLAIN'));
+        $tokenPlain = new NewAccessToken($token, $token->getKey() . '|' . env('TEST_USER2_PLAIN'));
 
         $this->setDiffLectureTypes($user);
         $this->createSubscriptionsForUser($user);

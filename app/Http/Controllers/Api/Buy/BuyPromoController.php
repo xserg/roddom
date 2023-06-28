@@ -84,7 +84,7 @@ class BuyPromoController extends Controller
             $link = $this->paymentService->createPayment(
                 self::coinsToRoubles(
                     $refPointsToSpend ?
-                        $price - self::roublesToCoins($refPointsToSpend) :
+                        $price - self::roublesToCoins($refPointsToSpend ?? 0) :
                         $price
                 ),
                 ['order_id' => $order->id]
