@@ -11,9 +11,9 @@ use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Traits\MoneyConversion;
 use Closure;
 use Filament\Forms;
-use Filament\Forms\Components\Component;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -24,6 +24,8 @@ use Illuminate\Support\Carbon;
 
 class SubscriptionResource extends Resource
 {
+    use MoneyConversion;
+
     protected static ?string $model = Subscription::class;
     protected static ?string $navigationIcon = 'heroicon-o-collection';
     protected static ?string $label = 'Подписки';
@@ -182,18 +184,19 @@ class SubscriptionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
-                    ->label('цена подписки')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')
-                    ->label('начало подписки')
-                    ->toggleable()
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('end_date')
-                    ->label('конец подписки')
-                    ->toggleable()
-                    ->dateTime()
-                    ->sortable(),
+                    ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
+                        ->label('цена подписки')
+                        ->sortable(),
+                        Tables\Columns\TextColumn::make('start_date')
+                            ->label('начало подписки')
+                            ->toggleable()
+                            ->dateTime()
+                            ->sortable(),
+                        Tables\Columns\TextColumn::make('end_date')
+                            ->label('конец подписки')
+                            ->toggleable()
+                            ->dateTime()
+                            ->sortable(),
             ])
             ->filters([//
             ])

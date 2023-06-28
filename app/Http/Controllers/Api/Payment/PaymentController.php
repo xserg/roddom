@@ -9,8 +9,8 @@ use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\Order;
 use App\Models\Period;
-use App\Models\Promo;
 use App\Models\RefInfo;
+use App\Models\RefPoints;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Repositories\PeriodRepository;
@@ -113,12 +113,25 @@ class PaymentController extends Controller
                         /**
                          * @var User $orderedUser
                          */
-                        $orderedUser = $order->user();
+                        $orderedUser = $order->user;
                         if ($order->points) {
                             $orderedUser->refPoints()->decrement('points', $order->points);
                         } else {
-                            $orderedUser->referrer?->refPoints()->increment($order->price * $refInfo->depth_1);
-                            $orderedUser->referrer?->referrer?->refPoints()->increment($order->price * $refInfo->depth_2);
+                            if ($referrer = $orderedUser->referrer) {
+                                if ($refPoints = $referrer->refPoints) {
+                                    $refPoints->points += $order->price * $refInfo->depth_1;
+                                } else {
+                                    $referrer->refPoints()->save(new RefPoints(['points' => $order->price * $refInfo->depth_1]));
+                                }
+
+                                if ($referrerDepthTwo = $referrer->referrer) {
+                                    if ($refPoints = $referrerDepthTwo->refPoints) {
+                                        $refPoints->points += $order->price * $refInfo->depth_1;
+                                    } else {
+                                        $referrerDepthTwo->refPoints()->save(new RefPoints(['points' => $order->price * $refInfo->depth_1]));
+                                    }
+                                }
+                            }
                         }
                         $order->save();
                         $subscription->save();

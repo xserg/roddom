@@ -11,15 +11,7 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'price',
-        'description',
-        'user_id',
-        'status',
-        'subscriptionable_type',
-        'subscriptionable_id',
-        'period',
-    ];
+    protected $guarded = [];
 
     public function user(): BelongsTo
     {
