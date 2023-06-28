@@ -74,7 +74,7 @@ class BuyPromoController extends Controller
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,
-            'points' => $refPointsToSpend,
+            'points' => self::roublesToCoins($refPointsToSpend),
             'subscriptionable_type' => Promo::class,
             'subscriptionable_id' => 1,
             'period' => $periodLength,
