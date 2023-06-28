@@ -121,14 +121,14 @@ class PaymentController extends Controller
                                 if ($refPoints = $referrer->refPoints) {
                                     $refPoints->points += $order->price * $refInfo->depth_1;
                                 } else {
-                                    $referrer->refPoints()->save(new RefPoints(['points' => $order->price * $refInfo->where('depth_level', 1)->percent]));
+                                    $referrer->refPoints()->updateOrCreate(['points' => $order->price * $refInfo->where('depth_level', 1)->percent]);
                                 }
 
                                 if ($referrerDepthTwo = $referrer->referrer) {
                                     if ($refPoints = $referrerDepthTwo->refPoints) {
                                         $refPoints->points += $order->price * $refInfo->depth_1;
                                     } else {
-                                        $referrerDepthTwo->refPoints()->save(new RefPoints(['points' => $order->price * $refInfo->where('depth_level', 2)->percent]));
+                                        $referrerDepthTwo->refPoints()->updateOrCreate(['points' => $order->price * $refInfo->where('depth_level', 2)->percent]);
                                     }
                                 }
                             }
