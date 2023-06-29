@@ -30,9 +30,14 @@ class ReferralsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('payer.name')
+                Tables\Columns\TextColumn::make('payer_id')
+                    ->formatStateUsing(function (?string $state) {
+                        return User::find($state)?->name;
+                    })
                     ->name('имя')
-                    ->sortable(),
+                    ->sortable(condition: false, query: function ($query) {
+
+                    }),
                 Tables\Columns\TextColumn::make('depth_level')
                     ->formatStateUsing(function (?string $state) {
                         if ((int) $state === 1) {
