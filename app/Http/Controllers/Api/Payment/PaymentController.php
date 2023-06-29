@@ -118,19 +118,40 @@ class PaymentController extends Controller
                             $orderedUser->refPoints()->decrement('points', $order->points);
                         } else {
                             if ($referrer = $orderedUser->referrer) {
+                                $percent = $refInfo->firstWhere('depth_level', 1)->percent;
+                                $pointsToGet = $order->price * ($percent / 100);
+                                $referrer->refPointsGetPayments()->create([
+                                    'payer_id' => $order->user->id,
+                                    'ref_points' => $pointsToGet,
+                                    'price' => $order->price,
+                                    'depth_level' => 1,
+                                    'percent' => $percent,
+                                ]);
+
                                 if ($refPoints = $referrer->refPoints) {
-                                    $refPoints->points += $order->price * ($refInfo->firstWhere('depth_level', 1)->percent / 100);
+                                    $refPoints->points += $pointsToGet;
                                     $refPoints->save();
                                 } else {
-                                    $referrer->refPoints()->updateOrCreate(['points' => $order->price * ($refInfo->firstWhere('depth_level', 1)->percent / 100)]);
+                                    $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
                                 }
 
                                 if ($referrerDepthTwo = $referrer->referrer) {
+                                    $percent = $refInfo->firstWhere('depth_level', 2)->percent;
+                                    $pointsToGet = $order->price * ($percent / 100);
+
+                                    $referrerDepthTwo->refPointsGetPayments()->create([
+                                        'payer_id' => $order->user->id,
+                                        'ref_points' => $pointsToGet,
+                                        'price' => $order->price,
+                                        'depth_level' => 2,
+                                        'percent' => $percent,
+                                    ]);
+
                                     if ($refPoints = $referrerDepthTwo->refPoints) {
-                                        $refPoints->points += $order->price * ($refInfo->firstWhere('depth_level', 2)->percent / 100);
+                                        $refPoints->points += $pointsToGet;
                                         $refPoints->save();
                                     } else {
-                                        $referrerDepthTwo->refPoints()->updateOrCreate(['points' => $order->price * ($refInfo->firstWhere('depth_level', 2)->percent / 100)]);
+                                        $referrerDepthTwo->refPoints()->updateOrCreate(['points' => $pointsToGet]);
                                     }
                                 }
                             }

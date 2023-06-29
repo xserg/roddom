@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReferralsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'referrals';
+    protected static string $relationship = 'refPointsGetPayments';
     protected static ?string $recordTitleAttribute = 'email';
-    protected static ?string $title = 'Рефералы';
+    protected static ?string $title = 'Начисления реф поинтов';
 
     public static function form(Form $form): Form
     {
@@ -30,11 +30,17 @@ class ReferralsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('email'),
-                Tables\Columns\TextColumn::make('name')
-                    ->url(function (?Model $record): string {
-                        return route('filament.resources.users.edit', ['record' => $record?->id]);
-                    }),
+                Tables\Columns\TextColumn::make('user_id'),
+                Tables\Columns\TextColumn::make('payer_id'),
+                Tables\Columns\TextColumn::make('depth_level'),
+                Tables\Columns\TextColumn::make('percent'),
+                Tables\Columns\TextColumn::make('ref_points'),
+                Tables\Columns\TextColumn::make('price'),
+
+//                Tables\Columns\TextColumn::make('name')
+//                    ->url(function (?Model $record): string {
+//                        return route('filament.resources.users.edit', ['record' => $record?->id]);
+//                    }),
             ])
             ->filters([
                 //
