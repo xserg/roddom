@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use App\Models\Feedback;
 use App\Models\User;
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
@@ -32,12 +30,15 @@ class ReferralsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('payer_id')
                     ->formatStateUsing(function (?string $state) {
-                        return User::find($state)?->name;
+                        $user = User::find($state);
+                        return $user->name ?? $user->email;
                     })
-                    ->name('имя')
-                    ->sortable(condition: false, query: function ($query) {
-
-                    }),
+                    ->url(function (?Model $record): string {
+                        $route = route('filament.resources.users.edit', ['record' => $record->payer_id]);
+                        return $route;
+                    })
+                    ->label('имя')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('depth_level')
                     ->formatStateUsing(function (?string $state) {
                         if ((int) $state === 1) {
@@ -61,11 +62,6 @@ class ReferralsRelationManager extends RelationManager
                     ->formatStateUsing(fn (?string $state) => $state / 100)
                     ->label('стоимость покупки')
                     ->sortable()
-
-//                Tables\Columns\TextColumn::make('name')
-//                    ->url(function (?Model $record): string {
-//                        return route('filament.resources.users.edit', ['record' => $record?->id]);
-//                    }),
             ])
             ->filters([
                 //
