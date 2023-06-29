@@ -37,8 +37,7 @@ class ReferralsRelationManager extends RelationManager
                         $route = route('filament.resources.users.edit', ['record' => $record->payer_id]);
                         return $route;
                     })
-                    ->label('имя')
-                    ->searchable(),
+                    ->label('имя'),
                 Tables\Columns\TextColumn::make('depth_level')
                     ->formatStateUsing(function (?string $state) {
                         if ((int) $state === 1) {
