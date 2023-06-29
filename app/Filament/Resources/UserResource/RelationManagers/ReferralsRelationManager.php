@@ -30,12 +30,24 @@ class ReferralsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user_id'),
-                Tables\Columns\TextColumn::make('payer_id'),
-                Tables\Columns\TextColumn::make('depth_level'),
-                Tables\Columns\TextColumn::make('percent'),
-                Tables\Columns\TextColumn::make('ref_points'),
-                Tables\Columns\TextColumn::make('price'),
+                Tables\Columns\TextColumn::make('payer.name')
+                    ->name('имя')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('depth_level')
+                    ->formatStateUsing(fn (?string $state) => ((int) $state === 1 ? 'реферал' : $state === 2) ? 'реферал реферала' : '')
+                    ->label('глубина')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('percent')
+                    ->label('процент от стоимости')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('ref_points')
+                    ->formatStateUsing(fn (?string $state) => $state / 100)
+                    ->label('поинтов начислено')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price')
+                    ->formatStateUsing(fn (?string $state) => $state / 100)
+                    ->label('стоимость покупки')
+                    ->sortable()
 
 //                Tables\Columns\TextColumn::make('name')
 //                    ->url(function (?Model $record): string {
@@ -43,13 +55,13 @@ class ReferralsRelationManager extends RelationManager
 //                    }),
             ])
             ->filters([
-                //
-            ])
-            ->headerActions([
-            ])
-            ->actions([
-            ])
-            ->bulkActions([
-            ]);
+        //
+    ])
+        ->headerActions([
+        ])
+        ->actions([
+        ])
+        ->bulkActions([
+        ]);
     }
 }
