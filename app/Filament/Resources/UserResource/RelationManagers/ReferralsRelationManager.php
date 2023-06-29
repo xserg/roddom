@@ -34,7 +34,15 @@ class ReferralsRelationManager extends RelationManager
                     ->name('имя')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('depth_level')
-                    ->formatStateUsing(fn (?string $state) => ((int) $state === 1 ? 'реферал' : $state === 2) ? 'реферал реферала' : '')
+                    ->formatStateUsing(function (?string $state) {
+                        if ((int) $state === 1) {
+                            return 'реферал';
+                        } elseif ((int) $state === 2) {
+                            return 'реферал реферала';
+                        }
+
+                        return $state;
+                    })
                     ->label('глубина')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('percent')
@@ -55,13 +63,13 @@ class ReferralsRelationManager extends RelationManager
 //                    }),
             ])
             ->filters([
-        //
-    ])
-        ->headerActions([
-        ])
-        ->actions([
-        ])
-        ->bulkActions([
-        ]);
+                //
+            ])
+            ->headerActions([
+            ])
+            ->actions([
+            ])
+            ->bulkActions([
+            ]);
     }
 }
