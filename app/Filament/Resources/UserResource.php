@@ -21,6 +21,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -37,9 +38,14 @@ class UserResource extends Resource
     protected static ?string $navigationGroup = 'Пользователи';
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('is_admin', 0);
+        return parent::getEloquentQuery()
+            ->where('is_admin', 0)
+            ->withCount(['referrals'])
+            ->with(['referrals' => function ($query) {
+                return $query->withCount('referrals');
+            }]);
     }
 
     public static function form(Form $form): Form
@@ -80,6 +86,10 @@ class UserResource extends Resource
                         ->label('Дата рождения ребёнка'),
                     Forms\Components\DateTimePicker::make('next_free_lecture_available')
                         ->label('Дата, когда можно смотреть бесплатную лекцию'),
+                    Forms\Components\DateTimePicker::make('created_at')
+                        ->label('Дата создания профиля'),
+                    Forms\Components\DateTimePicker::make('profile_fulfilled_at')
+                        ->label('Дата заполнения профиля'),
                 ])->columns(2),
 
                 Forms\Components\Card::make([
@@ -99,6 +109,29 @@ class UserResource extends Resource
                 ])
                     ->visible(fn (string $context): bool => $context === 'create')
                     ->columns(2),
+
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('points')
+                        ->afterStateHydrated(function (?RefPoints $record, TextInput $component) {
+                            if (is_null($record?->points)) {
+                                $component->state(0);
+                            }
+                            $component->state(number_format($record?->points / 100, 2, thousands_separator: ''));
+                        })
+                        ->dehydrateStateUsing(fn ($state) => $state * 100)
+                        ->mask(fn (TextInput\Mask $mask) => $mask
+                            ->numeric()
+                            ->decimalPlaces(2)
+                            ->decimalSeparator('.')
+                        )
+                        ->numeric()
+                        ->minValue(0)
+                        ->nullable()
+                        ->label('Реф поинты')
+                ])
+                    ->relationship('refPoints')
+                    ->columnSpan(1),
+
 
                 Forms\Components\Card::make([
 //                    Forms\Components\TextInput::make('ref_token')
@@ -124,42 +157,31 @@ class UserResource extends Resource
                             }
                             return $options;
                         })
-                        ->label('Реферер, если есть'),
-                    Forms\Components\TextInput::make('r1')
-                        ->formatStateUsing(function (Closure $get, string $context, ?User $record) use ($uuid) {
-                            if ($context === 'create') {
-                                return route('v1.register', ['ref' => $uuid->toString()]);
-                            }
-                            return route('v1.register', ['ref' => $record->ref_token]);
-                        })
-                        ->label('Реферальная ссылка')
-                        ->disabled()
-                        ->reactive()
-                        ->required()
-                        ->columnSpan(2),
-                ])->columns(2),
-                Forms\Components\Card::make([
-                    Forms\Components\TextInput::make('points')
-                        ->afterStateHydrated(function (?RefPoints $record, TextInput $component) {
-                            if (is_null($record?->points)) {
-                                $component->state(0);
-                            }
-                            $component->state(number_format($record?->points / 100, 2, thousands_separator: ''));
-                        })
-                        ->dehydrateStateUsing(fn ($state) => $state * 100)
-                        ->mask(fn (TextInput\Mask $mask) => $mask
-                            ->numeric()
-                            ->decimalPlaces(2) // Set the number of digits after the decimal point.
-                            ->decimalSeparator('.') // Add a separator for decimal numbers.
-                        )
-                        ->numeric()
-                        ->minValue(0)
-                        ->nullable()
-                        ->label('Реф поинты')
-                ])
-                    ->relationship('refPoints')
-                    ->columnSpan(1),
+                        ->label('Реферер'),
+//                    Forms\Components\TextInput::make('ref-link')
+//                        ->formatStateUsing(function (Closure $get, string $context, ?User $record) use ($uuid) {
+//                            if ($context === 'create') {
+//                                return route('v1.register', ['ref' => $uuid->toString()]);
+//                            }
+//                            return route('v1.register', ['ref' => $record->ref_token]);
+//                        })
+//                        ->label('Реферальная ссылка')
+//                        ->disabled()
+//                        ->reactive()
+//                        ->required()
+//                        ->columnSpan(2),
+                ])->columns(1)->columnSpan(1),
 
+                Forms\Components\Placeholder::make('referrals_count')
+                    ->label('Количество рефералов')
+                    ->content(fn (?Model $record) => $record->referrals_count)
+                    ->columnSpan(2),
+
+                Forms\Components\Placeholder::make('referrals_count')
+                    ->label('Количество рефералов рефералов')
+                    ->content(fn (?Model $record) => $record->referrals->sum(fn ($ref) => $ref->referrals_count)),
+//                Forms\Components\TextInput::make('referrals_count')
+//                    ->label('Количество рефералов'),
                 /*
                  * SUBSCRIPTIONS - REPEATER
                  */
@@ -262,13 +284,10 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('refPoints.points')->label('реф поинты')->toggleable()
                     ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
                     ->sortable(),
-//                Tables\Columns\TextColumn::make('referrer.id')
-//                    ->label('реферер')->toggleable()
-//                    ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
-//                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')->counts('referrals')->sortable()->toggleable(isToggledHiddenByDefault: true)
             ])
             ->filters([
                 //
