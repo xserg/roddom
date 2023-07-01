@@ -15,10 +15,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Staudenmeir\EloquentHasManyDeep\HasTableAlias;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias;
 
     protected $appends = ['purchased_lectures_counter'];
 
@@ -32,7 +35,7 @@ class User extends Authenticatable implements FilamentUser
         'baby_born',
         'photo',
         'photo_small',
-        'referer_id',
+        'referrer_id',
         'ref_token'
     ];
 
@@ -136,7 +139,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(
             User::class,
-            'referer_id'
+            'referrer_id'
         )->withDefault();
     }
 
@@ -144,8 +147,16 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(
             User::class,
-            'referer_id',
+            'referrer_id',
             'id'
+        );
+    }
+
+    public function referralsOfReferrals(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->referrals(),
+            (new User())->setAlias('users-alias')->referrals()
         );
     }
 

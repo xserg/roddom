@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers\ReferralsOfReferralsRelationManager;
+use App\Filament\Resources\UserResource\RelationManagers\ReferralsPaymentsRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
@@ -42,10 +44,7 @@ class UserResource extends Resource
     {
         return parent::getEloquentQuery()
             ->where('is_admin', 0)
-            ->withCount(['referrals'])
-            ->with(['referrals' => function ($query) {
-                return $query->withCount('referrals');
-            }]);
+            ->withCount(['referrals', 'referralsOfReferrals']);
     }
 
     public static function form(Form $form): Form
@@ -177,9 +176,9 @@ class UserResource extends Resource
                     ->content(fn (?Model $record) => $record->referrals_count)
                     ->columnSpan(2),
 
-                Forms\Components\Placeholder::make('referrals_count')
+                Forms\Components\Placeholder::make('referrals_of_referrals_count')
                     ->label('Количество рефералов рефералов')
-                    ->content(fn (?Model $record) => $record->referrals->sum(fn ($ref) => $ref->referrals_count)),
+                    ->content(fn (?Model $record) => $record->referrals_of_referrals_count),
 //                Forms\Components\TextInput::make('referrals_count')
 //                    ->label('Количество рефералов'),
                 /*
@@ -335,7 +334,9 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ReferralsRelationManager::class
+            ReferralsPaymentsRelationManager::class,
+            ReferralsRelationManager::class,
+            ReferralsOfReferralsRelationManager::class
         ];
     }
 

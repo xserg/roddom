@@ -3,19 +3,19 @@
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Models\User;
-use Filament\Tables\Actions\Action;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\Position;
 use Illuminate\Database\Eloquent\Model;
 
-class ReferralsRelationManager extends RelationManager
+class ReferralsOfReferralsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'referrals';
+    protected static string $relationship = 'referralsOfReferrals';
+    protected static ?string $title = 'Рефералы рефералов';
     protected static ?string $recordTitleAttribute = 'email';
-    protected static ?string $title = 'Рефералы';
 
     public static function form(Form $form): Form
     {
@@ -33,6 +33,16 @@ class ReferralsRelationManager extends RelationManager
                     ->label('имя'),
                 Tables\Columns\TextColumn::make('email')
                     ->label('email'),
+                Tables\Columns\TextColumn::make('referrer_id')
+                    ->formatStateUsing(function (?string $state) {
+                        $user = User::find($state);
+                        return $user->name ?? $user->email;
+                    })
+                    ->url(function (?Model $record): string {
+                        $route = route('filament.resources.users.edit', ['record' => $record->referrer_id]);
+                        return $route;
+                    })
+                    ->label('промежуточный реферал'),
             ])
             ->filters([
                 //
