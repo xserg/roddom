@@ -147,7 +147,7 @@ class UserResource extends Resource
 //                        ->label('токен для реферальной ссылки')
 //                        ->reactive()
 //                        ->required(),
-                    Forms\Components\Select::make('referer_id')
+                    Forms\Components\Select::make('referrer_id')
                         ->options(function () {
                             $users = User::select(['name', 'email', 'id'])->get();
                             $options = [];
