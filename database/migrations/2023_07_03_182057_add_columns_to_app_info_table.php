@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::table('app_info', function (Blueprint $table) {
             $table->string('ref_system_title')->default('Партнерская программа');
-            $table->text('ref_system_description')->default('Партнерская программа: описание');
+            $table->text('ref_system_description')->nullable();
         });
     }
 
