@@ -120,10 +120,14 @@ class PaymentController extends Controller
                                 'ref_points' => $order->points,
                                 'price' => $order->price,
                             ]);
-                        } else {
-                            if ($referrer = $orderedUser->referrer) {
-                                $percent = $refInfo->firstWhere('depth_level', 1)->percent;
-                                $pointsToGet = $order->price * ($percent / 100);
+                        }
+
+                        if ($referrer = $orderedUser->referrer) {
+                            $percent = $refInfo->firstWhere('depth_level', 1)->percent;
+                            $residualAmount = $order->price - $order->points;
+
+                            if($residualAmount > 0){
+                                $pointsToGet = $residualAmount * ($percent / 100);
                                 $referrer->refPointsGetPayments()->create([
                                     'payer_id' => $order->user->id,
                                     'ref_points' => $pointsToGet,
@@ -141,7 +145,7 @@ class PaymentController extends Controller
 
                                 if ($referrerDepthTwo = $referrer->referrer) {
                                     $percent = $refInfo->firstWhere('depth_level', 2)->percent;
-                                    $pointsToGet = $order->price * ($percent / 100);
+                                    $pointsToGet = $residualAmount * ($percent / 100);
 
                                     $referrerDepthTwo->refPointsGetPayments()->create([
                                         'payer_id' => $order->user->id,
