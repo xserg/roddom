@@ -46,7 +46,7 @@ class BuyAllLecturesController
 
         $price = $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id);
 
-        if (($refPointsToSpend && $price - self::roublesToCoins($refPointsToSpend)) < 1) {
+        if ($refPointsToSpend && ($price - self::roublesToCoins($refPointsToSpend)) < 1) {
             return response()->json([
                 'message' => 'нельзя чтобы цена была меньше рубля'
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
