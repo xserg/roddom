@@ -8,14 +8,16 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('ref_points_payments', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->change();
+            $table->unsignedSmallInteger('percent')->nullable()->change();
+            $table->unsignedSmallInteger('depth_level')->nullable()->change();
         });
     }
 
     public function down(): void
     {
         Schema::table('ref_points_payments', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->change();
+            $table->unsignedSmallInteger('percent')->change();
+            $table->unsignedSmallInteger('depth_level')->change();
         });
     }
 };

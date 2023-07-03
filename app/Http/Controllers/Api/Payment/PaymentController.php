@@ -117,10 +117,8 @@ class PaymentController extends Controller
                         if ($order->points) {
                             $orderedUser->refPoints()->decrement('points', $order->points);
                             $orderedUser->refPointsMadePayments()->create([
-                                'payer_id' => $order->user->id,
                                 'ref_points' => $order->points,
                                 'price' => $order->price,
-                                'depth_level' => 1,
                             ]);
                         } else {
                             if ($referrer = $orderedUser->referrer) {
