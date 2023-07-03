@@ -47,7 +47,8 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'profile_fulfilled_at' => 'datetime',
-        'is_admin' => 'bool'
+        'is_admin' => 'bool',
+        'is_mother' => 'bool'
     ];
 
     protected static function booted(): void

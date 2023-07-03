@@ -214,6 +214,16 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Строка "Ваша экономия составит х рублей."'),
+
+                                // ref system
+                                Forms\Components\TextInput::make('ref_system_title')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Партнерская программа, заголовок'),
+                                Forms\Components\Textarea::make('ref_system_description')
+                                    ->required()
+                                    ->rows(3)
+                                    ->label('Партнерская программа, описание'),
                             ])->columns(2),
                     ])
                     ->collapsible()
