@@ -193,10 +193,10 @@ class LectureService
         $everythingPackSubscriptions = $user->actualEverythingPackSubscriptions;
 
         if ($everythingPackSubscriptions && $everythingPackSubscriptions->isNotEmpty()) {
-            $lectures = Lecture::all();
+            $allLectures = Lecture::all();
             $everythingPackSubscription = $everythingPackSubscriptions->first();
 
-            foreach ($lectures as $lecture) {
+            foreach ($allLectures as $lecture) {
                 $lectures[$lecture->id] = [
                     'start_date' => $everythingPackSubscription['start_date'],
                     'end_date' => $everythingPackSubscription['end_date'],
