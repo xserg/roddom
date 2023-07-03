@@ -79,6 +79,12 @@ class BuyLectureController extends Controller
 
         $refPointsToSpend = $request->validated('ref_points');
 
+        if (($price - $refPointsToSpend) < 1) {
+            return response()->json([
+                'message' => 'нельзя чтобы цена была меньше рубля'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         $order = Order::create([
             'user_id' => auth()->user()->id,
             'price' => $price,

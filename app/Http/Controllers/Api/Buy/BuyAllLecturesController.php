@@ -46,6 +46,12 @@ class BuyAllLecturesController
 
         $price = $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id);
 
+        if (($price - $refPointsToSpend) < 1) {
+            return response()->json([
+                'message' => 'нельзя чтобы цена была меньше рубля'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
