@@ -47,7 +47,7 @@ class UserResource extends JsonResource
             'next_free_lecture_available' => $this->next_free_lecture_available,
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
-                'link' => route('v1.register', ['ref' => $this->ref_token]),
+                'token' => $this->ref_token,
                 'referer_id' => $this->referer_id
             ],
             'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, default: 0),
