@@ -53,19 +53,10 @@ class RegisterController
         try {
             $referer = User::where('ref_token', $ref)->first();
 
-            if ($referer) {
-                $points = $referer->refPoints()->firstOrCreate();
-                $points->increment('points', 250);
-
-                if ($referer->has('referrer')) {
-                    $referer->referrer->refPoints()->firstOrCreate()->increment('points', 350);
-                }
-            }
-
             $user = $this->userService->create([
                 'email' => $email,
                 'password' => $password,
-                'referer_id' => $referer?->id
+                'referrer_id' => $referer?->id
             ]);
 
             $code = mt_rand(100000, 999999);
