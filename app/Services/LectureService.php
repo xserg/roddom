@@ -190,6 +190,22 @@ class LectureService
         $promoSubscriptions = $user
             ->promoSubscriptions;
 
+        $everythingPackSubscriptions = $user->actualEverythingPackSubscriptions;
+
+        if ($everythingPackSubscriptions && $everythingPackSubscriptions->isNotEmpty()) {
+            $lectures = Lecture::all();
+
+            foreach ($lectures as $lecture) {
+                $lectures[$lecture->id] = [
+                    'start_date' => $everythingPackSubscriptions['start_date'],
+                    'end_date' => $everythingPackSubscriptions['end_date'],
+                ];
+            }
+
+            return $lectures;
+        }
+
+
         if ($lecturesSubscriptions && $lecturesSubscriptions->isNotEmpty()) {
             foreach ($lecturesSubscriptions as $lecturesSubscription) {
                 if ($lecturesSubscription['end_date'] < now()) {
