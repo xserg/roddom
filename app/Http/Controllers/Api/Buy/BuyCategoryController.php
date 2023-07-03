@@ -103,7 +103,7 @@ class BuyCategoryController extends Controller
         $refPointsToSpend = $request->validated('ref_points');
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
-            $refPointsToSpend = $price - 100;
+            $refPointsToSpend = self::coinsToRoubles($price - 100);
         }
 
         $order = Order::create([

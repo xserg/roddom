@@ -47,7 +47,7 @@ class BuyAllLecturesController
         $price = $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id);
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
-            $refPointsToSpend = $price - 100;
+            $refPointsToSpend = self::coinsToRoubles($price - 100);
         }
 
         $order = Order::create([
