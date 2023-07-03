@@ -185,18 +185,21 @@ class SubscriptionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
-                        ->label('цена подписки')
-                        ->sortable(),
-                        Tables\Columns\TextColumn::make('start_date')
-                            ->label('начало подписки')
-                            ->toggleable()
-                            ->dateTime()
-                            ->sortable(),
-                        Tables\Columns\TextColumn::make('end_date')
-                            ->label('конец подписки')
-                            ->toggleable()
-                            ->dateTime()
-                            ->sortable(),
+                    ->label('общая цена подписки')
+                    ->sortable(),
+                TextColumn::make('points')->label('поинтов потрачено')
+                    ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('start_date')
+                    ->label('начало подписки')
+                    ->toggleable()
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('end_date')
+                    ->label('конец подписки')
+                    ->toggleable()
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([//
             ])

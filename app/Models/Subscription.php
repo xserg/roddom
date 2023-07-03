@@ -17,7 +17,8 @@ class Subscription extends Model
         'start_date',
         'end_date',
         'total_price',
-        'entity_title'
+        'entity_title',
+        'points'
     ];
 
     protected static function booted()
