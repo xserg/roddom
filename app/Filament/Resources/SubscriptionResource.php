@@ -187,7 +187,7 @@ class SubscriptionResource extends Resource
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->label('общая цена подписки')
                     ->sortable(),
-                TextColumn::make('points')->label('поинтов потрачено')
+                TextColumn::make('points')->label('бебикоинов потрачено')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('start_date')

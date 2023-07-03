@@ -126,7 +126,7 @@ class UserResource extends Resource
                         ->numeric()
                         ->minValue(0)
                         ->nullable()
-                        ->label('Реф поинты')
+                        ->label('Бебикоины')
                 ])
                     ->relationship('refPoints')
                     ->columnSpan(1),

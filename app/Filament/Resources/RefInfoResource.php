@@ -17,9 +17,9 @@ class RefInfoResource extends Resource
 {
     protected static ?string $model = RefInfo::class;
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static ?string $navigationLabel = 'Реф система';
+    protected static ?string $navigationLabel = 'Партнерская программа';
     protected static ?string $navigationGroup = 'Приложение';
-    protected static ?string $pluralLabel = 'Реф система';
+    protected static ?string $pluralLabel = 'Партнерская программа';
     protected static ?string $recordTitleAttribute = 'depth_level';
 
     public static function form(Form $form): Form

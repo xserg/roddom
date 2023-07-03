@@ -48,7 +48,9 @@ class UserResource extends JsonResource
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
-                'referer_id' => $this->referer_id
+                'referer_id' => $this->referer_id,
+                'referrals_count' => $this->referrals()?->count() ?? 0,
+                'referrals_of_referrals_count' => $this->referralsOfReferrals()?->count() ?? 0,
             ],
             'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, default: 0),
             'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, default: 0),

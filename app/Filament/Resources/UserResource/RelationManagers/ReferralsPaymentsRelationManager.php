@@ -13,7 +13,7 @@ class ReferralsPaymentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'refPointsGetPayments';
     protected static ?string $recordTitleAttribute = 'email';
-    protected static ?string $title = 'История начисления реф поинтов';
+    protected static ?string $title = 'История начисления бебикоинов';
 
     public static function form(Form $form): Form
     {
@@ -53,7 +53,7 @@ class ReferralsPaymentsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ref_points')
                     ->formatStateUsing(fn (?string $state) => $state / 100)
-                    ->label('поинтов начислено')
+                    ->label('бебикоинов начислено')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(fn (?string $state) => $state / 100)

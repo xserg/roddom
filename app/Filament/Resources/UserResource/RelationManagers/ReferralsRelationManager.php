@@ -9,7 +9,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
-use Illuminate\Database\Eloquent\Model;
 
 class ReferralsRelationManager extends RelationManager
 {
