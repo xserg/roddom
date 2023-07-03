@@ -71,7 +71,7 @@ class BuyPromoController extends Controller
 
         $refPointsToSpend = $request->validated('ref_points');
 
-        if ($refPointsToSpend && ($price - self::roublesToCoins($refPointsToSpend)) < 1) {
+        if ($refPointsToSpend && ($price - self::roublesToCoins($refPointsToSpend)) < 100) {
             return response()->json([
                 'message' => 'нельзя чтобы цена была меньше рубля'
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
