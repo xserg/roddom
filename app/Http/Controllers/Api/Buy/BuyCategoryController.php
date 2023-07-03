@@ -102,10 +102,8 @@ class BuyCategoryController extends Controller
 
         $refPointsToSpend = $request->validated('ref_points');
 
-        if ($refPointsToSpend && ($price - self::roublesToCoins($refPointsToSpend)) < 100) {
-            return response()->json([
-                'message' => 'нельзя чтобы цена была меньше рубля'
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
+            $refPointsToSpend = $price - 100;
         }
 
         $order = Order::create([
