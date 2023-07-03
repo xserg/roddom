@@ -182,7 +182,8 @@ class User extends Authenticatable implements FilamentUser
 
     public function refPointsMadePayments(): HasMany
     {
-        return $this->hasMany(RefPointsPayments::class, 'payer_id');
+        return $this->hasMany(RefPointsPayments::class, 'payer_id')
+            ->where('user_id', null);
     }
 
     protected function purchasedLecturesCounter(): Attribute
