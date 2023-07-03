@@ -336,9 +336,9 @@ class UserResource extends Resource
     {
         return [
             ReferralsPaymentsRelationManager::class,
+            ReferralsMadePaymentsRelationManager::class,
             ReferralsRelationManager::class,
             ReferralsOfReferralsRelationManager::class,
-            ReferralsMadePaymentsRelationManager::class
         ];
     }
 
