@@ -124,7 +124,8 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->subscriptions()
             ->where('subscriptionable_type', '=', EverythingPack::class)
-            ->where('end_date', '>', now());
+            ->where('end_date', '>', now())
+            ->latest('id');
     }
 
     public function actualCategorySubscriptions(): HasMany
