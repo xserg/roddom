@@ -110,6 +110,8 @@ class LoginCodeController extends Controller
                 'ref_points' => $pointsToGet,
                 'reason' => RefPointsPayments::REASON_INVITED
             ]);
+
+            $user->markEmailAsVerified();
         }
 
         $this->loginCodeService->deleteRecordsWithCode($code);
