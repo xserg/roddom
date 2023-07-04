@@ -86,7 +86,7 @@ class LoginCodeController extends Controller
         if ($user->hasReferrer()) {
             if (! $user->referrer->hasVerifiedEmail()) {
                 $referrer = $user->referrer;
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points;
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
                 $referrer->refPointsGetPayments()->create([
                     'payer_id' => $user->id,
                     'ref_points' => $pointsToGet,
@@ -104,7 +104,7 @@ class LoginCodeController extends Controller
             }
 
             if ($user->canGetReferralsBonus()) {
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points;
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
                 if ($refPoints = $user->refPoints) {
                     $refPoints->points += $pointsToGet;
                     $refPoints->save();
