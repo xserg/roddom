@@ -12,7 +12,7 @@ class FullCatalogPrices extends Widget
 
     protected function getViewData(): array
     {
-        $lecturesCount = Lecture::count();
+        $lecturesCount = Lecture::payed()->count();
         $form = app(LectureService::class)->formAllLecturePrices();
 
         return [
