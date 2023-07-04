@@ -6,6 +6,8 @@ use App\Exceptions\LoginCodeExpiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginCodeRequest;
 use App\Http\Resources\UserResource;
+use App\Models\RefPointsGainOnce;
+use App\Models\RefPointsPayments;
 use App\Repositories\LoginCodeRepository;
 use App\Repositories\UserRepository;
 use App\Services\LoginCodeService;
@@ -40,9 +42,9 @@ class LoginCodeController extends Controller
 {
     public function __construct(
         private LoginCodeRepository $loginCodeRepository,
-        private LoginCodeService $loginCodeService,
-        private UserRepository $userRepository,
-        private UserService $userService
+        private LoginCodeService    $loginCodeService,
+        private UserRepository      $userRepository,
+        private UserService         $userService
     ) {
     }
 
@@ -79,6 +81,36 @@ class LoginCodeController extends Controller
             ->findByEmail(
                 $loginCode->email
             );
+
+        if (! $user->hasVerifiedEmail() && $user->hasReferrer()) {
+            $referrer = $user->referrer;
+            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer');
+            $referrer->refPointsGetPayments()->create([
+                'payer_id' => $user->id,
+                'ref_points' => $pointsToGet,
+                'reason' => RefPointsPayments::REASON_INVITE
+            ]);
+
+            if ($refPoints = $referrer->refPoints) {
+                $refPoints->points += $pointsToGet;
+                $refPoints->save();
+            } else {
+                $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+            }
+
+            if ($refPoints = $user->refPoints) {
+                $refPoints->points += $pointsToGet;
+                $refPoints->save();
+            } else {
+                $user->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+            }
+
+            $user->refPointsGetPayments()->create([
+                'payer_id' => $referrer->id,
+                'ref_points' => $pointsToGet,
+                'reason' => RefPointsPayments::REASON_INVITED
+            ]);
+        }
 
         $this->loginCodeService->deleteRecordsWithCode($code);
         $user->tokens()->delete();

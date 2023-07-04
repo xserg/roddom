@@ -70,6 +70,8 @@ class AppServiceProvider extends ServiceProvider
                     ->label('Пользователи'),
                 NavigationGroup::make()
                     ->label('Приложение'),
+                NavigationGroup::make()
+                    ->label('Партнерская программа'),
             ]);
         });
     }

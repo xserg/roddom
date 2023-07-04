@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RefPointsPayments extends Model
 {
+    const REASON_BUY = 'Покупка';
+    const REASON_INVITE = 'Приглашение';
+    const REASON_INVITED = 'Регистрация по приглашению';
+
     protected $guarded = [];
     protected $casts = [
         'points' => 'integer',

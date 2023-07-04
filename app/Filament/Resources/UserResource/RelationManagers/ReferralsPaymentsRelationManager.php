@@ -48,6 +48,9 @@ class ReferralsPaymentsRelationManager extends RelationManager
                     })
                     ->label('глубина')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('reason')
+                    ->label('описание операции')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('percent')
                     ->label('процент от стоимости')
                     ->sortable(),

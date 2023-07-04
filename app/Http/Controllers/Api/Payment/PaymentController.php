@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Models\Period;
 use App\Models\RefInfo;
 use App\Models\RefPoints;
+use App\Models\RefPointsPayments;
 use App\Models\Subscription;
 use App\Models\User;
 use App\Repositories\PeriodRepository;
@@ -120,6 +121,7 @@ class PaymentController extends Controller
                             $orderedUser->refPoints()->decrement('points', $order->points);
                             $orderedUser->refPointsMadePayments()->create([
                                 'ref_points' => $order->points,
+                                'reason' => RefPointsPayments::REASON_BUY,
                                 'price' => $order->price,
                             ]);
                         }
@@ -132,6 +134,7 @@ class PaymentController extends Controller
                                 $pointsToGet = $residualAmount * ($percent / 100);
                                 $referrer->refPointsGetPayments()->create([
                                     'payer_id' => $order->user->id,
+                                    'reason' => RefPointsPayments::REASON_BUY,
                                     'ref_points' => $pointsToGet,
                                     'price' => $order->price,
                                     'depth_level' => 1,
@@ -151,6 +154,7 @@ class PaymentController extends Controller
 
                                     $referrerDepthTwo->refPointsGetPayments()->create([
                                         'payer_id' => $order->user->id,
+                                        'reason' => RefPointsPayments::REASON_BUY,
                                         'ref_points' => $pointsToGet,
                                         'price' => $order->price,
                                         'depth_level' => 2,

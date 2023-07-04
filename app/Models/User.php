@@ -186,6 +186,11 @@ class User extends Authenticatable implements FilamentUser
             ->where('user_id', null);
     }
 
+    public function hasReferrer(): bool
+    {
+        return (bool) $this->referrer_id;
+    }
+
     protected function purchasedLecturesCounter(): Attribute
     {
         return new Attribute(
