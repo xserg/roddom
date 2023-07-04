@@ -243,7 +243,7 @@ class Lecture extends Model
 
     public function scopeFree(Builder $query): void
     {
-        $query->where('payment_type_id', '=', LecturePaymentType::FREE);
+        $query->where('payment_type_id', LecturePaymentType::FREE);
     }
 
     public function scopePayed(Builder $query): void

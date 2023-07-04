@@ -26,8 +26,8 @@ class FeedbackResource extends Resource
     protected static ?string $navigationLabel = 'Отзывы';
     protected static ?string $label = 'Отзыв';
     protected static ?string $pluralModelLabel = 'Отзывы';
-    protected static ?int $navigationSort = 4;
-    protected static ?string $navigationGroup = 'Лекции';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = 'Пользователи';
 
     public static function form(Form $form): Form
     {

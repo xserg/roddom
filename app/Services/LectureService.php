@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Resources\LectureResource;
 use App\Models\Category;
+use App\Models\FullCatalogPrices;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
@@ -110,44 +111,46 @@ class LectureService
     public function formAllLecturePrices(): array
     {
         $prices = [];
-        $mainCategories = Category::mainCategories()->with([
-            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
-            'childrenCategoriesLectures.pricesForLectures',
-            'childrenCategories.categoryPrices.period',
-            'childrenCategories.parentCategory',
-            'childrenCategories.categoryPrices',
-            'childrenCategories.lectures.category.categoryPrices',
-            'childrenCategories.lectures.category.parentCategory.categoryPrices',
-            'childrenCategories.lectures.pricesInPromoPacks',
-            'childrenCategories.lectures.pricesForLectures',
-            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-            'childrenCategories.lectures.paymentType',
-            'childrenCategories.lectures.contentType',
-        ])->get();
+
+        $fullCatalogPrices = FullCatalogPrices::with('period')->get();
 
         foreach ($this->periods as $period) {
             $prices[] = [
                 'period_id' => $period->id,
                 'period_length' => $period->length,
-                'price' => self::coinsToRoubles($this->calculateEverythingPriceByPeriod($mainCategories, $period->id))
+                'price_for_catalog' => self::coinsToRoubles(
+                    $this->calculateEverythingPriceByPeriod($fullCatalogPrices, $period->id)
+                ),
+                'price_for_catalog_promo' => self::coinsToRoubles(
+                    $this->calculateEverythingPricePromoByPeriod($fullCatalogPrices, $period->id)
+                ),
+                'is_promo' => $fullCatalogPrices->where('period_id', $period->id)->first()->is_promo
             ];
         }
 
         return $prices;
     }
 
-    public function calculateEverythingPriceByPeriod(Collection $mainCategories, int $periodId): int
+    public function calculateEverythingPriceByPeriod(Collection $fullCatalogPrices, int $periodId): int
     {
         $price = 0;
 
-        foreach ($mainCategories as $category) {
-            $pricesDto = $this->categoryService
-                ->calculateMainCategoryPriceForPeriod($category, $periodId);
+        $fullCatalogPrices = $fullCatalogPrices->where('period_id', $periodId)->first();
+        $lecturesCount = Lecture::payed()->count();
 
-            $price += $category->isPromo() ?
-                $pricesDto->getPromoPrice() :
-                $pricesDto->getPrice();
-        }
+        $price += ($lecturesCount * $fullCatalogPrices->price_for_one_lecture);
+
+        return $price;
+    }
+
+    public function calculateEverythingPricePromoByPeriod(Collection $fullCatalogPrices, int $periodId): int
+    {
+        $price = 0;
+
+        $fullCatalogPrices = $fullCatalogPrices->where('period_id', $periodId)->first();
+        $lecturesCount = Lecture::payed()->count();
+
+        $price += ($lecturesCount * $fullCatalogPrices->price_for_one_lecture_promo);
 
         return $price;
     }
