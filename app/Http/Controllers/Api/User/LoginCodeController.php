@@ -84,7 +84,7 @@ class LoginCodeController extends Controller
 
         if (! $user->hasVerifiedEmail() && $user->hasReferrer()) {
             $referrer = $user->referrer;
-            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer');
+            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points;
             $referrer->refPointsGetPayments()->create([
                 'payer_id' => $user->id,
                 'ref_points' => $pointsToGet,
@@ -98,6 +98,7 @@ class LoginCodeController extends Controller
                 $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
             }
 
+            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points;
             if ($refPoints = $user->refPoints) {
                 $refPoints->points += $pointsToGet;
                 $refPoints->save();
@@ -111,7 +112,7 @@ class LoginCodeController extends Controller
                 'reason' => RefPointsPayments::REASON_INVITED
             ]);
 
-            $user->markEmailAsVerified();
+            $referrer->markEmailAsVerified();
         }
 
         $this->loginCodeService->deleteRecordsWithCode($code);
