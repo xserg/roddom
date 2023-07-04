@@ -44,10 +44,19 @@ class AppInfoResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->label('тариф 3'),
-                    Forms\Components\Textarea::make('successful_purchase_text')
-                        ->required()
-                        ->maxLength(65535)
-                        ->label('текст успешной покупки, на email'),
+                    Forms\Components\RichEditor::make('successful_purchase_text')
+                        ->label('текст успешной покупки, на email')
+                        ->toolbarButtons([
+                            'bold',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'redo',
+                            'strike',
+                            'undo',
+                            'preview',
+                        ])
+                        ->maxLength(65535),
                     Forms\Components\FileUpload::make('successful_purchase_image')
                         ->directory('images/app')
                         ->required()
