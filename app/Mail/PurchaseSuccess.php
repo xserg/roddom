@@ -17,6 +17,7 @@ class PurchaseSuccess extends Mailable
      */
     public function __construct(
         public        $subject,
+        public string $appLink,
         public string $text,
         public string $entity,
         public string $dateStart,
@@ -42,7 +43,7 @@ class PurchaseSuccess extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.purchase-success',
+            view: 'emails.purchase-success',
         );
     }
 

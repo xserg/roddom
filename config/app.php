@@ -56,7 +56,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'back2site' => env('BACK_TO_SITE_URL', 'http://localhost'),
+    'back2site' => env('BACK_TO_SITE_URL', 'https://мамы.online/profile/bought'),
 
     'asset_url' => env('ASSET_URL', '/'),
 

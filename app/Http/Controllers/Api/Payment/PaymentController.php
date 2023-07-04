@@ -128,7 +128,7 @@ class PaymentController extends Controller
                             $percent = $refInfo->firstWhere('depth_level', 1)->percent;
                             $residualAmount = $order->price - $order->points;
 
-                            if($residualAmount > 0){
+                            if ($residualAmount > 0) {
                                 $pointsToGet = $residualAmount * ($percent / 100);
                                 $referrer->refPointsGetPayments()->create([
                                     'payer_id' => $order->user->id,
@@ -174,15 +174,18 @@ class PaymentController extends Controller
                     $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();
                     $image = Storage::url($appInfo->successful_purchase_image);
+                    $appLink = $appInfo->app_link_share_link ?? 'мамы.online';
                     Mail::to($email)
-                        ->send(new PurchaseSuccess(
-                            'Успешная покупка',
-                            $successfulPurchaseText,
-                            $subscription->entity_title,
-                            $subscription->start_date,
-                            $subscription->end_date,
-                            $image
-                        ));
+                        ->send(
+                            (new PurchaseSuccess(
+                                'Успешная покупка',
+                                $appLink,
+                                $successfulPurchaseText,
+                                $subscription->entity_title,
+                                $subscription->start_date->isoFormat('HH:mm DD.MM.YYYY'),
+                                $subscription->end_date->isoFormat('HH:mm DD.MM.YYYY'),
+                                $image
+                            )));
                 }
             }
         }
