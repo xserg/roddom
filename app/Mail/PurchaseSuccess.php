@@ -21,6 +21,7 @@ class PurchaseSuccess extends Mailable
         public string $entity,
         public string $dateStart,
         public string $dateEnd,
+        public string $image
     ) {
         //
     }

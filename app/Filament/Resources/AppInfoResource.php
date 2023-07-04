@@ -48,6 +48,15 @@ class AppInfoResource extends Resource
                         ->required()
                         ->maxLength(65535)
                         ->label('текст успешной покупки, на email'),
+                    Forms\Components\FileUpload::make('successful_purchase_image')
+                        ->directory('images/app')
+                        ->required()
+                        ->columnSpan(1)
+                        ->getUploadedFileNameForStorageUsing(
+                            function (): string {
+                                return 'successful_purchase_image.jpeg';
+                            })
+                        ->label('изображение в майле успешной покупки'),
                 ])->columns(2),
 
                 Forms\Components\Section::make('Раздел "Лицензионное соглашение"')

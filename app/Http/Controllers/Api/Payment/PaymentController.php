@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Mail\PurchaseSuccess;
 use App\Models\AppInfo;
 use App\Models\Category;
 use App\Models\Lecture;
@@ -19,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use YooKassa\Common\Exceptions\ApiException;
 use YooKassa\Common\Exceptions\BadApiRequestException;
 use YooKassa\Common\Exceptions\ExtensionNotFoundException;
@@ -168,17 +170,18 @@ class PaymentController extends Controller
                         $subscription->save();
                     });
 
-                    $successfulPurchaseText = AppInfo::query()->first()
-                        ?->successful_purchase_text ?? 'Спасибо за покупку';
+                    $appInfo = AppInfo::query()->first();
+                    $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();
-
+                    $image = Storage::url($appInfo->successful_purchase_image);
                     Mail::to($email)
-                        ->send(new \App\Mail\PurchaseSuccess(
+                        ->send(new PurchaseSuccess(
                             'Успешная покупка',
                             $successfulPurchaseText,
                             $subscription->entity_title,
                             $subscription->start_date,
-                            $subscription->end_date
+                            $subscription->end_date,
+                            $image
                         ));
                 }
             }
