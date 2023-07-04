@@ -79,40 +79,47 @@ class LoginCodeController extends Controller
         $user = $this
             ->userRepository
             ->findByEmail(
-                $loginCode->email
+                $loginCode->email,
+                ['referrer.refPoints', 'refPoints']
             );
 
-        if (! $user->hasVerifiedEmail() && $user->hasReferrer()) {
-            $referrer = $user->referrer;
-            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points;
-            $referrer->refPointsGetPayments()->create([
-                'payer_id' => $user->id,
-                'ref_points' => $pointsToGet,
-                'reason' => RefPointsPayments::REASON_INVITE
-            ]);
+        if ($user->hasReferrer()) {
+            if (! $user->referrer->hasVerifiedEmail()) {
+                $referrer = $user->referrer;
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points;
+                $referrer->refPointsGetPayments()->create([
+                    'payer_id' => $user->id,
+                    'ref_points' => $pointsToGet,
+                    'reason' => RefPointsPayments::REASON_INVITE
+                ]);
 
-            if ($refPoints = $referrer->refPoints) {
-                $refPoints->points += $pointsToGet;
-                $refPoints->save();
-            } else {
-                $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                if ($refPoints = $referrer->refPoints) {
+                    $refPoints->points += $pointsToGet;
+                    $refPoints->save();
+                } else {
+                    $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                }
+
+                $referrer->markEmailAsVerified();
             }
 
-            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points;
-            if ($refPoints = $user->refPoints) {
-                $refPoints->points += $pointsToGet;
-                $refPoints->save();
-            } else {
-                $user->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+            if ($user->canGetReferralsBonus()) {
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points;
+                if ($refPoints = $user->refPoints) {
+                    $refPoints->points += $pointsToGet;
+                    $refPoints->save();
+                } else {
+                    $user->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                }
+
+                $user->refPointsGetPayments()->create([
+                    'payer_id' => $referrer->id,
+                    'ref_points' => $pointsToGet,
+                    'reason' => RefPointsPayments::REASON_INVITED
+                ]);
+
+                $user->markCantGetReferralsBonus();
             }
-
-            $user->refPointsGetPayments()->create([
-                'payer_id' => $referrer->id,
-                'ref_points' => $pointsToGet,
-                'reason' => RefPointsPayments::REASON_INVITED
-            ]);
-
-            $referrer->markEmailAsVerified();
         }
 
         $this->loginCodeService->deleteRecordsWithCode($code);

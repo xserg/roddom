@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserRepository
 {
-    public function findByEmail(string $email): Model|User
+    public function findByEmail(string $email, $with = []): Model|User
     {
         $user = User::query()
+            ->with($with)
             ->where(['email' => $email])
             ->firstOrFail();
 

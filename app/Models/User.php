@@ -36,7 +36,8 @@ class User extends Authenticatable implements FilamentUser
         'photo',
         'photo_small',
         'referrer_id',
-        'ref_token'
+        'ref_token',
+        'can_get_referrals_bonus'
     ];
 
     protected $hidden = [
@@ -48,7 +49,8 @@ class User extends Authenticatable implements FilamentUser
         'email_verified_at' => 'datetime',
         'profile_fulfilled_at' => 'datetime',
         'is_admin' => 'bool',
-        'is_mother' => 'bool'
+        'is_mother' => 'bool',
+        'can_get_referrals_bonus' => 'bool'
     ];
 
     protected static function booted(): void
@@ -217,5 +219,17 @@ class User extends Authenticatable implements FilamentUser
     public function setProfileFulfilled(): void
     {
         $this->profile_fulfilled_at = now();
+    }
+
+    public function canGetReferralsBonus()
+    {
+        return $this->can_get_referrals_bonus;
+    }
+
+    public function markCantGetReferralsBonus()
+    {
+        return $this->forceFill([
+            'can_get_referrals_bonus' => false,
+        ])->save();
     }
 }
