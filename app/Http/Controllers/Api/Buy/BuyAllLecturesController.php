@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Buy;
 use App\Http\Requests\Buy\BuyAllLecturesRequest;
 use App\Models\Category;
 use App\Models\EverythingPack;
+use App\Models\FullCatalogPrices;
 use App\Models\Order;
 use App\Models\Period;
 use App\Services\LectureService;
@@ -27,24 +28,10 @@ class BuyAllLecturesController
         int                   $periodLength
     ) {
         $period = Period::firstWhere('length', $periodLength);
-        $mainCategories = Category::mainCategories()->with([
-            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
-            'childrenCategoriesLectures.pricesForLectures',
-            'childrenCategories.lectures.category.parentCategory.categoryPrices',
-            'childrenCategories.categoryPrices.period',
-            'childrenCategories.parentCategory',
-            'childrenCategories.categoryPrices',
-            'childrenCategories.lectures.category.categoryPrices',
-            'childrenCategories.lectures.pricesInPromoPacks',
-            'childrenCategories.lectures.pricesForLectures',
-            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-            'childrenCategories.lectures.paymentType',
-            'childrenCategories.lectures.contentType',
-        ])->get();
-
         $refPointsToSpend = $request->validated('ref_points');
+        $fullCatalogPrices = FullCatalogPrices::with('period')->get();
 
-        $price = $this->lectureService->calculateEverythingPriceByPeriod($mainCategories, $period->id);
+        $price = $this->lectureService->calculateEverythingPriceByPeriod($fullCatalogPrices, $period->id);
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
             $refPointsToSpend = self::coinsToRoubles($price - 100);
