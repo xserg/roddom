@@ -113,43 +113,40 @@ class LectureService
         $prices = [];
 
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
-
         foreach ($this->periods as $period) {
+            $fullCatalogPricesForPeriod = $fullCatalogPrices->where('period_id', $period->id)->first();
+
             $prices[] = [
                 'period_id' => $period->id,
                 'period_length' => $period->length,
                 'price_for_catalog' => self::coinsToRoubles(
-                    $this->calculateEverythingPriceByPeriod($fullCatalogPrices, $period->id)
+                    $this->calculateEverythingPriceByPeriod($fullCatalogPricesForPeriod)
                 ),
                 'price_for_catalog_promo' => self::coinsToRoubles(
-                    $this->calculateEverythingPricePromoByPeriod($fullCatalogPrices, $period->id)
+                    $this->calculateEverythingPricePromoByPeriod($fullCatalogPricesForPeriod)
                 ),
-                'is_promo' => $fullCatalogPrices->where('period_id', $period->id)->first()->is_promo
+                'is_promo' => $fullCatalogPricesForPeriod->is_promo
             ];
         }
 
         return $prices;
     }
 
-    public function calculateEverythingPriceByPeriod(Collection $fullCatalogPrices, int $periodId): int
+    public function calculateEverythingPriceByPeriod(FullCatalogPrices $fullCatalogPrices): int
     {
         $price = 0;
 
-        $fullCatalogPrices = $fullCatalogPrices->where('period_id', $periodId)->first();
         $lecturesCount = Lecture::payed()->count();
-
         $price += ($lecturesCount * $fullCatalogPrices->price_for_one_lecture);
 
         return $price;
     }
 
-    public function calculateEverythingPricePromoByPeriod(Collection $fullCatalogPrices, int $periodId): int
+    public function calculateEverythingPricePromoByPeriod(FullCatalogPrices $fullCatalogPrices): int
     {
         $price = 0;
 
-        $fullCatalogPrices = $fullCatalogPrices->where('period_id', $periodId)->first();
         $lecturesCount = Lecture::payed()->count();
-
         $price += ($lecturesCount * $fullCatalogPrices->price_for_one_lecture_promo);
 
         return $price;

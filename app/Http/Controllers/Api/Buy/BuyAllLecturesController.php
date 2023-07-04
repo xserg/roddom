@@ -31,7 +31,11 @@ class BuyAllLecturesController
         $refPointsToSpend = $request->validated('ref_points');
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
 
-        $price = $this->lectureService->calculateEverythingPriceByPeriod($fullCatalogPrices, $period->id);
+        if ($fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id)->is_promo) {
+            $price = $this->lectureService->calculateEverythingPricePromoByPeriod($fullCatalogPricesForPeriod);
+        } else {
+            $price = $this->lectureService->calculateEverythingPriceByPeriod($fullCatalogPricesForPeriod);
+        }
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
             $refPointsToSpend = self::coinsToRoubles($price - 100);
