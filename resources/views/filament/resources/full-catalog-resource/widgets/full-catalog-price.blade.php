@@ -24,10 +24,10 @@
                         <td class="px-6 py-4">
                             {{$value['period_length']}}
                         </td>
-                        <td class="px-6 py-4 font-bold">
+                        <td class="px-6 py-4 {{!$value['is_promo'] ? "font-bold" : ""}}">
                             {{$value['price_for_catalog']}}
                         </td>
-                        <td class="px-6 py-4 font-bold">
+                        <td class="px-6 py-4 {{$value['is_promo'] ? "font-bold" : ""}}">
                             {{$value['price_for_catalog_promo']}}
                         </td>
                     </tr>
