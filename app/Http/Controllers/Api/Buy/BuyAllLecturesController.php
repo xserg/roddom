@@ -30,8 +30,9 @@ class BuyAllLecturesController
         $period = Period::firstWhere('length', $periodLength);
         $refPointsToSpend = $request->validated('ref_points');
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
+        $fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id);
 
-        if ($fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id)->is_promo) {
+        if ($fullCatalogPricesForPeriod->is_promo) {
             $price = $this->lectureService->calculateEverythingPricePromoByPeriod($fullCatalogPricesForPeriod);
         } else {
             $price = $this->lectureService->calculateEverythingPriceByPeriod($fullCatalogPricesForPeriod);
