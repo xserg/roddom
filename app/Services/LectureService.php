@@ -113,10 +113,13 @@ class LectureService
         $prices = [];
 
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
+        $lecturesCount = Lecture::payed()->count();
+
         foreach ($this->periods as $period) {
             $fullCatalogPricesForPeriod = $fullCatalogPrices->where('period_id', $period->id)->first();
 
             $prices[] = [
+                'lectures_count' => $lecturesCount,
                 'period_id' => $period->id,
                 'period_length' => $period->length,
                 'price_for_catalog' => self::coinsToRoubles(
