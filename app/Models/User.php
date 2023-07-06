@@ -157,7 +157,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(
             User::class,
             'referrer_id'
-        )->withDefault();
+        );
     }
 
     public function referrals(): HasMany

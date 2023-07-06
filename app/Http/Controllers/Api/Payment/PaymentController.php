@@ -126,7 +126,8 @@ class PaymentController extends Controller
                             ]);
                         }
 
-                        if ($referrer = $orderedUser->referrer) {
+                        if ($orderedUser->referrer()->exists()) {
+                            $referrer = $orderedUser->referrer;
                             $percent = $refInfo->firstWhere('depth_level', 1)->percent;
                             $residualAmount = $order->price - $order->points;
 
@@ -141,14 +142,16 @@ class PaymentController extends Controller
                                     'percent' => $percent,
                                 ]);
 
-                                if ($refPoints = $referrer->refPoints) {
+                                if ($referrer->refPoints()->exists()) {
+                                    $refPoints = $referrer->refPoints;
                                     $refPoints->points += $pointsToGet;
                                     $refPoints->save();
                                 } else {
-                                    $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                                    $referrer->refPoints()->create(['points' => $pointsToGet]);
                                 }
 
-                                if ($referrerDepthTwo = $referrer->referrer) {
+                                if ($referrer->referrer()->exists()) {
+                                    $referrerDepthTwo = $referrer->referrer;
                                     $percent = $refInfo->firstWhere('depth_level', 2)->percent;
                                     $pointsToGet = $residualAmount * ($percent / 100);
 
@@ -161,11 +164,12 @@ class PaymentController extends Controller
                                         'percent' => $percent,
                                     ]);
 
-                                    if ($refPoints = $referrerDepthTwo->refPoints) {
+                                    if ($referrerDepthTwo->refPoints()->exists()) {
+                                        $refPoints = $referrerDepthTwo->refPoints;
                                         $refPoints->points += $pointsToGet;
                                         $refPoints->save();
                                     } else {
-                                        $referrerDepthTwo->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                                        $referrerDepthTwo->refPoints()->create(['points' => $pointsToGet]);
                                     }
                                 }
                             }
