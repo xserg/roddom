@@ -138,3 +138,5 @@ Route::prefix('v1')
                 ->name('promopack');
         });
     });
+
+Route::get('/wizard', \App\Http\Controllers\Api\Wizard\WizardController::class);
