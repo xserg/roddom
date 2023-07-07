@@ -95,7 +95,8 @@ class LoginCodeController extends Controller
                     'reason' => RefPointsPayments::REASON_INVITE
                 ]);
 
-                if ($refPoints = $referrer->refPoints) {
+                if ($referrer->refPoints()->exists()) {
+                    $refPoints = $referrer->refPoints;
                     $refPoints->points += $pointsToGet;
                     $refPoints->save();
                 } else {
@@ -107,7 +108,8 @@ class LoginCodeController extends Controller
 
             if ($user->canGetReferralsBonus()) {
                 $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
-                if ($refPoints = $user->refPoints) {
+                if ($user->refPoints()->exists()) {
+                    $refPoints = $user->refPoints;
                     $refPoints->points += $pointsToGet;
                     $refPoints->save();
                 } else {
@@ -125,13 +127,15 @@ class LoginCodeController extends Controller
         }
 
         $this->loginCodeService->deleteRecordsWithCode($code);
+        $user->tokens()->delete();
 
-        $name = $request->validated('device_name', 'access_token');
-        $token = $user->tokens()->firstWhere('name', $name);
-        $token?->delete();
+//        $name = $request->validated('device_name', 'access_token');
+//        $token = $user->tokens()->firstWhere('name', $name);
+//        $token?->delete();
+
 
         $token = $user
-            ->createToken($name)
+            ->createToken($name ?? 'access_token')
             ->plainTextToken;
 
         $user = $this->userService->appendLectureCountersToUser($user);

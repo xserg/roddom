@@ -190,7 +190,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function hasReferrer(): bool
     {
-        return (bool) $this->referrer_id;
+        return $this->referrer()->exists();
     }
 
     protected function purchasedLecturesCounter(): Attribute

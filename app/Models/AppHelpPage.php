@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AppHelpPage extends Model
 {
+    protected $guarded = [];
+
     protected $table = 'app_help_page';
 }
