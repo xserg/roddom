@@ -30,15 +30,20 @@ class WizardResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('title')
+                    ->required()
+                    ->columnSpan(2),
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record ? "шаг {$record->id}" : "шаг формы")
                     ->blocks([
-                        Builder\Block::make('question-type-1')
-                            ->label('вопрос с несколькими вариантами ответа')
+                        Builder\Block::make('question-type-checkbox')
+                            ->label('несколько вариантов ответа')
                             ->schema([
                                 TextInput::make('text')
                                     ->label('текст вопроса')
                                     ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
 
                                 Builder::make('answers')
                                     ->label('ответы')
@@ -47,16 +52,18 @@ class WizardResource extends Resource
                                             ->label('ответ')
                                             ->schema([
                                                 Forms\Components\TextInput::make('text')
-                                                    ->label('текст ответа')
+                                                    ->label('текст поля')
                                             ]),
                                     ])
                             ]),
-                        Builder\Block::make('question-type-2')
-                            ->label('вопрос с одним вариантом ответа')
+                        Builder\Block::make('question-type-radio')
+                            ->label('один вариант ответа')
                             ->schema([
                                 TextInput::make('text')
                                     ->label('текст вопроса')
                                     ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
 
                                 Builder::make('answers')
                                     ->label('ответы')
@@ -65,7 +72,91 @@ class WizardResource extends Resource
                                             ->label('ответ')
                                             ->schema([
                                                 Forms\Components\TextInput::make('text')
-                                                    ->label('текст ответа')
+                                                    ->label('текст поля')
+                                            ]),
+                                    ])
+                            ]),
+                        Builder\Block::make('question-type-one-text-field')
+                            ->label('одно текстовое поле')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('текст вопроса')
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
+
+                                Builder::make('answers')
+                                    ->label('поля')
+                                    ->maxItems(1)
+                                    ->blocks([
+                                        Builder\Block::make('answer')
+                                            ->label('поле')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('text')
+                                                    ->label('текст поля')
+                                            ]),
+                                    ])
+                            ]),
+                        Builder\Block::make('question-type-two-text-field')
+                            ->label('два текстовых поля')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('текст вопроса')
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
+
+                                Builder::make('answers')
+                                    ->label('поля')
+                                    ->maxItems(2)
+                                    ->blocks([
+                                        Builder\Block::make('answer')
+                                            ->label('поле')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('text')
+                                                    ->label('текст поля')
+                                            ]),
+                                    ])
+                            ]),
+                        Builder\Block::make('question-type-three-text-field')
+                            ->label('три текстовых поля')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('текст вопроса')
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
+
+                                Builder::make('answers')
+                                    ->label('поля')
+                                    ->maxItems(3)
+                                    ->blocks([
+                                        Builder\Block::make('answer')
+                                            ->label('поле')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('text')
+                                                    ->label('текст поля'),
+                                            ]),
+                                    ])
+                            ]),
+                        Builder\Block::make('question-type-one-number-field')
+                            ->label('одно числовое поле')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('текст вопроса')
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
+
+                                Builder::make('answers')
+                                    ->label('поля')
+                                    ->maxItems(1)
+                                    ->blocks([
+                                        Builder\Block::make('answer')
+                                            ->label('поле')
+                                            ->schema([
+                                                Forms\Components\TextInput::make('text')
+                                                    ->label('текст поля'),
                                             ]),
                                     ])
                             ]),
@@ -77,7 +168,7 @@ class WizardResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id'),
+                Tables\Columns\TextColumn::make('title'),
             ])
             ->filters([
                 //

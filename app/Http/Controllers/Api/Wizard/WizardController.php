@@ -10,12 +10,6 @@ use App\Models\RefPointsGainOnce;
 use App\Models\RefPointsPayments;
 use App\Models\Wizard;
 use App\Repositories\LoginCodeRepository;
-use App\Repositories\UserRepository;
-use App\Services\LoginCodeService;
-use App\Services\UserService;
-use Exception;
-use Illuminate\Http\Response;
-use OpenApi\Attributes as OA;
 
 class WizardController extends Controller
 {
@@ -23,7 +17,7 @@ class WizardController extends Controller
     {
     }
 
-    public function __invoke(LoginCodeRequest $request)
+    public function __invoke(\Illuminate\Http\Request $request)
     {
         return response()->json([
             Wizard::all()

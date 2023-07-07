@@ -136,7 +136,8 @@ Route::prefix('v1')
 
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
+
+            Route::get('/wizard', \App\Http\Controllers\Api\Wizard\WizardController::class);
         });
     });
 
-Route::get('/wizard', \App\Http\Controllers\Api\Wizard\WizardController::class);
