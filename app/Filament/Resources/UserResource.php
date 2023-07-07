@@ -174,17 +174,18 @@ class UserResource extends Resource
 
                 Forms\Components\Placeholder::make('referrals_count')
                     ->label('Количество рефералов')
-                    ->content(fn (?Model $record) => $record->referrals_count)
-                    ->columnSpan(2),
+                    ->content(fn (?Model $record) => $record?->referrals_count)
+                    ->columnSpan(2)
+                    ->visible(fn (string $context) => $context === 'edit'),
 
                 Forms\Components\Placeholder::make('referrals_of_referrals_count')
                     ->label('Количество рефералов рефералов')
-                    ->content(fn (?Model $record) => $record->referrals_of_referrals_count),
-//                Forms\Components\TextInput::make('referrals_count')
-//                    ->label('Количество рефералов'),
+                    ->content(fn (?Model $record) => $record?->referrals_of_referrals_count)
+                    ->visible(fn (string $context) => $context === 'edit'),
                 /*
                  * SUBSCRIPTIONS - REPEATER
                  */
+
                 Forms\Components\Grid::make()
                     ->schema([
                         Repeater::make('subscriptions')
