@@ -86,7 +86,7 @@ class LoginCodeController extends Controller
         if ($user->hasReferrer()) {
             $referrer = $user->referrer;
 
-            if (! $referrer->hasVerifiedEmail()) {
+            if ($referrer->canGetReferrersBonus()) {
 
                 $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
                 $referrer->refPointsGetPayments()->create([
@@ -96,24 +96,22 @@ class LoginCodeController extends Controller
                 ]);
 
                 if ($referrer->refPoints()->exists()) {
-                    $refPoints = $referrer->refPoints;
-                    $refPoints->points += $pointsToGet;
-                    $refPoints->save();
+                    $referrer->refPoints->points += $pointsToGet;
+                    $referrer->refPoints->save();
                 } else {
-                    $referrer->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                    $referrer->refPoints()->create(['points' => $pointsToGet]);
                 }
 
-                $referrer->markEmailAsVerified();
+                $referrer->markCantGetReferrersBonus();
             }
 
             if ($user->canGetReferralsBonus()) {
                 $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
                 if ($user->refPoints()->exists()) {
-                    $refPoints = $user->refPoints;
-                    $refPoints->points += $pointsToGet;
-                    $refPoints->save();
+                    $user->refPoints->points += $pointsToGet;
+                    $user->refPoints->save();
                 } else {
-                    $user->refPoints()->updateOrCreate(['points' => $pointsToGet]);
+                    $user->refPoints()->create(['points' => $pointsToGet]);
                 }
 
                 $user->refPointsGetPayments()->create([
