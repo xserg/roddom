@@ -128,7 +128,7 @@ class LoginCodeController extends Controller
 
         $name = $request->validated('device_name', 'access_token');
         $token = $user->tokens()->firstWhere('name', $name);
-        $token->delete();
+        $token?->delete();
 
         $token = $user
             ->createToken($name)
