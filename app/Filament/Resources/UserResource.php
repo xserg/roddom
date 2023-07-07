@@ -271,7 +271,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('id', 'desc')
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('имя')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->label('email')->sortable()->searchable(),
@@ -286,8 +286,9 @@ class UserResource extends Resource
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
+                Tables\Columns\TextColumn::make('created_at')->label('дата создания')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
-                Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')->counts('referrals')->sortable()->toggleable(isToggledHiddenByDefault: true)
+                Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')->counts('referrals')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

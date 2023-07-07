@@ -69,7 +69,7 @@
         }
 
         p {
-            font-size: 16px;
+            font-size: 17px;
             line-height: 1.5em;
             margin-top: 0;
             text-align: left;
