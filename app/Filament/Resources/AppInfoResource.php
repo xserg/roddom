@@ -242,6 +242,10 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->rows(3)
                                     ->label('Партнерская программа, описание'),
+                                Forms\Components\TextInput::make('user_invites_you_to_join')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->label('Строка "x приглашает Вас присоединиться к интересным материалам в Школе Мам и Пап"'),
                             ])->columns(2),
                     ])
                     ->collapsible()
