@@ -125,9 +125,11 @@ class LoginCodeController extends Controller
         }
 
         $this->loginCodeService->deleteRecordsWithCode($code);
-        $user->tokens()->delete();
 
         $name = $request->validated('device_name', 'access_token');
+        $token = $user->tokens()->firstWhere('name', $name);
+        $token->delete();
+
         $token = $user
             ->createToken($name)
             ->plainTextToken;
