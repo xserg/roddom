@@ -2,14 +2,9 @@
 
 namespace App\Http\Controllers\Api\Wizard;
 
-use App\Exceptions\LoginCodeExpiredException;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginCodeRequest;
-use App\Http\Resources\UserResource;
-use App\Models\RefPointsGainOnce;
-use App\Models\RefPointsPayments;
 use App\Models\Wizard;
-use App\Repositories\LoginCodeRepository;
+use Illuminate\Http\Request;
 
 class WizardController extends Controller
 {
@@ -17,10 +12,10 @@ class WizardController extends Controller
     {
     }
 
-    public function __invoke(\Illuminate\Http\Request $request)
+    public function __invoke(Request $request)
     {
         return response()->json([
-            Wizard::all()
+            'data' => Wizard::query()->orderBy('order')->get(['title', 'form'])
         ], 200);
     }
 }

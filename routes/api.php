@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\ResendLoginCodeController;
+use App\Http\Controllers\Api\Wizard\WizardController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
@@ -137,7 +138,7 @@ Route::prefix('v1')
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
 
-            Route::get('/wizard', \App\Http\Controllers\Api\Wizard\WizardController::class);
+            Route::get('/pregnancy-plan/form', WizardController::class);
         });
     });
 

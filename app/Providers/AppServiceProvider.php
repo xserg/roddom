@@ -72,6 +72,8 @@ class AppServiceProvider extends ServiceProvider
                     ->label('Приложение'),
                 NavigationGroup::make()
                     ->label('Партнерская программа'),
+                NavigationGroup::make()
+                    ->label('Форма «Мой план родов»'),
             ]);
         });
     }

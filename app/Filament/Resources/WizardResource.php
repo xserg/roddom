@@ -23,38 +23,31 @@ use Filament\Forms\Components\Wizard;
 class WizardResource extends Resource
 {
     protected static ?string $model = WizardModel::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationLabel = 'Форма «Мой план родов»';
+    protected static ?int $navigationSort = 1;
+    protected static ?string $label = 'Форма «Мой план родов»';
+    protected static ?string $navigationGroup = 'Форма «Мой план родов»';
+    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $pluralModelLabel = 'Шаги формы';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                TextInput::make('order')
+                    ->required()
+                    ->label('порядковый номер')
+                    ->columnSpan(2),
                 TextInput::make('title')
                     ->required()
+                    ->label('наименование')
                     ->columnSpan(2),
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record ? "шаг {$record->id}" : "шаг формы")
                     ->blocks([
-                        Builder\Block::make('textarea')
-                            ->label('textarea')
-                            ->schema([
-                                Forms\Components\RichEditor::make('text')
-                                    ->toolbarButtons([
-                                        'bold',
-                                        'h2',
-                                        'h3',
-                                        'italic',
-                                        'redo',
-                                        'strike',
-                                        'undo',
-                                        'preview',
-                                    ])
-                                    ->maxLength(65535)
-                                    ->label('text')
-                            ]),
                         Builder\Block::make('question-type-checkbox')
-                            ->label('несколько вариантов ответа')
+                            ->label('несколько вариантов ответа/checkboxes')
                             ->schema([
                                 TextInput::make('text')
                                     ->label('текст вопроса')
@@ -74,7 +67,7 @@ class WizardResource extends Resource
                                     ])
                             ]),
                         Builder\Block::make('question-type-radio')
-                            ->label('один вариант ответа')
+                            ->label('один вариант ответа/radiobuttons')
                             ->schema([
                                 TextInput::make('text')
                                     ->label('текст вопроса')
@@ -177,6 +170,23 @@ class WizardResource extends Resource
                                             ]),
                                     ])
                             ]),
+                        Builder\Block::make('обычное текстовое поле textarea')
+                            ->label('textarea')
+                            ->schema([
+                                Forms\Components\RichEditor::make('text')
+                                    ->toolbarButtons([
+                                        'bold',
+                                        'h2',
+                                        'h3',
+                                        'italic',
+                                        'redo',
+                                        'strike',
+                                        'undo',
+                                        'preview',
+                                    ])
+                                    ->maxLength(65535)
+                                    ->label('text')
+                            ]),
                     ])->collapsible()
             ]);
     }
@@ -184,8 +194,12 @@ class WizardResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('order')
             ->columns([
-                Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('order')
+                    ->label('порядковый номер'),
+                Tables\Columns\TextColumn::make('title')
+                    ->label('наименование'),
             ])
             ->filters([
                 //
