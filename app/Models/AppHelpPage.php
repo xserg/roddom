@@ -9,4 +9,6 @@ class AppHelpPage extends Model
     protected $guarded = [];
 
     protected $table = 'app_help_page';
+
+    public $timestamps = false;
 }
