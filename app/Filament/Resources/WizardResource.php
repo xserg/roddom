@@ -36,6 +36,23 @@ class WizardResource extends Resource
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record ? "шаг {$record->id}" : "шаг формы")
                     ->blocks([
+                        Builder\Block::make('textarea')
+                            ->label('textarea')
+                            ->schema([
+                                Forms\Components\RichEditor::make('text')
+                                    ->toolbarButtons([
+                                        'bold',
+                                        'h2',
+                                        'h3',
+                                        'italic',
+                                        'redo',
+                                        'strike',
+                                        'undo',
+                                        'preview',
+                                    ])
+                                    ->maxLength(65535)
+                                    ->label('text')
+                            ]),
                         Builder\Block::make('question-type-checkbox')
                             ->label('несколько вариантов ответа')
                             ->schema([
