@@ -45,6 +45,7 @@ class WizardResource extends Resource
                     ->columnSpan(2),
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record ? "шаг {$record->id}" : "шаг формы")
+                    ->columnSpan(2)
                     ->blocks([
                         Builder\Block::make('question-type-checkbox')
                             ->label('несколько вариантов ответа/checkboxes')
@@ -95,17 +96,8 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Builder::make('answers')
-                                    ->label('поля')
-                                    ->maxItems(1)
-                                    ->blocks([
-                                        Builder\Block::make('answer')
-                                            ->label('поле')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('text')
-                                                    ->label('текст поля')
-                                            ]),
-                                    ])
+                                Forms\Components\TextInput::make('field-text-1')
+                                    ->label('текст поля 1'),
                             ]),
                         Builder\Block::make('question-type-two-text-field')
                             ->label('два текстовых поля')
@@ -116,17 +108,10 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Builder::make('answers')
-                                    ->label('поля')
-                                    ->maxItems(2)
-                                    ->blocks([
-                                        Builder\Block::make('answer')
-                                            ->label('поле')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('text')
-                                                    ->label('текст поля')
-                                            ]),
-                                    ])
+                                Forms\Components\TextInput::make('field-text-1')
+                                    ->label('текст поля 1'),
+                                Forms\Components\TextInput::make('field-text-2')
+                                    ->label('текст поля 2'),
                             ]),
                         Builder\Block::make('question-type-three-text-field')
                             ->label('три текстовых поля')
@@ -137,17 +122,12 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Builder::make('answers')
-                                    ->label('поля')
-                                    ->maxItems(3)
-                                    ->blocks([
-                                        Builder\Block::make('answer')
-                                            ->label('поле')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('text')
-                                                    ->label('текст поля'),
-                                            ]),
-                                    ])
+                                Forms\Components\TextInput::make('field-text-1')
+                                    ->label('текст поля 1'),
+                                Forms\Components\TextInput::make('field-text-2')
+                                    ->label('текст поля 2'),
+                                Forms\Components\TextInput::make('field-text-3')
+                                    ->label('текст поля 3'),
                             ]),
                         Builder\Block::make('question-type-one-number-field')
                             ->label('одно числовое поле')
@@ -158,22 +138,16 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Builder::make('answers')
-                                    ->label('поля')
-                                    ->maxItems(1)
-                                    ->blocks([
-                                        Builder\Block::make('answer')
-                                            ->label('поле')
-                                            ->schema([
-                                                Forms\Components\TextInput::make('text')
-                                                    ->label('текст поля'),
-                                            ]),
-                                    ])
+                                Forms\Components\TextInput::make('field-text-1')
+                                    ->label('текст поля 1')
+                                    ->integer(),
                             ]),
                         Builder\Block::make('обычное текстовое поле textarea')
                             ->label('textarea')
+                            ->columnSpan(2)
+
                             ->schema([
-                                Forms\Components\RichEditor::make('text')
+                                Forms\Components\RichEditor::make('textarea')
                                     ->toolbarButtons([
                                         'bold',
                                         'h2',

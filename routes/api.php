@@ -138,7 +138,7 @@ Route::prefix('v1')
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
 
-            Route::get('/pregnancy-plan/form', WizardController::class);
+            Route::get('/pregnancy-plan-form', WizardController::class);
         });
     });
 
