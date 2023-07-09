@@ -45,7 +45,7 @@ class UserResource extends Resource
     {
         return parent::getEloquentQuery()
             ->where('is_admin', 0)
-            ->withCount(['referralsToDepth']);
+            ->withCount(['descendants']);
     }
 
     public static function form(Form $form): Form
@@ -153,7 +153,7 @@ class UserResource extends Resource
                             if ($context === 'edit') {
                                 $users = User::select(['name', 'email', 'id'])
                                     ->where('is_admin', 0)
-                                    ->whereNotIn('id', $record->descendantsAndSelf()->pluck('id')->toArray())
+                                    ->whereNotIn('id', User::query()->descendantsAndSelf($record->id)->pluck('id')->toArray())
                                     ->get();
                             } elseif ($context === 'create') {
                                 $users = User::select(['name', 'email', 'id'])
@@ -182,9 +182,9 @@ class UserResource extends Resource
 //                        ->columnSpan(2),
                 ])->columns(1)->columnSpan(1),
 
-                Forms\Components\Placeholder::make('referrals_to_depth_count')
+                Forms\Components\Placeholder::make('descendants_count')
                     ->label('Количество рефералов')
-                    ->content(fn (?Model $record) => $record?->referrals_to_depth_count)
+                    ->content(fn (?Model $record) => $record?->descendants_count)
                     ->columnSpan(2)
                     ->visible(fn (string $context) => $context === 'edit'),
                 /*

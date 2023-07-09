@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ReferralsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'referralsToDepth';
+    protected static string $relationship = 'descendants';
     protected static ?string $recordTitleAttribute = 'email';
     protected static ?string $title = 'Рефералы';
 
@@ -35,10 +35,10 @@ class ReferralsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('email')
                     ->label('email')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('depth')
-                    ->sortable()
-                    ->formatStateUsing(fn (?string $state) => "Реферал {$state} уровня")
-                    ->label('глубина'),
+//                Tables\Columns\TextColumn::make('depth')
+//                    ->sortable()
+//                    ->formatStateUsing(fn (?string $state) => "Реферал {$state} уровня")
+//                    ->label('глубина'),
             ])
             ->filters([
                 //

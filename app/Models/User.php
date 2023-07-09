@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Kalnoy\Nestedset\DescendantsRelation;
+use Kalnoy\Nestedset\NodeTrait;
 use Laravel\Sanctum\HasApiTokens;
 use SolutionForest\FilamentTree\Concern\ModelTree;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
@@ -22,14 +24,17 @@ use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias, ModelTree, HasRecursiveRelationships {
-        HasRecursiveRelationships::children insteadof ModelTree;
-        HasRecursiveRelationships::scopeIsRoot insteadof ModelTree;
+    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias, ModelTree, NodeTrait {
+        NodeTrait::children insteadof ModelTree;
+        NodeTrait::isRoot insteadof ModelTree;
         ModelTree::children as recursiveChildren;
-        ModelTree::scopeIsRoot as recursiveScopeIsRoot;
+        ModelTree::isRoot as recursiveScopeIsRoot;
     }
 
     protected $appends = ['purchased_lectures_counter'];
+
+
+    private $descendants = [];
 
     protected $fillable = [
         'email',
@@ -268,13 +273,8 @@ class User extends Authenticatable implements FilamentUser
         return ! is_null($this->name) ? 'name' : 'email';
     }
 
-    public function getParentKeyName(): string
+    public function getParentIdName(): string
     {
         return 'referrer_id';
-    }
-
-    public function referralsToDepth($depth = 5): HasMany
-    {
-        return $this->descendants()->whereDepth('<=', 5);
     }
 }
