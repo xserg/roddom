@@ -33,7 +33,6 @@ class User extends Authenticatable implements FilamentUser
 
     protected $appends = ['purchased_lectures_counter'];
 
-
     private $descendants = [];
 
     protected $fillable = [
@@ -75,6 +74,8 @@ class User extends Authenticatable implements FilamentUser
                 $user->ref_token = Str::uuid();
             }
         });
+
+        static::saved(fn () => User::fixTree());
     }
 
     public function watchedLectures(): BelongsToMany
