@@ -8,7 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign('users_referrer_id_foreign');
+            $table->dropIndex('users_referrer_id_foreign');
+            $table->dropColumn(['referrer_id']);
         });
         Schema::table('users', function (Blueprint $table) {
             $table->integer('referrer_id')->default(-1)->change();
