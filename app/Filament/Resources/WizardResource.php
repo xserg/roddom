@@ -142,10 +142,10 @@ class WizardResource extends Resource
                                     ->label('текст поля 1')
                                     ->integer(),
                             ]),
-                        Builder\Block::make('просто текст/textarea')
-                            ->label('textarea')
+                        Builder\Block::make('textarea')
+                            ->label('просто текст/textarea')
                             ->schema([
-                                Forms\Components\RichEditor::make('textarea')
+                                Forms\Components\RichEditor::make('text')
                                     ->toolbarButtons([
                                         'bold',
                                         'h2',
