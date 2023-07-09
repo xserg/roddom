@@ -44,7 +44,7 @@ class WizardResource extends Resource
                     ->label('наименование')
                     ->columnSpan(2),
                 Builder::make('form')
-                    ->label(fn (?Model $record) => $record->order ? "шаг {$record->order}" : "шаг формы")
+                    ->label(fn (?Model $record) => $record?->order ? "шаг {$record->order}" : "шаг формы")
                     ->columnSpan(2)
                     ->blocks([
                         Builder\Block::make('question-type-checkbox')
