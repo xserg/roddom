@@ -142,12 +142,10 @@ class WizardResource extends Resource
                                     ->label('текст поля 1')
                                     ->integer(),
                             ]),
-                        Builder\Block::make('обычное текстовое поле textarea')
+                        Builder\Block::make('просто текст/textarea')
                             ->label('textarea')
-                            ->columnSpan(2)
-
                             ->schema([
-                                Forms\Components\RichEditor::make('просто текст/textarea')
+                                Forms\Components\RichEditor::make('textarea')
                                     ->toolbarButtons([
                                         'bold',
                                         'h2',
@@ -159,7 +157,7 @@ class WizardResource extends Resource
                                         'preview',
                                     ])
                                     ->maxLength(65535)
-                                    ->label('text')
+                                    ->label('textarea')
                             ]),
                     ])->collapsible()
             ]);
