@@ -126,14 +126,14 @@ class PaymentController extends Controller
                             ]);
                         }
 
-                        if ($orderedUser->referrer()->exists()) {
-                            $referrer = $orderedUser->referrer;
+                        if ($orderedUser->parent()->exists()) {
+                            $parent = $orderedUser->parent;
                             $percent = $refInfo->firstWhere('depth_level', 1)->percent;
                             $residualAmount = $order->price - $order->points;
 
                             if ($residualAmount > 0) {
                                 $pointsToGet = $residualAmount * ($percent / 100);
-                                $referrer->refPointsGetPayments()->create([
+                                $parent->refPointsGetPayments()->create([
                                     'payer_id' => $order->user->id,
                                     'reason' => RefPointsPayments::REASON_BUY,
                                     'ref_points' => $pointsToGet,
@@ -142,37 +142,76 @@ class PaymentController extends Controller
                                     'percent' => $percent,
                                 ]);
 
-                                if ($referrer->refPoints()->exists()) {
-                                    $refPoints = $referrer->refPoints;
+                                if ($parent->refPoints()->exists()) {
+                                    $refPoints = $parent->refPoints;
                                     $refPoints->points += $pointsToGet;
                                     $refPoints->save();
                                 } else {
-                                    $referrer->refPoints()->create(['points' => $pointsToGet]);
+                                    $parent->refPoints()->create(['points' => $pointsToGet]);
                                 }
 
-                                if ($referrer->referrer()->exists()) {
-                                    $referrerDepthTwo = $referrer->referrer;
-                                    $percent = $refInfo->firstWhere('depth_level', 2)->percent;
-                                    $pointsToGet = $residualAmount * ($percent / 100);
-
-                                    $referrerDepthTwo->refPointsGetPayments()->create([
-                                        'payer_id' => $order->user->id,
-                                        'reason' => RefPointsPayments::REASON_BUY,
-                                        'ref_points' => $pointsToGet,
-                                        'price' => $order->price,
-                                        'depth_level' => 2,
-                                        'percent' => $percent,
-                                    ]);
-
-                                    if ($referrerDepthTwo->refPoints()->exists()) {
-                                        $refPoints = $referrerDepthTwo->refPoints;
-                                        $refPoints->points += $pointsToGet;
-                                        $refPoints->save();
-                                    } else {
-                                        $referrerDepthTwo->refPoints()->create(['points' => $pointsToGet]);
-                                    }
-                                }
+//                                if ($referrer->referrer()->exists()) {
+//                                    $referrerDepthTwo = $referrer->referrer;
+//                                    $percent = $refInfo->firstWhere('depth_level', 2)->percent;
+//                                    $pointsToGet = $residualAmount * ($percent / 100);
+//
+//                                    $referrerDepthTwo->refPointsGetPayments()->create([
+//                                        'payer_id' => $order->user->id,
+//                                        'reason' => RefPointsPayments::REASON_BUY,
+//                                        'ref_points' => $pointsToGet,
+//                                        'price' => $order->price,
+//                                        'depth_level' => 2,
+//                                        'percent' => $percent,
+//                                    ]);
+//
+//                                    if ($referrerDepthTwo->refPoints()->exists()) {
+//                                        $refPoints = $referrerDepthTwo->refPoints;
+//                                        $refPoints->points += $pointsToGet;
+//                                        $refPoints->save();
+//                                    } else {
+//                                        $referrerDepthTwo->refPoints()->create(['points' => $pointsToGet]);
+//                                    }
+//                                }
                             }
+                        }
+
+                        if (
+                            $orderedUser->ancestors()
+                                ->whereDepth('>', -6)
+                                ->whereDepth('<', -1)
+                                ->exists()
+                        ) {
+                            $ancestors = $orderedUser->ancestors()
+                                ->whereDepth('>', -6)
+                                ->whereDepth('<', -1)
+                                ->get();
+
+                            $ancestors->each(function ($ancestor) use ($order, $refInfo) {
+                                $percent = $refInfo->firstWhere('depth_level', 2)->percent;
+                                $residualAmount = $order->price - $order->points;
+
+                                if ($residualAmount <= 0) {
+                                    return;
+                                }
+
+                                $pointsToGet = $residualAmount * ($percent / 100);
+                                $ancestor->refPointsGetPayments()->create([
+                                    'payer_id' => $order->user->id,
+                                    'reason' => RefPointsPayments::REASON_BUY,
+                                    'ref_points' => $pointsToGet,
+                                    'price' => $order->price,
+                                    'depth_level' => 1,
+                                    'percent' => $percent,
+                                ]);
+
+                                if ($ancestor->refPoints()->exists()) {
+                                    $refPoints = $ancestor->refPoints;
+                                    $refPoints->points += $pointsToGet;
+                                    $refPoints->save();
+                                } else {
+                                    $ancestor->refPoints()->create(['points' => $pointsToGet]);
+                                }
+                            });
                         }
                         $order->save();
                         $subscription->save();
@@ -199,7 +238,8 @@ class PaymentController extends Controller
         }
     }
 
-    private function getSubscriptionAttributes(
+    private
+    function getSubscriptionAttributes(
         Order  $order,
         Period $period,
     ): array {

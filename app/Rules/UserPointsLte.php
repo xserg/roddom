@@ -12,10 +12,11 @@ class UserPointsLte implements ValidationRule
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $userPoints = self::coinsToRoubles(auth()->user()->refPoints?->points) ?? 0;
+        $userPoints = auth()->user()?->refPoints?->points ?? 0;
 
-        if ((float) $value > $userPoints) {
-            $fail("Значение {$attribute} аттрибута может быть равно или меньше, чем количество реф поинтов у юзера: {$userPoints}.");
+        if (self::roublesToCoins($value) > $userPoints) {
+            $pointsToShow = self::coinsToRoubles($userPoints);
+            $fail("Значение {$attribute} аттрибута может быть равно или меньше, чем количество реф поинтов у юзера: {$pointsToShow}.");
         }
     }
 }

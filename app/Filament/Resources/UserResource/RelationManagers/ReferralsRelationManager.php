@@ -9,10 +9,11 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReferralsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'referrals';
+    protected static string $relationship = 'referralsToDepth';
     protected static ?string $recordTitleAttribute = 'email';
     protected static ?string $title = 'Рефералы';
 
@@ -29,9 +30,15 @@ class ReferralsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('имя'),
+                    ->label('имя')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->label('email'),
+                    ->label('email')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('depth')
+                    ->sortable()
+                    ->formatStateUsing(fn (?string $state) => "Реферал {$state} уровня")
+                    ->label('глубина'),
             ])
             ->filters([
                 //

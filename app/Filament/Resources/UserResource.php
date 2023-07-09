@@ -45,7 +45,7 @@ class UserResource extends Resource
     {
         return parent::getEloquentQuery()
             ->where('is_admin', 0)
-            ->withCount(['referrals', 'referralsOfReferrals']);
+            ->withCount(['referralsToDepth']);
     }
 
     public static function form(Form $form): Form
@@ -149,8 +149,18 @@ class UserResource extends Resource
 //                        ->reactive()
 //                        ->required(),
                     Forms\Components\Select::make('referrer_id')
-                        ->options(function () {
-                            $users = User::select(['name', 'email', 'id'])->get();
+                        ->options(function (string $context, ?Model $record) {
+                            if ($context === 'edit') {
+                                $users = User::select(['name', 'email', 'id'])
+                                    ->where('is_admin', 0)
+                                    ->whereNotIn('id', $record->descendantsAndSelf()->pluck('id')->toArray())
+                                    ->get();
+                            } elseif ($context === 'create') {
+                                $users = User::select(['name', 'email', 'id'])
+                                    ->where('is_admin', 0)
+                                    ->get();
+                            }
+
                             $options = [];
                             foreach ($users as $user) {
                                 $options[$user->id] = $user->name ?? $user->email;
@@ -172,15 +182,10 @@ class UserResource extends Resource
 //                        ->columnSpan(2),
                 ])->columns(1)->columnSpan(1),
 
-                Forms\Components\Placeholder::make('referrals_count')
+                Forms\Components\Placeholder::make('referrals_to_depth_count')
                     ->label('Количество рефералов')
-                    ->content(fn (?Model $record) => $record?->referrals_count)
+                    ->content(fn (?Model $record) => $record?->referrals_to_depth_count)
                     ->columnSpan(2)
-                    ->visible(fn (string $context) => $context === 'edit'),
-
-                Forms\Components\Placeholder::make('referrals_of_referrals_count')
-                    ->label('Количество рефералов рефералов')
-                    ->content(fn (?Model $record) => $record?->referrals_of_referrals_count)
                     ->visible(fn (string $context) => $context === 'edit'),
                 /*
                  * SUBSCRIPTIONS - REPEATER
@@ -289,6 +294,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->label('дата создания')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('referrer.name')->label('реферер')->toggleable(),
                 Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')->counts('referrals')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -330,6 +336,8 @@ class UserResource extends Resource
             ])
             ->headerActions([
                 FilamentExportHeaderAction::make('Export'),
+//                Tables\Actions\Action::make('дерево рефералов')
+//                Forms\Components\Actions\Action::make('дерево рефералов')
             ])
             ->actionsPosition();
     }
@@ -340,7 +348,6 @@ class UserResource extends Resource
             ReferralsPaymentsRelationManager::class,
             ReferralsMadePaymentsRelationManager::class,
             ReferralsRelationManager::class,
-            ReferralsOfReferralsRelationManager::class,
         ];
     }
 
@@ -350,6 +357,7 @@ class UserResource extends Resource
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'tree-list' => Pages\UsersTree::route('/tree-list')
         ];
     }
 }

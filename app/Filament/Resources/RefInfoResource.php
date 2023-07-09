@@ -43,8 +43,8 @@ class RefInfoResource extends Resource
                     ->label('глубина')
                     ->formatStateUsing(function (string $state) {
                         return match ((int) $state) {
-                            1 => 'реферал',
-                            2 => 'рефералы реферала',
+                            1 => 'за покупку реферала 1 уровня',
+                            2 => 'за покупку рефералов 2-5 уровня',
                         };
                     }),
                 Tables\Columns\TextColumn::make('percent')

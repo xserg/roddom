@@ -2,8 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 /**
@@ -26,6 +28,8 @@ class UserFactory extends Factory
 
         $randomPhoto = fake()->randomElement($previewPictures);
 
+        $usersId = User::pluck('id')->toArray();
+
         return [
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -39,6 +43,8 @@ class UserFactory extends Factory
             'phone' => fake()->phoneNumber,
             'photo' => $randomPhoto,
             'photo_small' => $randomPhoto,
+            'ref_token' => Str::uuid(),
+            'referrer_id' => fake()->randomElement([-1, ...$usersId])
         ];
     }
 

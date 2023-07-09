@@ -9,19 +9,25 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use SolutionForest\FilamentTree\Concern\ModelTree;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Staudenmeir\EloquentHasManyDeep\HasTableAlias;
+use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias;
+    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias, ModelTree, HasRecursiveRelationships {
+        HasRecursiveRelationships::children insteadof ModelTree;
+        HasRecursiveRelationships::scopeIsRoot insteadof ModelTree;
+        ModelTree::children as recursiveChildren;
+        ModelTree::scopeIsRoot as recursiveScopeIsRoot;
+    }
 
     protected $appends = ['purchased_lectures_counter'];
 
@@ -39,7 +45,8 @@ class User extends Authenticatable implements FilamentUser
         'ref_token',
         'can_get_referrals_bonus',
         'can_get_referrers_bonus',
-        'order'
+        'order',
+        'next_free_lecture_available'
     ];
 
     protected $hidden = [
@@ -246,5 +253,28 @@ class User extends Authenticatable implements FilamentUser
         return $this->fill([
             'can_get_referrals_bonus' => false,
         ])->save();
+    }
+
+    public function markNextFreeLectureAvailable(?int $hours = null): bool
+    {
+        return $this->fill([
+            'next_free_lecture_available' => now()->addHours($hours ?? 24),
+        ])->save();
+    }
+
+
+    public function determineTitleColumnName(): string
+    {
+        return ! is_null($this->name) ? 'name' : 'email';
+    }
+
+    public function getParentKeyName(): string
+    {
+        return 'referrer_id';
+    }
+
+    public function referralsToDepth($depth = 5): HasMany
+    {
+        return $this->descendants()->whereDepth('<=', 5);
     }
 }

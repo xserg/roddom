@@ -57,28 +57,12 @@ class DatabaseSeeder extends Seeder
 //        $this->createAnotherUser();
 //        $this->createUsers(1000);
 //        $this->setRecommendedLectures(20);
-        User::all()->update([
-            'ref_token' => Str::uuid(4)
-        ]);
-
-        $orders = Order::all();
-        $orders->each(function ($order) {
-            $order->price = $order->price * 100;
-            $order->save();
-        });
     }
 
     private function createUsers(int $users)
     {
         User::factory($users)
-            ->create()
-            ->each(function ($user) {
-                /**
-                 * @var User $user
-                 */
-                $this->setDiffLectureTypes($user);
-                $this->createSubscriptionsForUser($user);
-            });
+            ->create();
     }
 
     private function createSubscriptionsForUser($user)
