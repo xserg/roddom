@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->dropIndex('users_referrer_id_foreign');
         });
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('referrer_id')->default(-1)->change();
+            $table->integer('referrer_id')->default(-1)->after('photo_small');
             $table->integer('order')->default(0)->index()->after('referrer_id');
         });
     }
