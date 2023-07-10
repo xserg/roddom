@@ -377,40 +377,40 @@ class UserService
             $percentRefSecondToFifth = $refInfo->firstWhere('depth_level', 2)->percent;
 
             $relationships = [
-                $buyer->referrer(),
-                $buyer->referralsSecondLevel(),
-                $buyer->referralsThirdLevel(),
-                $buyer->referralsFourthLevel(),
-                $buyer->referralsFifthLevel(),
+                1 => $buyer->referrer(),
+                2 => $buyer->referrerSecondLevel(),
+                3 => $buyer->referrerThirdLevel(),
+                4 => $buyer->referrerFourthLevel(),
+                5 => $buyer->referrerFifthLevel(),
             ];
 
-            $depth = 1;
-            foreach ($relationships as $relationship) {
+            foreach ($relationships as $depth => $relationship) {
+                if ($relationship->doesntExist()) {
+                    continue;
+                }
 
-                [$depth, $percent] = $relationship === $buyer->referrer() ?
-                    [$depth, $percentRefFirst] :
-                    [++$depth, $percentRefSecondToFifth];
+                $percent = $depth === 1 ?
+                    $percentRefFirst :
+                    $percentRefSecondToFifth;
 
-                if ($relationship->exists()) {
-                    $referrer = $relationship->first();
-                    $pointsToGet = $residualAmount * ($percent / 100);
+                $referrer = $relationship->first();
+                $pointsToGet = $residualAmount * ($percent / 100);
 
-                    $referrer->refPointsGetPayments()->create([
-                        'payer_id' => $order->user->id,
-                        'reason' => RefPointsPayments::REASON_BUY,
-                        'ref_points' => $pointsToGet,
-                        'price' => $order->price,
-                        'depth_level' => $depth,
-                        'percent' => $percent,
-                    ]);
+                $referrer->refPointsGetPayments()->create([
+                    'payer_id' => $order->user->id,
+                    'reason' => RefPointsPayments::REASON_BUY,
+                    'ref_points' => $pointsToGet,
+                    'price' => $order->price,
+                    'depth_level' => $depth,
+                    'percent' => $percent,
+                ]);
 
-                    if ($referrer->refPoints()->exists()) {
-                        $refPoints = $referrer->refPoints;
-                        $refPoints->points += $pointsToGet;
-                        $refPoints->save();
-                    } else {
-                        $referrer->refPoints()->create(['points' => $pointsToGet]);
-                    }
+                if ($referrer->refPoints()->exists()) {
+                    $refPoints = $referrer->refPoints;
+                    $refPoints->points += $pointsToGet;
+                    $refPoints->save();
+                } else {
+                    $referrer->refPoints()->create(['points' => $pointsToGet]);
                 }
             }
         }
