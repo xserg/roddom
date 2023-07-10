@@ -33,6 +33,13 @@ class UserResource extends JsonResource
     #[OA\Property(property: 'updated_at', description: 'Когда обновлен аккаунт', type: 'string')]
     public function toArray(Request $request): array
     {
+        $refsCount =
+            $this->referrals()->count() +
+            $this->referralsSecondLevel()->count() +
+            $this->referralsThirdLevel()->count() +
+            $this->referralsFourthLevel()->count() +
+            $this->referralsFifthLevel()->count();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -49,7 +56,7 @@ class UserResource extends JsonResource
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
                 'referer_id' => $this->referer_id,
-                'referrals_count' => $this->referralsToDepth(5)?->count() ?? 0,
+                'referrals_count' => $this->when($refsCount, $refsCount, 0),
             ],
             'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, default: 0),
             'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, default: 0),
