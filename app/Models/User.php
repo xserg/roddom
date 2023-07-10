@@ -15,6 +15,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
+use Staudenmeir\EloquentHasManyDeep\HasOneDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Staudenmeir\EloquentHasManyDeep\HasTableAlias;
 
@@ -165,6 +166,38 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsTo(
             User::class,
             'referrer_id'
+        );
+    }
+
+    public function referrerSecondLevel(): HasOneDeep
+    {
+        return $this->hasOneDeepFromRelations(
+            $this->referrer(),
+            (new User())->setAlias('users-alias-12')->referrer()
+        );
+    }
+
+    public function referrerThirdLevel(): HasOneDeep
+    {
+        return $this->hasOneDeepFromRelations(
+            $this->referrerSecondLevel(),
+            (new User())->setAlias('users-alias-13')->referrer()
+        );
+    }
+
+    public function referrerFourthLevel(): HasOneDeep
+    {
+        return $this->hasOneDeepFromRelations(
+            $this->referrerThirdLevel(),
+            (new User())->setAlias('users-alias-14')->referrer()
+        );
+    }
+
+    public function referrerFifthLevel(): HasOneDeep
+    {
+        return $this->hasOneDeepFromRelations(
+            $this->referrerFourthLevel(),
+            (new User())->setAlias('users-alias-15')->referrer()
         );
     }
 

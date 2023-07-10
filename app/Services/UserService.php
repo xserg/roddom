@@ -11,6 +11,9 @@ use App\Exceptions\UserCannotWatchPaidLectureException;
 use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
 use App\Models\EverythingPack;
+use App\Models\Order;
+use App\Models\RefInfo;
+use App\Models\RefPointsPayments;
 use App\Models\User;
 use App\Repositories\LectureRepository;
 use App\Repositories\PasswordResetRepository;
@@ -102,23 +105,6 @@ class UserService
         return $user;
     }
 
-    public function addLectureToWatched(
-        int  $lectureId,
-        User $user,
-        bool $setAvailableUntil = false
-    ): void {
-        if ($setAvailableUntil) {
-            $hoursAvailableToWatch = AppInfo::query()->first()?->free_lecture_hours ?? 24;
-
-            $user->watchedLectures()->attach(
-                $lectureId,
-                ['available_until' => now()->addHours($hoursAvailableToWatch)]
-            );
-        } else {
-            $user->watchedLectures()->attach($lectureId);
-        }
-    }
-
     /**
      * @throws FailedSaveUserException
      * @throws UserCannotWatchFreeLectureException
@@ -130,19 +116,12 @@ class UserService
     ): string {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
-        if (! $lecture) {
-            throw new NotFoundHttpException('Лекция с id ' . $lectureId . ' не найдена');
-        }
-
         $allLectureSubscription = $user
-            ->subscriptions()
+            ->actualEverythingPackSubscriptions()
             ->latest('id')
-            ->firstWhere('subscriptionable_type', EverythingPack::class);
+            ->first();
 
-        if (
-            $allLectureSubscription &&
-            $allLectureSubscription->isActual()
-        ) {
+        if ($allLectureSubscription) {
             return $lecture->content;
         }
 
@@ -152,11 +131,15 @@ class UserService
             }
 
             if ($this->userCanWatchNewFreeLecture($user)) {
-                $user->watchedLectures()->detach($lectureId);
-                $this->addLectureToWatched($lectureId, $user, true);
+                $hoursAvailableToWatch = AppInfo::query()->first()?->free_lecture_hours ?? 24;
 
-                $user = $this->setFreeLectureWatchedNow($user);
-                $this->saveUserGuard($user);
+                $user->watchedLectures()->syncWithoutDetaching(
+                    [$lectureId => ['available_until' => now()->addHours($hoursAvailableToWatch)]]
+                );
+
+                if (! $user->markNextFreeLectureAvailable($hoursAvailableToWatch)) {
+                    throw new FailedSaveUserException();
+                }
 
                 return $lecture->content;
             }
@@ -166,9 +149,6 @@ class UserService
             );
         } else {
             if ($this->isLecturePurchased($lectureId)) {
-                $user->watchedLectures()->detach($lectureId);
-                $this->addLectureToWatched($lectureId, $user);
-
                 return $lecture->content;
             }
 
@@ -259,15 +239,6 @@ class UserService
             is_null($user->next_free_lecture_available);
     }
 
-    public function setFreeLectureWatchedNow(User|Authenticatable $user): User
-    {
-        $user->next_free_lecture_available = now()->addHours(
-            AppInfo::query()->first()?->free_lecture_hours ?? 24
-        );
-
-        return $user;
-    }
-
     public function isLecturePurchased(int $lectureId): bool
     {
         return
@@ -339,7 +310,7 @@ class UserService
         User|Authenticatable|null $user
     ): void {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $alreadyRemoved = ! $user->listWatchedLectures->contains($lectureId);
+        $alreadyRemoved = $user->listWatchedLectures->doesntContain($lectureId);
 
         if ($alreadyRemoved) {
             throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в списке просмотренных');
@@ -394,5 +365,95 @@ class UserService
         if (! $user->save()) {
             throw new FailedSaveUserException();
         }
+    }
+
+    public function rewardReferrers(Order $order, User $buyer)
+    {
+        $refInfo = RefInfo::query()->first();
+        $residualAmount = $order->price - $order->points;
+
+        if ($residualAmount > 0) {
+            $percentRefFirst = $refInfo->firstWhere('depth_level', 1)->percent;
+            $percentRefSecondToFifth = $refInfo->firstWhere('depth_level', 2)->percent;
+
+            $relationships = [
+                $buyer->referrer(),
+                $buyer->referralsSecondLevel(),
+                $buyer->referralsThirdLevel(),
+                $buyer->referralsFourthLevel(),
+                $buyer->referralsFifthLevel(),
+            ];
+
+            foreach ($relationships as $relationship) {
+                $depth = 1;
+
+                [$depth, $percent] = $relationship === $buyer->referrer() ?
+                    [$depth, $percentRefFirst] :
+                    [$depth++, $percentRefSecondToFifth];
+
+                if ($relationship->exists()) {
+                    $referrer = $relationship->first();
+                    $pointsToGet = $residualAmount * ($percent / 100);
+
+                    $referrer->refPointsGetPayments()->create([
+                        'payer_id' => $order->user->id,
+                        'reason' => RefPointsPayments::REASON_BUY,
+                        'ref_points' => $pointsToGet,
+                        'price' => $order->price,
+                        'depth_level' => $depth,
+                        'percent' => $percent,
+                    ]);
+
+                    if ($referrer->refPoints()->exists()) {
+                        $refPoints = $referrer->refPoints;
+                        $refPoints->points += $pointsToGet;
+                        $refPoints->save();
+                    } else {
+                        $referrer->refPoints()->create(['points' => $pointsToGet]);
+                    }
+                }
+            }
+        }
+
+//        adjacency-list
+
+//        if (
+//            $buyer->ancestors()
+//                ->whereDepth('>', -6)
+//                ->whereDepth('<', -1)
+//                ->exists()
+//        ) {
+//            $ancestors = $buyer->ancestors()
+//                ->whereDepth('>', -6)
+//                ->whereDepth('<', -1)
+//                ->get();
+//
+//            $ancestors->each(function ($ancestor) use ($order, $refInfo) {
+//                $percent = $refInfo->firstWhere('depth_level', 2)->percent;
+//                $residualAmount = $order->price - $order->points;
+//
+//                if ($residualAmount <= 0) {
+//                    return;
+//                }
+//
+//                $pointsToGet = $residualAmount * ($percent / 100);
+//                $ancestor->refPointsGetPayments()->create([
+//                    'payer_id' => $order->user->id,
+//                    'reason' => RefPointsPayments::REASON_BUY,
+//                    'ref_points' => $pointsToGet,
+//                    'price' => $order->price,
+//                    'depth_level' => 1,
+//                    'percent' => $percent,
+//                ]);
+//
+//                if ($ancestor->refPoints()->exists()) {
+//                    $refPoints = $ancestor->refPoints;
+//                    $refPoints->points += $pointsToGet;
+//                    $refPoints->save();
+//                } else {
+//                    $ancestor->refPoints()->create(['points' => $pointsToGet]);
+//                }
+//            });
+//        }
     }
 }
