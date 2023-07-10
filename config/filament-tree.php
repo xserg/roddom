@@ -12,9 +12,9 @@ return [
     /**
      * Tree model default parent key
      */
-    'default_parent_id' => null,
+    'default_parent_id' => -1,
     /**
      * Tree model default children key name
      */
-    'default_children_key_name' => 'recursiveChildren',
+    'default_children_key_name' => 'children',
 ];

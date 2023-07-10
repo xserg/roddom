@@ -10,7 +10,7 @@ class UsersTree extends BasePage
 {
     protected static string $resource = UserResource::class;
 
-    protected static int $maxDepth = 3;
+    protected static int $maxDepth = 2;
 
     protected function getActions(): array
     {

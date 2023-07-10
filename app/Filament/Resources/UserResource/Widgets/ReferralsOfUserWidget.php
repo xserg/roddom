@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ReferralsOfUserWidget extends Widget
 {
     public ?User $record = null;
-    protected static ?string $heading = 'Рефералы до 1-5 уровня';
+    protected static ?string $heading = 'Рефералы 1-5 уровней';
 
     protected function getTableQuery(): Builder
     {
