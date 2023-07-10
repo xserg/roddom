@@ -314,7 +314,18 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('дата создания')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('profile_fulfilled_at')->label('дата заполнения профиля')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('referrer.name')->label('реферер')->toggleable(),
-                Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')->counts('referrals')->sortable()->toggleable(isToggledHiddenByDefault: true),
+//                Tables\Columns\TextColumn::make('referrals_count')->label('количество рефералов')
+//                    ->formatStateUsing(function (callable $get) {
+//                        $record = $get('id');
+//                        $allLevelsReferralsCount =
+//                            $record->referrals()->count() +
+//                            $record->referralsSecondLevel()->count() +
+//                            $record->referralsThirdLevel()->count() +
+//                            $record->referralsFourthLevel()->count() +
+//                            $record->referralsFifthLevel()->count();
+//
+//                        return $allLevelsReferralsCount;
+//                    }),
             ])
             ->filters([
                 //
