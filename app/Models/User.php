@@ -13,27 +13,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
-use Kalnoy\Nestedset\DescendantsRelation;
-use Kalnoy\Nestedset\NodeTrait;
 use Laravel\Sanctum\HasApiTokens;
-use SolutionForest\FilamentTree\Concern\ModelTree;
 use Staudenmeir\EloquentHasManyDeep\HasManyDeep;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 use Staudenmeir\EloquentHasManyDeep\HasTableAlias;
-use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias, ModelTree, NodeTrait {
-        NodeTrait::children insteadof ModelTree;
-        NodeTrait::isRoot insteadof ModelTree;
-        ModelTree::children as recursiveChildren;
-        ModelTree::isRoot as recursiveScopeIsRoot;
-    }
+    use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias;
 
     protected $appends = ['purchased_lectures_counter'];
-
-    private $descendants = [];
 
     protected $fillable = [
         'email',
@@ -74,8 +63,6 @@ class User extends Authenticatable implements FilamentUser
                 $user->ref_token = Str::uuid();
             }
         });
-
-        static::saved(fn () => User::fixTree());
     }
 
     public function watchedLectures(): BelongsToMany
@@ -117,7 +104,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasMany(Subscription::class)->orderBy('created_at', 'desc');
+    }
+
+    public function latestSubscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
     }
 
     public function lectureSubscriptions(): HasMany
@@ -185,11 +177,35 @@ class User extends Authenticatable implements FilamentUser
         );
     }
 
-    public function referralsOfReferrals(): HasManyDeep
+    public function referralsSecondLevel(): HasManyDeep
     {
         return $this->hasManyDeepFromRelations(
             $this->referrals(),
-            (new User())->setAlias('users-alias')->referrals()
+            (new User())->setAlias('users-alias-2')->referrals()
+        );
+    }
+
+    public function referralsThirdLevel(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->referralsSecondLevel(),
+            (new User())->setAlias('users-alias-3')->referrals()
+        );
+    }
+
+    public function referralsFourthLevel(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->referralsThirdLevel(),
+            (new User())->setAlias('users-alias-4')->referrals()
+        );
+    }
+
+    public function referralsFifthLevel(): HasManyDeep
+    {
+        return $this->hasManyDeepFromRelations(
+            $this->referralsFourthLevel(),
+            (new User())->setAlias('users-alias-5')->referrals()
         );
     }
 
@@ -268,14 +284,8 @@ class User extends Authenticatable implements FilamentUser
         ])->save();
     }
 
-
     public function determineTitleColumnName(): string
     {
         return ! is_null($this->name) ? 'name' : 'email';
-    }
-
-    public function getParentIdName(): string
-    {
-        return 'referrer_id';
     }
 }

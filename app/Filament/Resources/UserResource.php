@@ -44,8 +44,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_admin', 0)
-            ->withCount(['descendants']);
+            ->where('is_admin', 0);
     }
 
     public static function form(Form $form): Form
@@ -151,9 +150,17 @@ class UserResource extends Resource
                     Forms\Components\Select::make('referrer_id')
                         ->options(function (string $context, ?Model $record) {
                             if ($context === 'edit') {
+                                $allLevelsReferralsAndSelfIds = [
+                                    ...$record->referrals()->pluck('users.id')->toArray(),
+                                    ...$record->referralsSecondLevel()->pluck('users.id')->toArray(),
+                                    ...$record->referralsThirdLevel()->pluck('users.id')->toArray(),
+                                    ...$record->referralsFourthLevel()->pluck('users.id')->toArray(),
+                                    ...$record->referralsFifthLevel()->pluck('users.id')->toArray(),
+                                    $record->id
+                                ];
                                 $users = User::select(['name', 'email', 'id'])
                                     ->where('is_admin', 0)
-                                    ->whereNotIn('id', User::query()->descendantsAndSelf($record->id)->pluck('id')->toArray())
+                                    ->whereNotIn('id', $allLevelsReferralsAndSelfIds)
                                     ->get();
                             } elseif ($context === 'create') {
                                 $users = User::select(['name', 'email', 'id'])
@@ -184,93 +191,105 @@ class UserResource extends Resource
 
                 Forms\Components\Placeholder::make('descendants_count')
                     ->label('Количество рефералов')
-                    ->content(fn (?Model $record) => $record?->descendants_count)
+                    ->content(function (?Model $record) {
+                        $allLevelsReferralsCount =
+                            $record->referrals()->count() +
+                            $record->referralsSecondLevel()->count() +
+                            $record->referralsThirdLevel()->count() +
+                            $record->referralsFourthLevel()->count() +
+                            $record->referralsFifthLevel()->count();
+
+                        return $allLevelsReferralsCount;
+                    })
                     ->columnSpan(2)
                     ->visible(fn (string $context) => $context === 'edit'),
                 /*
                  * SUBSCRIPTIONS - REPEATER
                  */
 
-                Forms\Components\Grid::make()
+                Forms\Components\Section::make('Подписки')
                     ->schema([
-                        Repeater::make('subscriptions')
-                            ->relationship('subscriptions')
-                            ->label('Подписки')
-                            ->columnSpan(1)
-                            ->columns(2)
-                            ->createItemButtonLabel('Добавить подписку')
+                        Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\Select::make('subscriptionable_type')
-                                    ->required()
-                                    ->disableLabel()
-                                    ->placeholder('тип подписки')
-                                    ->options([
-                                        Lecture::class => 'Лекция',
-                                        Category::class => 'Категория',
-                                        Promo::class => 'Промопак лекций',
-                                        EverythingPack::class => 'Все лекции',
-                                    ])
-                                    ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
-                                        if (
-                                            $component->getState() === Promo::class ||
-                                            $component->getState() === EverythingPack::class
-                                        ) {
-                                            $set('subscriptionable_id', 1);
-                                        } else {
-                                            $set('subscriptionable_id', null);
-                                        }
-                                    })
-                                    ->reactive(),
-                                Forms\Components\Select::make('period_id')
-                                    ->relationship('period', 'length')
-                                    ->getOptionLabelFromRecordUsing(fn (?Model $record) => "дней: {$record->length}")
-                                    ->placeholder('период, дней')
-                                    ->disableLabel()
-                                    ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
-                                        if (is_null($state)) {
-                                            return;
-                                        }
+                                Repeater::make('subscriptions')
+                                    ->relationship('subscriptions')
+                                    ->label('Подписки')
+                                    ->columnSpan(1)
+                                    ->columns(2)
+                                    ->createItemButtonLabel('Добавить подписку')
+                                    ->schema([
+                                        Forms\Components\Select::make('subscriptionable_type')
+                                            ->required()
+                                            ->disableLabel()
+                                            ->placeholder('тип подписки')
+                                            ->options([
+                                                Lecture::class => 'Лекция',
+                                                Category::class => 'Категория',
+                                                Promo::class => 'Промопак лекций',
+                                                EverythingPack::class => 'Все лекции',
+                                            ])
+                                            ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
+                                                if (
+                                                    $component->getState() === Promo::class ||
+                                                    $component->getState() === EverythingPack::class
+                                                ) {
+                                                    $set('subscriptionable_id', 1);
+                                                } else {
+                                                    $set('subscriptionable_id', null);
+                                                }
+                                            })
+                                            ->reactive(),
+                                        Forms\Components\Select::make('period_id')
+                                            ->relationship('period', 'length')
+                                            ->getOptionLabelFromRecordUsing(fn (?Model $record) => "дней: {$record->length}")
+                                            ->placeholder('период, дней')
+                                            ->disableLabel()
+                                            ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                                                if (is_null($state)) {
+                                                    return;
+                                                }
 
-                                        $periodLength = Period::query()->firstWhere('id', $state)->length;
-                                        $set('start_date', now()->toDateTimeString());
-                                        $set('end_date', now()->addDays($periodLength)->toDateTimeString());
-                                    })
-                                    ->reactive()
-                                    ->required(),
-                                Forms\Components\Select::make('subscriptionable_id')
-                                    ->placeholder('объект подписки')
-                                    ->options(function (Closure $set, Closure $get) {
-                                        $type = $get('subscriptionable_type');
-                                        return match ($type) {
-                                            Category::class => Category::orderBy('title')->pluck('title', 'id'),
-                                            Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
-                                            Promo::class => Promo::all()->pluck('id', 'id'),
-                                            EverythingPack::class => [1 => 1],
-                                            default => null
-                                        };
-                                    })
-                                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
-                                        $get('subscriptionable_type') === Promo::class ||
-                                        $get('subscriptionable_type') === EverythingPack::class)
+                                                $periodLength = Period::query()->firstWhere('id', $state)->length;
+                                                $set('start_date', now()->toDateTimeString());
+                                                $set('end_date', now()->addDays($periodLength)->toDateTimeString());
+                                            })
+                                            ->reactive()
+                                            ->required(),
+                                        Forms\Components\Select::make('subscriptionable_id')
+                                            ->placeholder('объект подписки')
+                                            ->options(function (Closure $set, Closure $get) {
+                                                $type = $get('subscriptionable_type');
+                                                return match ($type) {
+                                                    Category::class => Category::orderBy('title')->pluck('title', 'id'),
+                                                    Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
+                                                    Promo::class => Promo::all()->pluck('id', 'id'),
+                                                    EverythingPack::class => [1 => 1],
+                                                    default => null
+                                                };
+                                            })
+                                            ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
+                                                $get('subscriptionable_type') === Promo::class ||
+                                                $get('subscriptionable_type') === EverythingPack::class)
 //                                    ->visible(fn (Closure $get) =>
 //                                        $get('subscriptionable_type') === Lecture::class ||
 //                                        $get('subscriptionable_type') === Category::class
 //                                    )
-                                    ->dehydrated()
-                                    ->required()
-                                    ->disableLabel()
-                                    ->columnSpan(2),
-                                Forms\Components\DateTimePicker::make('start_date')
-                                    ->placeholder('начало подписки')
-                                    ->disableLabel()
-                                    ->required(),
-                                Forms\Components\DateTimePicker::make('end_date')
-                                    ->placeholder('окончание подписки')
-                                    ->disableLabel()
-                                    ->required(),
-                            ])
-                            ->visible(fn (string $context) => $context === 'edit')
-                    ])
+                                            ->dehydrated()
+                                            ->required()
+                                            ->disableLabel()
+                                            ->columnSpan(2),
+                                        Forms\Components\DateTimePicker::make('start_date')
+                                            ->placeholder('начало подписки')
+                                            ->disableLabel()
+                                            ->required(),
+                                        Forms\Components\DateTimePicker::make('end_date')
+                                            ->placeholder('окончание подписки')
+                                            ->disableLabel()
+                                            ->required(),
+                                    ])
+                                    ->visible(fn (string $context) => $context === 'edit')
+                            ]),
+                    ])->collapsible()->collapsed()
             ]);
     }
 
@@ -347,7 +366,6 @@ class UserResource extends Resource
         return [
             ReferralsPaymentsRelationManager::class,
             ReferralsMadePaymentsRelationManager::class,
-            ReferralsRelationManager::class,
         ];
     }
 

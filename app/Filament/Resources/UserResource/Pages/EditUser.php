@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
+use App\Models\User;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
-
     protected static ?string $navigationLabel = 'Пользователи';
 
     protected function getActions(): array
@@ -24,11 +24,20 @@ class EditUser extends EditRecord
                         return true;
                     }
                 }),
+//            Actions\Action::make('refs')
+//                ->url(fn (?User $record): string => UserResource::getUrl('refs', ['record' => $record]))
         ];
     }
 
     public function hasCombinedRelationManagerTabsWithForm(): bool
     {
         return true;
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            UserResource\Widgets\ReferralsOfUserWidget::class,
+        ];
     }
 }
