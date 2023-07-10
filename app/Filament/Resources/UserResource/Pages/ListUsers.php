@@ -21,9 +21,6 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
-            Actions\Action::make('дерево_рефералов')
-                ->color('secondary')
-                ->url(route('filament.resources.users.tree-list'))
         ];
     }
 
