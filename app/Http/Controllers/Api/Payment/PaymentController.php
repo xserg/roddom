@@ -124,11 +124,11 @@ class PaymentController extends Controller
                                 'price' => $order->price,
                             ]);
                         }
-                        $this->userService->rewardReferrers($order, $orderedUser);
                         $order->save();
                         $subscription->save();
                     });
 
+                    $this->userService->rewardReferrers($order, $order->user);
                     $appInfo = AppInfo::query()->first();
                     $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();

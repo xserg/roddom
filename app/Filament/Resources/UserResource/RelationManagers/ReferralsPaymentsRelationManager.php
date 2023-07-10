@@ -39,13 +39,7 @@ class ReferralsPaymentsRelationManager extends RelationManager
                     ->label('имя'),
                 Tables\Columns\TextColumn::make('depth_level')
                     ->formatStateUsing(function (?string $state) {
-                        if ((int) $state === 1) {
-                            return 'реферал';
-                        } elseif ((int) $state === 2) {
-                            return 'реферал реферала';
-                        }
-
-                        return $state;
+                        return "реферал {$state} уровня";
                     })
                     ->label('глубина')
                     ->sortable(),

@@ -367,7 +367,7 @@ class UserService
         }
     }
 
-    public function rewardReferrers(Order $order, User $buyer)
+    public function rewardReferrers(Order $order, User $buyer): void
     {
         $refInfo = RefInfo::query()->first();
         $residualAmount = $order->price - $order->points;
@@ -384,12 +384,12 @@ class UserService
                 $buyer->referralsFifthLevel(),
             ];
 
+            $depth = 1;
             foreach ($relationships as $relationship) {
-                $depth = 1;
 
                 [$depth, $percent] = $relationship === $buyer->referrer() ?
                     [$depth, $percentRefFirst] :
-                    [$depth++, $percentRefSecondToFifth];
+                    [++$depth, $percentRefSecondToFifth];
 
                 if ($relationship->exists()) {
                     $referrer = $relationship->first();
