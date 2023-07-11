@@ -39,7 +39,7 @@ class ReferralsPaymentsRelationManager extends RelationManager
                     ->label('имя'),
                 Tables\Columns\TextColumn::make('depth_level')
                     ->formatStateUsing(function (?string $state) {
-                        return "реферал {$state} уровня";
+                        return $state ? "реферал {$state} уровня" : '';
                     })
                     ->label('глубина')
                     ->sortable(),
@@ -56,6 +56,9 @@ class ReferralsPaymentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(fn (?string $state) => $state / 100)
                     ->label('стоимость покупки')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('начислено в')
                     ->sortable()
             ])
             ->filters([
