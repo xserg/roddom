@@ -130,13 +130,13 @@ class LoginCodeController extends Controller
         $name = $request->validated('device_name', 'access_token');
         $token = $user->tokens()->firstWhere('name', $name);
 
-        if ($user->tokens()->count() === 3) {
+        if (! $token && $user->tokens()->count() === 3) {
             $token = $user->tokens()
-                ->orderBy('last_used_at')
+                ->orderBy('created_at')
                 ->first();
         }
 
-        $token->delete();
+        $token?->delete();
         $token = $user
             ->createToken($name ?? 'access_token')
             ->plainTextToken;
