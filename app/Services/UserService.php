@@ -121,7 +121,8 @@ class UserService
             ->latest('id')
             ->first();
 
-        if ($allLectureSubscription) {
+        if ($allLectureSubscription && ! $lecture->isFree()) {
+            $user->watchedLecturesHistory()->attach($lectureId);
             return $lecture->content;
         }
 
