@@ -66,17 +66,28 @@ class User extends Authenticatable implements FilamentUser
         });
     }
 
-    public function watchedLectures(): BelongsToMany
+    public function freeWatchedLectures(): BelongsToMany
     {
         return $this->belongsToMany(
             Lecture::class,
-            'user_to_watched_lectures',
-            'user_id',
-            'lecture_id'
+            'user_to_free_watched_lectures',
         )
             ->withPivot(['available_until'])
-            ->withTimestamps()
-            ->orderByPivot('updated_at', 'desc');
+            ->withTimestamps();
+    }
+
+    public function watchedLecturesHistory(): BelongsToMany
+    {
+        return $this->belongsToMany(Lecture::class, 'user_to_watched_lectures')
+            ->using(WatchedLecturesUsersPivot::class)
+            ->withTimestamps();
+    }
+
+    public function watchedLectures(): BelongsToMany
+    {
+        return $this->belongsToMany(Lecture::class, 'user_to_watched_lectures')
+            ->using(WatchedLecturesUsersPivot::class)
+            ->distinct();
     }
 
     public function savedLectures(): BelongsToMany
@@ -84,8 +95,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(
             Lecture::class,
             'user_to_saved_lectures',
-            'user_id',
-            'lecture_id'
         )
             ->withTimestamps()
             ->orderByPivot('updated_at', 'desc');
@@ -96,8 +105,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(
             Lecture::class,
             'user_to_list_watched_lectures',
-            'user_id',
-            'lecture_id'
         )
             ->withTimestamps()
             ->orderByPivot('updated_at', 'desc');

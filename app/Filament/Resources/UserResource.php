@@ -8,6 +8,7 @@ use App\Filament\Resources\UserResource\RelationManagers\ReferralsMadePaymentsRe
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsOfReferralsRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsPaymentsRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsRelationManager;
+use App\Filament\Resources\UserResource\RelationManagers\WatchedLecturesHistoryRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\Lecture;
@@ -377,6 +378,7 @@ class UserResource extends Resource
         return [
             ReferralsPaymentsRelationManager::class,
             ReferralsMadePaymentsRelationManager::class,
+            WatchedLecturesHistoryRelationManager::class
         ];
     }
 

@@ -127,13 +127,14 @@ class UserService
 
         if ($lecture->isFree()) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
+                $user->watchedLecturesHistory()->attach($lectureId);
                 return $lecture->content;
             }
 
             if ($this->userCanWatchNewFreeLecture($user)) {
                 $hoursAvailableToWatch = AppInfo::query()->first()?->free_lecture_hours ?? 24;
 
-                $user->watchedLectures()->syncWithoutDetaching(
+                $user->freeWatchedLectures()->syncWithoutDetaching(
                     [$lectureId => ['available_until' => now()->addHours($hoursAvailableToWatch)]]
                 );
 
@@ -141,6 +142,7 @@ class UserService
                     throw new FailedSaveUserException();
                 }
 
+                $user->watchedLecturesHistory()->attach($lectureId);
                 return $lecture->content;
             }
 
@@ -149,6 +151,8 @@ class UserService
             );
         } else {
             if ($this->isLecturePurchased($lectureId)) {
+
+                $user->watchedLecturesHistory()->attach($lectureId);
                 return $lecture->content;
             }
 
@@ -343,8 +347,8 @@ class UserService
     private function isFreeLectureAvailable(int $lectureId, User $user): bool
     {
         $lecture = $user
-            ->watchedLectures
-            ->firstWhere('id', $lectureId);
+            ->freeWatchedLectures()
+            ->firstWhere('lecture_id', $lectureId);
 
         if (! $lecture) {
             return false;

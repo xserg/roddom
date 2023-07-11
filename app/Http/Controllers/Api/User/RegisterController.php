@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\RegisterRequest;
 use App\Mail\SendLoginCode;
-use App\Models\RefLink;
 use App\Models\User;
 use App\Services\LoginCodeService;
 use App\Services\UserService;

@@ -94,9 +94,7 @@ class Lecture extends Model
         return $this->belongsToMany(
             User::class,
             'user_to_watched_lectures',
-            'lecture_id',
-            'user_id'
-        );
+        )->distinct();
     }
 
     public function listWatchedUsers(): BelongsToMany
@@ -104,8 +102,6 @@ class Lecture extends Model
         return $this->belongsToMany(
             User::class,
             'user_to_list_watched_lectures',
-            'lecture_id',
-            'user_id'
         );
     }
 
@@ -114,8 +110,6 @@ class Lecture extends Model
         return $this->belongsToMany(
             User::class,
             'user_to_saved_lectures',
-            'lecture_id',
-            'user_id'
         )->withTimestamps();
     }
 
