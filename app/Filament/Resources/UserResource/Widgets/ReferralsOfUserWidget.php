@@ -4,10 +4,12 @@ namespace App\Filament\Resources\UserResource\Widgets;
 
 use App\Models\User;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Widgets\TableWidget as Widget;
 
 //use Filament\Widgets\Widget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ReferralsOfUserWidget extends Widget
 {
@@ -42,15 +44,35 @@ class ReferralsOfUserWidget extends Widget
 
     protected function getTableColumns(): array
     {
+        $allLevelsReferralsId = [
+            '1' => $this->record->referrals()->pluck('users.id')->toArray(),
+            '2' => $this->record->referralsSecondLevel()->pluck('users.id')->toArray(),
+            '3' => $this->record->referralsThirdLevel()->pluck('users.id')->toArray(),
+            '4' => $this->record->referralsFourthLevel()->pluck('users.id')->toArray(),
+            '5' => $this->record->referralsFifthLevel()->pluck('users.id')->toArray(),
+        ];
+
         return [
             Tables\Columns\TextColumn::make('name')->label('имя'),
             Tables\Columns\TextColumn::make('email')->label('email'),
+            Tables\Columns\TextColumn::make('depth')->label('уровень')
+                ->formatStateUsing(function (?Model $record) use ($allLevelsReferralsId) {
+                    foreach ($allLevelsReferralsId as $depth => $ids) {
+                        if (in_array($record->id, $ids)) {
+                            return $depth;
+                        }
+                    }
+                    return 'не определен';
+                }),
         ];
     }
 
     protected function getTableActions(): array
     {
         return [
+            Action::make('Страница_пользователя')
+                ->url(fn (User $record): string => route('filament.resources.users.edit', $record))
+                ->openUrlInNewTab()
 //            Tables\Actions\ViewAction::make()
 //                ->form([
 //                    Forms\Components\Select::make('company_id')

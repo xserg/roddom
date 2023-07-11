@@ -121,6 +121,7 @@ class LoginCodeController extends Controller
                 ]);
 
                 $user->markCantGetReferralsBonus();
+                $user->refresh();
             }
         }
 
