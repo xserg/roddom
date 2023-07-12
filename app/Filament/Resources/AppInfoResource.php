@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
+use Livewire\TemporaryUploadedFile;
 
 class AppInfoResource extends Resource
 {
@@ -246,16 +247,16 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Строка "x приглашает Вас присоединиться к интересным материалам в Школе Мам и Пап"'),
-                                 Forms\Components\FileUpload::make('ref_system_preview_picture')
-                                     ->directory('images/app')
-                                     ->required()
-                                     ->columnSpan(1)
-                                     ->image()
-                                     ->getUploadedFileNameForStorageUsing(
-                                         function (): string {
-                                             return 'ref_system_preview_picture';
-                                         })
-                                     ->label('картинка реферальной системы'),
+                                Forms\Components\FileUpload::make('ref_system_preview_picture')
+                                    ->directory('images/app')
+                                    ->required()
+                                    ->columnSpan(1)
+                                    ->image()
+                                    ->getUploadedFileNameForStorageUsing(
+                                        function (TemporaryUploadedFile $file): string {
+                                            return 'ref_system_preview_picture.' . $file->extension();
+                                        })
+                                    ->label('картинка реферальной системы'),
                             ])->columns(2),
                     ])
                     ->collapsible()
