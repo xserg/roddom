@@ -13,7 +13,7 @@ class ReferralsMadePaymentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'refPointsMadePayments';
     protected static ?string $recordTitleAttribute = 'email';
-    protected static ?string $title = 'История списания бебикоинов';
+    protected static ?string $title = 'Списание бебикоинов';
 
     public static function form(Form $form): Form
     {

@@ -153,11 +153,6 @@ class ReferralsOfUserWidget extends Widget
         ];
     }
 
-    protected function isTablePaginationEnabled(): bool
-    {
-        return false;
-    }
-
     protected function getTableHeaderActions(): array
     {
         return [

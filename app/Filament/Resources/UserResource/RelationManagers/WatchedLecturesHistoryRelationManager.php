@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class WatchedLecturesHistoryRelationManager extends RelationManager
 {
@@ -36,7 +37,8 @@ class WatchedLecturesHistoryRelationManager extends RelationManager
             ->defaultSort('pivot_created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Лекция'),
+                    ->label('Лекция')
+                    ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('pivot.created_at')
                     ->label('Просмотрена')
                     ->sortable(query: function (Builder $query, string $direction): Builder {
@@ -45,12 +47,9 @@ class WatchedLecturesHistoryRelationManager extends RelationManager
                     })
             ])
             ->filters([
-                Tables\Filters\Filter::make('сегодня')
-                    ->query(fn (Builder $query): Builder => $query->whereDate((new User)->watchedLecturesHistory()->getTable() . '.created_at', today())),
-                Tables\Filters\Filter::make('за_неделю')
-                    ->query(fn (Builder $query): Builder => $query
-                        ->whereBetween((new User)->watchedLecturesHistory()->getTable() . '.created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
-                    )
+                DateRangeFilter::make('date')
+                    ->useColumn((new User())->watchedLecturesHistory()->getTable() . '.created_at')
+                    ->label('Фильтровать по дате'),
             ], layout: Layout::AboveContent,)
             ->headerActions([
             ])

@@ -4,10 +4,9 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers\DevicesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsMadePaymentsRelationManager;
-use App\Filament\Resources\UserResource\RelationManagers\ReferralsOfReferralsRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsPaymentsRelationManager;
-use App\Filament\Resources\UserResource\RelationManagers\ReferralsRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\WatchedLecturesHistoryRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
@@ -378,7 +377,8 @@ class UserResource extends Resource
         return [
             ReferralsPaymentsRelationManager::class,
             ReferralsMadePaymentsRelationManager::class,
-            WatchedLecturesHistoryRelationManager::class
+            WatchedLecturesHistoryRelationManager::class,
+            DevicesRelationManager::class
         ];
     }
 

@@ -260,6 +260,11 @@ class User extends Authenticatable implements FilamentUser
             ->where('user_id', null);
     }
 
+    public function devices(): HasMany
+    {
+        return $this->hasMany(\App\Models\Device::class);
+    }
+
     public function hasReferrer(): bool
     {
         return $this->referrer()->exists();

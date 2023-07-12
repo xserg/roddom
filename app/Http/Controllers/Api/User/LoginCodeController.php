@@ -127,8 +127,8 @@ class LoginCodeController extends Controller
 
         $this->loginCodeService->deleteRecordsWithCode($code);
 
-        $name = $request->validated('device_name', 'access_token');
-        $token = $user->tokens()->firstWhere('name', $name);
+        $deviceName = $request->validated('device_name', 'access_token');
+        $token = $user->tokens()->firstWhere('name', $deviceName);
 
         if (! $token && $user->tokens()->count() >= 3) {
             $token = $user->tokens()
@@ -138,7 +138,7 @@ class LoginCodeController extends Controller
 
         $token?->delete();
         $token = $user
-            ->createToken($name ?? 'access_token')
+            ->createToken($deviceName ?? 'access_token')
             ->plainTextToken;
 
         $user = $this->userService->appendLectureCountersToUser($user);
