@@ -12,9 +12,12 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class WatchedLecturesUsersPivotResource extends Resource
 {
@@ -39,6 +42,7 @@ class WatchedLecturesUsersPivotResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->limit(15)
@@ -50,6 +54,7 @@ class WatchedLecturesUsersPivotResource extends Resource
                     ->url(function (?Model $record): string {
                         return route('filament.resources.users.edit', ['record' => $record->user]);
                     })
+                    ->searchable(isIndividual: true)
                     ->label('пользователь'),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->limit(35)
@@ -57,19 +62,20 @@ class WatchedLecturesUsersPivotResource extends Resource
                     ->url(function (?Model $record): string {
                         return route('filament.resources.lectures.edit', ['record' => $record->lecture]);
                     })
+                    ->searchable(isIndividual: true)
                     ->label('лекция'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('дата')
                     ->dateTime(),
+
             ])
             ->filters([
-                //
-            ])
+                DateRangeFilter::make('created_at')
+                ->label('Фильтровать по дате'),
+            ], layout: Layout::AboveContent)
             ->actions([
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 
