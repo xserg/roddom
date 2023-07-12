@@ -26,7 +26,7 @@ class DevicesRelationManager extends RelationManager
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('last_used_at')
+            ->defaultSort('last_used_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('device_name')
                     ->label('устройство'),
