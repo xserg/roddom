@@ -253,7 +253,7 @@ class AppInfoResource extends Resource
                                      ->image()
                                      ->getUploadedFileNameForStorageUsing(
                                          function (): string {
-                                             return 'ref_system_preview_picture.jpeg';
+                                             return 'ref_system_preview_picture';
                                          })
                                      ->label('картинка реферальной системы'),
                             ])->columns(2),
