@@ -31,7 +31,7 @@ class DevicesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('device_name')
                     ->label('устройство'),
                 Tables\Columns\TextColumn::make('last_used_at')
-                    ->label('последний логин'),
+                    ->label('последнее использование'),
             ])
             ->filters([
                 //
