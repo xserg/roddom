@@ -201,6 +201,11 @@ class SubscriptionResource extends Resource
                     ->toggleable()
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('создана')
+                    ->toggleable()
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([//
             ])
