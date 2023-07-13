@@ -207,7 +207,8 @@ class UserResource extends Resource
                  * SUBSCRIPTIONS - REPEATER
                  */
 
-                Forms\Components\Section::make('Подписки')
+                Forms\Components\Section::make(fn (?Model $record) => 'Подписки (' . $record?->subscriptions()->count() . ')')
+                    ->visible(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Grid::make()
                             ->schema([

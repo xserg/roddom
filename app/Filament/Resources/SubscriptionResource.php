@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Models\Category;
 use App\Models\EverythingPack;
@@ -154,7 +155,7 @@ class SubscriptionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('id', 'desc')
+//            ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Пользователь')
@@ -202,6 +203,9 @@ class SubscriptionResource extends Resource
                     ->sortable(),
             ])
             ->filters([//
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('Export'),
             ])
             ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);

@@ -12,6 +12,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
@@ -19,7 +20,7 @@ class WatchedLecturesHistoryRelationManager extends RelationManager
 {
     protected static string $relationship = 'watchedLecturesHistory';
     protected static ?string $recordTitleAttribute = 'title';
-    protected static ?string $title = 'История просмотров лекций';
+    protected static ?string $title = 'Просмотры лекций';
 
     public static function form(Form $form): Form
     {
@@ -38,6 +39,9 @@ class WatchedLecturesHistoryRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Лекция')
+                    ->url(function (?Model $record): string {
+                        return route('filament.resources.users.edit', ['record' => $record]);
+                    })
                     ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('pivot.created_at')
                     ->label('Просмотрена')
