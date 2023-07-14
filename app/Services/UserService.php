@@ -8,9 +8,9 @@ use App\Exceptions\UserCannotRemoveFromSavedLectureException;
 use App\Exceptions\UserCannotSaveLectureException;
 use App\Exceptions\UserCannotWatchFreeLectureException;
 use App\Exceptions\UserCannotWatchPaidLectureException;
+use App\Jobs\AddLectureToWatchHistory;
 use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
-use App\Models\EverythingPack;
 use App\Models\Order;
 use App\Models\RefInfo;
 use App\Models\RefPointsPayments;
@@ -122,13 +122,13 @@ class UserService
             ->first();
 
         if ($allLectureSubscription && ! $lecture->isFree()) {
-            $user->watchedLecturesHistory()->attach($lectureId);
+            AddLectureToWatchHistory::dispatch($user, $lectureId);
             return $lecture->content;
         }
 
         if ($lecture->isFree()) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
-                $user->watchedLecturesHistory()->attach($lectureId);
+                AddLectureToWatchHistory::dispatch($user, $lectureId);
                 return $lecture->content;
             }
 
@@ -143,7 +143,7 @@ class UserService
                     throw new FailedSaveUserException();
                 }
 
-                $user->watchedLecturesHistory()->attach($lectureId);
+                AddLectureToWatchHistory::dispatch($user, $lectureId);
                 return $lecture->content;
             }
 
@@ -153,7 +153,8 @@ class UserService
         } else {
             if ($this->isLecturePurchased($lectureId)) {
 
-                $user->watchedLecturesHistory()->attach($lectureId);
+                AddLectureToWatchHistory::dispatch($user, $lectureId);
+
                 return $lecture->content;
             }
 
