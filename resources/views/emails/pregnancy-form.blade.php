@@ -338,7 +338,20 @@
                             <!-- Body content -->
                             <tr>
                                 <td class="content-cell">
-                                    <h1>Покупка успешно совершена</h1>
+
+                                    <table align="center" width="570" cellpadding="0" cellspacing="0"
+                                           role="presentation">
+                                        @foreach($html as $key => $value)
+                                            <tr>
+                                                <td align="center">
+                                                    {{$key}}
+                                                </td>
+                                                <td align="center">
+                                                    {{$value}}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
                                 </td>
                             </tr>
                         </table>
