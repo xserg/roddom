@@ -28,7 +28,7 @@ class WizardResource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $label = 'Форма «Мой план родов»';
     protected static ?string $navigationGroup = 'Форма «Мой план родов»';
-    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $recordTitleAttribute = 'title';
     protected static ?string $pluralModelLabel = 'Шаги формы';
 
     public static function form(Form $form): Form
@@ -38,10 +38,19 @@ class WizardResource extends Resource
                 TextInput::make('order')
                     ->required()
                     ->label('порядковый номер')
+                    ->integer()
                     ->columnSpan(2),
                 TextInput::make('title')
                     ->required()
                     ->label('наименование')
+                    ->columnSpan(2),
+                TextInput::make('subtitle')
+                    ->required()
+                    ->label('заголовок')
+                    ->columnSpan(2),
+                TextInput::make('description')
+                    ->required()
+                    ->label('описание')
                     ->columnSpan(2),
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record?->order ? "шаг {$record->order}" : "шаг формы")
@@ -96,7 +105,7 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Forms\Components\TextInput::make('field-text-1')
+                                Forms\Components\TextInput::make('field_text_1')
                                     ->label('текст поля 1'),
                             ]),
                         Builder\Block::make('question-type-two-text-field')
@@ -108,9 +117,9 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Forms\Components\TextInput::make('field-text-1')
+                                Forms\Components\TextInput::make('field_text_1')
                                     ->label('текст поля 1'),
-                                Forms\Components\TextInput::make('field-text-2')
+                                Forms\Components\TextInput::make('field_text_2')
                                     ->label('текст поля 2'),
                             ]),
                         Builder\Block::make('question-type-three-text-field')
@@ -122,11 +131,11 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Forms\Components\TextInput::make('field-text-1')
+                                Forms\Components\TextInput::make('field_text_1')
                                     ->label('текст поля 1'),
-                                Forms\Components\TextInput::make('field-text-2')
+                                Forms\Components\TextInput::make('field_text_2')
                                     ->label('текст поля 2'),
-                                Forms\Components\TextInput::make('field-text-3')
+                                Forms\Components\TextInput::make('field_text_3')
                                     ->label('текст поля 3'),
                             ]),
                         Builder\Block::make('question-type-one-number-field')
@@ -138,7 +147,7 @@ class WizardResource extends Resource
                                 TextInput::make('description')
                                     ->label('текст описания'),
 
-                                Forms\Components\TextInput::make('field-text-1')
+                                Forms\Components\TextInput::make('field_text_1')
                                     ->label('текст поля 1')
                                     ->integer(),
                             ]),
