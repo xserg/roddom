@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PurchaseSuccess extends Mailable
+class PregnancyForm extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -16,14 +16,7 @@ class PurchaseSuccess extends Mailable
      * Create a new message instance.
      */
     public function __construct(
-        public        $subject,
-        public string $appLink,
-        public string $appName,
-        public string $text,
-        public string $entity,
-        public string $dateStart,
-        public string $dateEnd,
-        public string $image
+        private string $htmlString
     ) {
         //
     }
@@ -34,7 +27,7 @@ class PurchaseSuccess extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: $this->subject,
+            subject: 'form',
         );
     }
 
@@ -44,7 +37,7 @@ class PurchaseSuccess extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.purchase-success',
+            view: 'emails.pregnancy-form',
         );
     }
 

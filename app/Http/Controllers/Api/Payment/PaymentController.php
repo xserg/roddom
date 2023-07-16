@@ -129,16 +129,19 @@ class PaymentController extends Controller
                     });
 
                     $this->userService->rewardReferrers($order, $order->user);
-                    $appInfo = AppInfo::query()->first();
+                    $appInfo = AppInfo::first();
                     $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();
                     $image = Storage::url($appInfo->successful_purchase_image);
-                    $appLink = $appInfo->app_link_share_link ?? 'мамы.online';
+                    $appLink = $appInfo?->app_link_share_link ?? config('app.url');
+                    $appName = $appInfo?->app_title ?? config('app.name');
+
                     Mail::to($email)
                         ->send(
                             (new PurchaseSuccess(
                                 'Успешная покупка',
                                 $appLink,
+                                $appName,
                                 $successfulPurchaseText,
                                 $subscription->entity_title,
                                 $subscription->start_date->isoFormat('HH:mm DD.MM.YYYY'),
