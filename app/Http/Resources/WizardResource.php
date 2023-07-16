@@ -12,8 +12,6 @@ class WizardResource extends JsonResource
         return [
             'index' => $this->order,
             'title' => $this->title,
-            'subtitle' => $this->subtitle,
-            'description' => $this->description,
             'form' => $this->form,
         ];
     }

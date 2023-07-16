@@ -35,7 +35,7 @@ use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\ResendLoginCodeController;
-use App\Http\Controllers\Api\Wizard\WizardController;
+use App\Http\Controllers\Api\Wizard\WizardControllerRetrieve;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
@@ -91,6 +91,7 @@ Route::prefix('v1')
             Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');
             Route::get('/lecture/{id}', RetrieveLectureController::class)
+                ->middleware(['throttle:1,0.015'])
                 ->name('lecture');
             Route::post('/lecture/{id}/rate', \App\Http\Controllers\Api\Lecture\RateLectureController::class)
                 ->name('lecture.rate');
@@ -138,7 +139,8 @@ Route::prefix('v1')
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
 
-            Route::get('/pregnancy-plan-form', WizardController::class);
+            Route::get('/pregnancy-plan-form', WizardControllerRetrieve::class);
+//            Route::post('/pregnancy-plan-form', WizardControllerRetrieve::class);
         });
     });
 

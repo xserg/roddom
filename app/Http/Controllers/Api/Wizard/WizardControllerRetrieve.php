@@ -8,7 +8,7 @@ use App\Models\Wizard;
 use App\Models\WizardInfo;
 use Illuminate\Http\Request;
 
-class WizardController extends Controller
+class WizardControllerRetrieve extends Controller
 {
     public function __construct()
     {
