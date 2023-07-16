@@ -44,14 +44,6 @@ class WizardResource extends Resource
                     ->required()
                     ->label('наименование')
                     ->columnSpan(2),
-                TextInput::make('subtitle')
-                    ->required()
-                    ->label('заголовок')
-                    ->columnSpan(2),
-                TextInput::make('description')
-                    ->required()
-                    ->label('описание')
-                    ->columnSpan(2),
                 Builder::make('form')
                     ->label(fn (?Model $record) => $record?->order ? "шаг {$record->order}" : "шаг формы")
                     ->columnSpan(2)
