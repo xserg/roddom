@@ -14,7 +14,7 @@ class PregnancyFormEmailNotification extends Notification
     use Queueable;
 
     public function __construct(
-        private array $html,
+        private string $html,
         private string $appLink,
         private string $appName,
     ) {

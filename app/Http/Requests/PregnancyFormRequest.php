@@ -9,7 +9,7 @@ class PregnancyFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'data' => 'required|array'
+            'data' => 'required|string'
         ];
     }
 }
