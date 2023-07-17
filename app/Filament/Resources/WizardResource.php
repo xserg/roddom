@@ -143,6 +143,18 @@ class WizardResource extends Resource
                                     ->label('текст поля 1')
                                     ->integer(),
                             ]),
+                        Builder\Block::make('question-type-one-date-field')
+                            ->label('одно поле с датой')
+                            ->schema([
+                                TextInput::make('text')
+                                    ->label('текст вопроса')
+                                    ->required(),
+                                TextInput::make('description')
+                                    ->label('текст описания'),
+
+                                Forms\Components\TextInput::make('field_date')
+                                    ->label('поле с датой'),
+                            ]),
                         Builder\Block::make('textarea')
                             ->label('просто текст/textarea')
                             ->schema([
