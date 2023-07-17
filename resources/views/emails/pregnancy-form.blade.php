@@ -338,23 +338,7 @@
                             <!-- Body content -->
                             <tr>
                                 <td class="content-cell">
-
-                                    <table align="center" width="570" cellpadding="0" cellspacing="0"
-                                           role="presentation">
-{{--                                        html as array --}}
-{{--                                                                         --}}
-{{--                                        @foreach($html as $key => $value)--}}
-{{--                                            <tr>--}}
-{{--                                                <td align="center">--}}
-{{--                                                    {{$key}}--}}
-{{--                                                </td>--}}
-{{--                                                <td align="center">--}}
-{{--                                                    {{$value}}--}}
-{{--                                                </td>--}}
-{{--                                            </tr>--}}
-{{--                                        @endforeach--}}
-                                        {{ $html }}
-                                    </table>
+                                    {{$html}}
                                 </td>
                             </tr>
                         </table>
