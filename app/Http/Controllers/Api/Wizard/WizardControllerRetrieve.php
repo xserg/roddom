@@ -7,6 +7,7 @@ use App\Http\Resources\WizardResource;
 use App\Models\Wizard;
 use App\Models\WizardInfo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class WizardControllerRetrieve extends Controller
 {
@@ -16,9 +17,12 @@ class WizardControllerRetrieve extends Controller
 
     public function __invoke(Request $request)
     {
+        $wizardSteps = WizardResource::collection(Wizard::query()->orderBy('order')->get());
+        $wizardCommonTitles = WizardInfo::query()->pluck('value', 'key');
+
         return response()->json([
-            'common_titles' => WizardInfo::query()->pluck( 'value', 'key'),
-            'data' => WizardResource::collection(Wizard::query()->orderBy('order')->get()),
+            'common_titles' => $wizardCommonTitles,
+            'data' => $wizardSteps,
         ]);
     }
 }

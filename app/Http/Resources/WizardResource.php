@@ -12,7 +12,7 @@ class WizardResource extends JsonResource
         return [
             'index' => $this->order,
             'title' => $this->title,
-            'form' => $this->form,
+            'form' => $this->formWithIndexes,
         ];
     }
 }
