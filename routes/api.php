@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\AppInfo\AppInfo;
+use App\Http\Controllers\Api\AppInfo\AppAgreementController;
+use App\Http\Controllers\Api\AppInfo\AppInfoController;
 use App\Http\Controllers\Api\Buy\BuyCategoryController;
 use App\Http\Controllers\Api\Buy\BuyAllLecturesController;
 use App\Http\Controllers\Api\Buy\BuyLectureController;
@@ -43,8 +44,9 @@ Route::prefix('v1')
     ->name('v1.')
     ->group(function () {
 
-        Route::get('/app/info', AppInfo::class)
+        Route::get('/app/info', AppInfoController::class)
             ->name('app.info');
+        Route::get('/app/agreement', AppAgreementController::class);
 
         Route::post('/user/register', RegisterController::class)
             ->name('register');

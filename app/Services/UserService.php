@@ -22,6 +22,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -121,12 +122,17 @@ class UserService
             ->latest('id')
             ->first();
 
-        if ($allLectureSubscription && ! $lecture->isFree()) {
+        if ($allLectureSubscription) {
+//        if ($allLectureSubscription && ! $lecture->isFree()) {
             AddLectureToWatchHistory::dispatch($user, $lectureId);
             return $lecture->content;
         }
 
-        if ($lecture->isFree()) {
+        if ($this->isLecturePurchased($lectureId)) {
+            AddLectureToWatchHistory::dispatch($user, $lectureId);
+            return $lecture->content;
+
+        } elseif ($lecture->isFree()) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
                 AddLectureToWatchHistory::dispatch($user, $lectureId);
                 return $lecture->content;
@@ -150,16 +156,9 @@ class UserService
             throw new UserCannotWatchFreeLectureException(
                 'Пользователь не сможет посмотреть новую бесплатную лекцию'
             );
-        } else {
-            if ($this->isLecturePurchased($lectureId)) {
-
-                AddLectureToWatchHistory::dispatch($user, $lectureId);
-
-                return $lecture->content;
-            }
-
-            throw new UserCannotWatchPaidLectureException('Пользователь не сможет посмотреть платную лекцию');
         }
+
+        throw new UserCannotWatchPaidLectureException('Пользователь не сможет посмотреть платную лекцию');
     }
 
     /**

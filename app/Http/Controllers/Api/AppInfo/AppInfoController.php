@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\AppInfo;
 
+use App\Http\Controllers\Controller;
 use App\Models\Period;
 use App\Models\RefInfo;
 use Illuminate\Http\JsonResponse;
@@ -56,12 +57,8 @@ use OpenApi\Attributes as OA;
         ]),
     ]))]
 #[OA\Response(response: 500, description: 'Server Error')]
-class AppInfo
+class AppInfoController extends Controller
 {
-    public function __construct()
-    {
-    }
-
     public function __invoke(): JsonResponse
     {
         return response()->json([

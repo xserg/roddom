@@ -338,7 +338,7 @@
                             <!-- Body content -->
                             <tr>
                                 <td class="content-cell">
-                                    {{$html}}
+                                    {!! $html !!}
                                 </td>
                             </tr>
                         </table>
