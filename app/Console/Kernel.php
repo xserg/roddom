@@ -12,7 +12,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('queue:work')
+        $schedule->command('queue:work --queue=' . config('queue.connections.database.queue'))
             ->everyMinute()
             ->withoutOverlapping();
 
