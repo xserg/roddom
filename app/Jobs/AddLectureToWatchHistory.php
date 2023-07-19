@@ -16,8 +16,8 @@ class AddLectureToWatchHistory implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        private User $user,
-        private int  $lectureId
+        public User $user,
+        public int  $lectureId
     ) {
         //
     }
