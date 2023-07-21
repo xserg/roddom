@@ -378,9 +378,6 @@ class UserService
         $residualAmount = $order->price - $order->points;
 
         if ($residualAmount > 0) {
-            $percentRefFirst = $refInfo->firstWhere('depth_level', 1)->percent;
-            $percentRefSecondToFifth = $refInfo->firstWhere('depth_level', 2)->percent;
-
             $relationships = [
                 1 => $buyer->referrer(),
                 2 => $buyer->referrerSecondLevel(),
@@ -394,10 +391,7 @@ class UserService
                     continue;
                 }
 
-                $percent = $depth === 1 ?
-                    $percentRefFirst :
-                    $percentRefSecondToFifth;
-
+                $percent = $refInfo->firstWhere('depth_level', $depth)?->percent ?? 5;
                 $referrer = $relationship->first();
                 $pointsToGet = $residualAmount * ($percent / 100);
 

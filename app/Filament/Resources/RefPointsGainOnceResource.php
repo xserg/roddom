@@ -21,10 +21,10 @@ class RefPointsGainOnceResource extends Resource
 
     protected static ?string $model = RefPointsGainOnce::class;
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static ?string $navigationLabel = 'Одномоментные начисления';
+    protected static ?string $navigationLabel = 'Единовременные начисления';
     protected static ?string $navigationGroup = 'Партнерская программа';
-    protected static ?string $pluralLabel = 'Одномоментные начисления';
-    protected static ?string $label = 'Одномоментные начисления';
+    protected static ?string $pluralLabel = 'Единовременные начисления';
+    protected static ?string $label = 'Единовременные начисления';
     protected static ?string $recordTitleAttribute = 'user_type';
 
     public static function form(Form $form): Form

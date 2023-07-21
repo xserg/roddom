@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class PregnancyFormEmailNotification extends Notification
+class PregnancyFormEmailNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -29,6 +29,7 @@ class PregnancyFormEmailNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage())
+            ->subject('План родов')
             ->view('emails.pregnancy-form', [
                 'html' => $this->html,
                 'appLink' => $this->appLink,

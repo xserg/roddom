@@ -10,6 +10,7 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -30,7 +31,7 @@ class RefInfoResource extends Resource
                     ->integer()
                     ->minValue(1)
                     ->maxValue(100)
-                    ->label('процент отчислений')
+                    ->label('процент начислений')
                     ->required(),
             ]);
     }
@@ -40,12 +41,9 @@ class RefInfoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('depth_level')
-                    ->label('глубина')
+                    ->label('уровень реферала')
                     ->formatStateUsing(function (string $state) {
-                        return match ((int) $state) {
-                            1 => 'за покупку реферала 1 уровня',
-                            2 => 'за покупку рефералов 2-5 уровня',
-                        };
+                        return $state ? $state . ' уровень' : 'уровень не определен';
                     }),
                 Tables\Columns\TextColumn::make('percent')
                     ->label('процент отчислений')
