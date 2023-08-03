@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
-use App\Filament\Resources\UserResource\Widgets\LectureViews;
+use App\Filament\Resources\LectureResource;
 use App\Models\User;
-use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -13,7 +12,6 @@ use Filament\Tables;
 use Filament\Tables\Filters\Layout;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class WatchedLecturesHistoryRelationManager extends RelationManager
@@ -39,9 +37,7 @@ class WatchedLecturesHistoryRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label('Лекция')
-                    ->url(function (?Model $record): string {
-                        return route('filament.resources.users.edit', ['record' => $record]);
-                    })
+                    ->url(fn (?Model $record) => LectureResource::getUrl('edit', ['record' => $record]))
                     ->searchable(isIndividual: true, isGlobal: false),
                 Tables\Columns\TextColumn::make('pivot.created_at')
                     ->label('Просмотрена')

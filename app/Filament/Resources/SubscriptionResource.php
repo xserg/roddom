@@ -161,8 +161,7 @@ class SubscriptionResource extends Resource
                     ->label('Пользователь')
                     ->sortable()
                     ->url(function (Subscription $record): string {
-                        $route = route('filament.resources.users.edit', ['record' => $record->user_id]);
-                        return $route;
+                        return UserResource::getUrl('edit', ['record' => $record->user_id]);
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('entity_title')

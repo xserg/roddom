@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Widgets;
 
+use App\Filament\Resources\UserResource;
 use App\Models\User;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
@@ -53,8 +54,10 @@ class ReferralsOfUserWidget extends Widget
         ];
 
         return [
-            Tables\Columns\TextColumn::make('name')->label('имя'),
-            Tables\Columns\TextColumn::make('email')->label('email'),
+            Tables\Columns\TextColumn::make('name')
+                ->label('пользователь')
+                ->formatStateUsing(fn (?User $record) => $record->name ?? $record->email)
+                ->url(fn (?User $record) => UserResource::getUrl('edit', ['record' => $record->id])),
             Tables\Columns\TextColumn::make('depth')->label('уровень')
                 ->formatStateUsing(function (?Model $record) use ($allLevelsReferralsId) {
                     foreach ($allLevelsReferralsId as $depth => $ids) {
@@ -70,9 +73,9 @@ class ReferralsOfUserWidget extends Widget
     protected function getTableActions(): array
     {
         return [
-            Action::make('Страница_пользователя')
-                ->url(fn (User $record): string => route('filament.resources.users.edit', $record))
-                ->openUrlInNewTab()
+//            Action::make('Страница_пользователя')
+//                ->url(fn (User $record): string => route('filament.resources.users.edit', $record))
+//                ->openUrlInNewTab()
 //            Tables\Actions\ViewAction::make()
 //                ->form([
 //                    Forms\Components\Select::make('company_id')

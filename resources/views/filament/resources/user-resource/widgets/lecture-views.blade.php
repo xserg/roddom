@@ -54,9 +54,10 @@
                     </td>
                     <td class="px-6 py-4">
                         @if($mostViewed)
-                            <a href="{{ url(route('filament.resources.lectors.edit', $mostViewed->id)) }}">
-                                {{$mostViewed->title}} - {{$mostViewedCount}}
-                            </a>
+                            <a class="text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500"
+                                href="{{ \App\Filament\Resources\LectureResource::getUrl('edit', ['record' => $mostViewed->id]) }}">
+                                {{$mostViewed->title}}
+                            </a>: {{$mostViewedCount}}
                         @else
                             отсутсвует
                         @endif
