@@ -74,7 +74,7 @@ class RateLectorController extends Controller
         LectorRate::query()->updateOrCreate([
             'user_id' => auth()->id(),
             'lector_id' => $lectorId,
-        ], ['rating' => $rateLectorRequest->safe(['rate'])]);
+        ], ['rating' => $rateLectorRequest->validated('rate')]);
 
         dispatch(new UpdateAverageLectorRateJob($lector));
 
