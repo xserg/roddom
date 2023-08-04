@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectorResource\Pages;
 use App\Filament\Resources\LectorResource\RelationManagers\DiplomasRelationManager;
-use App\Filament\Resources\LectorResource\RelationManagers\RatesRelationManager;
+use App\Filament\Resources\LectorResource\RelationManagers\LecotrRatesRelationManager;
 use App\Models\Lector;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -119,7 +119,7 @@ class LectorResource extends Resource
     {
         return [
             DiplomasRelationManager::class,
-            RatesRelationManager::class
+            LecotrRatesRelationManager::class
         ];
     }
 

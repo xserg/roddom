@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class RatesRelationManager extends RelationManager
+class LecotrRatesRelationManager extends RelationManager
 {
     protected static string $relationship = 'rates';
     protected static ?string $recordTitleAttribute = 'id';
@@ -37,9 +37,12 @@ class RatesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('user_id')
                     ->formatStateUsing(fn (?Model $record) => $record->user->name ?? $record->user->email)
                     ->url(fn (?Model $record) => UserResource::getUrl('edit', ['record' => $record->user->id]))
-                    ->label('Пользователь'),
+                    ->label('пользователь'),
                 Tables\Columns\TextColumn::make('rating')
                     ->label('оценка, из 10'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('поставлена')
+                    ->dateTime(),
             ])
             ->filters([
                 //

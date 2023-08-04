@@ -40,6 +40,9 @@ class LectureRatesRelationManager extends RelationManager
                     ->label('Пользователь'),
                 Tables\Columns\TextColumn::make('rating')
                     ->label('оценка, из 10'),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('поставлена')
+                    ->dateTime(),
             ])
             ->filters([
                 //

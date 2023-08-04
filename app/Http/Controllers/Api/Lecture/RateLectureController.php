@@ -66,27 +66,17 @@ class RateLectureController extends Controller
 {
     public function __invoke(
         RateLectureRequest $rateLectureRequest,
-        int $lectureId
+        int                $lectureId
     ) {
-        $lecture = Lecture::find($lectureId);
+        Lecture::findOrFail($lectureId);
 
-        if (is_null($lecture)) {
-            return response()->json([
-                'message' => 'Lecture with id '.$lectureId.' was not found',
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $lectureRate = LectureRate::query()
-            ->firstOrCreate([
-                'user_id' => auth()->user()->id,
-                'lecture_id' => $lectureId,
-            ]);
-
-        $lectureRate->rating = $rateLectureRequest->rate;
-        $lectureRate->save();
+        LectureRate::query()->updateOrCreate([
+            'user_id' => auth()->id(),
+            'lecture_id' => $lectureId,
+        ], ['rating' => $rateLectureRequest->validated('rate')]);
 
         $rateAverage = LectureRate::query()
-            ->where('lecture_id', '=', $lectureId)
+            ->where('lecture_id', $lectureId)
             ->average('rating');
 
         return response()->json([

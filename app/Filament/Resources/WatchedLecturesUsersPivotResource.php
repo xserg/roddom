@@ -62,7 +62,6 @@ class WatchedLecturesUsersPivotResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('дата')
                     ->dateTime(),
-
             ])
             ->filters([
                 DateRangeFilter::make('created_at')
