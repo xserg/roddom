@@ -4,8 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\WatchedLecturesUsersPivotResource\Pages;
 use App\Filament\Resources\WatchedLecturesUsersPivotResource\RelationManagers;
-use App\Models\Feedback;
-use App\Models\User;
 use App\Models\WatchedLecturesUsersPivot;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -13,10 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class WatchedLecturesUsersPivotResource extends Resource
@@ -71,7 +66,7 @@ class WatchedLecturesUsersPivotResource extends Resource
             ])
             ->filters([
                 DateRangeFilter::make('created_at')
-                ->label('Фильтровать по дате'),
+                    ->label('Фильтровать по дате'),
             ], layout: Layout::AboveContent)
             ->actions([
             ])
@@ -94,4 +89,18 @@ class WatchedLecturesUsersPivotResource extends Resource
             'edit' => Pages\EditWatchedLecturesUsersPivot::route('/{record}/edit'),
         ];
     }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        $countToday = static::getModel()::query()->where('created_at', '>', now()->subDay())->count();
+
+        return $countToday > 0 ? '+' . $countToday : null;
+    }
+
+    protected static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
+    }
+
+
 }
