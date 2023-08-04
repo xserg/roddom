@@ -18,10 +18,8 @@ class LectureViewsChart extends BarChartWidget
     {
         $activeFilter = $this->filter;
         $start = match ($activeFilter) {
-            'days' => now()->subDays(2),
             'week' => now()->subWeek(),
             'month' => now()->subMonth(),
-            'year' => now()->subYear(),
         };
 
         $data = Trend::model(WatchedLecturesUsersPivot::class)
@@ -49,10 +47,8 @@ class LectureViewsChart extends BarChartWidget
     protected function getFilters(): ?array
     {
         return [
-            'days' => 'Три дня',
             'week' => 'Неделя',
             'month' => 'Месяц',
-            'year' => 'Год',
         ];
     }
 }
