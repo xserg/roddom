@@ -92,7 +92,7 @@ class WatchedLecturesUsersPivotResource extends Resource
 
     protected static function getNavigationBadge(): ?string
     {
-        $countToday = static::getModel()::query()->where('created_at', '>', now()->subDay())->count();
+        $countToday = static::getModel()::where('created_at', '>', today())->count();
 
         return $countToday > 0 ? '+' . $countToday : null;
     }
