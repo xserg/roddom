@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 
 class LastDayViewsWidget extends BaseWidget
 {
-    protected static ?string $heading = 'Просмотров за сутки';
+    protected static ?string $heading = 'Просмотров за последние 24 часа';
 
     protected function getTableRecordsPerPage(): int
     {
