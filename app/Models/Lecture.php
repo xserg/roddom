@@ -347,7 +347,7 @@ class Lecture extends Model
         if (auth()->user()) {
             $rates['rate_user'] = $this
                 ->rates
-                ->where('user_id', '=', auth()->id())
+                ->where('user_id', auth()->id())
                 ->average('rating');
         } else {
             $rates['rate_user'] = null;

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectorResource\Pages;
 use App\Filament\Resources\LectorResource\RelationManagers\DiplomasRelationManager;
+use App\Filament\Resources\LectorResource\RelationManagers\RatesRelationManager;
 use App\Models\Lector;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -104,8 +105,6 @@ class LectorResource extends Resource
                 //
             ])
             ->headerActions([
-                // ...
-                //                Tables\Actions\AssociateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -113,7 +112,6 @@ class LectorResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-                //                Tables\Actions\DissociateBulkAction::make(),
             ]);
     }
 
@@ -121,6 +119,7 @@ class LectorResource extends Resource
     {
         return [
             DiplomasRelationManager::class,
+            RatesRelationManager::class
         ];
     }
 

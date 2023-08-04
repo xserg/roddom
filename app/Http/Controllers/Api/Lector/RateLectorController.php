@@ -69,22 +69,12 @@ class RateLectorController extends Controller
         RateLectorRequest $rateLectorRequest,
         int               $lectorId
     ) {
-        $lector = Lector::find($lectorId);
+        $lector = Lector::findOrFail($lectorId);
 
-        if (is_null($lector)) {
-            return response()->json([
-                'message' => 'Lector with id ' . $lectorId . ' was not found',
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $lectorRate = LectorRate::query()
-            ->firstOrCreate([
-                'user_id' => auth()->id(),
-                'lector_id' => $lectorId,
-            ]);
-
-        $lectorRate->rating = $rateLectorRequest->rate;
-        $lectorRate->save();
+        LectorRate::query()->updateOrCreate([
+            'user_id' => auth()->id(),
+            'lector_id' => $lectorId,
+        ], ['rating' => $rateLectorRequest->safe(['rate'])]);
 
         dispatch(new UpdateAverageLectorRateJob($lector));
 

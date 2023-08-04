@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
-use App\Models\User;
 use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use App\Traits\MoneyConversion;
@@ -361,7 +360,7 @@ class LectureResource extends Resource
                 Tables\Columns\TextColumn::make('rate_avg')
                     ->getStateUsing(
                         function (?Lecture $record): ?string {
-                            return round($record?->a_rates['rate_avg'] ?? 0, 1) ?: 'нет оценок';
+                            return round($record?->a_rates['rate_avg'] ?? 0, 2) ?: 'нет оценок';
                         }
                     )
                     ->label('Рейтинг, из 10'),
@@ -373,13 +372,13 @@ class LectureResource extends Resource
             ])
             ->filters([
                 Filter::make('free')
-                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::FREE))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', LecturePaymentType::FREE))
                     ->label('бесплатные'),
                 Filter::make('payed')
-                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PAY))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', LecturePaymentType::PAY))
                     ->label('платные'),
                 Filter::make('promo')
-                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', '=', LecturePaymentType::PROMO))
+                    ->query(fn (Builder $query): Builder => $query->where('payment_type_id', LecturePaymentType::PROMO))
                     ->label('промо'),
                 Filter::make('is_recommended')
                     ->query(fn (Builder $query): Builder => $query->where('is_recommended', true))
@@ -399,7 +398,6 @@ class LectureResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                //                Tables\Actions\DissociateBulkAction::make(),
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
@@ -409,6 +407,7 @@ class LectureResource extends Resource
         return [
             RelationManagers\PricesForLecturesRelationManager::class,
             RelationManagers\PromoLecturesPricesRelationManager::class,
+            RelationManagers\LectureRatesRelationManager::class
         ];
     }
 
