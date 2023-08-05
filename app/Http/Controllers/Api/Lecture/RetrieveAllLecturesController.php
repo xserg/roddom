@@ -190,6 +190,8 @@ class RetrieveAllLecturesController
                 'pricesPeriodsInPromoPacks',
                 'pricesForLectures',
                 'rates',
+                'userRate',
+                'averageRate',
                 'watchedUsers',
                 'savedUsers',
                 'listWatchedUsers'

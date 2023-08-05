@@ -80,7 +80,10 @@ class LectureResource extends JsonResource
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
             'prices' => $this->whenAppended('prices', $this->formPrices()),
-            'rates' => $this->whenNotNull($this->a_rates),
+            'rates' => [
+                'rate_avg' => $this->averageRate?->rating,
+                'rate_user' => $this->userRate?->rating,
+            ],
             'content_type' => $this->whenNotNull(new LectureContentTypeResource($this->contentType)),
             'payment_type' => $this->whenNotNull(new LecturePaymentTypeResource($this->paymentType)),
             'show_tariff_1' => $this->whenNotNull($this->show_tariff_1),
