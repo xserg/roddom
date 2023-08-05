@@ -278,7 +278,8 @@ class UserResource extends Resource
                                     })
                             ])
                     ])
-                    ->collapsible()->collapsed(false)
+                    ->collapsible()
+                    ->collapsed()
             ]);
     }
 
