@@ -115,7 +115,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Subscription::class)->orderBy('created_at', 'desc');
     }
 
-    public function latestSubscription()
+    public function actualSubscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class)
+            ->where('end_date', '>', now())
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function latestSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)->latestOfMany();
     }

@@ -11,9 +11,9 @@ use App\Filament\Resources\UserResource\RelationManagers\WatchedLecturesHistoryR
 use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\Lecture;
-use App\Models\Period;
 use App\Models\Promo;
 use App\Models\RefPoints;
+use App\Models\Subscription;
 use App\Models\User;
 use Closure;
 use Filament\Forms;
@@ -27,7 +27,10 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use Livewire\Features\Placeholder;
+use PhpParser\Node\Expr\AssignOp\Mod;
 
 class UserResource extends Resource
 {
@@ -133,20 +136,6 @@ class UserResource extends Resource
 
 
                 Forms\Components\Card::make([
-//                    Forms\Components\TextInput::make('ref_token')
-//                        ->unique('users', 'ref_token', ignoreRecord: true)
-//                        ->formatStateUsing(function (string $context, Closure $set) use($uuid) {
-//                            if ($context === 'create') {
-//                                return $uuid;
-//                            }
-//                        })
-//                        ->afterStateUpdated(function(Closure $set, string $state){
-//                            $set('r1', route('v1.register', ['ref' => $state]));
-//                        })
-//                        ->maxLength(255)
-//                        ->label('токен для реферальной ссылки')
-//                        ->reactive()
-//                        ->required(),
                     Forms\Components\Select::make('referrer_id')
                         ->options(function (string $context, ?Model $record) {
                             if ($context === 'edit') {
@@ -175,18 +164,6 @@ class UserResource extends Resource
                             return $options;
                         })
                         ->label('Реферер'),
-//                    Forms\Components\TextInput::make('ref-link')
-//                        ->formatStateUsing(function (Closure $get, string $context, ?User $record) use ($uuid) {
-//                            if ($context === 'create') {
-//                                return route('v1.register', ['ref' => $uuid->toString()]);
-//                            }
-//                            return route('v1.register', ['ref' => $record->ref_token]);
-//                        })
-//                        ->label('Реферальная ссылка')
-//                        ->disabled()
-//                        ->reactive()
-//                        ->required()
-//                        ->columnSpan(2),
                 ])->columns(1)->columnSpan(1),
 
                 Forms\Components\Placeholder::make('descendants_count')
@@ -207,7 +184,7 @@ class UserResource extends Resource
                  * SUBSCRIPTIONS - REPEATER
                  */
 
-                Forms\Components\Section::make(fn (?Model $record) => 'Подписки (' . $record?->subscriptions()->count() . ')')
+                Forms\Components\Section::make(fn (?Model $record) => 'Подписки (активных: ' . $record?->actualSubscriptions()->count() . ', всего: ' . $record?->subscriptions()->count() . ')')
                     ->visible(fn (string $context) => $context === 'edit')
                     ->schema([
                         Forms\Components\Grid::make()
@@ -215,9 +192,11 @@ class UserResource extends Resource
                                 Repeater::make('subscriptions')
                                     ->relationship('subscriptions')
                                     ->label('Подписки')
-                                    ->columnSpan(1)
+                                    ->grid(2)
+                                    ->columnSpanFull()
                                     ->columns(2)
                                     ->createItemButtonLabel('Добавить подписку')
+                                    ->collapsible()
                                     ->schema([
                                         Forms\Components\Select::make('subscriptionable_type')
                                             ->required()
@@ -239,23 +218,8 @@ class UserResource extends Resource
                                                     $set('subscriptionable_id', null);
                                                 }
                                             })
-                                            ->reactive(),
-                                        Forms\Components\Select::make('period_id')
-                                            ->relationship('period', 'length')
-                                            ->getOptionLabelFromRecordUsing(fn (?Model $record) => "дней: {$record->length}")
-                                            ->placeholder('период, дней')
-                                            ->disableLabel()
-                                            ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
-                                                if (is_null($state)) {
-                                                    return;
-                                                }
-
-                                                $periodLength = Period::query()->firstWhere('id', $state)->length;
-                                                $set('start_date', now()->toDateTimeString());
-                                                $set('end_date', now()->addDays($periodLength)->toDateTimeString());
-                                            })
                                             ->reactive()
-                                            ->required(),
+                                            ->columnSpan(2),
                                         Forms\Components\Select::make('subscriptionable_id')
                                             ->placeholder('объект подписки')
                                             ->options(function (Closure $set, Closure $get) {
@@ -268,29 +232,53 @@ class UserResource extends Resource
                                                     default => null
                                                 };
                                             })
-                                            ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
-                                                $get('subscriptionable_type') === Promo::class ||
-                                                $get('subscriptionable_type') === EverythingPack::class)
-//                                    ->visible(fn (Closure $get) =>
-//                                        $get('subscriptionable_type') === Lecture::class ||
-//                                        $get('subscriptionable_type') === Category::class
-//                                    )
+                                            ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type'))
+                                                || $get('subscriptionable_type') === Promo::class
+                                                || $get('subscriptionable_type') === EverythingPack::class)
                                             ->dehydrated()
                                             ->required()
                                             ->disableLabel()
                                             ->columnSpan(2),
                                         Forms\Components\DateTimePicker::make('start_date')
                                             ->placeholder('начало подписки')
-                                            ->disableLabel()
-                                            ->required(),
+                                            ->label('начало')
+                                            ->required()
+                                            ->columnSpan(1)
+                                            ->afterStateHydrated(fn (Forms\Components\DateTimePicker $component) => $component->getState() ?? $component->state(now()->toDateTimeString())),
                                         Forms\Components\DateTimePicker::make('end_date')
                                             ->placeholder('окончание подписки')
+                                            ->label('окончание')
+                                            ->required()
+                                            ->columnSpan(1),
+
+//                                        Forms\Components\Placeholder::make('link')
+//                                            ->visible()
+//                                            ->disableLabel()
+//                                            ->content(function (?Subscription $record) {
+//                                                $text = $record->created_at;
+//                                                $url = SubscriptionResource::getUrl('edit', ['record' => $record->id]);
+//                                                $link = new HtmlString("<a class='text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500' href='$url'>ссылка</a>");
+//                                                return $link;
+//                                            }),
+                                        Forms\Components\Placeholder::make('is_actual')
+                                            ->visible(fn (?Subscription $record) => $record)
                                             ->disableLabel()
-                                            ->required(),
+                                            ->content(function (?Subscription $record) {
+                                                $url = SubscriptionResource::getUrl('edit', ['record' => $record->id]);
+                                                $actual = new HtmlString("<a style='color: rgb(34 197 94);' class='transition hover:underline focus:underline' href='$url'>ссылка</a>");
+                                                $notActual = new HtmlString("<a style='color: rgb(248 113 113);' class='transition hover:underline focus:underline' href='$url'>ссылка</a>");
+                                                return $record->isActual() ? $actual : $notActual;
+                                            }),
                                     ])
                                     ->visible(fn (string $context) => $context === 'edit')
-                            ]),
-                    ])->collapsible()->collapsed()
+                                    ->itemLabel(function (array $state) {
+                                        $subscription = isset($state['id']) ? Subscription::find($state['id']) : null;
+                                        $status = $subscription?->isActual() ? 'активна' : 'истекла';
+                                        return $subscription ? '#' . $state['id'] . ' - ' . $status : null;
+                                    })
+                            ])
+                    ])
+                    ->collapsible()->collapsed(false)
             ]);
     }
 
