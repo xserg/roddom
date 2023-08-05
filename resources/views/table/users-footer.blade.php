@@ -12,7 +12,7 @@
                 @if ($column->getName() == $calc_columns[$i])
                     <div class="filament-tables-column-wrapper">
                         <div class="filament-tables-text-column px-4 py-2 flex flex-col w-full justify-start text-start">
-                            <div class="items-center space-x-1 rtl:space-x-reverse">
+                            <div class="items-center">
                                 <div class="font-medium">
                                     <span class="font-light">Страница: </span> {{ $records->sum($calc_columns[$i]) / 100 }}
                                 </div>

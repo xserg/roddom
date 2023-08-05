@@ -336,26 +336,14 @@ class Lecture extends Model
         return $prices;
     }
 
-    protected function aRates(): Attribute
+    public function userRate(): HasOne
     {
-        $rates = [];
+        return $this->hasOne(LectureRate::class)->where('user_id', auth()->id());
+    }
 
-        $rates['rate_avg'] = $this
-            ->rates
-            ->average('rating');
-
-        if (auth()->user()) {
-            $rates['rate_user'] = $this
-                ->rates
-                ->where('user_id', auth()->id())
-                ->average('rating');
-        } else {
-            $rates['rate_user'] = null;
-        }
-
-        return new Attribute(
-            get: fn () => $rates,
-        );
+    public function averageRate(): HasOne
+    {
+        return $this->hasOne(LectureAverageRate::class);
     }
 
     protected function idTitle(): Attribute

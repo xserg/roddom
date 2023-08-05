@@ -22,8 +22,8 @@ class UpdateAverageLectureRateJob implements ShouldQueue
     public function handle(): void
     {
         $average = $this->lecture->rates()->average('rating');
-        $this->lector->averageRate()->updateOrCreate([
-            'lector_id' => $this->lector->id
+        $this->lecture->averageRate()->updateOrCreate([
+            'lecture_id' => $this->lecture->id
         ], [
             'rating' => $average
         ]);

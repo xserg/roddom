@@ -357,13 +357,10 @@ class LectureResource extends Resource
                 Tables\Columns\ImageColumn::make('preview_picture')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Превью изображение лекции'),
-                Tables\Columns\TextColumn::make('rate_avg')
-                    ->getStateUsing(
-                        function (?Lecture $record): ?string {
-                            return round($record?->a_rates['rate_avg'] ?? 0, 2) ?: 'нет оценок';
-                        }
-                    )
-                    ->label('Рейтинг, из 10'),
+                Tables\Columns\TextColumn::make('averageRate.rating')
+                    ->default('пока нет оценок')
+                    ->label('Рейтинг, из 10')
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_published')
                     ->label('Опубликована ли')
                     ->boolean()

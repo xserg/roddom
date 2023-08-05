@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\LectorResource\Pages;
 use App\Filament\Resources\LectorResource\RelationManagers\DiplomasRelationManager;
-use App\Filament\Resources\LectorResource\RelationManagers\LecotrRatesRelationManager;
+use App\Filament\Resources\LectorResource\RelationManagers\LectorRatesRelationManager;
 use App\Models\Lector;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -74,6 +74,9 @@ class LectorResource extends Resource
                         ])
                         ->required()
                         ->maxLength(65535),
+                    Forms\Components\Placeholder::make('avg_rate')
+                    ->content(fn(?Model $record) => $record->averageRate?->rating ?? 'Пока нет ни одной оценки')
+                    ->label('Средняя оценка, из 10')
                 ]),
             ]);
     }
@@ -119,7 +122,7 @@ class LectorResource extends Resource
     {
         return [
             DiplomasRelationManager::class,
-            LecotrRatesRelationManager::class
+            LectorRatesRelationManager::class
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RateLectureRequest;
+use App\Jobs\UpdateAverageLectureRateJob;
 use App\Models\Lecture;
 use App\Models\LectureRate;
 use Illuminate\Http\Response;
@@ -68,22 +69,20 @@ class RateLectureController extends Controller
         RateLectureRequest $rateLectureRequest,
         int                $lectureId
     ) {
-        Lecture::findOrFail($lectureId);
+        $lecture = Lecture::findOrFail($lectureId);
 
         LectureRate::query()->updateOrCreate([
             'user_id' => auth()->id(),
             'lecture_id' => $lectureId,
         ], ['rating' => $rateLectureRequest->validated('rate')]);
 
-        $rateAverage = LectureRate::query()
-            ->where('lecture_id', $lectureId)
-            ->average('rating');
+        dispatch(new UpdateAverageLectureRateJob($lecture));
 
         return response()->json([
             'message' => 'Your rate was updated',
             'rates' => [
-                'rate_user' => $rateLectureRequest->rate,
-                'rate_avg' => $rateAverage,
+                'rate_user' => $rateLectureRequest->validated('rate'),
+                'rate_avg' => $lecture->averageRate?->rating,
             ],
         ], Response::HTTP_OK);
     }

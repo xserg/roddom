@@ -57,6 +57,16 @@ class DatabaseSeeder extends Seeder
 //        $this->createAnotherUser();
 //        $this->createUsers(1000);
 //        $this->setRecommendedLectures(20);
+        $lectors = Lector::all();
+
+        $lectors->each(function (Lector $lector) {
+            $lector->averageRate()->updateOrCreate(['lector_id' => $lector->id], ['rating' => $lector->rates()->average('rating')]);
+        });
+        $lectures = Lecture::all();
+
+        $lectures->each(function (Lecture $lecture) {
+            $lecture->averageRate()->updateOrCreate(['lecture_id' => $lecture->id], ['rating' => $lecture->rates()->average('rating')]);
+        });
     }
 
     private function createUsers(int $users)
