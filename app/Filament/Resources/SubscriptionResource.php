@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\SubscriptionResource\Pages;
+use App\Filament\Resources\SubscriptionResource\RelationManagers\LecturesRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\Feedback;
@@ -218,7 +219,7 @@ class SubscriptionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            LecturesRelationManager::class
         ];
     }
 

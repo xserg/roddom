@@ -226,12 +226,20 @@ class Lecture extends Model
 
     public function scopePurchased(Builder $query): void
     {
-        $purchasedIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $user = auth()->user();
 
-        $ids = implode(',', array_keys($purchasedIds)) ?? '';
+        $purchasedLecturesIds = [];
+
+        if ($user) {
+            $subs = $user->actualSubscriptions()->with('lectures')->get();
+
+            $purchasedLecturesIds = $subs?->map(function ($subscription) {
+                return $subscription->lectures?->modelKeys();
+            })->flatten()->unique();
+        }
 
         $query
-            ->whereIn('id', array_keys($purchasedIds));
+            ->whereIn('id', $purchasedLecturesIds);
         //            ->orderByRaw("FIELD(id, $ids)");
     }
 
@@ -303,37 +311,6 @@ class Lecture extends Model
                 ->listWatchedUsers
                 ->contains('id', auth()->id())
         );
-    }
-
-//    /**
-//     * В этот аксессор попадают либо промо цены, либо цены категории - общие и кастомные
-//     * на каждый период
-//     */
-//    protected function prices(): Attribute
-//    {
-//        if ($this->isPromo()) {
-//            $prices = $this->lectureService->formPromoLecturePricesPromoPack($this);
-//        } else {
-//            $prices = $this->lectureService->formLecturePricesSubCategory($this);
-//        }
-//
-//        return new Attribute(
-//            get: fn () => $prices,
-//        );
-//    }
-
-    public function convertPrices(array $prices): array
-    {
-        foreach ($prices as &$priceForOnePeriod) {
-            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
-                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
-            }
-            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
-                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
-            }
-        }
-
-        return $prices;
     }
 
     public function userRate(): HasOne

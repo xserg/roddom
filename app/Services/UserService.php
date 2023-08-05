@@ -328,8 +328,11 @@ class UserService
     {
         $user = $user->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures');
 
-        $purchasedLectureIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
-        $purchasedLecturesCount = count($purchasedLectureIds);
+        $subs = $user->actualSubscriptions()->with('lectures')->get();
+        $purchasedLecturesIds = $subs?->map(function ($subscription) {
+            return $subscription->lectures?->modelKeys();
+        })->flatten()->unique();
+        $purchasedLecturesCount = count($purchasedLecturesIds);
         $user->purchased_lectures_counter = $purchasedLecturesCount;
 
         return $user;

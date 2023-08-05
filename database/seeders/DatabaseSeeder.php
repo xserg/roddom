@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Diploma;
+use App\Models\EverythingPack;
 use App\Models\Lector;
 use App\Models\Lecture;
 use App\Models\Order;
@@ -57,26 +58,32 @@ class DatabaseSeeder extends Seeder
 //        $this->createAnotherUser();
 //        $this->createUsers(1000);
 //        $this->setRecommendedLectures(20);
-        $lectors = Lector::all();
-
-        $lectors->each(function (Lector $lector) {
-            $lector->averageRate()->updateOrCreate(['lector_id' => $lector->id], ['rating' => $lector->rates()->average('rating')]);
-        });
-        $lectures = Lecture::all();
-
-        $lectures->each(function (Lecture $lecture) {
-            $lecture->averageRate()->updateOrCreate(['lecture_id' => $lecture->id], ['rating' => $lecture->rates()->average('rating')]);
+        Subscription::all()->each(function (Subscription $subscription) {
+            if ($subscription->subscriptionable_type == Lecture::class) {
+                if (is_null(Lecture::find($subscription->subscriptionable_id))) return;
+                $subscription->lectures()->sync([$subscription->subscriptionable_id]);
+            } elseif ($subscription->subscriptionable_type == Category::class) {
+                $lectureIds = Category::find($subscription->subscriptionable_id)->lectures()->get(['id']);
+                $subscription->lectures()->sync($lectureIds);
+            } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
+                $lectureIds = Lecture::all(['id']);
+                $subscription->lectures()->sync($lectureIds);
+            }
         });
     }
 
-    private function createUsers(int $users)
-    {
+    private
+    function createUsers(
+        int $users
+    ) {
         User::factory($users)
             ->create();
     }
 
-    private function createSubscriptionsForUser($user)
-    {
+    private
+    function createSubscriptionsForUser(
+        $user
+    ) {
         $periodDay = Period::query()->firstWhere('title', '=', 'day');
         $periodWeek = Period::query()->firstWhere('title', '=', 'week');
         $periodMonth = Period::query()->firstWhere('title', '=', 'month');
@@ -127,7 +134,8 @@ class DatabaseSeeder extends Seeder
         $subscription->save();
     }
 
-    private function createFirstTestUser()
+    private
+    function createFirstTestUser()
     {
         $photo = fake()->randomElement($this->previewPictures);
         $user = [
@@ -159,7 +167,8 @@ class DatabaseSeeder extends Seeder
         $this->createSubscriptionsForUser($user);
     }
 
-    private function createSecondTestUser()
+    private
+    function createSecondTestUser()
     {
         $photo = fake()->randomElement($this->previewPictures);
         $user = [
@@ -192,7 +201,8 @@ class DatabaseSeeder extends Seeder
         $this->createSubscriptionsForUser($user);
     }
 
-    private function createAnotherUser()
+    private
+    function createAnotherUser()
     {
         $user = [
             'name' => 'admin',
@@ -205,16 +215,20 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->insert($user);
     }
 
-    private function setRecommendedLectures(int $num)
-    {
+    private
+    function setRecommendedLectures(
+        int $num
+    ) {
         Lecture::all()->random($num)->each(function ($lecture) {
             $lecture->setRecommended();
             $lecture->save();
         });
     }
 
-    private function setDiffLectureTypes($user)
-    {
+    private
+    function setDiffLectureTypes(
+        $user
+    ) {
         $lectures = Lecture::all()
             ->random(150);
 

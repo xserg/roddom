@@ -4,7 +4,9 @@ namespace App\Http\Resources;
 
 use App\Models\Lecture;
 use App\Services\LectureService;
+use App\Traits\MoneyConversion;
 use Closure;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -15,6 +17,8 @@ use OpenApi\Attributes as OA;
 )]
 class LectureResource extends JsonResource
 {
+    use MoneyConversion;
+
     #[OA\Property(property: 'id', description: 'id лекции', type: 'integer')]
     #[OA\Property(property: 'lector_id', description: 'id лектора - автора лекции', type: 'integer')]
     #[OA\Property(property: 'category_id', description: 'id категории лекции', type: 'integer')]
@@ -80,7 +84,10 @@ class LectureResource extends JsonResource
             'is_watched' => $this->whenNotNull($this->is_watched),
             'purchase_info' => $this->whenNotNull($this->purchase_info),
             'prices' => $this->whenAppended('prices', $this->formPrices()),
-            'rates' => $this->whenNotNull($this->a_rates),
+            'rates' => [
+                'rate_avg' => $this->averageRate?->rating,
+                'rate_user' => $this->userRate?->rating,
+            ],
             'content_type' => $this->whenNotNull(new LectureContentTypeResource($this->contentType)),
             'payment_type' => $this->whenNotNull(new LecturePaymentTypeResource($this->paymentType)),
             'show_tariff_1' => $this->whenNotNull($this->show_tariff_1),
@@ -98,5 +105,19 @@ class LectureResource extends JsonResource
                 return $this->convertPrices(app(LectureService::class)->formLecturePricesSubCategory($this));
             }
         };
+    }
+
+    private function convertPrices(array $prices): array
+    {
+        foreach ($prices as &$priceForOnePeriod) {
+            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
+                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
+            }
+            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
+                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
+            }
+        }
+
+        return $prices;
     }
 }

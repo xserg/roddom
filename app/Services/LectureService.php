@@ -287,19 +287,24 @@ class LectureService
     public function setPurchaseInfoToLectures(
         Collection $lectures
     ): Collection {
-        $purchasedLectures = $this->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $subs = auth()->user()->actualSubscriptions()->with('lectures')->get();
 
-        $lectures = $lectures->map(function ($lecture) use ($purchasedLectures) {
-            /**
-             * @var $lecture Lecture
-             */
-            $isPurchased = array_key_exists($lecture->id, $purchasedLectures);
+        $lectures = $lectures->map(function (Lecture $lecture) use ($subs) {
+            $isPurchased = false;
+            $endDate = null;
 
+            foreach ($subs as $sub) {
+                if ($sub->lectures?->contains($lecture)) {
+                    $isPurchased = true;
+                }
+                if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
+                    $endDate = $sub->end_date;
+                }
+            }
             $purchaseInfo = [
-                'is_purchased' => array_key_exists($lecture->id, $purchasedLectures),
-                'end_date' => $isPurchased ? $purchasedLectures[$lecture->id]['end_date'] : null,
+                'is_purchased' => $isPurchased,
+                'end_date' => $endDate,
             ];
-
             $lecture->purchase_info = $purchaseInfo;
 
             return $lecture;
