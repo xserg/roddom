@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
+use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
@@ -118,6 +119,18 @@ class Lecture extends Model
         return $this->morphMany(Subscription::class, 'subscriptionable');
     }
 
+    public function subscriptionItems(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscription::class, 'subscription_items');
+    }
+
+    public function actualSubscriptionItemsForCurrentUser(): BelongsToMany
+    {
+        return $this->subscriptionItems()
+            ->where('user_id', auth()->id())
+            ->where('end_date', '>', now());
+    }
+
     /**
      * Кастомные цены на платную лекцию
      */
@@ -226,12 +239,15 @@ class Lecture extends Model
 
     public function scopePurchased(Builder $query): void
     {
-        $purchasedIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser(auth()->user());
+        $user = auth()->user();
 
-        $ids = implode(',', array_keys($purchasedIds)) ?? '';
+        $purchasedLecturesIds = [];
 
-        $query
-            ->whereIn('id', array_keys($purchasedIds));
+        if ($user) {
+            $purchasedLecturesIds = app(LectureRepository::class)->getAllPurchasedLectureIdsForCurrentUser();
+        }
+
+        $query->whereIn('id', $purchasedLecturesIds);
         //            ->orderByRaw("FIELD(id, $ids)");
     }
 
@@ -303,37 +319,6 @@ class Lecture extends Model
                 ->listWatchedUsers
                 ->contains('id', auth()->id())
         );
-    }
-
-//    /**
-//     * В этот аксессор попадают либо промо цены, либо цены категории - общие и кастомные
-//     * на каждый период
-//     */
-//    protected function prices(): Attribute
-//    {
-//        if ($this->isPromo()) {
-//            $prices = $this->lectureService->formPromoLecturePricesPromoPack($this);
-//        } else {
-//            $prices = $this->lectureService->formLecturePricesSubCategory($this);
-//        }
-//
-//        return new Attribute(
-//            get: fn () => $prices,
-//        );
-//    }
-
-    public function convertPrices(array $prices): array
-    {
-        foreach ($prices as &$priceForOnePeriod) {
-            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
-                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
-            }
-            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
-                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
-            }
-        }
-
-        return $prices;
     }
 
     public function userRate(): HasOne

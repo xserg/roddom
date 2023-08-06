@@ -117,18 +117,7 @@ class UserService
     ): string {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
-        $allLectureSubscription = $user
-            ->actualEverythingPackSubscriptions()
-            ->latest('id')
-            ->first();
-
-        if ($allLectureSubscription) {
-//        if ($allLectureSubscription && ! $lecture->isFree()) {
-            AddLectureToWatchHistory::dispatch($user, $lectureId);
-            return $lecture->content;
-        }
-
-        if ($this->isLecturePurchased($lectureId)) {
+        if ($this->lectureService->isLecturePurchased($lectureId)) {
             AddLectureToWatchHistory::dispatch($user, $lectureId);
             return $lecture->content;
 
@@ -244,14 +233,6 @@ class UserService
             is_null($user->next_free_lecture_available);
     }
 
-    public function isLecturePurchased(int $lectureId): bool
-    {
-        return
-            $this->lectureService->isLectureStrictPurchased($lectureId) ||
-            $this->lectureService->isLecturesCategoryPurchased($lectureId) ||
-            $this->lectureService->isLecturePromoPurchased($lectureId);
-    }
-
     /**
      * @throws UserCannotSaveLectureException
      * @throws NotFoundHttpException
@@ -328,8 +309,11 @@ class UserService
     {
         $user = $user->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures');
 
-        $purchasedLectureIds = $this->lectureService->getAllPurchasedLecturesIdsAndTheirDatesByUser($user);
-        $purchasedLecturesCount = count($purchasedLectureIds);
+        $subs = $user->actualSubscriptions()->with('lectures')->get();
+        $purchasedLecturesIds = $subs?->map(function ($subscription) {
+            return $subscription->lectures?->modelKeys();
+        })->flatten()->unique();
+        $purchasedLecturesCount = count($purchasedLecturesIds);
         $user->purchased_lectures_counter = $purchasedLecturesCount;
 
         return $user;
