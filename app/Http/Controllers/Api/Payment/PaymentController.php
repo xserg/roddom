@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Payment;
 
 use App\Enums\PaymentStatusEnum;
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncSubscriptionItemsJob;
 use App\Mail\PurchaseSuccess;
 use App\Models\AppInfo;
 use App\Models\Category;
@@ -126,6 +127,7 @@ class PaymentController extends Controller
                         }
                         $order->save();
                         $subscription->save();
+                        dispatch(new SyncSubscriptionItemsJob($subscription));
                     });
 
                     $this->userService->rewardReferrers($order, $order->user);
@@ -153,8 +155,7 @@ class PaymentController extends Controller
         }
     }
 
-    private
-    function getSubscriptionAttributes(
+    private function getSubscriptionAttributes(
         Order  $order,
         Period $period,
     ): array {

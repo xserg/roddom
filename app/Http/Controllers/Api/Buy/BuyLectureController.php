@@ -62,10 +62,10 @@ class BuyLectureController extends Controller
         int               $period
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $isPurchasedStrict = $this->lectureService->isLectureStrictPurchased($lectureId);
+        $isLecturePurchased = $this->lectureService->isLecturePurchased($lectureId);
         $price = $this->lectureService->calculateLecturePrice($lecture, $period);
 
-        if ($isPurchasedStrict) {
+        if ($isLecturePurchased) {
             return response()->json([
                 'message' => 'Lecture with id ' . $request->id . ' is already purchased.',
             ], Response::HTTP_FORBIDDEN);

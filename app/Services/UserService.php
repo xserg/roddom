@@ -117,18 +117,7 @@ class UserService
     ): string {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
-        $allLectureSubscription = $user
-            ->actualEverythingPackSubscriptions()
-            ->latest('id')
-            ->first();
-
-        if ($allLectureSubscription) {
-//        if ($allLectureSubscription && ! $lecture->isFree()) {
-            AddLectureToWatchHistory::dispatch($user, $lectureId);
-            return $lecture->content;
-        }
-
-        if ($this->isLecturePurchased($lectureId)) {
+        if ($this->lectureService->isLecturePurchased($lectureId)) {
             AddLectureToWatchHistory::dispatch($user, $lectureId);
             return $lecture->content;
 
@@ -242,14 +231,6 @@ class UserService
         return
             $user->next_free_lecture_available < now() ||
             is_null($user->next_free_lecture_available);
-    }
-
-    public function isLecturePurchased(int $lectureId): bool
-    {
-        return
-            $this->lectureService->isLectureStrictPurchased($lectureId) ||
-            $this->lectureService->isLecturesCategoryPurchased($lectureId) ||
-            $this->lectureService->isLecturePromoPurchased($lectureId);
     }
 
     /**

@@ -62,4 +62,29 @@ class CategoryRepository
             ->orderBy('id')
             ->get();
     }
+
+    public function getAllLecturesByCategory(int $id, array $relationships = []): Collection
+    {
+        $category = Category::findOrFail($id);
+
+        if ($category->isMain()) {
+            $subCategoriesIds = Category::subCategories()
+                ->where('parent_id', $category->id)
+                ->pluck('id');
+
+            if ($subCategoriesIds->isEmpty()) {
+                return collect();
+            }
+
+            return Lecture::whereIn('category_id', $subCategoriesIds)
+                ->with($relationships)
+                ->orderBy('id')
+                ->get();
+        }
+
+        return Lecture::where('category_id', $category->id)
+            ->with($relationships)
+            ->orderBy('id')
+            ->get();
+    }
 }

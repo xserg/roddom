@@ -175,7 +175,6 @@ class RetrieveAllLecturesController
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private LectureService    $lectureService
     ) {
     }
 
@@ -192,6 +191,7 @@ class RetrieveAllLecturesController
                 'rates',
                 'averageRate',
                 'userRate',
+                'actualSubscriptionItemsForCurrentUser.lectures',
                 'watchedUsers',
                 'savedUsers',
                 'listWatchedUsers'
@@ -199,8 +199,7 @@ class RetrieveAllLecturesController
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
-            $lectures = $builder->get()->append(['prices']);
-            $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
+            $lectures = $builder->get()->append(['prices', 'purchase_info']);
             $lectures = $this->lectureRepository->paginate(
                 $lectures,
                 (int) $request->per_page ?? 15,

@@ -7,7 +7,6 @@ use App\Filament\Resources\SubscriptionResource\Pages;
 use App\Filament\Resources\SubscriptionResource\RelationManagers\LecturesRelationManager;
 use App\Models\Category;
 use App\Models\EverythingPack;
-use App\Models\Feedback;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
@@ -17,6 +16,7 @@ use App\Traits\MoneyConversion;
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
@@ -39,117 +39,109 @@ class SubscriptionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->required()
-                    ->multiple(function (string $context) {
-                        return $context !== 'edit';
-                    })
-                    ->options(function () {
-                        $users = User::select(['name', 'email', 'id'])->get();
-                        $options = [];
-                        foreach ($users as $user) {
-                            $options[$user->id] = $user->name ?? $user->email;
-                        }
-                        return $options;
-                    })
-                    ->getSearchResultsUsing(function (string $search) {
-                        $usersByNames = User::where('name', 'like', "%$search%")
-                            ->limit(10)
-                            ->get();
-                        if ($usersByNames->isNotEmpty()) {
-                            return $usersByNames->pluck('name', 'id');
-                        }
+                Forms\Components\Grid::make(3)
+                    ->schema([
+                        Forms\Components\Card::make([
+                            Forms\Components\Select::make('user_id')
+                                ->required()
+                                ->multiple(function (string $context) {
+                                    return $context !== 'edit';
+                                })
+                                ->options(function () {
+                                    $users = User::select(['name', 'email', 'id'])->whereNot('is_admin', '1')->get();
+                                    $options = [];
+                                    foreach ($users as $user) {
+                                        $options[$user->id] = $user->name ?? $user->email;
+                                    }
+                                    return $options;
+                                })
+                                ->getSearchResultsUsing(function (string $search) {
+                                    $usersByNames = User::where('name', 'like', "%$search%")
+                                        ->limit(10)
+                                        ->get();
+                                    if ($usersByNames->isNotEmpty()) {
+                                        return $usersByNames->pluck('name', 'id');
+                                    }
 
-                        $usersByEmails = User::orWhere('email', 'like', "%$search%")
-                            ->limit(10)
-                            ->get();
-                        if ($usersByEmails->isNotEmpty()) {
-                            return $usersByEmails->pluck('email', 'id');
-                        }
-                    })
-                    ->disabled(function (string $context) {
-                        return $context === 'edit';
-                    })
-                    ->label('пользователь'),
-                Forms\Components\Select::make('period_id')
-                    ->relationship('period', 'length')
-                    ->label('период подписки, дней')
-                    ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
-                        if (is_null($state)) {
-                            return;
-                        }
+                                    $usersByEmails = User::orWhere('email', 'like', "%$search%")
+                                        ->limit(10)
+                                        ->get();
+                                    if ($usersByEmails->isNotEmpty()) {
+                                        return $usersByEmails->pluck('email', 'id');
+                                    }
+                                })
+                                ->disabled(function (string $context) {
+                                    return $context === 'edit';
+                                })
+                                ->label('пользователь'),
+                            Forms\Components\Select::make('subscriptionable_type')
+                                ->required()
+//                                ->disabled(fn (string $context) => $context === 'edit')
+                                ->label('тип подписки')
+                                ->options([
+                                    Lecture::class => 'Лекция',
+                                    Category::class => 'Категория',
+                                    Promo::class => 'Промопак лекций',
+                                    EverythingPack::class => 'Все лекции',
+                                ])
+                                ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
+                                    if (
+                                        $component->getState() === Promo::class ||
+                                        $component->getState() === EverythingPack::class
+                                    ) {
+                                        $set('subscriptionable_id', 1);
+                                    } else {
+                                        $set('subscriptionable_id', null);
+                                    }
+                                })
+                                ->reactive(),
+                            Forms\Components\Select::make('subscriptionable_id')
+                                ->label('объект подписки')
+                                ->options(function (Closure $set, Closure $get) {
+                                    $type = $get('subscriptionable_type');
+                                    return match ($type) {
+                                        Category::class => Category::orderBy('title')->pluck('title', 'id'),
+                                        Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
+                                        Promo::class => Promo::all()->pluck('id', 'id'),
+                                        EverythingPack::class => [1 => 1],
+                                        default => null
+                                    };
+                                })
+                                ->optionsLimit(0)
+                                ->disabled(fn (Closure $get, string $context) => is_null($get('subscriptionable_type'))
+                                    || $get('subscriptionable_type') === Promo::class
+                                    || $get('subscriptionable_type') === EverythingPack::class)
+                                ->saveRelationshipsWhenHidden()
+                                ->required(),
+                        ])->columnSpan(2),
+                        Forms\Components\Card::make([
+                            Forms\Components\Select::make('period_id')
+                                ->relationship('period', 'length')
+                                ->label('период подписки, дней(не обязательно)')
+                                ->afterStateUpdated(function (Closure $set, string $context, $state, Closure $get) {
+                                    if (is_null($state)) {
+                                        return;
+                                    }
 
-                        $periodLength = Period::query()->firstWhere('id', $state)->length;
+                                    $periodLength = Period::query()->firstWhere('id', $state)->length;
 
-                        if ($context === 'create') {
-                            $set('start_date', now()->toDateTimeString());
-                            $set('end_date', now()->addDays($periodLength)->toDateTimeString());
-                        } elseif ($context === 'edit') {
-                            $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength)->toDateTimeString());
-                        }
-                    })
-                    ->reactive()
-                    ->required(),
-                Forms\Components\Select::make('subscriptionable_type')
-                    ->required()
-                    ->label('подписка на')
-                    ->options([
-                        Lecture::class => 'Лекция',
-                        Category::class => 'Категория',
-                        Promo::class => 'Промопак лекций',
-                        EverythingPack::class => 'Все лекции',
-                    ])
-                    ->afterStateUpdated(function (Closure $set, Forms\Components\Select $component) {
-                        if (
-                            $component->getState() === Promo::class ||
-                            $component->getState() === EverythingPack::class
-                        ) {
-                            $set('subscriptionable_id', 1);
-                        } else {
-                            $set('subscriptionable_id', null);
-                        }
-                    })
-                    ->reactive(),
-                Forms\Components\Select::make('subscriptionable_id')
-                    ->label('id объекта подписки')
-                    ->options(function (Closure $set, Closure $get) {
-                        $type = $get('subscriptionable_type');
-                        return match ($type) {
-                            Category::class => Category::orderBy('title')->pluck('title', 'id'),
-                            Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
-                            Promo::class => Promo::all()->pluck('id', 'id'),
-                            EverythingPack::class => [1 => 1],
-                            default => null
-                        };
-                    })
-//                    ->multiple(function (Closure $get) {
-//                        $type = $get('subscriptionable_type');
-//                        if ($type === Lecture::class ||
-//                            $type === Category::class) {
-//                            return true;
-//                        }
-//                        return false;
-//                    })
-                    ->optionsLimit(0)
-                    ->disabled(fn (Closure $get) => is_null($get('subscriptionable_type')) ||
-                        $get('subscriptionable_type') === Promo::class ||
-                        $get('subscriptionable_type') === EverythingPack::class)
-//                    ->visible(fn (Closure $get) => $get('subscriptionable_type') === Lecture::class ||
-//                        $get('subscriptionable_type') === Category::class
-//                    )
-                    ->saveRelationshipsWhenHidden()
-                    ->required(),
-                Forms\Components\DateTimePicker::make('start_date')
-//                    ->afterStateHydrated(function ($state, Component $component) {
-//                        if (is_null($state)) {
-//                            $component->state(Carbon::now());
-//                        }
-//                    })
-                    ->label('начало подписки')
-                    ->required(),
-                Forms\Components\DateTimePicker::make('end_date')
-                    ->label('окончание подписки')
-                    ->required(),
+                                    if ($context === 'create') {
+                                        $set('start_date', now()->toDateTimeString());
+                                        $set('end_date', now()->addDays($periodLength)->toDateTimeString());
+                                    } elseif ($context === 'edit') {
+                                        $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength)->toDateTimeString());
+                                    }
+                                })
+                                ->reactive()
+                                ->visible(fn (string $context) => $context === 'create'),
+                            Forms\Components\DateTimePicker::make('start_date')
+                                ->label('начало подписки')
+                                ->required(),
+                            Forms\Components\DateTimePicker::make('end_date')
+                                ->label('окончание подписки')
+                                ->required(),
+                        ])->columnSpan(1)
+                    ]),
             ]);
     }
 
@@ -212,7 +204,9 @@ class SubscriptionResource extends Resource
             ->headerActions([
                 FilamentExportHeaderAction::make('Export'),
             ])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->actions([Tables\Actions\EditAction::make()->after(function (RelationManager $livewire){
+                $livewire->emit('refresh');
+            }), Tables\Actions\DeleteAction::make()])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
     }
 

@@ -97,4 +97,19 @@ class LectureRepository
 
         return $lectures;
     }
+
+    /**
+     * Возвращает массив типа [0 => 320, 1 => 252, 2 => 138],
+     * где values - lecture ids
+     */
+    public function getAllPurchasedLectureIdsForCurrentUser(): array
+    {
+        $subscriptions = auth()->user()->actualSubscriptions()->with('lectures')->get();
+
+        return $subscriptions
+            ->map(fn ($subscription) => $subscription->lectures?->modelKeys())
+            ->flatten()
+            ->unique()
+            ->toArray();
+    }
 }

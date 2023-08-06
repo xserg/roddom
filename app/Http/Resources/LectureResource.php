@@ -82,8 +82,8 @@ class LectureResource extends JsonResource
             'list_watched' => $this->whenNotNull($this->list_watched),
             'is_promo' => $this->isPromo(),
             'is_watched' => $this->whenNotNull($this->is_watched),
-            'purchase_info' => $this->whenNotNull($this->purchase_info),
-            'prices' => $this->whenAppended('prices', $this->formPrices()),
+            'purchase_info' => $this->whenAppended('purchase_info', $this->setPurchaseInfo()),
+            'prices' => $this->whenAppended('prices', $this->setPrices()),
             'rates' => [
                 'rate_avg' => $this->averageRate?->rating,
                 'rate_user' => $this->userRate?->rating,
@@ -96,7 +96,7 @@ class LectureResource extends JsonResource
         ];
     }
 
-    private function formPrices(): Closure
+    private function setPrices(): Closure
     {
         return function () {
             if ($this->isPromo()) {
@@ -119,5 +119,28 @@ class LectureResource extends JsonResource
         }
 
         return $prices;
+    }
+
+    private function setPurchaseInfo(): array
+    {
+        $isPurchased = false;
+        $endDate = null;
+
+        //подписки, актуальные, принадлежащие текущему юзеру
+        $subs = $this->actualSubscriptionItemsForCurrentUser;
+
+        foreach ($subs as $sub) {
+            if ($sub->lectures?->contains($this->id)) {
+                $isPurchased = true;
+            }
+            if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
+                $endDate = $sub->end_date;
+            }
+        }
+
+        return [
+            'is_purchased' => $isPurchased,
+            'end_date' => $endDate,
+        ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
+use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
@@ -118,6 +119,18 @@ class Lecture extends Model
         return $this->morphMany(Subscription::class, 'subscriptionable');
     }
 
+    public function subscriptionItems(): BelongsToMany
+    {
+        return $this->belongsToMany(Subscription::class, 'subscription_items');
+    }
+
+    public function actualSubscriptionItemsForCurrentUser(): BelongsToMany
+    {
+        return $this->subscriptionItems()
+            ->where('user_id', auth()->id())
+            ->where('end_date', '>', now());
+    }
+
     /**
      * Кастомные цены на платную лекцию
      */
@@ -231,15 +244,10 @@ class Lecture extends Model
         $purchasedLecturesIds = [];
 
         if ($user) {
-            $subs = $user->actualSubscriptions()->with('lectures')->get();
-
-            $purchasedLecturesIds = $subs?->map(function ($subscription) {
-                return $subscription->lectures?->modelKeys();
-            })->flatten()->unique();
+            $purchasedLecturesIds = app(LectureRepository::class)->getAllPurchasedLectureIdsForCurrentUser();
         }
 
-        $query
-            ->whereIn('id', $purchasedLecturesIds);
+        $query->whereIn('id', $purchasedLecturesIds);
         //            ->orderByRaw("FIELD(id, $ids)");
     }
 

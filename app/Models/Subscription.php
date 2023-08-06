@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -65,6 +66,11 @@ class Subscription extends Model
     public function lectures(): BelongsToMany
     {
         return $this->belongsToMany(Lecture::class, table: 'subscription_items');
+    }
+
+    public function scopeActual(Builder $query): void
+    {
+        $query->where('end_date', '>', now());
     }
 
     public function isActual(): bool
