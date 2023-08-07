@@ -36,7 +36,7 @@ class LecturesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('title')
                     ->label('лекция')
                     ->limit(50)
-                    ->tooltip(fn(?Lecture $record) => $record->title)
+                    ->tooltip(fn (?Lecture $record) => $record->title)
                     ->url(fn (?Lecture $record) => LectureResource::getUrl('edit', ['record' => $record->id])),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('категория')
@@ -55,16 +55,13 @@ class LecturesRelationManager extends RelationManager
                                 $lectures = Lecture::whereDoesntHave(
                                     'subscriptionItems',
                                     fn (Builder $query) => $query->where('id', $currentSubscription->id))
-                                    ->with(array('category'))
+                                    ->with(['category'])
+                                    ->orderBy('title')
                                     ->get();
-                                $options = [];
-                                $lectures->each(function (Lecture $lecture) use (&$options) {
-                                    $lectureTitle = $lecture->title;
-                                    $categoryTitle = $lecture->category->title;
 
-                                    $options[$lecture->id] = Str::limit($lectureTitle, 40) . ' (' . Str::limit($categoryTitle, 25) . ')';
-                                });
-                                return $options;
+                                return $lectures->mapWithKeys(fn (Lecture $lecture) => [
+                                    $lecture->id => Str::limit($lecture->title, 40) . ' (' . Str::limit($lecture->category->title, 25) . ')'
+                                ]);
                             })
                     ])
                     ->preloadRecordSelect()
