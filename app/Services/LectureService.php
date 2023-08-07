@@ -49,7 +49,7 @@ class LectureService
         $prices = [];
 
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
-        $lecturesCount = Lecture::payed()->count();
+        $lecturesCount = Lecture::count();
 
         foreach ($this->periods as $period) {
             $fullCatalogPricesForPeriod = $fullCatalogPrices->where('period_id', $period->id)->first();
