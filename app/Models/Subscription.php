@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Repositories\CategoryRepository;
 use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,8 @@ class Subscription extends Model
     {
         static::creating(self::makeEntityTitle());
         static::updating(self::makeEntityTitle());
+        static::updated(self::syncSubscriptionItems());
+        static::created(self::syncSubscriptionItems());
     }
 
     private static function makeEntityTitle(): Closure
@@ -45,6 +48,28 @@ class Subscription extends Model
             }
 
             $subscription->entity_title = $entityTitle;
+        };
+    }
+
+    private static function syncSubscriptionItems(): Closure
+    {
+        return function (Subscription $subscription) {
+            $type = $subscription->subscriptionable_type;
+            $id = $subscription->subscriptionable_id;
+
+            if ($subscription->isDirty(['subscriptionable_type', 'subscriptionable_id']))
+                if ($type === Lecture::class) {
+                    $subscription->lectures()->sync([$id]);
+                } elseif ($type === Category::class) {
+                    $categoryLectures = app()->make(CategoryRepository::class)->getAllLecturesByCategory($id);
+                    $subscription->lectures()->sync($categoryLectures);
+                } elseif ($type === Promo::class) {
+                    $promoLectures = Lecture::promo()->get('id');
+                    $subscription->lectures()->sync($promoLectures);
+                } elseif ($type === EverythingPack::class) {
+                    $lectures = Lecture::all('id');
+                    $subscription->lectures()->sync($lectures);
+                }
         };
     }
 

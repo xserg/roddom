@@ -127,7 +127,6 @@ class PaymentController extends Controller
                         }
                         $order->save();
                         $subscription->save();
-                        dispatch(new SyncSubscriptionItemsJob($subscription));
                     });
 
                     $this->userService->rewardReferrers($order, $order->user);
