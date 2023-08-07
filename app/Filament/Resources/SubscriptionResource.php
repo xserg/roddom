@@ -23,6 +23,8 @@ use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 class SubscriptionResource extends Resource
 {
@@ -45,7 +47,7 @@ class SubscriptionResource extends Resource
                             Forms\Components\Select::make('user_id')
                                 ->required()
                                 ->multiple(function (string $context) {
-                                    return $context !== 'edit';
+                                    return $context === 'create';
                                 })
                                 ->options(function () {
                                     $users = User::select(['name', 'email', 'id'])->whereNot('is_admin', '1')->get();
@@ -70,10 +72,24 @@ class SubscriptionResource extends Resource
                                         return $usersByEmails->pluck('email', 'id');
                                     }
                                 })
-                                ->disabled(function (string $context) {
-                                    return $context === 'edit';
+                                ->visible(function (string $context) {
+                                    return $context !== 'edit';
+                                })
+                                ->dehydrated(function (string $context) {
+                                    return $context !== 'edit';
                                 })
                                 ->label('пользователь'),
+
+                            Forms\Components\Placeholder::make('user_name')
+                                ->content(function (Closure $get, ?Subscription $record) {
+                                    $name = $record->user?->name ?? $record->user?->email;
+                                    $path = UserResource::getUrl('edit', ['record' => $record->user?->id]);
+                                    $classes = 'text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500';
+
+                                    return new HtmlString("<a class=$classes href=\"$path\">$name</a>");
+                                })
+                                ->visible(fn(string $context) => $context === 'edit')
+                                ->label('Пользователь'),
                             Forms\Components\Select::make('subscriptionable_type')
                                 ->required()
 //                                ->disabled(fn (string $context) => $context === 'edit')
@@ -100,10 +116,18 @@ class SubscriptionResource extends Resource
                                 ->options(function (Closure $set, Closure $get) {
                                     $type = $get('subscriptionable_type');
                                     return match ($type) {
-                                        Category::class => Category::orderBy('title')->pluck('title', 'id'),
-                                        Lecture::class => Lecture::orderBy('title')->pluck('title', 'id'),
-                                        Promo::class => Promo::all()->pluck('id', 'id'),
-                                        EverythingPack::class => [1 => 1],
+                                        Category::class => Category::orderBy('parent_id')->get()->mapWithKeys(fn (Category $category) => [
+                                            $category->id => $category->title . ' (' . ($category->isMain() ? 'основная) '
+                                                    . $category->childrenCategories()->withCount('lectures')->get()->sum('lectures_count')
+                                                    : 'подкатегория) ' . $category->lectures()->count()) . ' лекций'
+                                        ]),
+                                        Lecture::class => Lecture::orderBy('title')->get()->mapWithKeys(fn (Lecture $lecture) => [
+                                            $lecture->id => Str::limit($lecture->title, 60) . ' (' . Str::limit($lecture->category->title, 25) . ')'
+                                        ]),
+                                        Promo::class => Promo::all()->mapWithKeys(fn (Promo $promo) => [
+                                            1 => Lecture::promo()->count()  . ' лекций'
+                                        ]),
+                                        EverythingPack::class => [1 => Lecture::count() . ' лекций'],
                                         default => null
                                     };
                                 })
@@ -204,7 +228,7 @@ class SubscriptionResource extends Resource
             ->headerActions([
                 FilamentExportHeaderAction::make('Export'),
             ])
-            ->actions([Tables\Actions\EditAction::make()->after(function (RelationManager $livewire){
+            ->actions([Tables\Actions\EditAction::make()->after(function (RelationManager $livewire) {
                 $livewire->emit('refresh');
             }), Tables\Actions\DeleteAction::make()])
             ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
