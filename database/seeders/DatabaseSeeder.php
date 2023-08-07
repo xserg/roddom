@@ -12,6 +12,7 @@ use App\Models\Period;
 use App\Models\Promo;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Repositories\CategoryRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -63,8 +64,8 @@ class DatabaseSeeder extends Seeder
                 if (is_null(Lecture::find($subscription->subscriptionable_id))) return;
                 $subscription->lectures()->sync([$subscription->subscriptionable_id]);
             } elseif ($subscription->subscriptionable_type == Category::class) {
-                $lectureIds = Category::find($subscription->subscriptionable_id)->lectures()->get(['id']);
-                $subscription->lectures()->sync($lectureIds);
+                $categoryLectures = app()->make(CategoryRepository::class)->getAllLecturesByCategory($subscription->subscriptionable_id);
+                $subscription->lectures()->sync($categoryLectures);
             } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
                 $lectureIds = Lecture::all(['id']);
                 $subscription->lectures()->sync($lectureIds);
