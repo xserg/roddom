@@ -141,6 +141,9 @@ class RetrieveAllPromoLecturesController extends Controller
             'pricesPeriodsInPromoPacks',
             'pricesForLectures',
             'rates',
+            'averageRate',
+            'userRate',
+            'actualSubscriptionItemsForCurrentUser.lectures',
             'watchedUsers',
             'savedUsers',
             'listWatchedUsers'
@@ -148,8 +151,7 @@ class RetrieveAllPromoLecturesController extends Controller
         $builder = $this->lectureRepository->getAllPromoQueryWith($relations);
         $builder = $this->lectureRepository->addFiltersToQuery($builder);
 
-        $lectures = $builder->get()->append('prices');
-        $lectures = $this->lectureService->setPurchaseInfoToLectures($lectures);
+        $lectures = $builder->get()->append(['prices', 'purchase_info']);
 
         $lectures = $this->lectureRepository->paginate(
             $lectures,

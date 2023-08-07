@@ -54,15 +54,13 @@ class RetrieveLectureController
 {
     public function __construct(
         private LectureRepository $lectureRepository,
-        private LectureService    $lectureService
     ) {
     }
 
     public function __invoke(Request $request, int $id): JsonResource|JsonResponse
     {
         $builder = $this->lectureRepository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
-        $lecture = $builder->get()->append(['prices']);
-        $lecture = $this->lectureService->setPurchaseInfoToLectures($lecture)->first();
+        $lecture = $builder->get()->append(['prices', 'purchase_info'])->first();
 
         if (is_null($lecture)) {
             return response()->json([
