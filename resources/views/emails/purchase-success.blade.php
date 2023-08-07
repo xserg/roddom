@@ -1,9 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>{{ config('app.name') }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
     <style type="text/css">
@@ -89,7 +90,6 @@
             -premailer-cellpadding: 0;
             -premailer-cellspacing: 0;
             -premailer-width: 100%;
-            background-color: #edf2f7;
             margin: 0;
             padding: 0;
             width: 100%;
@@ -102,20 +102,6 @@
             margin: 0;
             padding: 0;
             width: 100%;
-        }
-
-        /* Header */
-
-        .header {
-            padding: 25px 0;
-            text-align: center;
-        }
-
-        .header a {
-            color: #3d4852;
-            font-size: 19px;
-            font-weight: bold;
-            text-decoration: none;
         }
 
         /* Logo */
@@ -144,9 +130,6 @@
             -premailer-cellpadding: 0;
             -premailer-cellspacing: 0;
             -premailer-width: 570px;
-            background-color: #ffffff;
-            border-color: #e8e5ef;
-            border-radius: 2px;
             border-width: 1px;
             box-shadow: 0 2px 0 rgba(0, 0, 150, 0.025), 2px 4px 0 rgba(0, 0, 150, 0.015);
             margin: 0 auto;
@@ -213,70 +196,8 @@
             padding: 10px 0;
         }
 
-        .content-cell {
-            max-width: 100vw;
-            padding: 32px;
-        }
-
-        /* Buttons */
-
-        .action {
-            -premailer-cellpadding: 0;
-            -premailer-cellspacing: 0;
-            -premailer-width: 100%;
-            margin: 30px auto;
-            padding: 0;
-            text-align: center;
-            width: 100%;
-        }
-
-        .button {
-            -webkit-text-size-adjust: none;
-            border-radius: 4px;
-            color: #fff;
-            display: inline-block;
-            overflow: hidden;
-            text-decoration: none;
-        }
-
-        .button-blue,
-        .button-primary {
-            background-color: #2d3748;
-            border-bottom: 8px solid #2d3748;
-            border-left: 18px solid #2d3748;
-            border-right: 18px solid #2d3748;
-            border-top: 8px solid #2d3748;
-        }
-
-        .button-green,
-        .button-success {
-            background-color: #48bb78;
-            border-bottom: 8px solid #48bb78;
-            border-left: 18px solid #48bb78;
-            border-right: 18px solid #48bb78;
-            border-top: 8px solid #48bb78;
-        }
-
-        .button-red,
-        .button-error {
-            background-color: #e53e3e;
-            border-bottom: 8px solid #e53e3e;
-            border-left: 18px solid #e53e3e;
-            border-right: 18px solid #e53e3e;
-            border-top: 8px solid #e53e3e;
-        }
-
         /* Panels */
 
-        .panel {
-            border-left: #2d3748 solid 4px;
-            margin: 21px 0;
-        }
-
-        .panel-content {
-            background-color: #edf2f7;
-            color: #718096;
-            padding: 16px;
         }
 
         .panel-content p {
@@ -292,39 +213,24 @@
             padding-bottom: 0;
         }
 
-        /* Utilities */
 
-        .break-all {
-            word-break: break-all;
-        }
-
-        @media only screen and (max-width: 600px) {
-            .inner-body {
-                width: 100% !important;
-            }
-
-            .footer {
-                width: 100% !important;
-            }
-        }
-
-        @media only screen and (max-width: 500px) {
-            .button {
-                width: 100% !important;
-            }
-        }
     </style>
 </head>
 <body>
 
-<table class="wrapper" width="100%" cellpadding="0" cellspacing="0" role="presentation">
+<table class="wrapper" style="background-color: #edf2f7;" width="100%" cellpadding="0" cellspacing="0"
+       role="presentation">
     <tr>
         <td align="center">
             <table class="content" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 @props(['url'])
                 <tr>
-                    <td class="header">
-                        <a href="{{ $appLink }}">{{ $appName }}</a>
+                    <td class="header" style=" padding: 25px 0;
+            text-align: center;">
+                        <a style=" color: #3d4852;
+            font-size: 19px;
+            font-weight: bold;
+            text-decoration: none;" href="{{ $appLink }}">{{ $appName }}</a>
                         </a>
                     </td>
                 </tr>
@@ -333,15 +239,24 @@
                 <!-- Email Body -->
                 <tr>
                     <td class="body" width="100%" cellpadding="0" cellspacing="0" style="border: hidden !important;">
-                        <table class="inner-body" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+                        <table class="inner-body"
+                               style="background-color: #ffffff;border-color: #e8e5ef;border-radius: 2px;"
+                               align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
                             <!-- Body content -->
                             <tr>
-                                <td class="content-cell">
-                                    <img src="{{ $image }}" alt="">
+                                <td class="content-cell" style=" max-width: 100vw;padding: 32px;">
+                                    <img style="display:block; margin: 0 auto;" src="{{ $image }}" alt="">
                                     <h1>Покупка успешно совершена</h1>
-                                    {!! $text !!}
-                                    <p><b>Приобретено</b>: <a href="{{ config('app.back2site') }}">{{ $entity }}</a>.</p>
-                                    <p>Срок действия с <b>{{ $dateStart }}</b> до <b>{{ $dateEnd }}</b>.</p>
+                                    <span style="font-size: 17px;line-height: 1.5em;margin-top: 0;text-align: left;">
+                                        {!! $text !!}
+                                    </span>
+                                    <p style="font-size: 17px;line-height: 1.5em;margin-top: 0;text-align: left;">
+                                        <b>Приобретено</b>: <a style="color: #000001"
+                                                              href="{{ config('app.back2site') }}">{{ $entity }}</a>.
+                                    </p>
+                                    <p style="font-size: 17px;line-height: 1.5em; margin-top: 0;text-align: left;">
+                                        Срок действия с <b>{{ $dateStart }}</b> до <b>{{ $dateEnd }}</b>.
+                                    </p>
                                 </td>
                             </tr>
                         </table>
@@ -350,9 +265,10 @@
 
                 <tr>
                     <td>
-                        <table class="footer" align="center" width="570" cellpadding="0" cellspacing="0" role="presentation">
+                        <table class="footer" style=" margin: 0 auto;padding: 0;text-align: center;width: 570px;" align="center" width="570" cellpadding="0" cellspacing="0"
+                               role="presentation">
                             <tr>
-                                <td class="content-cell" align="center">
+                                <td class="content-cell" style="max-width: 100vw;padding: 32px;" align="center">
 
                                     Всегда Ваши,<br>
                                     {{ $appName }}
