@@ -4,7 +4,7 @@ namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
 use App\Filament\Resources\UserResource\Widgets\LectureViews;
-use App\Models\User;
+use App\Filament\Resources\UserResource\Widgets\ReferralsOfUserWidget;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -38,7 +38,7 @@ class EditUser extends EditRecord
     protected function getFooterWidgets(): array
     {
         return [
-            UserResource\Widgets\ReferralsOfUserWidget::class,
+            ReferralsOfUserWidget::class,
             LectureViews::class
         ];
     }

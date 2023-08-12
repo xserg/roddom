@@ -48,7 +48,18 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where('is_admin', 0);
+            ->where('is_admin', 0)
+            ->with([
+                'referrals',
+                'referralsSecondLevel',
+                'referralsThirdLevel',
+                'referralsFourthLevel',
+                'referralsFifthLevel',
+                'watchedLecturesHistory',
+                'watchedLecturesToday',
+                'watchedLectures',
+                'watchedLecturesHistoryToday'
+            ]);
     }
 
     public static function form(Form $form): Form
@@ -141,11 +152,11 @@ class UserResource extends Resource
                         ->options(function (string $context, ?Model $record) {
                             if ($context === 'edit') {
                                 $allLevelsReferralsAndSelfIds = [
-                                    ...$record->referrals()->pluck('users.id')->toArray(),
-                                    ...$record->referralsSecondLevel()->pluck('users.id')->toArray(),
-                                    ...$record->referralsThirdLevel()->pluck('users.id')->toArray(),
-                                    ...$record->referralsFourthLevel()->pluck('users.id')->toArray(),
-                                    ...$record->referralsFifthLevel()->pluck('users.id')->toArray(),
+                                    ...$record->referrals->pluck('id')->toArray(),
+                                    ...$record->referralsSecondLevel->pluck('id')->toArray(),
+                                    ...$record->referralsThirdLevel->pluck('id')->toArray(),
+                                    ...$record->referralsFourthLevel->pluck('id')->toArray(),
+                                    ...$record->referralsFifthLevel->pluck('id')->toArray(),
                                     $record->id
                                 ];
                                 $users = User::select(['name', 'email', 'id'])
@@ -171,11 +182,11 @@ class UserResource extends Resource
                     ->label('Количество рефералов')
                     ->content(function (?Model $record) {
                         $allLevelsReferralsCount =
-                            $record->referrals()->count() +
-                            $record->referralsSecondLevel()->count() +
-                            $record->referralsThirdLevel()->count() +
-                            $record->referralsFourthLevel()->count() +
-                            $record->referralsFifthLevel()->count();
+                            $record->referrals->count() +
+                            $record->referralsSecondLevel->count() +
+                            $record->referralsThirdLevel->count() +
+                            $record->referralsFourthLevel->count() +
+                            $record->referralsFifthLevel->count();
 
                         return $allLevelsReferralsCount;
                     })

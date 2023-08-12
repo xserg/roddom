@@ -3,10 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
-use App\Repositories\LectureRepository;
-use App\Services\LectureService;
+use App\QueryBuilders\LectureQueryBuilder;
 use App\Traits\MoneyConversion;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,17 +18,6 @@ use Illuminate\Support\Facades\Log;
 class Lecture extends Model
 {
     use HasFactory, MoneyConversion;
-
-    private $lectureService;
-
-//    protected $appends = [
-//        'is_watched',
-//        'prices',
-//        'is_saved',
-//        'list_watched',
-//        'id_title',
-//        'a_rates',
-//    ];
 
     protected $casts = [
         'created_at' => 'datetime',
@@ -59,15 +46,14 @@ class Lecture extends Model
 
     protected $hidden = ['pivot'];
 
-    public function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
-        $this->lectureService = app(LectureService::class);
-    }
-
     protected static function booted(): void
     {
         static::addGlobalScope(new PublishedScope);
+    }
+
+    public function newEloquentBuilder($query): LectureQueryBuilder
+    {
+        return new LectureQueryBuilder($query);
     }
 
     public function category(): BelongsTo
@@ -92,10 +78,7 @@ class Lecture extends Model
 
     public function watchedUsers(): BelongsToMany
     {
-        return $this->belongsToMany(
-            User::class,
-            'user_to_watched_lectures',
-        )->distinct();
+        return $this->belongsToMany(User::class, 'user_to_watched_lectures')->distinct();
     }
 
     public function listWatchedUsers(): BelongsToMany
@@ -173,151 +156,30 @@ class Lecture extends Model
         return $this->hasMany(LectureRate::class);
     }
 
-    public function scopeWatched(Builder $query): void
-    {
-        if (auth()->user()) {
-            $watchedIds = auth()
-                ->user()
-                ->watchedLectures()
-                ->pluck($this->getTable() . '.' . $this->getKeyName())
-                ->toArray();
-
-            $query->whereIn('id', $watchedIds);
-
-            if (! empty($watchedIds)) {
-                $ids = implode(',', $watchedIds);
-                $query->orderByRaw("FIELD(id, $ids)");
-            }
-        }
-    }
-
-    public function scopeListWatched(Builder $query): void
-    {
-        if (auth()->user()) {
-            $listWatchedIds = auth()
-                ->user()
-                ->listWatchedLectures()
-                ->pluck($this->getTable() . '.' . $this->getKeyName())
-                ->toArray();
-
-            $query->whereIn('id', $listWatchedIds);
-
-            if (! empty($listWatchedIds)) {
-                $ids = implode(',', $listWatchedIds);
-                $query->orderByRaw("FIELD(id, $ids)");
-            }
-        }
-    }
-
-    public function scopeSaved(Builder $query): void
-    {
-        if (auth()->user()) {
-            $savedIds = auth()
-                ->user()
-                ->savedLectures()
-                ->pluck($this->getTable() . '.' . $this->getKeyName())
-                ->toArray();
-
-            $query->whereIn('id', $savedIds);
-
-            if (! empty($savedIds)) {
-                $ids = implode(',', $savedIds);
-                $query->orderByRaw("FIELD(id, $ids)");
-            }
-        }
-    }
-
-    public function scopePromo(Builder $query): void
-    {
-        $query->where('payment_type_id', LecturePaymentType::PROMO);
-    }
-
-    public function scopeNotPromo(Builder $query): void
-    {
-        $query->where('payment_type_id', '!=', LecturePaymentType::PROMO);
-    }
-
-    public function scopePurchased(Builder $query): void
-    {
-        $user = auth()->user();
-
-        $purchasedLecturesIds = [];
-
-        if ($user) {
-            $purchasedLecturesIds = app(LectureRepository::class)->getAllPurchasedLectureIdsForCurrentUser();
-        }
-
-        $query->whereIn('id', $purchasedLecturesIds);
-        //            ->orderByRaw("FIELD(id, $ids)");
-    }
-
-    public function scopeFree(Builder $query): void
-    {
-        $query->where('payment_type_id', LecturePaymentType::FREE);
-    }
-
-    public function scopePayed(Builder $query): void
-    {
-        $query->where('payment_type_id', '!=', LecturePaymentType::FREE);
-    }
-
-    public function scopeNotWatched(Builder $query): void
-    {
-        $user = auth()->user();
-        if ($user) {
-            $query->whereDoesntHave('watchedUsers', function (Builder $query) {
-                $query->where('user_id', auth()->id());
-            });
-        }
-    }
-
-    public function scopeRecommended(Builder $query): void
-    {
-        $query->where('is_recommended', '=', true);
-    }
-
     protected function isWatched(): Attribute
     {
-        if (! auth()->user()) {
-            return new Attribute(
-                get: fn () => false,
-            );
-        }
-
         return new Attribute(
-            get: fn () => $this
-                ->watchedUsers
-                ->contains('id', auth()->id())
+            get: fn () => auth()->user() ?
+                $this->watchedUsers->contains('id', auth()->id())
+                : false
         );
     }
 
     protected function isSaved(): Attribute
     {
-        if (! auth()->user()) {
-            return new Attribute(
-                get: fn () => false,
-            );
-        }
-
         return new Attribute(
-            get: fn () => $this
-                ->savedUsers
-                ->contains('id', auth()->id())
+            get: fn () => auth()->user() ?
+                $this->savedUsers->contains('id', auth()->id())
+                : false
         );
     }
 
     protected function listWatched(): Attribute
     {
-        if (! auth()->user()) {
-            return new Attribute(
-                get: fn () => false,
-            );
-        }
-
         return new Attribute(
-            get: fn () => $this
-                ->listWatchedUsers
-                ->contains('id', auth()->id())
+            get: fn () => auth()->user() ?
+                $this->listWatchedUsers->contains('id', auth()->id())
+                : false
         );
     }
 

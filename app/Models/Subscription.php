@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Repositories\CategoryRepository;
-use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,66 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Subscription extends Model
 {
-    protected $fillable = [
-        'user_id',
-        'period_id',
-        'subscriptionable_type',
-        'subscriptionable_id',
-        'start_date',
-        'end_date',
-        'total_price',
-        'entity_title',
-        'points'
-    ];
-
-    protected static function booted()
-    {
-        static::creating(self::makeEntityTitle());
-        static::updating(self::makeEntityTitle());
-        static::updated(self::syncSubscriptionItems());
-        static::created(self::syncSubscriptionItems());
-    }
-
-    private static function makeEntityTitle(): Closure
-    {
-        return function (Subscription $subscription) {
-            if ($subscription->subscriptionable_type == Lecture::class) {
-                $entityTitle = 'Лекция: ' . Lecture::query()->find($subscription->subscriptionable_id)->title;
-            } elseif ($subscription->subscriptionable_type == Category::class) {
-                $entityTitle = 'Категория: ' . Category::query()->find($subscription->subscriptionable_id)->title;
-            } elseif ($subscription->subscriptionable_type == Promo::class) {
-                $entityTitle = 'Промопак лекций';
-            } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
-                $entityTitle = 'Все лекции';
-            } else {
-                $entityTitle = 'Заголовок лекции не определён';
-            }
-
-            $subscription->entity_title = $entityTitle;
-        };
-    }
-
-    private static function syncSubscriptionItems(): Closure
-    {
-        return function (Subscription $subscription) {
-            $type = $subscription->subscriptionable_type;
-            $id = $subscription->subscriptionable_id;
-
-            if ($subscription->isDirty(['subscriptionable_type', 'subscriptionable_id']))
-                if ($type === Lecture::class) {
-                    $subscription->lectures()->sync([$id]);
-                } elseif ($type === Category::class) {
-                    $categoryLectures = app()->make(CategoryRepository::class)->getAllLecturesByCategory($id);
-                    $subscription->lectures()->sync($categoryLectures);
-                } elseif ($type === Promo::class) {
-                    $promoLectures = Lecture::promo()->get('id');
-                    $subscription->lectures()->sync($promoLectures);
-                } elseif ($type === EverythingPack::class) {
-                    $lectures = Lecture::all('id');
-                    $subscription->lectures()->sync($lectures);
-                }
-        };
-    }
+    protected $guarded = [];
 
     public function subscriptionable(): MorphTo
     {
@@ -95,11 +34,12 @@ class Subscription extends Model
 
     public function scopeActual(Builder $query): void
     {
-        $query->where('end_date', '>', now());
+        $query->where('start_date', '<', now())
+            ->where('end_date', '>', now());
     }
 
     public function isActual(): bool
     {
-        return $this->end_date > now();
+        return ($this->end_date > now()) && ($this->start_date < now());
     }
 }

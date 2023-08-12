@@ -39,7 +39,6 @@ class User extends Authenticatable implements FilamentUser
         'ref_token',
         'can_get_referrals_bonus',
         'can_get_referrers_bonus',
-        'order',
         'next_free_lecture_available'
     ];
 
@@ -83,10 +82,26 @@ class User extends Authenticatable implements FilamentUser
             ->withTimestamps();
     }
 
+    public function watchedLecturesHistoryToday(): BelongsToMany
+    {
+        return $this->belongsToMany(Lecture::class, 'user_to_watched_lectures')
+            ->using(WatchedLecturesUsersPivot::class)
+            ->withTimestamps()
+            ->wherePivotBetween('created_at', [today(), today()->addHours(24)]);
+    }
+
     public function watchedLectures(): BelongsToMany
     {
         return $this->belongsToMany(Lecture::class, 'user_to_watched_lectures')
             ->using(WatchedLecturesUsersPivot::class)
+            ->distinct();
+    }
+
+    public function watchedLecturesToday(): BelongsToMany
+    {
+        return $this->belongsToMany(Lecture::class, 'user_to_watched_lectures')
+            ->using(WatchedLecturesUsersPivot::class)
+            ->wherePivotBetween('created_at', [today(), today()->addHours(24)])
             ->distinct();
     }
 
@@ -118,6 +133,7 @@ class User extends Authenticatable implements FilamentUser
     public function actualSubscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class)
+            ->where('start_date', '<', now())
             ->where('end_date', '>', now())
             ->orderBy('created_at', 'desc');
     }
@@ -130,13 +146,13 @@ class User extends Authenticatable implements FilamentUser
     public function lectureSubscriptions(): HasMany
     {
         return $this->subscriptions()
-            ->where('subscriptionable_type', '=', Lecture::class);
+            ->where('subscriptionable_type', Lecture::class);
     }
 
     public function categorySubscriptions(): HasMany
     {
         return $this->subscriptions()
-            ->where('subscriptionable_type', '=', Category::class);
+            ->where('subscriptionable_type', Category::class);
     }
 
     public function everythingPackSubscriptions(): HasMany
@@ -148,7 +164,8 @@ class User extends Authenticatable implements FilamentUser
     public function actualEverythingPackSubscriptions(): HasMany
     {
         return $this->subscriptions()
-            ->where('subscriptionable_type', '=', EverythingPack::class)
+            ->where('subscriptionable_type', EverythingPack::class)
+            ->where('start_date', '<', now())
             ->where('end_date', '>', now())
             ->latest('id');
     }
@@ -156,6 +173,7 @@ class User extends Authenticatable implements FilamentUser
     public function actualCategorySubscriptions(): HasMany
     {
         return $this->categorySubscriptions()
+            ->where('start_date', '<', now())
             ->where('end_date', '>', now());
     }
 
