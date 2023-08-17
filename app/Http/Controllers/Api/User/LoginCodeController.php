@@ -14,6 +14,7 @@ use App\Services\LoginCodeService;
 use App\Services\UserService;
 use Exception;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -142,6 +143,8 @@ class LoginCodeController extends Controller
             ->plainTextToken;
 
         $user = $this->userService->appendLectureCountersToUser($user);
+
+        Log::error("залогинили юзера $user->email, код был $code");
 
         return response()->json([
             'user' => new UserResource($user),

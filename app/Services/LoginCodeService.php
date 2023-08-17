@@ -7,6 +7,7 @@ use App\Exceptions\LoginCodeExpiredException;
 use App\Models\LoginCode;
 use App\Repositories\LoginCodeRepository;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class LoginCodeService
 {
@@ -35,7 +36,7 @@ class LoginCodeService
         } catch (Exception) {
             throw new FailedCreateLoginCodeException();
         }
-
+        Log::warning("создали для $email код $code");
         return $loginCode;
     }
 
