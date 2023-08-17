@@ -34,8 +34,6 @@ class LoginCodeService
 
             Mail::to($email)
                 ->send(new SendLoginCode($code));
-
-            throw new \RuntimeException('Mail won\'t be sent');
         });
         Log::warning("создали для $email код $code");
     }
