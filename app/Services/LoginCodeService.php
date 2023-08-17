@@ -34,8 +34,9 @@ class LoginCodeService
 
             Mail::to($email)
                 ->send(new SendLoginCode($code));
+
+            Log::warning("создали, послали для $email код $code");
         });
-        Log::warning("создали для $email код $code");
     }
 
     /**
