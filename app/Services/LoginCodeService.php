@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Exceptions\FailedCreateLoginCodeException;
 use App\Exceptions\LoginCodeExpiredException;
+use App\Mail\SendLoginCode;
 use App\Models\LoginCode;
 use App\Repositories\LoginCodeRepository;
-use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class LoginCodeService
 {
@@ -23,21 +24,20 @@ class LoginCodeService
             ->delete();
     }
 
-    /**
-     * @throws FailedCreateLoginCodeException
-     */
-    public function create(string $email, int|string $code): LoginCode
+    public function createAndSendEmail(string $email, int|string $code): void
     {
-        try {
-            $loginCode = LoginCode::create([
+        DB::transaction(function () use ($email, $code) {
+            LoginCode::create([
                 'email' => $email,
                 'code' => $code,
             ]);
-        } catch (Exception) {
-            throw new FailedCreateLoginCodeException();
-        }
+
+            Mail::to($email)
+                ->send(new SendLoginCode($code));
+
+            throw new \RuntimeException('Mail won\'t be sent');
+        });
         Log::warning("создали для $email код $code");
-        return $loginCode;
     }
 
     /**

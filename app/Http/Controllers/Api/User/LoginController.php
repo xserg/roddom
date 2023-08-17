@@ -69,7 +69,7 @@ class LoginController
         $code = mt_rand(100000, 999999);
 
         try {
-            $this->loginCodeService->create($email, $code);
+            $this->loginCodeService->createAndSendEmail($email, $code);
 
         } catch (FailedCreateLoginCodeException $exception) {
 
@@ -78,8 +78,7 @@ class LoginController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        $sent = Mail::to($email)
-            ->send(new SendLoginCode($code));
+
 
         if (! $sent) {
             return response()->json([

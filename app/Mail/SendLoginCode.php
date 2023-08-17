@@ -2,13 +2,13 @@
 
 namespace App\Mail;
 
+use Duijker\LaravelTransactionalMails\TransactionalMailable;
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendLoginCode extends Mailable
+class SendLoginCode extends TransactionalMailable
 {
     use Queueable, SerializesModels;
 

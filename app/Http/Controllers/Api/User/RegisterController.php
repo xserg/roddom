@@ -59,21 +59,12 @@ class RegisterController
             ]);
 
             $code = mt_rand(100000, 999999);
-            $this->loginCodeService->create($email, $code);
+            $this->loginCodeService->createAndSendEmail($email, $code);
 
         } catch (\Exception $exception) {
             return response()->json(
                 ['message' => $exception->getMessage()],
                 Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        $sent = Mail::to($email)
-            ->send(new SendLoginCode($code));
-
-        if (! $sent) {
-            return response()->json([
-                'message' => 'Невозможно послать email с кодом логина',
-            ], \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4abbe82ecf913ca69bf8f5fa7905594",
+    "content-hash": "032a04541e2a2c0baddd5dd96e00e281",
     "packages": [
         {
             "name": "akaunting/laravel-money",
@@ -3193,6 +3193,66 @@
                 }
             ],
             "time": "2023-02-06T13:46:10+00:00"
+        },
+        {
+            "name": "mvanduijker/laravel-transactional-mails",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mvanduijker/laravel-transactional-mails.git",
+                "reference": "ad6e3311f7e37ffb872209ba3d9487183a989aa7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mvanduijker/laravel-transactional-mails/zipball/ad6e3311f7e37ffb872209ba3d9487183a989aa7",
+                "reference": "ad6e3311f7e37ffb872209ba3d9487183a989aa7",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "~6.0,!=6.9.0|~7.0|~8.0|~9.0|~10.0",
+                "illuminate/mail": "~6.0|~7.0|~8.0|~9.0|~10.0",
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "larapack/dd": "^1.0",
+                "orchestra/testbench": "~4.0|~5.0|~6.0|~7.0|~8.0",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Duijker\\LaravelTransactionalMails\\TransactionalMailsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Duijker\\LaravelTransactionalMails\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Mark van Duijker",
+                    "email": "mark@duyker.nl",
+                    "homepage": "https://github.com/mvanduijker",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Send mails after DB transaction is committed",
+            "keywords": [
+                "database",
+                "laravel",
+                "mail",
+                "mailable",
+                "transaction"
+            ],
+            "support": {
+                "issues": "https://github.com/mvanduijker/laravel-transactional-mails/issues",
+                "source": "https://github.com/mvanduijker/laravel-transactional-mails/tree/1.7.0"
+            },
+            "time": "2023-02-14T20:50:59+00:00"
         },
         {
             "name": "nesbot/carbon",
