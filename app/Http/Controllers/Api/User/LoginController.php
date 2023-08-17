@@ -68,23 +68,7 @@ class LoginController
         $this->loginCodeService->deleteWhereEmail($email);
         $code = mt_rand(100000, 999999);
 
-        try {
-            $this->loginCodeService->createAndSendEmail($email, $code);
-
-        } catch (FailedCreateLoginCodeException $exception) {
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-
-
-        if (! $sent) {
-            return response()->json([
-                'message' => 'Невозможно послать email с кодом логина',
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $this->loginCodeService->createAndSendEmail($email, $code);
 
         return response()->json([
             'message' => 'Код отослан на ваш email',
