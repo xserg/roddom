@@ -52,13 +52,13 @@ Route::prefix('v1')
             ->name('register');
         Route::post('/user/login', LoginController::class)
             ->name('login')
-            ->middleware(['throttle:1,0.33']);
+            ->middleware(['throttle:1,0.1']);
         Route::post('/user/login/code', LoginCodeController::class)
             ->name('login.code')
             ->middleware(['throttle:3,1']);
         Route::post('/user/resend-login-code', ResendLoginCodeController::class)
             ->name('resend.login.code')
-            ->middleware(['throttle:1,0.33']);
+            ->middleware(['throttle:1,0.1']);
 
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
