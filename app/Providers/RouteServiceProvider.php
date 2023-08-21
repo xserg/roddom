@@ -44,7 +44,7 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
         RateLimiter::for('login-code', function (Request $request) {
-            return Limit::perMinute(3)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
         });
         RateLimiter::for('login-attempt', function (Request $request) {
             return \App\Http\Cache\Limit::perSeconds(6, 1)->by($request->user()?->id ?: $request->ip());
