@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use Illuminate\Cache\RateLimiting\Limit;
+use App\Http\Cache\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -40,14 +40,27 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting(): void
     {
-        RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        $this->createRateLimiter('api', $this->limiterOptions());
+        $this->createRateLimiter('login-code', $this->limiterOptions(maxAttempts: 30));
+        $this->createRateLimiter('login-attempt', $this->limiterOptions('perSeconds', 1, 6));
+    }
+
+    private function createRateLimiter(string $name, object $options): void
+    {
+        RateLimiter::for($name, function (Request $request) use ($options) {
+            return match ($options->type) {
+                'perMinute' => Limit::perMinute($options->maxAttempts)->by($request->user()?->id ?: $request->ip()),
+                'perSeconds' => Limit::perSeconds($options->decay, $options->maxAttempts)->by($request->user()?->id ?: $request->ip())
+            };
         });
-        RateLimiter::for('login-code', function (Request $request) {
-            return Limit::perMinute(10)->by($request->user()?->id ?: $request->ip());
-        });
-        RateLimiter::for('login-attempt', function (Request $request) {
-            return \App\Http\Cache\Limit::perSeconds(6, 1)->by($request->user()?->id ?: $request->ip());
-        });
+    }
+
+    private function limiterOptions(string $type = 'perMinute', int $maxAttempts = 60, int $decay = 60): object
+    {
+        return (object) [
+            'type' => $type,
+            'maxAttempts' => $maxAttempts,
+            'decay' => $decay
+        ];
     }
 }
