@@ -67,6 +67,8 @@ class AppServiceProvider extends ServiceProvider
                 NavigationGroup::make()
                     ->label('Пользователи'),
                 NavigationGroup::make()
+                    ->label('Уведомления'),
+                NavigationGroup::make()
                     ->label('Приложение'),
                 NavigationGroup::make()
                     ->label('Партнерская программа'),

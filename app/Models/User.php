@@ -39,7 +39,8 @@ class User extends Authenticatable implements FilamentUser
         'ref_token',
         'can_get_referrals_bonus',
         'can_get_referrers_bonus',
-        'next_free_lecture_available'
+        'next_free_lecture_available',
+        'is_notification_read'
     ];
 
     protected $hidden = [
@@ -53,7 +54,8 @@ class User extends Authenticatable implements FilamentUser
         'is_admin' => 'bool',
         'is_mother' => 'bool',
         'can_get_referrals_bonus' => 'bool',
-        'can_get_referrers_bonus' => 'bool'
+        'can_get_referrers_bonus' => 'bool',
+        'is_notification_read' => 'bool'
     ];
 
     protected static function booted(): void
@@ -293,6 +295,19 @@ class User extends Authenticatable implements FilamentUser
     public function hasReferrer(): bool
     {
         return $this->referrer()->exists();
+    }
+
+    public function markNotificationRead()
+    {
+        return $this->fill([
+            'is_notification_read' => true,
+        ])->save();
+    }
+    public function markNotificationUnread()
+    {
+        return $this->fill([
+            'is_notification_read' => false,
+        ])->save();
     }
 
     protected function purchasedLecturesCounter(): Attribute

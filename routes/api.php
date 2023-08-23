@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\Buy\BuyLectureController;
 use App\Http\Controllers\Api\Buy\BuyPromoController;
 use App\Http\Controllers\Api\Category\RetrieveAllCategoriesController;
 use App\Http\Controllers\Api\Category\RetrieveCategoryController;
+use App\Http\Controllers\Api\CustomNotifications\MarkNotificationReadController;
+use App\Http\Controllers\Api\CustomNotifications\RetrieveNotificationsController;
 use App\Http\Controllers\Api\Lector\RateLectorController;
 use App\Http\Controllers\Api\Lector\RetrieveAllLectorsController;
 use App\Http\Controllers\Api\Lector\RetrieveLectorController;
@@ -145,6 +147,11 @@ Route::prefix('v1')
 
             Route::get('/pregnancy-plan-form', WizardControllerRetrieve::class);
             Route::post('/pregnancy-plan-form', WizardEmailController::class);
+
+            Route::get('/notifications', RetrieveNotificationsController::class)
+                ->name('notifications.index');
+            Route::put('/notifications/read', MarkNotificationReadController::class)
+                ->name('notifications.read');
         });
     });
 

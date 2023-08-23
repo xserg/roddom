@@ -62,6 +62,7 @@ class UserResource extends JsonResource
             'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, default: 0),
             'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, default: 0),
             'purchased_lectures_count' => $this->whenNotNull($this->purchased_lectures_counter, default: 0),
+            'is_notification_read' => $this->is_notification_read,
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,
         ];

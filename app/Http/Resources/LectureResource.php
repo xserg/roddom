@@ -123,6 +123,9 @@ class LectureResource extends JsonResource
 
     private function setPurchaseInfo(): array
     {
+        /**
+         * @var Lecture $this
+         */
         $isPurchased = false;
         $endDate = null;
 
