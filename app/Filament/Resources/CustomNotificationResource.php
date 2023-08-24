@@ -11,9 +11,8 @@ use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomNotificationResource extends Resource
 {
@@ -31,19 +30,22 @@ class CustomNotificationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make([
-                    Forms\Components\RichEditor::make('text')
-                        ->label('Текст уведомления')
-                        ->toolbarButtons([
-                            'bold',
-                            'h2',
-                            'h3',
-                            'italic',
-                            'redo',
-                            'strike',
-                            'undo',
-                            'preview',
-                        ])
-                        ->maxLength(65535),
+//                    Forms\Components\RichEditor::make('text')
+//                        ->label('Текст уведомления')
+//                        ->toolbarButtons([
+//                            'bold',
+//                            'h2',
+//                            'h3',
+//                            'italic',
+//                            'redo',
+//                            'strike',
+//                            'undo',
+//                            'preview',
+//                        ])
+//                        ->maxLength(65535),
+                    TiptapEditor::make('text')
+                        ->profile('barebone')
+                        ->output(TiptapEditor::OUTPUT_HTML),
                 ]),
             ]);
     }
@@ -54,6 +56,7 @@ class CustomNotificationResource extends Resource
             ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('text')
+                    ->formatStateUsing(fn(string $state) => strip_tags($state))
                     ->label('Текст уведомления')
                     ->sortable()
                     ->searchable(),
