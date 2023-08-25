@@ -13,6 +13,7 @@ use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
 use App\Models\Order;
 use App\Models\RefInfo;
+use App\Models\RefPointsGainOnce;
 use App\Models\RefPointsPayments;
 use App\Models\User;
 use App\Repositories\LectureRepository;
@@ -184,28 +185,19 @@ class UserService
         return [$user->photo, $user->photo_small];
     }
 
-    /**
-     * @throws FailedSaveUserException
-     * @throws NotFoundHttpException
-     */
-    public function deletePhoto(Authenticatable|User $user): void
+    public function deletePhoto(int $userId): void
     {
-        if (isset($user->id)) {
-            Storage::delete('images/users/' . $user->id . '.jpg');
-            Storage::delete('images/users/' . $user->id . '-small' . '.jpg');
+        $user = User::findOrFail($userId);
 
-            $user->photo = null;
-            $user->photo_small = null;
+        Storage::delete('images/users/' . $user->id . '.jpg');
+        Storage::delete('images/users/' . $user->id . '-small' . '.jpg');
 
-            $this->saveUserGuard($user);
-        } else {
-            throw new NotFoundHttpException('User not found');
-        }
+        $user->photo = null;
+        $user->photo_small = null;
+
+        $this->saveUserGuard($user);
     }
 
-    /**
-     * @throws Exception
-     */
     public function saveProfile($user, array $profile): User
     {
         $user->fill($profile);
@@ -319,6 +311,20 @@ class UserService
         return $user;
     }
 
+    public function createToken(Model|User $user, string $deviceName = 'default_device')
+    {
+        $token = $user->tokens()->firstWhere('name', $deviceName);
+
+        if (! $token && $user->tokens()->count() >= 3) {
+            $token = $user->tokens()
+                ->orderBy('created_at')
+                ->first();
+        }
+
+        $token?->delete();
+        return $user->createToken($deviceName)->plainTextToken;
+    }
+
     /**
      * @throws Exception
      */
@@ -356,7 +362,7 @@ class UserService
         }
     }
 
-    public function rewardReferrers(Order $order, User $buyer): void
+    public function rewardReferrersForBuying(Order $order, User $buyer): void
     {
         $refInfo = RefInfo::query()->first();
         $residualAmount = $order->price - $order->points;
@@ -438,5 +444,50 @@ class UserService
 //                }
 //            });
 //        }
+    }
+
+    public function rewardForRefLinkRegistration(User $user): void
+    {
+        if ($user->hasReferrer()) {
+            $referrer = $user->referrer;
+
+            if ($referrer->canGetReferrersBonus()) {
+
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
+                $referrer->refPointsGetPayments()->create([
+                    'payer_id' => $user->id,
+                    'ref_points' => $pointsToGet,
+                    'reason' => RefPointsPayments::REASON_INVITE
+                ]);
+
+                if ($referrer->refPoints()->exists()) {
+                    $referrer->refPoints->points += $pointsToGet;
+                    $referrer->refPoints->save();
+                } else {
+                    $referrer->refPoints()->create(['points' => $pointsToGet]);
+                }
+
+                $referrer->markCantGetReferrersBonus();
+            }
+
+            if ($user->canGetReferralsBonus()) {
+                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
+                if ($user->refPoints()->exists()) {
+                    $user->refPoints->points += $pointsToGet;
+                    $user->refPoints->save();
+                } else {
+                    $user->refPoints()->create(['points' => $pointsToGet]);
+                }
+
+                $user->refPointsGetPayments()->create([
+                    'payer_id' => $referrer->id,
+                    'ref_points' => $pointsToGet,
+                    'reason' => RefPointsPayments::REASON_INVITED
+                ]);
+
+                $user->markCantGetReferralsBonus();
+                $user->refresh();
+            }
+        }
     }
 }

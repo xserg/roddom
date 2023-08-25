@@ -38,21 +38,9 @@ class PhotoDeleteController
     ) {
     }
 
-    public function __invoke(
-        //        ProfilePhotoRequest $request
-    ): JsonResponse {
-        $user = auth()->user();
-
-        try {
-            $this->service->deletePhoto($user);
-
-        } catch (Exception $exception) {
-
-            return response()->json([
-                'data' => '',
-                'message' => 'Что-то пошло не так: '.$exception->getMessage(),
-            ], 500);
-        }
+    public function __invoke(): JsonResponse
+    {
+        $this->service->deletePhoto(auth()->id());
 
         return response()->json([
             'message' => 'Фото успешно удалены',

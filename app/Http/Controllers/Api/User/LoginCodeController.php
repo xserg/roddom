@@ -53,94 +53,23 @@ class LoginCodeController extends Controller
     {
         $code = $request->validated('code');
 
-        try {
-            $this
-                ->loginCodeService
-                ->throwIfExpired($code);
+        $this->loginCodeService->throwIfExpired($code);
 
-        } catch (LoginCodeExpiredException $exception) {
-
-            $this->loginCodeService->deleteRecordsWithCode($code);
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
-
-        } catch (Exception $exception) {
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
-
-        $loginCode = $this
-            ->loginCodeRepository
+        $loginCode = $this->loginCodeRepository
             ->latestWhereCode($code);
 
-        $user = $this
-            ->userRepository
+        $user = $this->userRepository
             ->findByEmail(
                 $loginCode->email,
                 ['referrer.refPoints', 'refPoints']
             );
 
-        if ($user->hasReferrer()) {
-            $referrer = $user->referrer;
-
-            if ($referrer->canGetReferrersBonus()) {
-
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
-                $referrer->refPointsGetPayments()->create([
-                    'payer_id' => $user->id,
-                    'ref_points' => $pointsToGet,
-                    'reason' => RefPointsPayments::REASON_INVITE
-                ]);
-
-                if ($referrer->refPoints()->exists()) {
-                    $referrer->refPoints->points += $pointsToGet;
-                    $referrer->refPoints->save();
-                } else {
-                    $referrer->refPoints()->create(['points' => $pointsToGet]);
-                }
-
-                $referrer->markCantGetReferrersBonus();
-            }
-
-            if ($user->canGetReferralsBonus()) {
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
-                if ($user->refPoints()->exists()) {
-                    $user->refPoints->points += $pointsToGet;
-                    $user->refPoints->save();
-                } else {
-                    $user->refPoints()->create(['points' => $pointsToGet]);
-                }
-
-                $user->refPointsGetPayments()->create([
-                    'payer_id' => $referrer->id,
-                    'ref_points' => $pointsToGet,
-                    'reason' => RefPointsPayments::REASON_INVITED
-                ]);
-
-                $user->markCantGetReferralsBonus();
-                $user->refresh();
-            }
-        }
+        $this->userService->rewardForRefLinkRegistration($user);
 
         $this->loginCodeService->deleteRecordsWithCode($code);
 
-        $deviceName = $request->validated('device_name', 'access_token');
-        $token = $user->tokens()->firstWhere('name', $deviceName);
-
-        if (! $token && $user->tokens()->count() >= 3) {
-            $token = $user->tokens()
-                ->orderBy('created_at')
-                ->first();
-        }
-
-        $token?->delete();
-        $token = $user
-            ->createToken($deviceName ?? 'access_token')
-            ->plainTextToken;
+        $deviceName = $request->validated('device_name');
+        $token = $this->userService->createToken($user, $deviceName);
 
         $user = $this->userService->appendLectureCountersToUser($user);
 

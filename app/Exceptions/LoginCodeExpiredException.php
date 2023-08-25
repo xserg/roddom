@@ -7,4 +7,5 @@ use Exception;
 class LoginCodeExpiredException extends Exception
 {
     protected $message = 'Срок действия кода истёк';
+    protected $code = 422;
 }

@@ -74,19 +74,10 @@ class PhotoController
     public function __invoke(
         ProfilePhotoRequest $request
     ): JsonResponse {
-        try {
-            $paths = $this->service->saveUsersPhoto(
-                auth()->user(),
-                $request->validated('photo')
-            );
-
-        } catch (Exception $exception) {
-
-            return response()->json([
-                'data' => '',
-                'message' => 'Что-то пошло не так: ' . $exception->getMessage(),
-            ], 500);
-        }
+        $paths = $this->service->saveUsersPhoto(
+            auth()->user(),
+            $request->validated('photo')
+        );
 
         return response()->json([
             'data' => $paths,

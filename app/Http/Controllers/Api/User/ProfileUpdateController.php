@@ -58,21 +58,9 @@ class ProfileUpdateController
     public function __invoke(
         ProfileRequest $request
     ): JsonResponse {
-        /**
-         * @var $user User
-         */
         $user = auth()->user();
 
-        try {
-            $user = $this
-                ->userService
-                ->saveProfile($user, $request->input());
-        } catch (Exception $exception) {
-            return response()->json([
-                'data' => [],
-                'message' => $exception->getMessage(),
-            ]);
-        }
+        $user = $this->userService->saveProfile($user, $request->validated());
 
         $user = $this->userService->appendLectureCountersToUser($user);
 

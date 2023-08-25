@@ -66,9 +66,8 @@ class LoginController
 
         $email = $request->validated('email');
         $this->loginCodeService->deleteWhereEmail($email);
-        $code = mt_rand(100000, 999999);
 
-        $this->loginCodeService->createAndSendEmail($email, $code);
+        $this->loginCodeService->createAndSendEmail($email);
 
         return response()->json([
             'message' => 'Код отослан на ваш email',

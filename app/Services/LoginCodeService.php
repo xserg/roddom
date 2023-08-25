@@ -24,8 +24,10 @@ class LoginCodeService
             ->delete();
     }
 
-    public function createAndSendEmail(string $email, int|string $code): void
+    public function createAndSendEmail(string $email): void
     {
+        $code = mt_rand(100000, 999999);
+
         DB::transaction(function () use ($email, $code) {
             LoginCode::create([
                 'email' => $email,

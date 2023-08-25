@@ -11,7 +11,7 @@ class LoginCodeRequest extends FormRequest
     {
         return [
             'code' => 'required|string|exists:login_codes',
-            'device_name' => 'string'
+            'device_name' => 'sometimes|string'
         ];
     }
 

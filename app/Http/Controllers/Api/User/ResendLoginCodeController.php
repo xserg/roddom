@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Exceptions\FailedCreateLoginCodeException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EmailResendLoginCodeRequest;
-use App\Mail\SendLoginCode;
 use App\Services\LoginCodeService;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Mail;
 
 class ResendLoginCodeController extends Controller
 {
@@ -23,9 +20,7 @@ class ResendLoginCodeController extends Controller
 
         $this->loginCodeService->deleteWhereEmail($email);
 
-        $code = mt_rand(100000, 999999);
-
-        $this->loginCodeService->createAndSendEmail($email, $code);
+        $this->loginCodeService->createAndSendEmail($email);
 
         return response()->json([
             'message' => 'Код отослан на ваш email',

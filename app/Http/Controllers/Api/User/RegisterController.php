@@ -58,7 +58,6 @@ class RegisterController
                 'referrer_id' => $referer?->id
             ]);
 
-            $code = mt_rand(100000, 999999);
             $this->loginCodeService->createAndSendEmail($email, $code);
 
         } catch (\Exception $exception) {

@@ -45,15 +45,7 @@ class DeleteUserController
 
     public function __invoke(Request $request): JsonResponse
     {
-        try {
-            $this->service->makeDeletionRequest(auth()->user());
-
-        } catch (Exception $exception) {
-
-            return response()->json([
-                'message' => 'Заявка на удаление аккаунта не зарегистрирована: '.$exception->getMessage(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $this->service->makeDeletionRequest(auth()->user());
 
         return response()->json([
             'message' => 'Заявка на удаление аккаунта успешно зарегистрирована',

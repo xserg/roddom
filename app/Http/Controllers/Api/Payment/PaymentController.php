@@ -129,7 +129,7 @@ class PaymentController extends Controller
                         $subscription->save();
                     });
 
-                    $this->userService->rewardReferrers($order, $order->user);
+                    $this->userService->rewardReferrersForBuying($order, $order->user);
                     $appInfo = AppInfo::first();
                     $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();
