@@ -13,9 +13,10 @@ class PasswordResetRepository
             ->where('email', $email);
     }
 
-    public function firstWhereCode(int|string $code): ?PasswordReset
+    public function firstWhereCode(int|string $code): PasswordReset
     {
         return PasswordReset::query()
-            ->firstWhere('code', $code);
+            ->where('code', $code)
+            ->firstOrFail();
     }
 }

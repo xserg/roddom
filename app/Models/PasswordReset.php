@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Exceptions\FailedCreateResetCodeException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 
@@ -30,7 +31,7 @@ class PasswordReset extends Model
         $instance->fill($attributes);
         $instance->setCreatedAt(now());
         if (! $instance->save()) {
-            throw new Exception('Could not save instance of '.__CLASS__.'to table'.$instance->table);
+            throw new FailedCreateResetCodeException();
         }
 
         return $instance;

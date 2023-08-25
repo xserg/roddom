@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Api\ResetPassword;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPassword\UpdatePasswordRequest;
+use App\Services\PasswordResetService;
 use App\Services\UserService;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/password/reset',
@@ -47,7 +47,8 @@ use OpenApi\Attributes as OA;
 class ResetPasswordController extends Controller
 {
     public function __construct(
-        private UserService $userService
+        private UserService          $userService,
+        private PasswordResetService $passwordResetService
     ) {
     }
 
@@ -57,20 +58,15 @@ class ResetPasswordController extends Controller
         $code = $request->input('code');
         $password = $request->input('password');
 
-        try {
-            $this->userService->updateUsersPassword(
-                $code,
-                $password
-            );
-        } catch (Exception $exception) {
+        $passwordReset = $this->passwordResetService->handleCodeExpiration($code);
 
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
+        $user = $this->userService->getUserByEmail($passwordReset->email);
+        $this->userService->updatePassword($user->id, $password);
+
+        $passwordReset->delete();
 
         return response()->json([
             'message' => 'Пароль успешно обновлён',
-        ], 200);
+        ], Response::HTTP_OK);
     }
 }

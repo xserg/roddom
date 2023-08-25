@@ -16,6 +16,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Школа Мам и Пап'),
+    'frontend_url' => env('FRONTEND_URL', env('APP_URL', 'http://localhost')),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +57,7 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
-    'back2site' => env('BACK_TO_SITE_URL', 'https://мамы.online/profile/bought'),
+    'back2site' => env('BACK_TO_SITE_URL', 'https://roddom15.ru/profile/bought'),
 
     'asset_url' => env('ASSET_URL', '/'),
 

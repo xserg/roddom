@@ -33,16 +33,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class UserService
 {
     public function __construct(
-        private PasswordResetService    $passwordResetService,
-        private PasswordResetRepository $passwordResetRepository,
-        private LectureService          $lectureService,
-        private LectureRepository       $lectureRepository
+        private LectureService    $lectureService,
+        private LectureRepository $lectureRepository
     ) {
     }
 
     public function getUserByEmail($email): User
     {
-        return User::firstWhere('email', '=', $email);
+        return User::query()->where('email', $email)->firstOrFail();
     }
 
     /**
@@ -75,34 +73,13 @@ class UserService
     }
 
     /**
-     * @throws ResetCodeExpiredException|FailedSaveUserException
+     * @throws FailedSaveUserException
      */
-    public function updateUsersPassword(
-        string $code,
-        string $password
-    ): User {
-        $passwordReset = $this
-            ->passwordResetRepository
-            ->firstWhereCode($code);
-
-        try {
-            $this->passwordResetService
-                ->checkCodeIfExpired($passwordReset->code);
-
-        } catch (ResetCodeExpiredException) {
-
-            $this->passwordResetService
-                ->deleteCode($code);
-
-            throw new ResetCodeExpiredException();
-        }
-
-        $user = $this->getUserByEmail($passwordReset->email);
-
+    public function updatePassword(int $userId, string $password): User
+    {
+        $user = User::findOrFail($userId);
         $user->password = Hash::make($password);
         $this->saveUserGuard($user);
-
-        $passwordReset->delete();
 
         return $user;
     }

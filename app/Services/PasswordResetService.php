@@ -22,35 +22,29 @@ class PasswordResetService
             ->delete();
     }
 
-    /**
-     * @throws FailedCreateResetCodeException
-     */
-    public function create(string $email, int|string $code): PasswordReset
+    public function create(string $email): PasswordReset
     {
-        try {
-            $passwordReset = PasswordReset::create([
-                'email' => $email,
-                'code' => $code,
-            ]);
-        } catch (Exception) {
-            throw new FailedCreateResetCodeException();
-        }
+        $code = mt_rand(100000, 999999);
 
-        return $passwordReset;
+        return PasswordReset::create([
+            'email' => $email,
+            'code' => $code,
+        ]);
     }
 
     /**
      * @throws ResetCodeExpiredException
      */
-    public function checkCodeIfExpired(string|int $code): string|int
+    public function handleCodeExpiration(string|int $code): PasswordReset
     {
         $passwordReset = $this->repository->firstWhereCode($code);
 
         if ($this->codeIsOlderThanHour($passwordReset->created_at)) {
+            $this->deleteCode($code);
             throw new ResetCodeExpiredException();
         }
 
-        return $passwordReset->code;
+        return $passwordReset;
     }
 
     public function deleteCode(string|int $code): bool

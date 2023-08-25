@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Api\ResetPassword;
 
-use App\Exceptions\FailedCreateResetCodeException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPassword\ForgotPasswordRequest;
 use App\Mail\SendCodeResetPassword;
 use App\Services\PasswordResetService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/password/forgot',
@@ -58,33 +57,18 @@ class ForgotPasswordController extends Controller
         $email = $request->input('email');
         $this->passwordResetService->deleteWhereEmail($email);
 
-        $code = mt_rand(100000, 999999);
+        $passwordReset = $this->passwordResetService->create($email);
 
-        try {
-            $passwordReset = $this->passwordResetService->create($email, $code);
-        } catch (FailedCreateResetCodeException $exception) {
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 500);
-        }
-
-//        SendResetPasswordCodeJob::dispatch(
-//            $request->email,
-//            $passwordReset->code
-//        );
-
-        $sent = Mail::to($email)
-            ->send(new SendCodeResetPassword($passwordReset->code));
+        $sent = Mail::to($email)->send(new SendCodeResetPassword($passwordReset->code));
 
         if (! $sent) {
             return response()->json([
                 'message' => 'Невозможно отослать код на email',
-            ], 422);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return response()->json([
             'message' => 'Код отослан на ваш email',
-        ], 200);
+        ], Response::HTTP_OK);
     }
 }

@@ -134,7 +134,7 @@ class PaymentController extends Controller
                     $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
                     $email = $order->userEmail();
                     $image = Storage::url($appInfo->successful_purchase_image);
-                    $appLink = $appInfo?->app_link_share_link ?? config('app.url');
+                    $appLink = $appInfo?->app_link_share_link ?? config('app.frontend_url');
                     $appName = $appInfo?->app_title ?? config('app.name');
 
                     Mail::to($email)

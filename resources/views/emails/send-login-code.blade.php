@@ -4,5 +4,5 @@
         <h2>{{ $code }}</h2>
     <p>Срок действия кода - один час, после того как это сообщение было отправлено</p>
     Всегда Ваши,<br>
-    {{ config('app.name') }}
+    <a style="text-decoration: none; color: rgb(113, 128, 150);" href="{{config('app.frontend_url')}}">{{ config('app.name') }}</a>
 </x-mail::message>

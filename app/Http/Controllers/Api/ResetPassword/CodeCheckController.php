@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Api\ResetPassword;
 
-use App\Exceptions\ResetCodeExpiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResetPassword\CodeRequest;
 use App\Services\PasswordResetService;
-use Exception;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/password/check',
@@ -58,29 +56,11 @@ class CodeCheckController extends Controller
     {
         $requestCode = $request->input('code');
 
-        try {
-            $code = $this
-                ->passwordResetService
-                ->checkCodeIfExpired($requestCode);
-
-        } catch (ResetCodeExpiredException $exception) {
-
-            $this->passwordResetService->deleteCode($requestCode);
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
-
-        } catch (Exception $exception) {
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
+        $this->passwordResetService->handleCodeExpiration($requestCode);
 
         return response([
-            'code' => $code,
+            'code' => $requestCode,
             'message' => 'Код валидный',
-        ], 200);
+        ], Response::HTTP_OK);
     }
 }
