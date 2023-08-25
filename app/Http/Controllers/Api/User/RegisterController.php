@@ -49,22 +49,14 @@ class RegisterController
 
         $this->loginCodeService->deleteWhereEmail($email);
 
-        try {
-            $referer = User::where('ref_token', $ref)->first();
+        $referer = User::withRefToken($ref)->first();
+        $this->userService->create([
+            'email' => $email,
+            'password' => $password,
+            'referrer_id' => $referer?->id
+        ]);
 
-            $user = $this->userService->create([
-                'email' => $email,
-                'password' => $password,
-                'referrer_id' => $referer?->id
-            ]);
-
-            $this->loginCodeService->createAndSendEmail($email, $code);
-
-        } catch (\Exception $exception) {
-            return response()->json(
-                ['message' => $exception->getMessage()],
-                Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $this->loginCodeService->createAndSendEmail($email);
 
         return response()->json([
             'message' => 'Код отослан на ваш email',

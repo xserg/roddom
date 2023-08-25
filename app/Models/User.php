@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -292,6 +293,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(\App\Models\Device::class);
     }
 
+    public function scopeWithRefToken(Builder $query, string $refToken): void
+    {
+        $query->where('ref_token', $refToken);
+    }
+
     public function hasReferrer(): bool
     {
         return $this->referrer()->exists();
@@ -303,6 +309,7 @@ class User extends Authenticatable implements FilamentUser
             'is_notification_read' => true,
         ])->save();
     }
+
     public function markNotificationUnread()
     {
         return $this->fill([
