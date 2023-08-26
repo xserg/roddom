@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\Exceptions\FailedCreateResetCodeException;
-use App\Exceptions\ResetCodeExpiredException;
+use App\Exceptions\Custom\ResetCodeExpiredException;
 use App\Models\PasswordReset;
 use App\Repositories\PasswordResetRepository;
-use Exception;
 
 class PasswordResetService
 {

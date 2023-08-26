@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Api\Lecture;
 
 use App\Http\Resources\LectureResource;
 use App\Repositories\LectureRepository;
-use App\Services\LectureService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Get(
     path: '/lecture/{id}',
@@ -57,10 +55,10 @@ class RetrieveLectureController
     ) {
     }
 
-    public function __invoke(Request $request, int $id): JsonResource|JsonResponse
+    public function __invoke(Request $request, int $id): JsonResponse
     {
         $builder = $this->lectureRepository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
-        $lecture = $builder->get()->append(['prices', 'purchase_info'])->first();
+        $lecture = $builder->firstOrFail()->append(['prices', 'purchase_info']);
 
         if (is_null($lecture)) {
             return response()->json([

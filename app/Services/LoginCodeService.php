@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\LoginCodeExpiredException;
+use App\Exceptions\Custom\LoginCodeExpiredException;
 use App\Mail\SendLoginCode;
 use App\Models\LoginCode;
 use App\Repositories\LoginCodeRepository;

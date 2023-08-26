@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Exceptions\LoginCodeExpiredException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginCodeRequest;
 use App\Http\Resources\UserResource;
-use App\Models\RefPointsGainOnce;
-use App\Models\RefPointsPayments;
 use App\Repositories\LoginCodeRepository;
 use App\Repositories\UserRepository;
 use App\Services\LoginCodeService;
 use App\Services\UserService;
-use Exception;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;

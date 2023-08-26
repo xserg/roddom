@@ -11,6 +11,7 @@ use OpenApi\Attributes as OA;
     schema: 'UserResource',
     title: 'UserResource'
 )]
+/** @mixin \App\Models\User */
 class UserResource extends JsonResource
 {
     use MoneyConversion;
@@ -55,13 +56,13 @@ class UserResource extends JsonResource
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
-                'referer_id' => $this->referer_id,
+                'referer_id' => $this->referrer_id,
                 'referrals_count' => $this->when($refsCount, $refsCount, 0),
             ],
-            'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, default: 0),
-            'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, default: 0),
-            'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, default: 0),
-            'purchased_lectures_count' => $this->whenNotNull($this->purchased_lectures_counter, default: 0),
+            'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, 0),
+            'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, 0),
+            'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, 0),
+            'purchased_lectures_count' => $this->whenAppended('purchasedLecturesCounter', $this->purchased_lectures_counter, 0),
             'is_notification_read' => $this->is_notification_read,
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,

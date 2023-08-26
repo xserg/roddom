@@ -24,8 +24,6 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias;
 
-    protected $appends = ['purchased_lectures_counter'];
-
     protected $fillable = [
         'email',
         'password',
@@ -317,14 +315,6 @@ class User extends Authenticatable implements FilamentUser
         ])->save();
     }
 
-    protected function purchasedLecturesCounter(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $value,
-            set: fn ($value) => $value
-        );
-    }
-
     public function canAccessFilament(): bool
     {
         return $this->isAdmin();
@@ -369,15 +359,28 @@ class User extends Authenticatable implements FilamentUser
         ])->save();
     }
 
-    public function markNextFreeLectureAvailable(?int $hours = null): bool
+    public function markNextFreeLectureAvailable(int $hours = 24): bool
     {
         return $this->fill([
-            'next_free_lecture_available' => now()->addHours($hours ?? 24),
+            'next_free_lecture_available' => now()->addHours($hours),
         ])->save();
     }
 
     public function determineTitleColumnName(): string
     {
         return ! is_null($this->name) ? 'name' : 'email';
+    }
+
+    public function purchasedLecturesCounter(): Attribute
+    {
+        $subs = $this->actualSubscriptions()->with('lectures')->get();
+
+        $purchasedLecturesIds = $subs->map(fn ($subscription) => $subscription->lectures?->modelKeys())
+            ->flatten()
+            ->unique();
+
+        return Attribute::make(
+            get: fn () => count($purchasedLecturesIds),
+        );
     }
 }

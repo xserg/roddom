@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\Lecture;
 
-use App\Exceptions\UserCannotWatchFreeLectureException;
-use App\Exceptions\UserCannotWatchPaidLectureException;
+use App\Exceptions\Custom\UserCannotWatchFreeLectureException;
+use App\Exceptions\Custom\UserCannotWatchPaidLectureException;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

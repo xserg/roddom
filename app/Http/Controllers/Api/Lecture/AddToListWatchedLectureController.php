@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Lecture;
 
-use App\Exceptions\UserCannotSaveLectureException;
+use App\Exceptions\Custom\UserCannotSaveLectureException;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;

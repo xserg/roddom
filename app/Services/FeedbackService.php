@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\FailedCreateFeedbackException;
+use App\Exceptions\Custom\FailedCreateFeedbackException;
 use App\Models\Feedback;
 use Exception;
 

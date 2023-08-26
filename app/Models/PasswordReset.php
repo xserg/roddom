@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Exceptions\FailedCreateResetCodeException;
+use App\Exceptions\Custom\FailedCreateResetCodeException;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api\Lecture;
 
-use App\Exceptions\UserCannotRemoveFromSavedLectureException;
+use App\Exceptions\Custom\UserCannotRemoveLectureFromListException;
 use App\Services\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -63,7 +63,7 @@ class UnsaveLectureController
         try {
             $this->userService->removeLectureFromSaved($lectureId, auth()->user());
 
-        } catch (UserCannotRemoveFromSavedLectureException $exception) {
+        } catch (UserCannotRemoveLectureFromListException $exception) {
 
             return response()->json([
                 'message' => $exception->getMessage(),

@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use App\Exceptions\FailedSaveUserException;
-use App\Exceptions\ResetCodeExpiredException;
-use App\Exceptions\UserCannotRemoveFromSavedLectureException;
-use App\Exceptions\UserCannotSaveLectureException;
-use App\Exceptions\UserCannotWatchFreeLectureException;
-use App\Exceptions\UserCannotWatchPaidLectureException;
+use App\Exceptions\Custom\FailedSaveUserException;
+use App\Exceptions\Custom\UserCannotRemoveLectureFromListException;
+use App\Exceptions\Custom\UserCannotSaveLectureException;
+use App\Exceptions\Custom\UserCannotWatchFreeLectureException;
+use App\Exceptions\Custom\UserCannotWatchPaidLectureException;
 use App\Jobs\AddLectureToWatchHistory;
 use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
@@ -17,13 +16,11 @@ use App\Models\RefPointsGainOnce;
 use App\Models\RefPointsPayments;
 use App\Models\User;
 use App\Repositories\LectureRepository;
-use App\Repositories\PasswordResetRepository;
 use Exception;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -221,7 +218,7 @@ class UserService
     }
 
     /**
-     * @throws UserCannotRemoveFromSavedLectureException
+     * @throws UserCannotRemoveLectureFromListException
      * @throws NotFoundHttpException
      */
     public function removeLectureFromSaved(
@@ -232,7 +229,7 @@ class UserService
         $alreadyRemoved = ! $user->savedLectures->contains($lectureId);
 
         if ($alreadyRemoved) {
-            throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в сохраненных');
+            throw new UserCannotRemoveLectureFromListException('Лекция уже не находится в сохраненных');
         }
 
         $user->savedLectures()->detach($lectureId);
@@ -257,35 +254,26 @@ class UserService
     }
 
     /**
-     * @throws UserCannotRemoveFromSavedLectureException
+     * @throws UserCannotRemoveLectureFromListException
      * @throws NotFoundHttpException
      */
-    public function removeLectureFromListWatched(
-        int                       $lectureId,
-        User|Authenticatable|null $user
-    ): void {
+    public function removeLectureFromListWatched(int $lectureId, User $user): void
+    {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $alreadyRemoved = $user->listWatchedLectures->doesntContain($lectureId);
 
         if ($alreadyRemoved) {
-            throw new UserCannotRemoveFromSavedLectureException('Лекция уже не находится в списке просмотренных');
+            throw new UserCannotRemoveLectureFromListException('Лекция уже не находится в списке просмотренных');
         }
 
         $user->listWatchedLectures()->detach($lectureId);
     }
 
-    public function appendLectureCountersToUser(Model|User $user): User
+    public function appendLectureCountersToUser(User $user): User
     {
-        $user = $user->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures');
-
-        $subs = $user->actualSubscriptions()->with('lectures')->get();
-        $purchasedLecturesIds = $subs?->map(function ($subscription) {
-            return $subscription->lectures?->modelKeys();
-        })->flatten()->unique();
-        $purchasedLecturesCount = count($purchasedLecturesIds);
-        $user->purchased_lectures_counter = $purchasedLecturesCount;
-
-        return $user;
+        return $user
+            ->loadCount('watchedLectures', 'savedLectures', 'listWatchedLectures')
+            ->append('purchasedLecturesCounter');
     }
 
     public function createToken(Model|User $user, string $deviceName = 'default_device')

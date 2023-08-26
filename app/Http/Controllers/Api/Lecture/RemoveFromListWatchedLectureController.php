@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api\Lecture;
 
-use App\Exceptions\UserCannotRemoveFromSavedLectureException;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Delete(
     path: '/lecture/{id}/list-watch',
@@ -60,15 +59,7 @@ class RemoveFromListWatchedLectureController
 
     public function __invoke(Request $request, int $lectureId)
     {
-        try {
-            $this->userService->removeLectureFromListWatched($lectureId, auth()->user());
-
-        } catch (UserCannotRemoveFromSavedLectureException $exception) {
-
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ], Response::HTTP_FORBIDDEN);
-        }
+        $this->userService->removeLectureFromListWatched($lectureId, auth()->user());
 
         return response()->json([
             'message' => 'Лекция успешно удалена из списка просмотренных',

@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Api\User;
 
-use App\Exceptions\FailedCreateLoginCodeException;
 use App\Http\Requests\LoginRequest;
-use App\Mail\SendLoginCode;
 use App\Services\LoginCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
