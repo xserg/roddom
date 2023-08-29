@@ -111,6 +111,7 @@ class Lecture extends Model
     {
         return $this->subscriptionItems()
             ->where('user_id', auth()->id())
+            ->where('start_date', '<=', now())
             ->where('end_date', '>', now());
     }
 
