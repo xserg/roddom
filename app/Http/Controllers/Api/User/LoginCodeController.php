@@ -64,7 +64,7 @@ class LoginCodeController extends Controller
 
         $this->loginCodeService->deleteRecordsWithCode($code);
 
-        $deviceName = $request->validated('device_name');
+        $deviceName = $request->validated('device_name', 'default_device');
         $token = $this->userService->createToken($user, $deviceName);
 
         $user = $this->userService->appendLectureCountersToUser($user);

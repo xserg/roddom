@@ -276,7 +276,7 @@ class UserService
             ->append('purchasedLecturesCounter');
     }
 
-    public function createToken(Model|User $user, string $deviceName = 'default_device')
+    public function createToken(Model|User $user, ?string $deviceName = 'default_device')
     {
         $token = $user->tokens()->firstWhere('name', $deviceName);
 
