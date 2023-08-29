@@ -291,7 +291,7 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(\App\Models\Device::class);
     }
 
-    public function scopeWithRefToken(Builder $query, string $refToken): void
+    public function scopeWithRefToken(Builder $query, ?string $refToken): void
     {
         $query->where('ref_token', $refToken);
     }
