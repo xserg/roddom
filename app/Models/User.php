@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Threads\Thread;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -289,6 +290,11 @@ class User extends Authenticatable implements FilamentUser
     public function devices(): HasMany
     {
         return $this->hasMany(\App\Models\Device::class);
+    }
+
+    public function threads(): HasMany
+    {
+        return $this->hasMany(Thread::class);
     }
 
     public function scopeWithRefToken(Builder $query, ?string $refToken): void

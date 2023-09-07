@@ -28,6 +28,10 @@ use App\Http\Controllers\Api\Promo\RetrieveAllPromoLecturesController;
 use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
+use App\Http\Controllers\Api\Thread\CloseThreadController;
+use App\Http\Controllers\Api\Thread\CreateThreadController;
+use App\Http\Controllers\Api\Thread\RetrieveThreadController;
+use App\Http\Controllers\Api\Thread\SendMessageThreadController;
 use App\Http\Controllers\Api\User\DeleteUserController;
 use App\Http\Controllers\Api\User\LoginCodeController;
 use App\Http\Controllers\Api\User\LoginController;
@@ -152,6 +156,15 @@ Route::prefix('v1')
                 ->name('notifications.index');
             Route::put('/notifications/read', MarkNotificationReadController::class)
                 ->name('notifications.read');
+
+            Route::get('/threads/{thread}', RetrieveThreadController::class)
+                ->name('threads.retrieve');
+            Route::post('/threads', CreateThreadController::class)
+                ->name('threads.create');
+            Route::put('/threads/{thread}', SendMessageThreadController::class)
+                ->name('threads.send-message');
+            Route::delete('/threads/{thread}', CloseThreadController::class)
+                ->name('threads.close');
         });
     });
 

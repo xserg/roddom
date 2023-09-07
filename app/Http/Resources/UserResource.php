@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\ThreadStatusEnum;
 use App\Traits\MoneyConversion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -64,6 +65,7 @@ class UserResource extends JsonResource
             'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, 0),
             'purchased_lectures_count' => $this->whenAppended('purchasedLecturesCounter', $this->purchased_lectures_counter, 0),
             'is_notification_read' => $this->is_notification_read,
+            'threads' => $this->threads?->where('status', ThreadStatusEnum::OPEN)->pluck('id'),
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,
         ];
