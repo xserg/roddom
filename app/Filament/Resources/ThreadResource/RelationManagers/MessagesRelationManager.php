@@ -11,6 +11,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class MessagesRelationManager extends RelationManager
 {
@@ -34,26 +35,29 @@ class MessagesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('message')->label('Текст сообщения')
-                    ->limit(75)
-                    ->tooltip(fn (Model $record): string => $record->message),
                 TextColumn::make('user.name')
                     ->label('Пользователь')
                     ->limit(15)
-                    ->formatStateUsing(fn(?Message $record) => $record->author->name ?? $record->author->email)
+                    ->formatStateUsing(fn (?Message $record) => $record->author->name ?? $record->author->email)
                     ->url(function (Message $record): string {
+                        if ($record->author->isAdmin()) {
+                            return false;
+                        }
                         return UserResource::getUrl('edit', ['record' => $record->author_id]);
                     }),
+                Tables\Columns\TextColumn::make('message')->label('Текст сообщения')
+                    ->limit(75)
+                    ->tooltip(fn (Model $record): string => $record->message),
                 TextColumn::make('updated_at')
                     ->label('Обновлено')
                     ->limit(10)
-                    ->dateTime(),
+                    ->formatStateUsing(fn (?string $state) => Carbon::parse($state)->diffForHumans()),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->mutateFormDataUsing(function(array $data){
+                Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data) {
                     $data['author_id'] = auth()->id();
 
                     return $data;
@@ -70,6 +74,6 @@ class MessagesRelationManager extends RelationManager
 
     protected function isTablePaginationEnabled(): bool
     {
-        return  false;
+        return false;
     }
 }
