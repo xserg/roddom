@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Message extends Model
 {
     protected $guarded = [];
+    protected $touches = ['thread'];
 
     public function thread(): BelongsTo
     {
