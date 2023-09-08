@@ -17,6 +17,15 @@ class Thread extends Model
     protected $casts = ['status' => ThreadStatusEnum::class];
     protected $guarded = [];
 
+    protected static function booted(): void
+    {
+        static::saved(function (Thread $thread) {
+            if (auth()->id()) {
+                $thread->participants()->updateOrCreate(['user_id' => auth()->id()], ['read_at' => now()]);
+            }
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

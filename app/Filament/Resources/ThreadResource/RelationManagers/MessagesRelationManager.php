@@ -62,17 +62,11 @@ class MessagesRelationManager extends RelationManager
                     $data['author_id'] = auth()->id();
 
                     return $data;
-                })->after(function (?Message $record) {
-                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
                 })
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->after(function (?Message $record) {
-                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
-                }),
-                Tables\Actions\DeleteAction::make()->after(function (?Message $record) {
-                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
-                }),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
 //                Tables\Actions\DeleteBulkAction::make(),
