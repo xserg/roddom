@@ -86,7 +86,7 @@ class ThreadResource extends Resource
                 BadgeColumn::make('unread')
                     ->formatStateUsing(fn (?Thread $record): string => $record->updated_at > $record->participantForUser(auth()->id())?->read_at ? 'есть' : 'отсутствуют')
                     ->color(static function (?Thread $record): string {
-                        if ($record->updated_at > $record->participantForUser(auth()->id())->read_at) {
+                        if ($record->updated_at > $record->participantForUser(auth()->id())?->read_at) {
                             return 'success';
                         }
 
