@@ -293,11 +293,6 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(\App\Models\Device::class);
     }
 
-    public function threads(): HasMany
-    {
-        return $this->hasMany(Thread::class);
-    }
-
     public function participants(): HasMany
     {
         return $this->hasMany(Participant::class);

@@ -14,6 +14,7 @@ class RetrieveThreadController extends Controller
         Gate::authorize('show-thread-messages', $thread);
 
         $thread->participantForUser(auth()->id())->setReadAtNow();
+        $thread = $thread->load(['participants', 'messages.author'])->append('messages');
 
         return ThreadResource::make($thread);
     }

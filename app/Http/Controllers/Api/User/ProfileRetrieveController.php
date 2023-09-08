@@ -39,6 +39,7 @@ class ProfileRetrieveController
     public function __invoke(): JsonResponse
     {
         $user = auth()->user();
+        $user->load(['participants.thread.messages']);
         $user = $this->userService->appendLectureCountersToUser($user);
 
         return response()->json([

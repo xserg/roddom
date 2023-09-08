@@ -63,7 +63,7 @@ class ProfileUpdateController
         $user = $this->userService->saveProfile($user, $request->validated());
 
         $user = $this->userService->appendLectureCountersToUser($user);
-
+        $user->load(['participants.thread.messages']);
         return response()->json([
             'data' => new UserResource($user),
         ]);

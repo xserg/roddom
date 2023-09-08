@@ -2,11 +2,12 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\ThreadStatusEnum;
+use App\Models\Threads\Participant;
 use App\Traits\MoneyConversion;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 #[OA\Schema(
     schema: 'UserResource',
@@ -57,6 +58,7 @@ class UserResource extends JsonResource
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
+                'ref_link_qr' => QrCode::generate(route('v1.login', ['ref' => $this->ref_token]))->toHtml(),
                 'referer_id' => $this->referrer_id,
                 'referrals_count' => $this->when($refsCount, $refsCount, 0),
             ],
@@ -65,7 +67,9 @@ class UserResource extends JsonResource
             'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, 0),
             'purchased_lectures_count' => $this->whenAppended('purchasedLecturesCounter', $this->purchased_lectures_counter, 0),
             'is_notification_read' => $this->is_notification_read,
-            'threads' => $this->threads?->where('status', ThreadStatusEnum::OPEN)->pluck('id'),
+            'threads' => ThreadResource::collection($this->participants?->map(function (Participant $participant) {
+                return $participant->thread->append('last_message');
+            })),
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,
         ];

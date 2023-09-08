@@ -68,6 +68,7 @@ class LoginCodeController extends Controller
         $token = $this->userService->createToken($user, $deviceName);
 
         $user = $this->userService->appendLectureCountersToUser($user);
+        $user->load(['participants.thread.messages']);
 
         Log::error("залогинили юзера $user->email, код был $code");
 
