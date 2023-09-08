@@ -33,6 +33,10 @@ class ThreadResource extends Resource
     protected static ?string $navigationGroup = 'Беседы';
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('messages');
+    }
 
     public static function form(Form $form): Form
     {
@@ -83,10 +87,12 @@ class ThreadResource extends Resource
                     ->dateTime(),
                 BadgeColumn::make('status')
                     ->label('Статус беседы'),
+                TextColumn::make('messages_count')
+                    ->label('Количество сообщений'),
                 BadgeColumn::make('unread')
-                    ->formatStateUsing(fn (?Thread $record): string => $record->updated_at > $record->participantForUser(auth()->id())?->read_at ? 'есть' : 'отсутствуют')
+                    ->formatStateUsing(fn (?Thread $record): string => ($record->updated_at > $record->participantForUser(auth()->id())?->read_at) && $record->messages_count > 0 ? 'есть' : 'отсутствуют')
                     ->color(static function (?Thread $record): string {
-                        if ($record->updated_at > $record->participantForUser(auth()->id())?->read_at) {
+                        if (($record->updated_at > $record->participantForUser(auth()->id())?->read_at) && $record->messages_count > 0) {
                             return 'success';
                         }
 
