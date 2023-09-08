@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ThreadResource\RelationManagers;
 
 use App\Filament\Resources\UserResource;
 use App\Models\Threads\Message;
+use App\Models\Threads\Thread;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -47,7 +48,7 @@ class MessagesRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('message')->label('Текст сообщения')
                     ->limit(75)
-                    ->tooltip(fn (Model $record): string => $record->message),
+                    ->tooltip(fn (?Message $record): string => $record->message),
                 TextColumn::make('updated_at')
                     ->label('Обновлено')
                     ->limit(10)
@@ -61,11 +62,17 @@ class MessagesRelationManager extends RelationManager
                     $data['author_id'] = auth()->id();
 
                     return $data;
+                })->after(function (?Message $record) {
+                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
                 })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->after(function (?Message $record) {
+                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
+                }),
+                Tables\Actions\DeleteAction::make()->after(function (?Message $record) {
+                    $record->thread->participantForUser(auth()->id())->setReadAtNow();
+                }),
             ])
             ->bulkActions([
 //                Tables\Actions\DeleteBulkAction::make(),
