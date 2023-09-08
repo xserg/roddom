@@ -13,6 +13,8 @@ class RetrieveThreadController extends Controller
     {
         Gate::authorize('show-thread-messages', $thread);
 
+        $thread->participantForUser(auth()->id())->setReadAtNow();
+
         return ThreadResource::make($thread);
     }
 }

@@ -9,6 +9,9 @@ class CreateThreadController extends Controller
 {
     public function __invoke()
     {
-        return response()->json(['id' => Thread::create(['user_id' => auth()->id()])->id], 201);
+        $thread = Thread::create();
+        auth()->user()->participants()->create(['thread_id' => $thread->id, 'opened' => true]);
+
+        return response()->json(['id' => $thread->id], 201);
     }
 }

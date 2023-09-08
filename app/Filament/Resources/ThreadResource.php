@@ -7,8 +7,7 @@ use App\Filament\Resources\ThreadResource\Pages;
 use App\Filament\Resources\ThreadResource\RelationManagers\MessagesRelationManager;
 use App\Models\User;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\Position;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Threads\Thread;
@@ -20,6 +19,7 @@ use Filament\Resources\Table;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 
 class ThreadResource extends Resource
@@ -43,11 +43,12 @@ class ThreadResource extends Resource
 //                ->label('Юзер'),
                 Select::make('status')
                     ->label('Статус беседы')
+                    ->disablePlaceholderSelection()
                     ->options(collect(ThreadStatusEnum::cases())->pluck('name', 'value')),
                 Card::make([
                     Placeholder::make('user_name')
-                        ->content(function (\Closure $get) {
-                            $user = User::firstWhere('id', $get('user_id'));
+                        ->content(function (?Thread $record) {
+                            $user = User::firstWhere('id', $record->participants->firstWhere('opened', true)->user->id);
                             $name = $user?->name ?? $user?->email;
                             $path = UserResource::getUrl('edit', ['record' => $user?->id]);
                             $classes = 'text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500';
@@ -73,15 +74,25 @@ class ThreadResource extends Resource
                 TextColumn::make('user.name')
                     ->label('С юзером')
                     ->sortable()
-                    ->formatStateUsing(fn (?Thread $record) => $record->user->name ?? $record->user->email)
+                    ->formatStateUsing(fn (?Thread $record) => $record->openedParticipant->user->name ?? $record->openedParticipant->user->email)
                     ->url(function (Thread $record): string {
-                        return UserResource::getUrl('edit', ['record' => $record->user_id]);
+                        return UserResource::getUrl('edit', ['record' => $record->openedParticipant->user->id]);
                     }),
                 TextColumn::make('updated_at')
                     ->label('обновлена')
                     ->dateTime(),
                 BadgeColumn::make('status')
-                    ->label('Статус беседы')
+                    ->label('Статус беседы'),
+                BadgeColumn::make('unread')
+                    ->formatStateUsing(fn (?Thread $record): string => $record->updated_at > $record->participantForUser(auth()->id())->read_at ? 'есть' : 'отсутствуют')
+                    ->color(static function (?Thread $record): string {
+                        if ($record->updated_at > $record->participantForUser(auth()->id())->read_at) {
+                            return 'success';
+                        }
+
+                        return 'secondary';
+                    })
+                    ->label('Непрочитанные сообщения')
             ])
             ->filters([
                 Filter::make('Октрытые')
@@ -91,9 +102,18 @@ class ThreadResource extends Resource
                 Filter::make('Закрытые')
                     ->query(fn (Builder $query): Builder => $query->orWhere('status', ThreadStatusEnum::CLOSED))
                     ->label('Закрытые'),
+//                Filter::make('Есть непрочитанные сообщения')
+//                    ->query(function (Builder $query): Builder {
+//                        return $query->whereHas('participants', function (Builder $query) {
+//                            //take only threads, where thread's updated_at > user's read_at
+//                            return $query->where('read_at', '<', )
+//                        });
+//                    })
+//                    ->label('Есть непрочитанные сообщения'),
             ])
             ->actions([
-                EditAction::make()->label('К сообщениям')
+                Action::make('to-msgs')->label('К сообщениям')
+                    ->url(fn (?Model $record) => ThreadResource::getUrl('edit', ['record' => $record->id, 'activeRelationManager' => 0]))
             ])
             ->actionsPosition(Position::BeforeCells)
             ->bulkActions([]);
@@ -104,6 +124,21 @@ class ThreadResource extends Resource
         return [
             MessagesRelationManager::class
         ];
+    }
+
+    protected static function getNavigationBadge(): ?string
+    {
+        $threads = static::getModel()::all();
+
+        //compare users read_at and thread read_at, count it
+        $count = 0;
+        $threads->each(function (Thread $thread) use (&$count) {
+            if ($thread->updated_at > $thread->participantForUser(auth()->id())->read_at) {
+                $count++;
+            }
+        });
+
+        return $count;
     }
 
     public static function getPages(): array

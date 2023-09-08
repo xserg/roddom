@@ -35,19 +35,19 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('edit-message', function (User $user, Message $message) {
-            return $user->id === $message->thread->user_id;
+            return $user->id === $message->author_id;
         });
 
         Gate::define('show-thread-messages', function (User $user, Thread $thread) {
-            return ($user->id === $thread->user_id) && $thread->isOpen();
+            return $thread->participants->contains('user_id', $user->id) && $thread->isOpen();
         });
 
         Gate::define('close-thread', function (User $user, Thread $thread) {
-            return ($user->id === $thread->user_id) && $thread->isOpen();
+            return $thread->participants->contains('user_id', $user->id) && $thread->isOpen();
         });
 
         Gate::define('add-message-to-thread', function (User $user, Thread $thread) {
-            return ($user->id === $thread->user_id) && $thread->isOpen();
+            return $thread->participants->contains('user_id', $user->id) && $thread->isOpen();
         });
     }
 }

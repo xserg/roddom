@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Thread extends Model
 {
@@ -21,6 +22,21 @@ class Thread extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function participants(): HasMany
+    {
+        return $this->hasMany(Participant::class);
+    }
+
+    public function openedParticipant(): HasOne
+    {
+        return $this->hasOne(Participant::class)->where('opened', true);
+    }
+
+    public function participantForUser(int $userId): ?Participant
+    {
+        return $this->participants()->where('user_id', $userId)->first();
+    }
+
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);
@@ -30,7 +46,7 @@ class Thread extends Model
     {
         return $this->forceFill([
             'status' => ThreadStatusEnum::CLOSED
-        ])->save();
+        ])->saveQuietly();
     }
 
     public function isOpen(): bool
