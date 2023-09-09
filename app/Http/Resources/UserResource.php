@@ -71,9 +71,6 @@ class UserResource extends JsonResource
             'saved_lectures_count' => $this->whenCounted('savedLectures', $this->saved_lectures_count, 0),
             'purchased_lectures_count' => $this->whenAppended('purchasedLecturesCounter', $this->purchased_lectures_counter, 0),
             'is_notification_read' => $this->is_notification_read,
-            'threads' => ThreadResource::collection($this->participants?->map(function (Participant $participant) {
-                return $participant->thread->append('last_message');
-            })),
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,
         ];

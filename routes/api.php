@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
 use App\Http\Controllers\Api\ResetPassword\ResetPasswordController;
 use App\Http\Controllers\Api\Thread\CloseThreadController;
 use App\Http\Controllers\Api\Thread\CreateThreadController;
+use App\Http\Controllers\Api\Thread\RetrieveAllThreadsController;
 use App\Http\Controllers\Api\Thread\RetrieveThreadController;
 use App\Http\Controllers\Api\Thread\SendMessageThreadController;
 use App\Http\Controllers\Api\User\DeleteUserController;
@@ -158,6 +159,8 @@ Route::prefix('v1')
                 ->name('notifications.read');
 
             Route::get('/threads/{thread}', RetrieveThreadController::class)
+                ->name('threads.exact.retrieve');
+            Route::get('/threads', RetrieveAllThreadsController::class)
                 ->name('threads.retrieve');
             Route::post('/threads', CreateThreadController::class)
                 ->name('threads.create');

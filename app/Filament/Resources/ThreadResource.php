@@ -52,9 +52,13 @@ class ThreadResource extends Resource
                 Card::make([
                     Placeholder::make('user_name')
                         ->content(function (?Thread $record) {
-                            $user = User::firstWhere('id', $record->participants->firstWhere('opened', true)->user->id);
-                            $name = $user?->name ?? $user?->email;
-                            $path = UserResource::getUrl('edit', ['record' => $user?->id]);
+                            $user = $record->participants->firstWhere('opened', true)?->user;
+
+                            if(is_null($user)){
+                                return 'не определен';
+                            }
+                            $name = $user->name ?? $user->email;
+                            $path = UserResource::getUrl('edit', ['record' => $user->id]);
                             $classes = 'text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500';
 
                             return new HtmlString("<a class=$classes href=\"$path\">$name</a>");
@@ -78,9 +82,11 @@ class ThreadResource extends Resource
                 TextColumn::make('user.name')
                     ->label('С юзером')
                     ->sortable()
-                    ->formatStateUsing(fn (?Thread $record) => $record->openedParticipant->user->name ?? $record->openedParticipant->user->email)
+                    ->formatStateUsing(fn (?Thread $record) => $record->openedParticipant?->user?->name ?? $record->openedParticipant?->user?->email ?? 'не определен')
                     ->url(function (Thread $record): string {
-                        return UserResource::getUrl('edit', ['record' => $record->openedParticipant->user->id]);
+                        return $record->openedParticipant ?
+                            UserResource::getUrl('edit', ['record' => $record->openedParticipant->user->id]) :
+                            '';
                     }),
                 TextColumn::make('updated_at')
                     ->label('обновлена')

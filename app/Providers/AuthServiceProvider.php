@@ -39,7 +39,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::define('show-thread-messages', function (User $user, Thread $thread) {
-            return $thread->participants->contains('user_id', $user->id) && $thread->isOpen();
+            return $thread->participants->contains('user_id', $user->id);
         });
 
         Gate::define('close-thread', function (User $user, Thread $thread) {

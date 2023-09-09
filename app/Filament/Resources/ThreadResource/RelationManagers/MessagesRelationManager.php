@@ -4,14 +4,12 @@ namespace App\Filament\Resources\ThreadResource\RelationManagers;
 
 use App\Filament\Resources\UserResource;
 use App\Models\Threads\Message;
-use App\Models\Threads\Thread;
-use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Support\Carbon;
 
 class MessagesRelationManager extends RelationManager
@@ -25,9 +23,11 @@ class MessagesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('message')
-                    ->label('сообщение')
-                    ->required()
+                TiptapEditor::make('message')
+                    ->profile('barebone')
+                    ->disableFloatingMenus()
+                    ->disableBubbleMenus()
+                    ->output(TiptapEditor::OUTPUT_HTML)
                     ->maxLength(1024),
             ]);
     }
@@ -62,7 +62,7 @@ class MessagesRelationManager extends RelationManager
                     $data['author_id'] = auth()->id();
 
                     return $data;
-                })
+                })->disableCreateAnother()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -13,7 +13,7 @@ class ThreadResource extends JsonResource
         return [
             'id' => $this->id,
             'status' => $this->status,
-            'last_message' => $this->whenAppended('last_message', $this->messages->last()),
+            'last_message' => $this->whenAppended('last_message', MessageResource::make($this->messages->last())),
             'messages' => $this->whenAppended('messages', MessageResource::collection($this->messages)),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
