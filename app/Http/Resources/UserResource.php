@@ -45,7 +45,7 @@ class UserResource extends JsonResource
             $this->referralsFifthLevel()->count();
 
         $inviteText = $this->resolveInviteQr();
-        $inviteQrCode = QrCode::generate($inviteText)->toHtml();
+        $inviteQrCode = QrCode::encoding('UTF-8')->size(250)->generate($inviteText)->toHtml();
 
         return [
             'id' => $this->id,
@@ -81,9 +81,10 @@ class UserResource extends JsonResource
 
     private function resolveInviteQr(): string
     {
-        return str_replace('x',
-                $this->name ?? $this->email,
-                AppInfo::first()?->user_invites_you_to_join ?? 'x приглашает Вас присоединиться к интересным материалам Школы Мам и Пап!') .
+        return
+//            str_replace('x',
+//                $this->name ?? $this->email,
+//                AppInfo::first()?->user_invites_you_to_join ?? 'x приглашает Вас присоединиться к интересным материалам Школы Мам и Пап!') .
             config('app.frontend_url') . '/register?ref=' . $this->ref_token;
     }
 }
