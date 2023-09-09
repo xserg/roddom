@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\AppInfo;
 use App\Models\Threads\Participant;
 use App\Traits\MoneyConversion;
 use Illuminate\Http\Request;
@@ -43,6 +44,9 @@ class UserResource extends JsonResource
             $this->referralsFourthLevel()->count() +
             $this->referralsFifthLevel()->count();
 
+        $inviteText = $this->resolveInviteQr();
+        $inviteQrCode = QrCode::generate($inviteText)->toHtml();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -58,13 +62,13 @@ class UserResource extends JsonResource
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
-                'ref_link_qr' => QrCode::generate(route('v1.login', ['ref' => $this->ref_token]))->toHtml(),
+                'ref_link_qr' => $inviteQrCode,
                 'referer_id' => $this->referrer_id,
                 'referrals_count' => $this->when($refsCount, $refsCount, 0),
             ],
-            'watched_lectures_count' => $this->whenNotNull($this->watched_lectures_count, 0),
-            'list_watched_lectures_count' => $this->whenNotNull($this->list_watched_lectures_count, 0),
-            'saved_lectures_count' => $this->whenNotNull($this->saved_lectures_count, 0),
+            'watched_lectures_count' => $this->whenCounted('watchedLectures', $this->watched_lectures_count, 0),
+            'list_watched_lectures_count' => $this->whenCounted('listWatchedLectures', $this->list_watched_lectures_count, 0),
+            'saved_lectures_count' => $this->whenCounted('savedLectures', $this->saved_lectures_count, 0),
             'purchased_lectures_count' => $this->whenAppended('purchasedLecturesCounter', $this->purchased_lectures_counter, 0),
             'is_notification_read' => $this->is_notification_read,
             'threads' => ThreadResource::collection($this->participants?->map(function (Participant $participant) {
@@ -73,5 +77,13 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->profile_fulfilled_at,
         ];
+    }
+
+    private function resolveInviteQr(): string
+    {
+        return str_replace('x',
+                $this->name ?? $this->email,
+                AppInfo::first()?->user_invites_you_to_join ?? 'x приглашает Вас присоединиться к интересным материалам Школы Мам и Пап!') .
+            config('app.frontend_url') . '/register?ref=' . $this->ref_token;
     }
 }
