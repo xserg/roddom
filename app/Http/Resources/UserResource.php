@@ -46,8 +46,7 @@ class UserResource extends JsonResource
 
         $inviteText = $this->resolveInviteQr();
         $inviteQrCode = QrCode::encoding('UTF-8')->size(250)->generate($inviteText)->toHtml();
-        $inviteQrCodePng = QrCode::format('png')->generate($inviteText)->toHtml();
-        $inviteQrCodePng = mb_convert_encoding($inviteQrCodePng, 'UTF-8', 'UTF-8');
+        $inviteQrCodePng = base64_encode(QrCode::encoding('UTF-8')->format('png')->size(250)->generate($inviteText)->toHtml());
 
         return [
             'id' => $this->id,
