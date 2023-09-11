@@ -46,6 +46,8 @@ class UserResource extends JsonResource
 
         $inviteText = $this->resolveInviteQr();
         $inviteQrCode = QrCode::encoding('UTF-8')->size(250)->generate($inviteText)->toHtml();
+        $inviteQrCodePng = QrCode::format('png')->generate($inviteText)->toHtml();
+        $inviteQrCodePng = mb_convert_encoding($inviteQrCodePng, 'UTF-8', 'UTF-8');
 
         return [
             'id' => $this->id,
@@ -63,6 +65,7 @@ class UserResource extends JsonResource
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
                 'token' => $this->ref_token,
                 'ref_link_qr' => $inviteQrCode,
+                'ref_link_qr_png' => $inviteQrCodePng,
                 'referer_id' => $this->referrer_id,
                 'referrals_count' => $this->when($refsCount, $refsCount, 0),
             ],
