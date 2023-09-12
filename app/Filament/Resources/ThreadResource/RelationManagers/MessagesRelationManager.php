@@ -28,7 +28,7 @@ class MessagesRelationManager extends RelationManager
                     ->disableFloatingMenus()
                     ->disableBubbleMenus()
                     ->output(TiptapEditor::OUTPUT_HTML)
-                    ->maxLength(1024),
+                    ->maxLength(65535),
             ]);
     }
 

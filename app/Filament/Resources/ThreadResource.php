@@ -54,7 +54,7 @@ class ThreadResource extends Resource
                         ->content(function (?Thread $record) {
                             $user = $record->participants->firstWhere('opened', true)?->user;
 
-                            if(is_null($user)){
+                            if (is_null($user)) {
                                 return 'не определен';
                             }
                             $name = $user->name ?? $user->email;
@@ -150,7 +150,16 @@ class ThreadResource extends Resource
             }
         });
 
-        return $count;
+        if ($count > 0) {
+            return '+' . $count;
+        }
+
+        return null;
+    }
+
+    protected static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 
     public static function getPages(): array
