@@ -145,7 +145,10 @@ class ThreadResource extends Resource
         //compare users read_at and thread read_at, count it
         $count = 0;
         $threads->each(function (Thread $thread) use (&$count) {
-            if ($thread->updated_at > $thread->participantForUser(auth()->id())?->read_at) {
+            if (
+                $thread->participantForUser(auth()->id()) &&
+                $thread->updated_at > $thread->participantForUser(auth()->id())?->read_at
+            ) {
                 $count++;
             }
         });
