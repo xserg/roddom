@@ -298,15 +298,6 @@ class AppInfoResource extends Resource
                             ->columnSpan(1)
                             ->maxLength(255)
                             ->label('строка "Показать QR-код"'),
-                        Forms\Components\FileUpload::make('app_show_qr_link')
-                            ->directory('images/app')
-                            ->required()
-                            ->columnSpan(1)
-                            ->getUploadedFileNameForStorageUsing(
-                                function (): string {
-                                    return 'qr.jpeg';
-                                })
-                            ->label('qr код линка приложения'),
                     ])
                     ->collapsible()
                     ->collapsed(),
