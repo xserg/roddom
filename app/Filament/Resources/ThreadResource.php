@@ -147,8 +147,12 @@ class ThreadResource extends Resource
         $threads->each(function (Thread $thread) use (&$count) {
             $adminIsNotParticipant = is_null($thread->participantForUser(auth()->id()));
             $threadUpdatedLaterThanAdminsReadAt = $thread->updated_at > $thread->participantForUser(auth()->id())?->read_at;
+            $threadHasMessages = $thread->messages()->exists();
 
-            if ($adminIsNotParticipant || $threadUpdatedLaterThanAdminsReadAt) {
+            if (
+                ($adminIsNotParticipant || $threadUpdatedLaterThanAdminsReadAt)
+                && $threadHasMessages
+            ) {
                 $count++;
             }
         });
