@@ -9,7 +9,7 @@ class AddMessageToThreadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'message' => 'required|string|max:1024'
+            'message' => 'required|string|max:65535'
         ];
     }
 }
