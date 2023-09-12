@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Enums\ThreadStatusEnum;
 use App\Filament\Resources\ThreadResource\Pages;
 use App\Filament\Resources\ThreadResource\RelationManagers\MessagesRelationManager;
-use App\Models\User;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\Position;
@@ -35,7 +34,7 @@ class ThreadResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withCount('messages');
+        return parent::getEloquentQuery()->with(['messages'])->withCount('messages');
     }
 
     public static function form(Form $form): Form
@@ -96,9 +95,9 @@ class ThreadResource extends Resource
                 TextColumn::make('messages_count')
                     ->label('Количество сообщений'),
                 BadgeColumn::make('unread')
-                    ->formatStateUsing(fn (?Thread $record): string => ($record->updated_at > $record->participantForUser(auth()->id())?->read_at) && $record->messages_count > 0 ? 'есть' : 'отсутствуют')
+                    ->formatStateUsing(fn (?Thread $record): string => $record->hasUnreadMessagesForUser(auth()->id()) ? 'есть' : 'отсутствуют')
                     ->color(static function (?Thread $record): string {
-                        if (($record->updated_at > $record->participantForUser(auth()->id())?->read_at) && $record->messages_count > 0) {
+                        if ($record->hasUnreadMessagesForUser(auth()->id())) {
                             return 'success';
                         }
 
@@ -145,13 +144,14 @@ class ThreadResource extends Resource
         //compare users read_at and thread read_at, count it
         $count = 0;
         $threads->each(function (Thread $thread) use (&$count) {
-            $adminIsNotParticipant = is_null($thread->participantForUser(auth()->id()));
-            $threadUpdatedLaterThanAdminsReadAt = $thread->updated_at > $thread->participantForUser(auth()->id())?->read_at;
-            $threadHasMessages = $thread->messages()->exists();
+            $participant = $thread->participantForUser(auth()->id());
+
+            $adminIsNotParticipant = is_null($participant);
+            $threadHasMessages = $thread->messages->isNotEmpty();
 
             if (
-                ($adminIsNotParticipant || $threadUpdatedLaterThanAdminsReadAt)
-                && $threadHasMessages
+                $threadHasMessages &&
+                ($adminIsNotParticipant || $thread->hasUnreadMessagesForUser(auth()->id()))
             ) {
                 $count++;
             }

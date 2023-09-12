@@ -62,4 +62,12 @@ class Thread extends Model
     {
         return $this->status === ThreadStatusEnum::OPEN;
     }
+
+    public function hasUnreadMessagesForUser(?int $userId): bool
+    {
+        $participant = $this->participantForUser($userId);
+
+        return $this->messages->isNotEmpty() &&
+            ($this->messages->max('updated_at') > $participant?->read_at);
+    }
 }
