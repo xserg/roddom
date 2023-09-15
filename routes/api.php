@@ -24,6 +24,7 @@ use App\Http\Controllers\Api\Lecture\SaveLectureController;
 use App\Http\Controllers\Api\Lecture\UnsaveLectureController;
 use App\Http\Controllers\Api\Lecture\WatchLectureController;
 use App\Http\Controllers\Api\Payment\PaymentController;
+use App\Http\Controllers\Api\Payment\TinkoffPaymentController;
 use App\Http\Controllers\Api\Promo\RetrieveAllPromoLecturesController;
 use App\Http\Controllers\Api\ResetPassword\CodeCheckController;
 use App\Http\Controllers\Api\ResetPassword\ForgotPasswordController;
@@ -74,6 +75,8 @@ Route::prefix('v1')
         //payments notifications listener
         Route::post('/listen', PaymentController::class)
             ->name('payments.listener');
+        Route::post('/tinkoff-listen', TinkoffPaymentController::class)
+            ->name('tinkoff-payments.listener');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
 
