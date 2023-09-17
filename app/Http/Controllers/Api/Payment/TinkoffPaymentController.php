@@ -54,7 +54,7 @@ class TinkoffPaymentController extends Controller
                 return;
             }
 
-            if ($order->price !== ($request->order_amount * 100)) {
+            if ($order->price !== (int)($request->order_amount * 100)) {
                 $order->status = PaymentStatusEnum::FAILED;
                 $order->description = 'Сумма заказа не совпадает с суммой кредита';
                 $order->save();
