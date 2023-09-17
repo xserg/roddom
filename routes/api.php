@@ -75,7 +75,7 @@ Route::prefix('v1')
         //payments notifications listener
         Route::post('/listen', PaymentController::class)
             ->name('payments.listener');
-        Route::post('/tinkoff-listen', TinkoffPaymentController::class)
+        Route::post('/t-listen', TinkoffPaymentController::class)
             ->name('tinkoff-payments.listener');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -130,6 +130,9 @@ Route::prefix('v1')
                 ->where('period', '[0-9]+');
 
             Route::post('/lecture/all/buy/{period}', BuyAllLecturesController::class)
+                ->name('lecture.buy.all')
+                ->where('period', '[0-9]+');
+            Route::post('/lecture/all/buy/{period}/order', [BuyAllLecturesController::class, 'order'])
                 ->name('lecture.buy.all')
                 ->where('period', '[0-9]+');
 

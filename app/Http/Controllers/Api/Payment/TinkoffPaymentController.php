@@ -20,32 +20,51 @@ class TinkoffPaymentController extends Controller
 
     public function __invoke(Request $request)
     {
-        Log::warning('--------------------------------------');
-        foreach ($request->all() as $key => $value){
+        Log::warning('----------------NOT-SIGNED--------------------');
+        foreach ($request->all() as $key => $value) {
             Log::warning($key);
             Log::error($value);
         }
+        Log::warning('------------------NOT-SIGNED-END-------------------------');
 
-        Log::warning('-------------------------------------------');
-//        $notification = match ($requestBody['event']) {
-//            NotificationEventType::PAYMENT_SUCCEEDED => new NotificationSucceeded($requestBody),
-//            NotificationEventType::PAYMENT_WAITING_FOR_CAPTURE => new NotificationWaitingForCapture($requestBody),
-//            NotificationEventType::PAYMENT_CANCELED => new NotificationCanceled($requestBody),
-//        };
-//
-//        $payment = $notification->getObject();
-//
-//        if (isset($payment->status) && $payment->status === 'canceled') {
-//            $metadata = $payment->metadata;
-//
-//            if (isset($metadata->order_id)) {
-//                $orderId = (int) $metadata->order_id;
-//                $order = Order::query()->findOrFail($orderId);
-//
-//                $order->status = PaymentStatusEnum::FAILED;
-//                $order->save();
-//            }
-//        }
+        if ($request->status && $request->status === 'signed') {
+            Log::warning('----------------SIGNED--------------------');
+            foreach ($request->all() as $key => $value) {
+                Log::warning($key);
+                Log::error($value);
+            }
+            Log::warning('------------------SIGNED-END-------------------------');
+
+            if (is_null($request->id)) {
+                return;
+            }
+
+            $orderId = (string) $request->id;
+            $order = Order::query()->firstWhere(['code' => $orderId]);
+
+            if (is_null($order)) {
+                return;
+            }
+
+            if ($order->isConfirmed()) {
+                return;
+            }
+
+            if (! $request->order_amount) {
+                return;
+            }
+
+            if ($order->price !== ($request->order_amount * 100)) {
+                $order->status = PaymentStatusEnum::FAILED;
+                $order->description = 'Сумма заказа не совпадает с суммой кредита';
+                $order->save();
+
+                return;
+            }
+
+            $period = $this->periodRepository->getPeriodByLength($order->period);
+            $this->paymentService->confirmOrder($order, $period);
+        }
 //
 //        if (isset($payment->status) && $payment->status === 'waiting_for_capture') {
 //            $this->paymentService->getClient()->capturePayment([
@@ -65,14 +84,6 @@ class TinkoffPaymentController extends Controller
 //
 //            $orderId = (int) $metadata->order_id;
 //            $order = Order::query()->findOrFail($orderId);
-//
-//            if ($order->isConfirmed()) {
-//                return;
-//            }
-//
-//            $period = $this->periodRepository->getPeriodByLength($order->period);
-//
-//            $this->paymentService->confirmOrder($order, $period);
 //        }
     }
 }

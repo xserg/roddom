@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Requests\Buy\BuyAllLecturesRequest;
-use App\Models\Category;
 use App\Models\EverythingPack;
 use App\Models\FullCatalogPrices;
 use App\Models\Order;
@@ -11,7 +10,7 @@ use App\Models\Period;
 use App\Services\LectureService;
 use App\Services\PaymentService;
 use App\Traits\MoneyConversion;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class BuyAllLecturesController
 {
@@ -24,6 +23,49 @@ class BuyAllLecturesController
     }
 
     public function __invoke(
+        BuyAllLecturesRequest $request,
+        int                   $periodLength
+    ) {
+        $resolved = $this->resolveOrder($request, $periodLength);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $link = $this->paymentService->createPayment(
+            self::coinsToRoubles(
+                $resolved->refPointsToSpend ?
+                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
+                    $resolved->price
+            ),
+            ['order_id' => $resolved->order->id]
+        );
+
+        return response()->json([
+            'link' => $link,
+        ], Response::HTTP_OK);
+    }
+
+    public function order(
+        BuyAllLecturesRequest $request,
+        int                   $periodLength
+    ) {
+        $resolved = $this->resolveOrder($request, $periodLength);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            $resolved->order->code
+        ]);
+    }
+
+    private function resolveOrder(
         BuyAllLecturesRequest $request,
         int                   $periodLength
     ) {
@@ -42,28 +84,17 @@ class BuyAllLecturesController
             $refPointsToSpend = self::coinsToRoubles($price - 100);
         }
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
+        return (object) [
+            'order' => Order::create([
+                'user_id' => auth()->id(),
+                'price' => $price,
+                'points' => self::roublesToCoins($refPointsToSpend ?? 0),
+                'subscriptionable_type' => EverythingPack::class,
+                'subscriptionable_id' => 1,
+                'period' => $periodLength,
+            ]),
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
-            'subscriptionable_type' => EverythingPack::class,
-            'subscriptionable_id' => 1,
-            'period' => $periodLength,
-        ]);
-
-        if ($order) {
-            $link = $this->paymentService->createPayment(
-                self::coinsToRoubles(
-                    $refPointsToSpend ?
-                        $price - self::roublesToCoins($refPointsToSpend) :
-                        $price
-                ),
-                ['order_id' => $order->id]
-            );
-
-            return response()->json([
-                'link' => $link,
-            ], Response::HTTP_OK);
-        }
+            'refPointsToSpend' => $refPointsToSpend
+        ];
     }
 }
