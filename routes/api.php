@@ -161,7 +161,7 @@ Route::prefix('v1')
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
                 ->where('period', '[0-9]+');
-            Route::post('/promopack/buy/{period}', [BuyPromoController::class, 'order'])
+            Route::post('/promopack/buy/{period}/order', [BuyPromoController::class, 'order'])
                 ->name('promopack.buy.order')
                 ->where('period', '[0-9]+');
 
