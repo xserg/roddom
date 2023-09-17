@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Lector\RetrieveLectorsByCategoryController;
 use App\Http\Controllers\Api\Lecture\AddToListWatchedLectureController;
 use App\Http\Controllers\Api\Lecture\AllLecturesPricesController;
 use App\Http\Controllers\Api\Lecture\FeedbackLectureController;
+use App\Http\Controllers\Api\Lecture\RateLectureController;
 use App\Http\Controllers\Api\Lecture\RemoveFromListWatchedLectureController;
 use App\Http\Controllers\Api\Lecture\RetrieveAllLecturesController;
 use App\Http\Controllers\Api\Lecture\RetrieveLectureController;
@@ -107,7 +108,7 @@ Route::prefix('v1')
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->middleware(['throttle:1,0.015'])
                 ->name('lecture');
-            Route::post('/lecture/{id}/rate', \App\Http\Controllers\Api\Lecture\RateLectureController::class)
+            Route::post('/lecture/{id}/rate', RateLectureController::class)
                 ->name('lecture.rate');
             Route::post('/lecture/{id}/watch', WatchLectureController::class)
                 ->name('lecture.watch');
@@ -128,12 +129,16 @@ Route::prefix('v1')
                 ->name('lecture.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
+            Route::post('/lecture/{id}/buy/{period}/order', [BuyLectureController::class, 'order'])
+                ->name('lecture.buy.order')
+                ->where('id', '[0-9]+')
+                ->where('period', '[0-9]+');
 
             Route::post('/lecture/all/buy/{period}', BuyAllLecturesController::class)
                 ->name('lecture.buy.all')
                 ->where('period', '[0-9]+');
             Route::post('/lecture/all/buy/{period}/order', [BuyAllLecturesController::class, 'order'])
-                ->name('lecture.buy.all')
+                ->name('lecture.buy.all.order')
                 ->where('period', '[0-9]+');
 
             Route::get('/lecture/all/prices', AllLecturesPricesController::class)
@@ -143,13 +148,21 @@ Route::prefix('v1')
                 ->name('categories');
             Route::get('/category/{slug}', RetrieveCategoryController::class)
                 ->name('subcategories');
+
             Route::post('/category/{id}/buy/{period}', BuyCategoryController::class)
                 ->name('category.buy')
+                ->where('id', '[0-9]+')
+                ->where('period', '[0-9]+');
+            Route::post('/category/{id}/buy/{period}/order', [BuyCategoryController::class, 'order'])
+                ->name('category.buy.order')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
 
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
+                ->where('period', '[0-9]+');
+            Route::post('/promopack/buy/{period}', [BuyPromoController::class, 'order'])
+                ->name('promopack.buy.order')
                 ->where('period', '[0-9]+');
 
 

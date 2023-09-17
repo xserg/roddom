@@ -10,7 +10,7 @@ use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Services\PaymentService;
 use App\Traits\MoneyConversion;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Post(
@@ -61,6 +61,51 @@ class BuyLectureController extends Controller
         int               $lectureId,
         int               $period
     ) {
+        $resolved = $this->resolveOrder($request, $lectureId, $period);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $link = $this->paymentService->createPayment(
+            self::coinsToRoubles(
+                $resolved->refPointsToSpend ?
+                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
+                    $resolved->price
+            ),
+            ['order_id' => $resolved->order->id]
+        );
+
+        return response()->json([
+            'link' => $link,
+        ], Response::HTTP_OK);
+    }
+
+    public function order(
+        BuyLectureRequest $request,
+        int               $lectureId,
+        int               $period
+    ) {
+        $resolved = $this->resolveOrder($request, $lectureId, $period);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            $resolved->order->code
+        ]);
+    }
+
+    private function resolveOrder(
+        BuyLectureRequest $request,
+        int               $lectureId,
+        int               $period
+    ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
         $isLecturePurchased = $this->lectureService->isLecturePurchased($lectureId);
         $price = $this->lectureService->calculateLecturePrice($lecture, $period);
@@ -92,19 +137,10 @@ class BuyLectureController extends Controller
             'period' => $period,
         ]);
 
-        if ($order) {
-            $link = $this->paymentService->createPayment(
-                self::coinsToRoubles(
-                    $refPointsToSpend ?
-                        $price - self::roublesToCoins($refPointsToSpend) :
-                        $price
-                ),
-                ['order_id' => $order->id]
-            );
-
-            return response()->json([
-                'link' => $link,
-            ], Response::HTTP_OK);
-        }
+        return (object) [
+            'order' => $order,
+            'price' => $price,
+            'refPointsToSpend' => $refPointsToSpend
+        ];
     }
 }

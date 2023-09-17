@@ -6,14 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyCategoryRequest;
 use App\Models\Category;
 use App\Models\Order;
-use App\Models\Period;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PeriodRepository;
 use App\Services\CategoryService;
 use App\Services\PaymentService;
 use App\Traits\MoneyConversion;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/category/{id}/buy/{period}',
@@ -64,6 +63,48 @@ class BuyCategoryController extends Controller
         int                $categoryId,
         int                $period
     ) {
+        $resolved = $this->resolveOrder($request, $categoryId, $period);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $link = $this->paymentService->createPayment(
+            self::coinsToRoubles(
+                $resolved->refPointsToSpend ?
+                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
+                    $resolved->price
+            ),
+            ['order_id' => $resolved->order->id]
+        );
+
+        return response()->json([
+            'link' => $link,
+        ], Response::HTTP_OK);
+    }
+
+    public function order(
+        BuyCategoryRequest $request,
+        int                $categoryId,
+        int                $period
+    ) {
+        $resolved = $this->resolveOrder($request, $categoryId, $period);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            $resolved->order->code
+        ]);
+    }
+
+    private function resolveOrder(BuyCategoryRequest $request, int $categoryId, int $period)
+    {
         $periodId = $this->periodRepository->getPeriodByLength($period)->id;
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
         $relations = [
@@ -115,19 +156,10 @@ class BuyCategoryController extends Controller
             'period' => $period,
         ]);
 
-        if ($order) {
-            $link = $this->paymentService->createPayment(
-                self::coinsToRoubles(
-                    $refPointsToSpend ?
-                        $price - self::roublesToCoins($refPointsToSpend) :
-                        $price
-                ),
-                ['order_id' => $order->id]
-            );
-
-            return response()->json([
-                'link' => $link,
-            ], Response::HTTP_OK);
-        }
+        return (object) [
+            'order' => $order,
+            'price' => $price,
+            'refPointsToSpend' => $refPointsToSpend
+        ];
     }
 }

@@ -11,8 +11,8 @@ use App\Repositories\PromoRepository;
 use App\Services\PaymentService;
 use App\Services\PromoService;
 use App\Traits\MoneyConversion;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/promopack/buy/{period}',
@@ -54,6 +54,49 @@ class BuyPromoController extends Controller
         BuyPromoRequest $request,
         int             $periodLength
     ) {
+        $resolved = $this->resolveOrder($request, $periodLength);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        $link = $this->paymentService->createPayment(
+            self::coinsToRoubles(
+                $resolved->refPointsToSpend ?
+                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
+                    $resolved->price
+            ),
+            ['order_id' => $resolved->order->id]
+        );
+
+        return response()->json([
+            'link' => $link,
+        ], Response::HTTP_OK);
+    }
+
+    public function order(
+        BuyPromoRequest $request,
+        int             $periodLength
+    ) {
+        $resolved = $this->resolveOrder($request, $categoryId, $period);
+
+        if (! $resolved->order) {
+            return response()->json([
+                'message' => 'Some problem with order creating'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return response()->json([
+            $resolved->order->code
+        ]);
+    }
+
+    private function resolveOrder(
+        BuyPromoRequest $request,
+        int             $periodLength
+    ) {
         $isPurchased = $this->promoService->isPromoPurchased();
 
         if ($isPurchased) {
@@ -84,19 +127,10 @@ class BuyPromoController extends Controller
             'period' => $periodLength,
         ]);
 
-        if ($order) {
-            $link = $this->paymentService->createPayment(
-                self::coinsToRoubles(
-                    $refPointsToSpend ?
-                        $price - self::roublesToCoins($refPointsToSpend ?? 0) :
-                        $price
-                ),
-                ['order_id' => $order->id]
-            );
-
-            return response()->json([
-                'link' => $link,
-            ], Response::HTTP_OK);
-        }
+        return (object) [
+            'order' => $order,
+            'price' => $price,
+            'refPointsToSpend' => $refPointsToSpend
+        ];
     }
 }
