@@ -69,7 +69,7 @@ class BuyAllLecturesController
                 ["name" => "Hasta", "quantity" => 1, "price" => self::coinsToRoubles($resolved->price)]
             ],
             "demoFlow" => "sms",
-            "orderNumber" => $resolved->order->id,
+            "orderNumber" => $resolved->order->code,
             "sum" => self::coinsToRoubles($resolved->price),
             "values" => [
                 "contact" => [
