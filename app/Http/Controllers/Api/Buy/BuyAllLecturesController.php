@@ -10,7 +10,9 @@ use App\Models\Period;
 use App\Services\LectureService;
 use App\Services\PaymentService;
 use App\Traits\MoneyConversion;
+use GuzzleHttp\Client;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Http;
 
 class BuyAllLecturesController
 {
@@ -60,8 +62,31 @@ class BuyAllLecturesController
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
+        $response = Http::post('https://forma.tinkoff.ru/api/partners/v2/orders/create-demo', [
+            "shopId" => config('services.tinkoff.shop_id'),
+            "showcaseId" => config('services.tinkoff.case_id'),
+            "items" => [
+                ["name" => "Hasta", "quantity" => 1, "price" => self::coinsToRoubles($resolved->price)]
+            ],
+            "demoFlow" => "sms",
+            "orderNumber" => $resolved->order->id,
+            "sum" => self::coinsToRoubles($resolved->price),
+            "values" => [
+                "contact" => [
+                    "fio" => [
+                        "lastName" => "Иванов",
+                        "firstName" => "Иван",
+                        "middleName" => "Иванович"
+                    ],
+                    "mobilePhone" => "9998887766",
+                    "email" => "ivan@example.com"
+                ]
+            ]
+        ]);
+
         return response()->json([
-            $resolved->order->code
+            'link' => $response->object()->link,
+            'id' => $resolved->order->code
         ]);
     }
 

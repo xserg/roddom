@@ -34,4 +34,8 @@ return [
         'shop_id' => env('YOOKASSA_SHOP_ID'),
         'secret_key' => env('YOOKASSA_SECRET_KEY'),
     ],
+    'tinkoff' => [
+        'shop_id' => env('TINKOFF_SHOP_ID'),
+        'case_id' => env('TINKOFF_CASE_ID')
+    ]
 ];
