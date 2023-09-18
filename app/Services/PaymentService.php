@@ -47,7 +47,7 @@ class PaymentService
         return $client->getConfirmation()->getConfirmationUrl();
     }
 
-    public function confirmOrder(Order $order, Period $period): void
+    public function confirmOrder(Order $order, Period $period, ?string $description = null): void
     {
         $subscriptionAttributes = $this->getSubscriptionAttributes(
             $order, $period
@@ -58,8 +58,10 @@ class PaymentService
         DB::transaction(function () use (
             $order,
             $subscription,
+            $description
         ) {
             $order->status = PaymentStatusEnum::CONFIRMED;
+            $subscription->description = $description;
             /**
              * @var User $orderedUser
              */

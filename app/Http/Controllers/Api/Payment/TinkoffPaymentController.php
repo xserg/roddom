@@ -64,7 +64,7 @@ class TinkoffPaymentController extends Controller
             }
 
             $period = $this->periodRepository->getPeriodByLength($order->period);
-            $this->paymentService->confirmOrder($order, $period);
+            $this->paymentService->confirmOrder($order, $period, 'Покупка | Тинькофф кредит/рассрочка');
         }
 //
 //        if (isset($payment->status) && $payment->status === 'waiting_for_capture') {

@@ -18,7 +18,7 @@ class CreateSubscription extends CreateRecord
     {
         $users = array_shift($data);
         foreach ($users as $user) {
-            $last = $this->getModel()::create(['user_id' => $user, ...$data]);
+            $last = $this->getModel()::create(['user_id' => $user, ...$data, 'description' => 'Создана в админке']);
         }
 
         return $last;

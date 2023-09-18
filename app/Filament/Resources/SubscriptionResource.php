@@ -88,7 +88,7 @@ class SubscriptionResource extends Resource
 
                                     return new HtmlString("<a class=$classes href=\"$path\">$name</a>");
                                 })
-                                ->visible(fn(string $context) => $context === 'edit')
+                                ->visible(fn (string $context) => $context === 'edit')
                                 ->label('Пользователь'),
                             Forms\Components\Select::make('subscriptionable_type')
                                 ->required()
@@ -125,7 +125,7 @@ class SubscriptionResource extends Resource
                                             $lecture->id => Str::limit($lecture->title, 60) . ' (' . Str::limit($lecture->category->title, 25) . ')'
                                         ]),
                                         Promo::class => Promo::all()->mapWithKeys(fn (Promo $promo) => [
-                                            1 => Lecture::promo()->count()  . ' лекций'
+                                            1 => Lecture::promo()->count() . ' лекций'
                                         ]),
                                         EverythingPack::class => [1 => Lecture::count() . ' лекций'],
                                         default => null
@@ -158,6 +158,11 @@ class SubscriptionResource extends Resource
                                 })
                                 ->reactive()
                                 ->visible(fn (string $context) => $context === 'create'),
+                            Forms\Components\Placeholder::make('created_at')
+                                ->content(fn(?Subscription $record) => $record->created_at)
+                                ->label('создана')
+                                ->visible(fn ($context) => $context === 'edit')
+                                ->disabled(),
                             Forms\Components\DateTimePicker::make('start_date')
                                 ->label('начало подписки')
                                 ->required(),
@@ -202,11 +207,14 @@ class SubscriptionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
-                    ->label('общая цена подписки')
+                    ->label('общая сумма')
                     ->sortable(),
                 TextColumn::make('points')->label('бебикоинов потрачено')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->limit(25)
+                    ->label('описание'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('начало подписки')
                     ->toggleable()
