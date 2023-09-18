@@ -29,7 +29,7 @@ class ThreadResource extends Resource
     protected static ?string $modelLabel = 'Беседа';
     protected static ?string $pluralModelLabel = 'Беседы';
     protected static ?string $recordTitleAttribute = 'id';
-    protected static ?string $navigationGroup = 'Беседы';
+    protected static ?string $navigationGroup = 'Уведомления и обращения';
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
     public static function getEloquentQuery(): Builder

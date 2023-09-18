@@ -81,7 +81,7 @@ class BuyPromoController extends Controller
         BuyPromoRequest $request,
         int             $periodLength
     ) {
-        $resolved = $this->resolveOrder($request, $categoryId, $period);
+        $resolved = $this->resolveOrder($request, $periodLength);
 
         if (! $resolved->order) {
             return response()->json([

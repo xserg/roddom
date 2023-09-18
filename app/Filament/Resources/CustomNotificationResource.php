@@ -19,7 +19,7 @@ class CustomNotificationResource extends Resource
     protected static ?string $model = CustomNotification::class;
 
     protected static ?string $navigationLabel = 'Уведомления';
-    protected static ?string $navigationGroup = 'Уведомления';
+    protected static ?string $navigationGroup = 'Уведомления и обращения';
     protected static ?string $modelLabel = 'Уведомления';
     protected static ?string $pluralModelLabel = 'Уведомления';
     protected static ?int $navigationSort = 1;
