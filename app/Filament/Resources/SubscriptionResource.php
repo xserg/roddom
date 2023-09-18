@@ -213,7 +213,7 @@ class SubscriptionResource extends Resource
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->limit(25)
+                    ->limit(35)
                     ->label('описание'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('начало подписки')
