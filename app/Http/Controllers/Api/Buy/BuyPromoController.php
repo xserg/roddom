@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Buy;
 
+use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtPromoPackException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
 use App\Models\Order;
@@ -100,9 +101,7 @@ class BuyPromoController extends Controller
         $isPurchased = $this->promoService->isPromoPurchased();
 
         if ($isPurchased) {
-            return response()->json([
-                'message' => 'Promo pack is already purchased.',
-            ], Response::HTTP_FORBIDDEN);
+            throw new UserCannotBuyAlreadyBoughtPromoPackException();
         }
 
         $periodId = $this->periodRepository

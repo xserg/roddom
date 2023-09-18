@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\Buy;
 
+use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtLectureException;
+use App\Exceptions\Custom\UserCannotBuyFreeLectureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyLectureRequest;
 use App\Models\Lecture;
@@ -111,15 +113,11 @@ class BuyLectureController extends Controller
         $price = $this->lectureService->calculateLecturePrice($lecture, $period);
 
         if ($isLecturePurchased) {
-            return response()->json([
-                'message' => 'Lecture with id ' . $request->id . ' is already purchased.',
-            ], Response::HTTP_FORBIDDEN);
+            throw new UserCannotBuyAlreadyBoughtLectureException();
         }
 
         if ($lecture->isFree()) {
-            return response()->json([
-                'message' => 'You cannot purchase free lecture'
-            ], Response::HTTP_FORBIDDEN);
+            throw new UserCannotBuyFreeLectureException();
         }
 
         $refPointsToSpend = $request->validated('ref_points');
