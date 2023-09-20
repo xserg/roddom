@@ -7,6 +7,7 @@ use App\Models\LecturePaymentType;
 use App\Models\Promo;
 use App\Services\LectureService;
 use App\Traits\MoneyConversion;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
@@ -100,5 +101,10 @@ class PromoRepository
         }
 
         return ['final_price' => $finalPrice, 'usual_price' => $usualPrice];
+    }
+
+    public function getAllLectures(): Collection
+    {
+        return Lecture::promo()->get();
     }
 }

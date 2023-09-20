@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Buy;
 
+use App\Exceptions\Custom\PromoLecturesAreEmptyException;
 use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtPromoPackException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
@@ -102,6 +103,12 @@ class BuyPromoController extends Controller
 
         if ($isPurchased) {
             throw new UserCannotBuyAlreadyBoughtPromoPackException();
+        }
+
+        $promoLectures = $this->promoRepository->getAllLectures();
+
+        if ($promoLectures->isEmpty()) {
+            throw new PromoLecturesAreEmptyException();
         }
 
         $periodId = $this->periodRepository
