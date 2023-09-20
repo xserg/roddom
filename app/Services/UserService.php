@@ -329,46 +329,48 @@ class UserService
 
     public function rewardForRefLinkRegistration(User $user): void
     {
-        if ($user->hasReferrer()) {
-            $referrer = $user->referrer;
+        if ($user->hasNotReferrer()) {
+            return;
+        }
 
-            if ($referrer->canGetReferrersBonus()) {
+        $referrer = $user->referrer;
 
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
-                $referrer->refPointsGetPayments()->create([
-                    'payer_id' => $user->id,
-                    'ref_points' => $pointsToGet,
-                    'reason' => RefPointsPayments::REASON_INVITE
-                ]);
+        if ($referrer->canGetReferrersBonus()) {
 
-                if ($referrer->refPoints()->exists()) {
-                    $referrer->refPoints->points += $pointsToGet;
-                    $referrer->refPoints->save();
-                } else {
-                    $referrer->refPoints()->create(['points' => $pointsToGet]);
-                }
+            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referrer')?->points_gains ?? 0;
+            $referrer->refPointsGetPayments()->create([
+                'payer_id' => $user->id,
+                'ref_points' => $pointsToGet,
+                'reason' => RefPointsPayments::REASON_INVITE
+            ]);
 
-                $referrer->markCantGetReferrersBonus();
+            if ($referrer->refPoints()->exists()) {
+                $referrer->refPoints->points += $pointsToGet;
+                $referrer->refPoints->save();
+            } else {
+                $referrer->refPoints()->create(['points' => $pointsToGet]);
             }
 
-            if ($user->canGetReferralsBonus()) {
-                $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
-                if ($user->refPoints()->exists()) {
-                    $user->refPoints->points += $pointsToGet;
-                    $user->refPoints->save();
-                } else {
-                    $user->refPoints()->create(['points' => $pointsToGet]);
-                }
+            $referrer->markCantGetReferrersBonus();
+        }
 
-                $user->refPointsGetPayments()->create([
-                    'payer_id' => $referrer->id,
-                    'ref_points' => $pointsToGet,
-                    'reason' => RefPointsPayments::REASON_INVITED
-                ]);
-
-                $user->markCantGetReferralsBonus();
-                $user->refresh();
+        if ($user->canGetReferralsBonus()) {
+            $pointsToGet = RefPointsGainOnce::query()->firstWhere('user_type', 'referral')?->points_gains ?? 0;
+            if ($user->refPoints()->exists()) {
+                $user->refPoints->points += $pointsToGet;
+                $user->refPoints->save();
+            } else {
+                $user->refPoints()->create(['points' => $pointsToGet]);
             }
+
+            $user->refPointsGetPayments()->create([
+                'payer_id' => $referrer->id,
+                'ref_points' => $pointsToGet,
+                'reason' => RefPointsPayments::REASON_INVITED
+            ]);
+
+            $user->markCantGetReferralsBonus();
+            $user->refresh();
         }
     }
 }

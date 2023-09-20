@@ -314,6 +314,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->referrer()->exists();
     }
 
+    public function hasNotReferrer(): bool
+    {
+        return $this->referrer()->doesntExist();
+    }
+
     public function markNotificationRead()
     {
         return $this->fill([
