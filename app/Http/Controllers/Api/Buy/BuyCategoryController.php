@@ -141,7 +141,7 @@ class BuyCategoryController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
-        $refPointsToSpend = $request->validated('ref_points');
+        $refPointsToSpend = $request->validated('ref_points', 0);
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
             $refPointsToSpend = self::coinsToRoubles($price - 100);
@@ -150,7 +150,7 @@ class BuyCategoryController extends Controller
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
+            'points' => self::roublesToCoins($refPointsToSpend),
             'subscriptionable_type' => Category::class,
             'subscriptionable_id' => $categoryId,
             'period' => $period,

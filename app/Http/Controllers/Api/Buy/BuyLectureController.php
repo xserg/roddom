@@ -120,7 +120,7 @@ class BuyLectureController extends Controller
             throw new UserCannotBuyFreeLectureException();
         }
 
-        $refPointsToSpend = $request->validated('ref_points');
+        $refPointsToSpend = $request->validated('ref_points', 0);
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
             $refPointsToSpend = self::coinsToRoubles($price - 100);
@@ -129,7 +129,7 @@ class BuyLectureController extends Controller
         $order = Order::create([
             'user_id' => auth()->id(),
             'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend ?? 0),
+            'points' => self::roublesToCoins($refPointsToSpend),
             'subscriptionable_type' => Lecture::class,
             'subscriptionable_id' => $lectureId,
             'period' => $period,

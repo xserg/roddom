@@ -96,7 +96,7 @@ class BuyAllLecturesController
         int                   $periodLength
     ) {
         $period = Period::firstWhere('length', $periodLength);
-        $refPointsToSpend = $request->validated('ref_points');
+        $refPointsToSpend = $request->validated('ref_points', 0);
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
         $fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id);
 
@@ -114,7 +114,7 @@ class BuyAllLecturesController
             'order' => Order::create([
                 'user_id' => auth()->id(),
                 'price' => $price,
-                'points' => self::roublesToCoins($refPointsToSpend ?? 0),
+                'points' => self::roublesToCoins($refPointsToSpend),
                 'subscriptionable_type' => EverythingPack::class,
                 'subscriptionable_id' => 1,
                 'period' => $periodLength,

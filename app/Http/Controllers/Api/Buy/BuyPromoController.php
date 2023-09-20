@@ -111,7 +111,7 @@ class BuyPromoController extends Controller
             ->calculatePromoPackPriceForPeriod(1, $periodId);
         $price = $prices['final_price'];
 
-        $refPointsToSpend = $request->validated('ref_points');
+        $refPointsToSpend = $request->validated('ref_points', 0);
 
         if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
             $refPointsToSpend = self::coinsToRoubles($price - 100);
