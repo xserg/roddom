@@ -75,10 +75,10 @@ Route::prefix('v1')
 
         //payments notifications listener
         Route::post('/listen', PaymentController::class)
-            ->middleware('yookassa-verify-ip')
+//            ->middleware('yookassa-verify-ip')
             ->name('payments.listener');
         Route::post('/t-listen', TinkoffPaymentController::class)
-            ->middleware('tinkoff-verify-ip')
+//            ->middleware('tinkoff-verify-ip')
             ->name('tinkoff-payments.listener');
 
         Route::group(['middleware' => ['auth:sanctum']], function () {
