@@ -43,6 +43,9 @@ class RefInfoResource extends Resource
                 Tables\Columns\TextColumn::make('depth_level')
                     ->label('уровень реферала')
                     ->formatStateUsing(function (string $state) {
+                        if ($state === '1.1') {
+                            return '1 уровень, горизонтальный';
+                        }
                         return $state ? $state . ' уровень' : 'уровень не определен';
                     }),
                 Tables\Columns\TextColumn::make('percent')

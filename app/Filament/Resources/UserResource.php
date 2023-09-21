@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use App\Enums\RefTypeEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers\DevicesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\ReferralsMadePaymentsRelationManager;
@@ -124,28 +125,6 @@ class UserResource extends Resource
                     ->visible(fn (string $context): bool => $context === 'create')
                     ->columns(2),
 
-                Forms\Components\Card::make([
-                    Forms\Components\TextInput::make('points')
-                        ->afterStateHydrated(function (?RefPoints $record, TextInput $component) {
-                            if (is_null($record?->points)) {
-                                $component->state(0);
-                            }
-                            $component->state(number_format($record?->points / 100, 2, thousands_separator: ''));
-                        })
-                        ->dehydrateStateUsing(fn ($state) => $state * 100)
-                        ->mask(fn (TextInput\Mask $mask) => $mask
-                            ->numeric()
-                            ->decimalPlaces(2)
-                            ->decimalSeparator('.')
-                        )
-                        ->numeric()
-                        ->minValue(0)
-                        ->nullable()
-                        ->label('Бебикоины')
-                ])
-                    ->relationship('refPoints')
-                    ->columnSpan(1),
-
 
                 Forms\Components\Card::make([
                     Forms\Components\Select::make('referrer_id')
@@ -176,22 +155,55 @@ class UserResource extends Resource
                             return $options;
                         })
                         ->label('Реферер'),
-                ])->columns(1)->columnSpan(1),
 
-                Forms\Components\Placeholder::make('descendants_count')
-                    ->label('Количество рефералов')
-                    ->content(function (?Model $record) {
-                        $allLevelsReferralsCount =
-                            $record->referrals->count() +
-                            $record->referralsSecondLevel->count() +
-                            $record->referralsThirdLevel->count() +
-                            $record->referralsFourthLevel->count() +
-                            $record->referralsFifthLevel->count();
+                    Forms\Components\Select::make('ref_type')
+                        ->options(function (string $context) {
+                            return [
+                                RefTypeEnum::VERTICAL->value => 'вертикальная',
+                                RefTypeEnum::HORIZONTAL->value => 'горизонтальная'
+                            ];
+                        })
+                        ->disablePlaceholderSelection()
+                        ->label('Тип'),
 
-                        return $allLevelsReferralsCount;
-                    })
-                    ->columnSpan(2)
-                    ->visible(fn (string $context) => $context === 'edit'),
+                    Forms\Components\Placeholder::make('descendants_count')
+                        ->label('Количество рефералов')
+                        ->content(function (?Model $record) {
+                            $allLevelsReferralsCount =
+                                $record->referrals->count() +
+                                $record->referralsSecondLevel->count() +
+                                $record->referralsThirdLevel->count() +
+                                $record->referralsFourthLevel->count() +
+                                $record->referralsFifthLevel->count();
+
+                            return $allLevelsReferralsCount;
+                        })
+                        ->columnSpan(2)
+                        ->visible(fn (string $context) => $context === 'edit'),
+                ])->columns(2)->columnSpan(1),
+
+                Forms\Components\Card::make([
+                    Forms\Components\TextInput::make('points')
+                        ->afterStateHydrated(function (?RefPoints $record, TextInput $component) {
+                            if (is_null($record?->points)) {
+                                $component->state(0);
+                            }
+                            $component->state(number_format($record?->points / 100, 2, thousands_separator: ''));
+                        })
+                        ->dehydrateStateUsing(fn ($state) => $state * 100)
+                        ->mask(fn (TextInput\Mask $mask) => $mask
+                            ->numeric()
+                            ->decimalPlaces(2)
+                            ->decimalSeparator('.')
+                        )
+                        ->numeric()
+                        ->minValue(0)
+                        ->nullable()
+                        ->label('Бебикоины'),
+                ])
+                    ->relationship('refPoints')
+                    ->columnSpan(1),
+
                 /*
                  * SUBSCRIPTIONS - REPEATER
                  */

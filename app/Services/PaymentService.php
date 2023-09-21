@@ -131,11 +131,22 @@ class PaymentService
 
             foreach ($relationships as $depth => $relationship) {
                 if ($relationship->doesntExist()) {
+                    break;
+                }
+
+                /** @var User $referrer */
+                $referrer = $relationship->first();
+
+                if ($depth > 1 && $referrer->ref_type->isHorizontal()) {
                     continue;
                 }
 
-                $percent = $refInfo->firstWhere('depth_level', $depth)?->percent ?? 5;
-                $referrer = $relationship->first();
+                if ($depth === 1 && $referrer->ref_type->isHorizontal()) {
+                    $percent = $refInfo->firstWhere('depth_level', 1.1)?->percent ?? 20;
+                } else {
+                    $percent = $refInfo->firstWhere('depth_level', $depth)?->percent ?? 5;
+                }
+
                 $pointsToGet = $residualAmount * ($percent / 100);
 
                 $referrer->refPointsGetPayments()->create([

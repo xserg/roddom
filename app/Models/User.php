@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\RefTypeEnum;
 use App\Models\Threads\Participant;
 use App\Models\Threads\Thread;
 use Filament\Models\Contracts\FilamentUser;
@@ -41,7 +42,8 @@ class User extends Authenticatable implements FilamentUser
         'can_get_referrals_bonus',
         'can_get_referrers_bonus',
         'next_free_lecture_available',
-        'is_notification_read'
+        'is_notification_read',
+        'ref_type'
     ];
 
     protected $hidden = [
@@ -56,7 +58,8 @@ class User extends Authenticatable implements FilamentUser
         'is_mother' => 'bool',
         'can_get_referrals_bonus' => 'bool',
         'can_get_referrers_bonus' => 'bool',
-        'is_notification_read' => 'bool'
+        'is_notification_read' => 'bool',
+        'ref_type' => RefTypeEnum::class
     ];
 
     protected static function booted(): void
