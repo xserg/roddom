@@ -334,25 +334,25 @@ class LectureResource extends Resource
                     ->label('Наименование')
                     ->limit(35)
                     ->tooltip(fn (Model $record): string => $record->title)
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('Подкатегория')
                     ->limit(25)
                     ->tooltip(fn (Model $record): string => isset($record->category) ? $record->category->title : '')
                     ->toggleable()
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('Лектор')
                     ->limit(20)
                     ->tooltip(fn (Model $record): string => isset($record->lector) ? $record->lector->name : '')
+                    ->searchable(isIndividual: true)
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('contentType.title_ru')
                     ->label('Тип')
                     ->sortable()
-                    ->searchable()
                     ->toggleable(),
                 Tables\Columns\ImageColumn::make('preview_picture')
                     ->toggleable(isToggledHiddenByDefault: true)
