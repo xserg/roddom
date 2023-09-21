@@ -3,16 +3,11 @@
 namespace App\Repositories;
 
 use App\Models\Lecture;
-use App\Models\LecturePaymentType;
-use App\Models\Period;
-use App\Models\Promo;
-use App\Models\User;
+use App\QueryBuilders\LectureCategoryFilter;
 use App\Traits\MoneyConversion;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Arr;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -72,7 +67,7 @@ class LectureRepository
                 AllowedFilter::scope('recommended'),
                 AllowedFilter::scope('not_watched'),
                 AllowedFilter::exact('lector_id'),
-                AllowedFilter::exact('category_id'),
+                AllowedFilter::custom('category_id', new LectureCategoryFilter()),
             ]);
 
         return $builder;
