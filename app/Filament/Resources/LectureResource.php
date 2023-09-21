@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LectureResource\Pages;
 use App\Filament\Resources\LectureResource\RelationManagers;
 use App\Models\Category;
+use App\Models\Lector;
 use App\Models\Lecture;
 use App\Models\LectureContentType;
 use App\Models\LecturePaymentType;
@@ -18,6 +19,8 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Layout;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
@@ -334,40 +337,48 @@ class LectureResource extends Resource
                     ->label('Наименование')
                     ->limit(35)
                     ->tooltip(fn (Model $record): string => $record->title)
-                    ->searchable(isIndividual: true)
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('category.title')
                     ->label('Подкатегория')
                     ->limit(25)
                     ->tooltip(fn (Model $record): string => isset($record->category) ? $record->category->title : '')
                     ->toggleable()
-                    ->searchable(isIndividual: true)
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('lector.name')
                     ->label('Лектор')
-                    ->limit(20)
                     ->tooltip(fn (Model $record): string => isset($record->lector) ? $record->lector->name : '')
-                    ->searchable(isIndividual: true)
+                    ->searchable(isIndividual: true, isGlobal: false)
                     ->sortable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('contentType.title_ru')
                     ->label('Тип')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ImageColumn::make('preview_picture')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->label('Превью изображение лекции'),
                 Tables\Columns\TextColumn::make('averageRate.rating')
                     ->default('пока нет оценок')
                     ->label('Рейтинг, из 10')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\IconColumn::make('is_published')
                     ->label('Опубликована ли')
                     ->boolean()
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('category_id')
+                    ->multiple()
+                    ->options(Category::subCategories()->orderBy('title')->pluck('title', 'id'))
+                    ->label('По подкатегории'),
+                SelectFilter::make('lector_id')
+                    ->multiple()
+                    ->options(Lector::orderBy('name')->pluck('name', 'id'))
+                    ->label('По лектору'),
                 Filter::make('free')
                     ->query(fn (Builder $query): Builder => $query->where('payment_type_id', LecturePaymentType::FREE))
                     ->label('бесплатные'),
