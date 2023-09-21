@@ -203,7 +203,7 @@ class RetrieveAllLecturesController
             $lectures = $this->lectureRepository->paginate(
                 $lectures,
                 (int) $request->per_page ?? 15,
-                $request->page,
+                (int) $request->page,
             );
         } catch (NotFoundHttpException $exception) {
             return response()->json(
