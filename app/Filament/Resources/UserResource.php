@@ -159,8 +159,8 @@ class UserResource extends Resource
                     Forms\Components\Select::make('ref_type')
                         ->options(function (string $context) {
                             return [
-                                RefTypeEnum::VERTICAL->value => 'вертикальная',
-                                RefTypeEnum::HORIZONTAL->value => 'горизонтальная'
+                                RefTypeEnum::VERTICAL->value => 'вертикальный',
+                                RefTypeEnum::HORIZONTAL->value => 'горизонтальный'
                             ];
                         })
                         ->disablePlaceholderSelection()

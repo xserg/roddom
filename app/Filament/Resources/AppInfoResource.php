@@ -45,6 +45,21 @@ class AppInfoResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->label('тариф 3'),
+                    Forms\Components\TextInput::make('credit_minimal_sum')
+                        ->required()
+                        ->integer()
+                        ->label('минимальная сумма рассрочки/кредита')
+                        ->rules(['gte:0']),
+                    Forms\Components\FileUpload::make('successful_purchase_image')
+                        ->directory('images/app')
+                        ->required()
+                        ->columnSpan(1)
+                        ->getUploadedFileNameForStorageUsing(
+                            function (): string {
+                                return 'successful_purchase_image.jpeg';
+                            })
+                        ->label('изображение в майле успешной покупки'),
+
                     Forms\Components\RichEditor::make('successful_purchase_text')
                         ->label('текст успешной покупки, на email')
                         ->toolbarButtons([
@@ -58,15 +73,6 @@ class AppInfoResource extends Resource
                             'preview',
                         ])
                         ->maxLength(65535),
-                    Forms\Components\FileUpload::make('successful_purchase_image')
-                        ->directory('images/app')
-                        ->required()
-                        ->columnSpan(1)
-                        ->getUploadedFileNameForStorageUsing(
-                            function (): string {
-                                return 'successful_purchase_image.jpeg';
-                            })
-                        ->label('изображение в майле успешной покупки'),
                 ])->columns(2),
 
                 Forms\Components\Section::make('Раздел "Лицензионное соглашение"')
@@ -182,11 +188,6 @@ class AppInfoResource extends Resource
                                     ->rows(3)
                                     ->maxLength(255)
                                     ->label('Спасибо за обратную связь! Ваше сообщение успешно отправлено.'),
-
-                                /**
-                                 * add last
-                                 */
-
                                 Forms\Components\Textarea::make('buy_page_under_btn_description')
                                     ->required()
                                     ->rows(2)
@@ -233,6 +234,9 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Строка "Ваша экономия составит х рублей."'),
+                                Forms\Components\TextInput::make('category_special_price_text')
+                                    ->label('строка «Вы также можете приобрести полностью категорию по специальной цене»')
+                                    ->maxLength(255)->columnSpan(2),
 
                                 // ref system
                                 Forms\Components\TextInput::make('ref_system_title')
