@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
@@ -159,7 +160,7 @@ class SubscriptionResource extends Resource
                                 ->reactive()
                                 ->visible(fn (string $context) => $context === 'create'),
                             Forms\Components\Placeholder::make('created_at')
-                                ->content(fn(?Subscription $record) => $record->created_at)
+                                ->content(fn (?Subscription $record) => $record->created_at)
                                 ->label('создана')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
@@ -231,7 +232,18 @@ class SubscriptionResource extends Resource
                     ->dateTime()
                     ->sortable(),
             ])
-            ->filters([//
+            ->filters([
+                SelectFilter::make('user_id')
+                    ->multiple()
+                    ->options(function () {
+                        $query = User::has('subscriptions')->orderBy('name')->orderBy('email');
+                        $options = [];
+                        $query->get()->each(function (User $user) use (&$options) {
+                            return $options[$user->id] = "$user->name ($user->email)";
+                        });
+                        return $options;
+                    })
+                    ->label('По пользователю'),
             ])
             ->headerActions([
                 FilamentExportHeaderAction::make('Export'),
