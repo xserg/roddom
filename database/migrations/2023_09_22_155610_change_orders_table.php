@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('price_to_pay')->after('price');
+            $table->unsignedBigInteger('price_to_pay')->nullable()->after('price');
         });
     }
 
