@@ -91,26 +91,6 @@ class CategoryService
         return $result;
     }
 
-//    public function calculateMainCategoryPriceForPeriod(
-//        Category $mainCategory,
-//        int      $periodId
-//    ): CategoryPricesDto {
-//        $price = 0;
-//
-//        foreach ($mainCategory->childrenCategories as $subCategory) {
-//            $subCategoryPricesDto = $this->calculateSubCategoryPriceForPeriod($subCategory, $periodId);
-//
-//            $price += $subCategory->isPromo() ?
-//                $subCategoryPricesDto->getPromoPrice() :
-//                $subCategoryPricesDto->getPrice();
-//        }
-//
-//        return new CategoryPricesDto(
-//            $price,
-//            $pricePromo
-//        );
-//    }
-
     public function calculateSubCategoryPriceForPeriod(
         Category $category,
         int      $periodId

@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Actions\Position;
+use FilamentTiptapEditor\TiptapEditor;
 use Livewire\TemporaryUploadedFile;
 
 class AppInfoResource extends Resource
@@ -243,10 +244,13 @@ class AppInfoResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->label('Партнерская программа, заголовок'),
-                                Forms\Components\Textarea::make('ref_system_description')
-                                    ->required()
-                                    ->rows(3)
-                                    ->label('Партнерская программа, описание'),
+                                TiptapEditor::make('ref_system_description')
+                                    ->profile('barebone')
+                                    ->label('Партнерская программа, описание')
+                                    ->disableFloatingMenus()
+                                    ->disableBubbleMenus()
+                                    ->output(TiptapEditor::OUTPUT_HTML)
+                                    ->maxLength(65535),
                                 Forms\Components\TextInput::make('user_invites_you_to_join')
                                     ->required()
                                     ->maxLength(255)
