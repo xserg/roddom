@@ -18,6 +18,7 @@ class PurchaseService
 
         if ($this->priceToPayLessThanOneRouble($priceToPay)) {
             $refPointsToSpend = $price - 100;
+            $priceToPay = 100;
         }
 
         return Order::create([
