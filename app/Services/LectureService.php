@@ -301,7 +301,7 @@ class LectureService
 
     public function getEverythingPriceForPeriod(int $periodLength): int
     {
-        $period = $this->periods->where('length', $periodLength);
+        $period = $this->periods->firstWhere('length', $periodLength);
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
         $fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id);
 
