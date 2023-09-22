@@ -72,6 +72,7 @@ class PaymentService
                     'ref_points' => $order->points,
                     'reason' => RefPointsPayments::REASON_BUY,
                     'price' => $order->price,
+                    'price_to_pay' => $order->price_to_pay
                 ]);
             }
             $order->save();
