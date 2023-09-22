@@ -109,6 +109,7 @@ class PaymentService
             'subscriptionable_id' => $order->subscriptionable_id,
             'period_id' => $period->id,
             'total_price' => $order->price,
+            'price_to_pay' => $order->price_to_pay,
             'points' => $order->points,
             'start_date' => now(),
             'end_date' => now()->addDays($period->length),
@@ -154,6 +155,7 @@ class PaymentService
                     'reason' => RefPointsPayments::REASON_BUY,
                     'ref_points' => $pointsToGet,
                     'price' => $order->price,
+                    'price_to_pay' => $order->price_to_pay,
                     'depth_level' => $depth,
                     'percent' => $percent,
                 ]);

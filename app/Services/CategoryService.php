@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Dto\CategoryPricesDto;
 use App\Models\Category;
 use App\Models\Period;
+use App\Repositories\CategoryRepository;
 use App\Repositories\UserRepository;
 use App\Traits\MoneyConversion;
 use Illuminate\Support\Arr;
@@ -14,7 +15,8 @@ class CategoryService
     use MoneyConversion;
 
     public function __construct(
-        private UserRepository $userRepository,
+        private UserRepository     $userRepository,
+        private CategoryRepository $categoryRepository
     ) {
     }
 
@@ -49,7 +51,7 @@ class CategoryService
         foreach (Period::all() as $period) {
             $categoryPriceDto = $this->calculateMainCategoryPriceForPeriod($category, $period->id);
 
-            $categoryPriceInRoubles = self::coinsToRoubles($categoryPriceDto->getPrice());
+            $categoryPriceInRoubles = self::coinsToRoubles($categoryPriceDto->getUsualPrice());
             $categoryPricePromoInRoubles = self::coinsToRoubles($categoryPriceDto->getPromoPrice());
 
             $result[] = [
@@ -73,7 +75,7 @@ class CategoryService
 
             $priceForOneLectureInRoubles = self::coinsToRoubles($price->price_for_one_lecture);
             $priceForOneLecturePromoInRoubles = self::coinsToRoubles($price->price_for_one_lecture_promo);
-            $categoryPriceInRoubles = self::coinsToRoubles($subCategoryPricesDto->getPrice());
+            $categoryPriceInRoubles = self::coinsToRoubles($subCategoryPricesDto->getUsualPrice());
             $categoryPromoPriceInRoubles = self::coinsToRoubles($subCategoryPricesDto->getPromoPrice());
 
             $result[] = [
@@ -121,17 +123,18 @@ class CategoryService
         if ($lecturesCount === 0) {
             return new CategoryPricesDto(
                 $price,
-                $pricePromo
+                $pricePromo,
+                $category
             );
         }
 
         foreach ($category->lectures as $lecture) {
-            if($lecture->isFree()){
-                return new CategoryPricesDto($price, $pricePromo);
+            if ($lecture->isFree()) {
+                return new CategoryPricesDto($price, $pricePromo, $category);
             }
 
             $lecturePrices = app(LectureService::class)
-                ->formLecturePricesSubCategory($lecture);
+                ->calculateLecturePricesSubCategory($lecture);
             $lecturePromoPrices = app(LectureService::class)
                 ->formPricesPromoLectureSubCategory($lecture);
 
@@ -158,7 +161,7 @@ class CategoryService
             $pricePromo += $customPromoPrice ?? $commonPromoPrice;
         }
 
-        return new CategoryPricesDto($price, $pricePromo);
+        return new CategoryPricesDto($price, $pricePromo, $category);
     }
 
     public function calculateMainCategoryPriceForPeriod(
@@ -173,13 +176,14 @@ class CategoryService
         if ($lecturesCount === 0) {
             return new CategoryPricesDto(
                 $price,
-                $pricePromo
+                $pricePromo,
+                $category
             );
         }
 
         foreach ($category->childrenCategoriesLectures as $lecture) {
-            if($lecture->isFree()){
-                return new CategoryPricesDto($price, $pricePromo);
+            if ($lecture->isFree()) {
+                return new CategoryPricesDto($price, $pricePromo, $category);
             }
 
             $lecturePrices = app(LectureService::class)
@@ -210,33 +214,37 @@ class CategoryService
             $pricePromo += $customPromoPrice ?? $commonPromoPrice;
         }
 
-        return new CategoryPricesDto($price, $pricePromo);
+        return new CategoryPricesDto($price, $pricePromo, $category);
     }
 
-
-    /**
-     * Считать цену учитывая только общую цену на лекции и количество лекций в категории
-     */
-    public function getCategoryPrice(int $categoryId, int $periodId): int|string
+    private function calculatePriceForPeriod(?Category $category, int $periodId): CategoryPricesDto
     {
-        $category = $this->getCategoryById($categoryId);
-
-        if (! is_null($category)) {
-            return 0;
+        if ($category->isSub()) {
+            return $this->calculateSubCategoryPriceForPeriod($category, $periodId);
         }
 
-        $prices = $category->categoryPrices;
-        $lecturesCount = $category->lectures->count();
+        return $this->calculateMainCategoryPriceForPeriod($category, $periodId);
+    }
 
-        foreach ($prices as $price) {
-            $priceForPackInRoubles =
-                number_format(($price->price_for_one_lecture * $lecturesCount) / 100, 2, thousands_separator: '');
+    public function getCategoryPriceForPeriod(int $categoryId, int $periodId): int
+    {
+        $relations = [
+            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
+            'childrenCategories.lectures.category.parentCategory.categoryPrices',
+            'childrenCategoriesLectures.pricesForLectures',
+            'childrenCategories.categoryPrices.period',
+            'childrenCategories.parentCategory',
+            'childrenCategories.categoryPrices',
+            'childrenCategories.lectures.category.categoryPrices',
+            'childrenCategories.lectures.pricesInPromoPacks',
+            'childrenCategories.lectures.pricesForLectures',
+            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+            'childrenCategories.lectures.paymentType',
+            'childrenCategories.lectures.contentType',
+        ];
+        $category = $this->categoryRepository->getCategoryById($categoryId, $relations);
+        $categoryPricesDto = $this->calculatePriceForPeriod($category, $periodId);
 
-            if ($price->period->id == $periodId) {
-                return $priceForPackInRoubles;
-            }
-        }
-
-        return 0;
+        return $categoryPricesDto->getPrice();
     }
 }

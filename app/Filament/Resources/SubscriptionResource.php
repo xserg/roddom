@@ -208,7 +208,11 @@ class SubscriptionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
-                    ->label('общая сумма')
+                    ->label('цена')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price_to_pay')
+                    ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
+                    ->label('оплачено реальной валютой')
                     ->sortable(),
                 TextColumn::make('points')->label('бебикоинов потрачено')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))

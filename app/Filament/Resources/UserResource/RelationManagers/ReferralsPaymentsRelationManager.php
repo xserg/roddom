@@ -55,7 +55,11 @@ class ReferralsPaymentsRelationManager extends RelationManager
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price')
                     ->formatStateUsing(fn (?string $state) => $state / 100)
-                    ->label('стоимость покупки')
+                    ->label('цена')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('price_to_pay')
+                    ->formatStateUsing(fn (?string $state) => $state / 100)
+                    ->label('оплачено реальной валютой')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('начислено в')

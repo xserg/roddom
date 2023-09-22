@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\Buy;
 
-use App\Exceptions\Custom\PromoLecturesAreEmptyException;
 use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtPromoPackException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
@@ -12,6 +11,7 @@ use App\Repositories\PeriodRepository;
 use App\Repositories\PromoRepository;
 use App\Services\PaymentService;
 use App\Services\PromoService;
+use App\Services\PurchaseService;
 use App\Traits\MoneyConversion;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,7 +48,8 @@ class BuyPromoController extends Controller
         private PromoService     $promoService,
         private PromoRepository  $promoRepository,
         private PeriodRepository $periodRepository,
-        private PaymentService   $paymentService
+        private PaymentService   $paymentService,
+        private PurchaseService  $purchaseService
     ) {
     }
 
@@ -56,87 +57,49 @@ class BuyPromoController extends Controller
         BuyPromoRequest $request,
         int             $periodLength
     ) {
-        $resolved = $this->resolveOrder($request, $periodLength);
-
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $order = $this->createOrder($request, $periodLength);
 
         $link = $this->paymentService->createPayment(
-            self::coinsToRoubles(
-                $resolved->refPointsToSpend ?
-                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
-                    $resolved->price
-            ),
-            ['order_id' => $resolved->order->id]
+            self::coinsToRoubles($order->price_to_pay),
+            ['order_id' => $order->id]
         );
 
-        return response()->json([
-            'link' => $link,
-        ], Response::HTTP_OK);
+        return response()->json(['link' => $link]);
     }
 
-    public function order(
+    public function prepareOrderForTinkoff(
         BuyPromoRequest $request,
         int             $periodLength
     ) {
-        $resolved = $this->resolveOrder($request, $periodLength);
+        $order = $this->createOrder($request, $periodLength);
 
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return response()->json([
-            $resolved->order->code
-        ]);
+        return response()->json([$order->code]);
     }
 
-    private function resolveOrder(
+    private function createOrder(
         BuyPromoRequest $request,
-        int             $periodLength
-    ) {
-        $isPurchased = $this->promoService->isPromoPurchased();
+        int             $periodLength,
+        int             $promoPackId = 1
+    ): Order {
+        $lectures = $this->promoRepository->getAllLecturesForPromoPack($promoPackId);
+        $isPurchased = $this->promoService->isPromoPurchased($promoPackId);
 
         if ($isPurchased) {
             throw new UserCannotBuyAlreadyBoughtPromoPackException();
         }
 
-        $promoLectures = $this->promoRepository->getAllLectures();
+        $periodId = $this->periodRepository->getPeriodByLength($periodLength)->id;
+        $price = $this->promoRepository->getPromoPackPriceForPeriod($promoPackId, $periodId);
 
-        if ($promoLectures->isEmpty()) {
-            throw new PromoLecturesAreEmptyException();
-        }
+        $refPointsToSpend = self::roublesToCoins($request->validated('ref_points', 0));
 
-        $periodId = $this->periodRepository
-            ->getPeriodByLength($periodLength)
-            ->id;
-        $prices = $this->promoRepository
-            ->calculatePromoPackPriceForPeriod(1, $periodId);
-        $price = $prices['final_price'];
-
-        $refPointsToSpend = $request->validated('ref_points', 0);
-
-        if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
-            $refPointsToSpend = self::coinsToRoubles($price - 100);
-        }
-
-        $order = Order::create([
-            'user_id' => auth()->user()->id,
-            'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
-            'subscriptionable_type' => Promo::class,
-            'subscriptionable_id' => 1,
-            'period' => $periodLength,
-        ]);
-
-        return (object) [
-            'order' => $order,
-            'price' => $price,
-            'refPointsToSpend' => $refPointsToSpend
-        ];
+        return $this->purchaseService->resolveOrder(
+            auth()->id(),
+            Promo::class,
+            1,
+            $price,
+            $periodLength,
+            $refPointsToSpend
+        );
     }
 }

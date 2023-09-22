@@ -131,7 +131,7 @@ Route::prefix('v1')
                 ->name('lecture.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            Route::post('/lecture/{id}/buy/{period}/order', [BuyLectureController::class, 'order'])
+            Route::post('/lecture/{id}/buy/{period}/order', [BuyLectureController::class, 'prepareOrderForTinkoff'])
                 ->name('lecture.buy.order')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
@@ -139,7 +139,7 @@ Route::prefix('v1')
             Route::post('/lecture/all/buy/{period}', BuyAllLecturesController::class)
                 ->name('lecture.buy.all')
                 ->where('period', '[0-9]+');
-            Route::post('/lecture/all/buy/{period}/order', [BuyAllLecturesController::class, 'order'])
+            Route::post('/lecture/all/buy/{period}/order', [BuyAllLecturesController::class, 'prepareOrderForTinkoff'])
                 ->name('lecture.buy.all.order')
                 ->where('period', '[0-9]+');
 
@@ -155,7 +155,7 @@ Route::prefix('v1')
                 ->name('category.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            Route::post('/category/{id}/buy/{period}/order', [BuyCategoryController::class, 'order'])
+            Route::post('/category/{id}/buy/{period}/order', [BuyCategoryController::class, 'prepareOrderForTinkoff'])
                 ->name('category.buy.order')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
@@ -163,7 +163,7 @@ Route::prefix('v1')
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
                 ->where('period', '[0-9]+');
-            Route::post('/promopack/buy/{period}/order', [BuyPromoController::class, 'order'])
+            Route::post('/promopack/buy/{period}/order', [BuyPromoController::class, 'prepareOrderForTinkoff'])
                 ->name('promopack.buy.order')
                 ->where('period', '[0-9]+');
 

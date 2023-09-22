@@ -8,13 +8,10 @@ use App\Models\FullCatalogPrices;
 use App\Models\Lecture;
 use App\Models\Period;
 use App\Models\Promo;
-use App\Models\User;
 use App\Repositories\CategoryRepository;
 use App\Repositories\LectureRepository;
 use App\Repositories\UserRepository;
 use App\Traits\MoneyConversion;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 class LectureService
@@ -91,21 +88,19 @@ class LectureService
         return $price;
     }
 
-    public function calculateLecturePrice(Lecture $lecture, int $period): int|float
+    public function getLecturePriceForPeriod(int $lectureId, int $periodLength): int
     {
+        $lecture = $this->lectureRepository->getLectureById($lectureId);
+
         if ($lecture->isFree()) {
             return 0;
         }
 
-        if ($lecture->isPromo()) {
-            $prices = $this->formPromoLecturePricesPromoPack($lecture);
-        } else {
-            $prices = $this->formLecturePricesSubCategory($lecture);
-        }
+        $prices = $this->calculatePrices($lecture);
 
         $priceArr = Arr::where(
             $prices,
-            fn ($value) => $value['length'] == $period
+            fn ($value) => $value['length'] == $periodLength
         );
         $priceArr = Arr::first($priceArr);
 
@@ -116,7 +111,7 @@ class LectureService
         return $price;
     }
 
-    public function formPromoLecturePricesPromoPack(Lecture|LectureResource $lecture): array
+    public function calculatePromoLecturePricesPromoPack(Lecture|LectureResource $lecture): array
     {
         $prices = [];
 
@@ -155,7 +150,7 @@ class LectureService
         return $prices;
     }
 
-    public function formLecturePricesSubCategory(Lecture|LectureResource $lecture): array
+    public function calculateLecturePricesSubCategory(Lecture|LectureResource $lecture): array
     {
         $prices = [];
 
@@ -293,5 +288,27 @@ class LectureService
         }
 
         return $prices;
+    }
+
+    private function calculatePrices(Lecture $lecture): array
+    {
+        if ($lecture->isPromo()) {
+            return $this->calculatePromoLecturePricesPromoPack($lecture);
+        }
+
+        return $this->calculateLecturePricesSubCategory($lecture);
+    }
+
+    public function getEverythingPriceForPeriod(int $periodLength): int
+    {
+        $period = $this->periods->where('length', $periodLength);
+        $fullCatalogPrices = FullCatalogPrices::with('period')->get();
+        $fullCatalogPricesForPeriod = $fullCatalogPrices->firstWhere('period_id', $period->id);
+
+        if ($fullCatalogPricesForPeriod->is_promo) {
+            return $this->calculateEverythingPricePromoByPeriod($fullCatalogPricesForPeriod);
+        }
+
+        return $this->calculateEverythingPriceByPeriod($fullCatalogPricesForPeriod);
     }
 }

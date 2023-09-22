@@ -10,6 +10,7 @@ use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PromoRepository
 {
@@ -77,8 +78,8 @@ class PromoRepository
         }
 
         foreach ($promoLectures as $promoLecture) {
-            $lecturePrices = $this->lectureService->formPromoLecturePricesPromoPack($promoLecture);
-            $lectureUsualPrices = $this->lectureService->formLecturePricesSubCategory($promoLecture);
+            $lecturePrices = $this->lectureService->calculatePromoLecturePricesPromoPack($promoLecture);
+            $lectureUsualPrices = $this->lectureService->calculateLecturePricesSubCategory($promoLecture);
 
             $lecturePriceForPeriod = Arr::where($lecturePrices, function ($value) use ($periodId) {
                 return $value['period_id'] == $periodId;
@@ -103,8 +104,20 @@ class PromoRepository
         return ['final_price' => $finalPrice, 'usual_price' => $usualPrice];
     }
 
-    public function getAllLectures(): Collection
+    public function getAllLecturesForPromoPack(int $promoPackId): Collection
     {
-        return Lecture::promo()->get();
+        $promoLectures = Lecture::promo()->get();
+
+        if ($promoLectures->isEmpty()) {
+            throw new NotFoundHttpException('There are no promo lectures');
+        }
+
+        return $promoLectures;
+    }
+
+    public function getPromoPackPriceForPeriod(int $promoPackId, int $periodId): int
+    {
+        $prices = $this->calculatePromoPackPriceForPeriod($promoPackId, $periodId);
+        return $prices['final_price'];
     }
 }

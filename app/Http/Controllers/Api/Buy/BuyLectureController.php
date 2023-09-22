@@ -7,10 +7,10 @@ use App\Exceptions\Custom\UserCannotBuyFreeLectureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyLectureRequest;
 use App\Models\Lecture;
-use App\Models\Order;
 use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Services\PaymentService;
+use App\Services\PurchaseService;
 use App\Traits\MoneyConversion;
 use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
@@ -54,7 +54,8 @@ class BuyLectureController extends Controller
     public function __construct(
         private LectureRepository $lectureRepository,
         private LectureService    $lectureService,
-        private PaymentService    $paymentService
+        private PaymentService    $paymentService,
+        private PurchaseService   $purchaseService
     ) {
     }
 
@@ -63,82 +64,53 @@ class BuyLectureController extends Controller
         int               $lectureId,
         int               $period
     ) {
-        $resolved = $this->resolveOrder($request, $lectureId, $period);
-
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $order = $this->createOrder($request, $lectureId, $period);
 
         $link = $this->paymentService->createPayment(
-            self::coinsToRoubles(
-                $resolved->refPointsToSpend ?
-                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
-                    $resolved->price
-            ),
-            ['order_id' => $resolved->order->id]
+            self::coinsToRoubles($order->price_to_pay),
+            ['order_id' => $order->id]
         );
 
-        return response()->json([
-            'link' => $link,
-        ], Response::HTTP_OK);
+        return response()->json(['link' => $link]);
     }
 
-    public function order(
+    public function prepareOrderForTinkoff(
         BuyLectureRequest $request,
         int               $lectureId,
         int               $period
     ) {
-        $resolved = $this->resolveOrder($request, $lectureId, $period);
+        $order = $this->createOrder($request, $lectureId, $period);
 
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return response()->json([
-            $resolved->order->code
-        ]);
+        return response()->json([$order->code]);
     }
 
-    private function resolveOrder(
+    private function createOrder(
         BuyLectureRequest $request,
         int               $lectureId,
         int               $period
     ) {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
-        $isLecturePurchased = $this->lectureService->isLecturePurchased($lectureId);
-        $price = $this->lectureService->calculateLecturePrice($lecture, $period);
-
-        if ($isLecturePurchased) {
-            throw new UserCannotBuyAlreadyBoughtLectureException();
-        }
 
         if ($lecture->isFree()) {
             throw new UserCannotBuyFreeLectureException();
         }
 
-        $refPointsToSpend = $request->validated('ref_points', 0);
+        $isLecturePurchased = $this->lectureService->isLecturePurchased($lectureId);
 
-        if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
-            $refPointsToSpend = self::coinsToRoubles($price - 100);
+        if ($isLecturePurchased) {
+            throw new UserCannotBuyAlreadyBoughtLectureException();
         }
 
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
-            'subscriptionable_type' => Lecture::class,
-            'subscriptionable_id' => $lectureId,
-            'period' => $period,
-        ]);
+        $price = $this->lectureService->getLecturePriceForPeriod($lectureId, $period);
+        $refPointsToSpend = self::roublesToCoins($request->validated('ref_points', 0));
 
-        return (object) [
-            'order' => $order,
-            'price' => $price,
-            'refPointsToSpend' => $refPointsToSpend
-        ];
+        return $this->purchaseService->resolveOrder(
+            auth()->id(),
+            Lecture::class,
+            $lectureId,
+            $price,
+            $period,
+            $refPointsToSpend,
+        );
     }
 }

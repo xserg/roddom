@@ -100,9 +100,9 @@ class LectureResource extends JsonResource
     {
         return function () {
             if ($this->isPromo()) {
-                return $this->convertPrices(app(LectureService::class)->formPromoLecturePricesPromoPack($this));
+                return $this->convertPrices(app(LectureService::class)->calculatePromoLecturePricesPromoPack($this));
             } else {
-                return $this->convertPrices(app(LectureService::class)->formLecturePricesSubCategory($this));
+                return $this->convertPrices(app(LectureService::class)->calculateLecturePricesSubCategory($this));
             }
         };
     }

@@ -3,10 +3,8 @@
 namespace App\Filament\Resources\SubscriptionResource\Pages;
 
 use App\Filament\Resources\SubscriptionResource;
-use App\Jobs\SyncSubscriptionItemsJob;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 
 class CreateSubscription extends CreateRecord
 {

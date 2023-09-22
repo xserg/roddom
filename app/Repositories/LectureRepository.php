@@ -20,8 +20,7 @@ class LectureRepository
     {
         $lecture = Lecture::query()
             ->with('lector', 'lector.diplomas')
-            ->where(['id' => $id])
-            ->first();
+            ->find($id);
 
         if (! $lecture) {
             throw new NotFoundHttpException('Лекция c id ' . $id . ' не найдена');

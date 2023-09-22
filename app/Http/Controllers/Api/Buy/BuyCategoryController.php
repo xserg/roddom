@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Buy;
 
+use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtCategoryException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyCategoryRequest;
 use App\Models\Category;
@@ -9,6 +10,7 @@ use App\Models\Order;
 use App\Repositories\CategoryRepository;
 use App\Repositories\PeriodRepository;
 use App\Services\CategoryService;
+use App\Services\PurchaseService;
 use App\Services\PaymentService;
 use App\Traits\MoneyConversion;
 use OpenApi\Attributes as OA;
@@ -53,8 +55,9 @@ class BuyCategoryController extends Controller
     public function __construct(
         private CategoryService    $categoryService,
         private CategoryRepository $categoryRepository,
+        private PeriodRepository   $periodRepository,
         private PaymentService     $paymentService,
-        private PeriodRepository   $periodRepository
+        private PurchaseService    $purchaseService
     ) {
     }
 
@@ -63,103 +66,45 @@ class BuyCategoryController extends Controller
         int                $categoryId,
         int                $period
     ) {
-        $resolved = $this->resolveOrder($request, $categoryId, $period);
-
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
+        $order = $this->createOrder($request, $categoryId, $period);
 
         $link = $this->paymentService->createPayment(
-            self::coinsToRoubles(
-                $resolved->refPointsToSpend ?
-                    $resolved->price - self::roublesToCoins($resolved->refPointsToSpend) :
-                    $resolved->price
-            ),
-            ['order_id' => $resolved->order->id]
+            self::coinsToRoubles($order->price_to_pay),
+            ['order_id' => $order->id]
         );
 
-        return response()->json([
-            'link' => $link,
-        ], Response::HTTP_OK);
+        return response()->json(['link' => $link]);
     }
 
-    public function order(
+    public function prepareOrderForTinkoff(
         BuyCategoryRequest $request,
         int                $categoryId,
         int                $period
     ) {
-        $resolved = $this->resolveOrder($request, $categoryId, $period);
+        $order = $this->createOrder($request, $categoryId, $period);
 
-        if (! $resolved->order) {
-            return response()->json([
-                'message' => 'Some problem with order creating'
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-
-        return response()->json([
-            $resolved->order->code
-        ]);
+        return response()->json([$order->code]);
     }
 
-    private function resolveOrder(BuyCategoryRequest $request, int $categoryId, int $period)
+    private function createOrder(BuyCategoryRequest $request, int $categoryId, int $period): Order
     {
         $periodId = $this->periodRepository->getPeriodByLength($period)->id;
         $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
-        $relations = [
-            'childrenCategoriesLectures.category.parentCategory.categoryPrices',
-            'childrenCategoriesLectures.pricesForLectures',
-            'childrenCategories.lectures.category.parentCategory.categoryPrices',
-            'childrenCategories.categoryPrices.period',
-            'childrenCategories.parentCategory',
-            'childrenCategories.categoryPrices',
-            'childrenCategories.lectures.category.categoryPrices',
-            'childrenCategories.lectures.pricesInPromoPacks',
-            'childrenCategories.lectures.pricesForLectures',
-            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-            'childrenCategories.lectures.paymentType',
-            'childrenCategories.lectures.contentType',
-        ];
-        $category = $this->categoryRepository->getCategoryById($categoryId, $relations);
-
-        if ($category->isSub()) {
-            $subCategoryPricesDto = $this->categoryService->calculateSubCategoryPriceForPeriod($category, $periodId);
-            $price = $category->isPromo() ?
-                $subCategoryPricesDto->getPromoPrice() :
-                $subCategoryPricesDto->getPrice();
-        } else {
-            $categoryPricesDto = $this->categoryService->calculateMainCategoryPriceForPeriod($category, $periodId);
-            $price = $category->isPromo() ?
-                $categoryPricesDto->getPromoPrice() :
-                $categoryPricesDto->getPrice();
-        }
 
         if ($isPurchased) {
-            return response()->json([
-                'message' => 'Category with id ' . $categoryId . ' is already purchased.',
-            ], Response::HTTP_FORBIDDEN);
+            throw new UserCannotBuyAlreadyBoughtCategoryException();
         }
 
-        $refPointsToSpend = $request->validated('ref_points', 0);
+        $price = $this->categoryService->getCategoryPriceForPeriod($categoryId, $periodId);
+        $refPointsToSpend = self::roublesToCoins($request->validated('ref_points', 0));
 
-        if ($refPointsToSpend && (($price - self::roublesToCoins($refPointsToSpend)) < 100)) {
-            $refPointsToSpend = self::coinsToRoubles($price - 100);
-        }
-
-        $order = Order::create([
-            'user_id' => auth()->id(),
-            'price' => $price,
-            'points' => self::roublesToCoins($refPointsToSpend),
-            'subscriptionable_type' => Category::class,
-            'subscriptionable_id' => $categoryId,
-            'period' => $period,
-        ]);
-
-        return (object) [
-            'order' => $order,
-            'price' => $price,
-            'refPointsToSpend' => $refPointsToSpend
-        ];
+        return $this->purchaseService->resolveOrder(
+            auth()->id(),
+            Category::class,
+            $categoryId,
+            $price,
+            $period,
+            $refPointsToSpend
+        );
     }
 }

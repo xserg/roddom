@@ -4,7 +4,7 @@ namespace App\Services;
 
 class PromoService
 {
-    public function isPromoPurchased()
+    public function isPromoPurchased(int $promoPackId)
     {
         $purchasedCategoriesIds = auth()->user()
             ->promoSubscriptions()
