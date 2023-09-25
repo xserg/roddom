@@ -42,7 +42,7 @@ class SubscriptionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Grid::make(3)
+                Forms\Components\Grid::make(4)
                     ->schema([
                         Forms\Components\Card::make([
                             Forms\Components\Select::make('user_id')
@@ -139,8 +139,14 @@ class SubscriptionResource extends Resource
                                     || $get('subscriptionable_type') === EverythingPack::class)
                                 ->saveRelationshipsWhenHidden()
                                 ->required(),
-                        ])->columnSpan(2),
+                        ])->columnSpan(fn(string $context) => $context === 'create' ? 3 : 2),
                         Forms\Components\Card::make([
+                            Forms\Components\DateTimePicker::make('start_date')
+                                ->label('начало подписки')
+                                ->required(),
+                            Forms\Components\DateTimePicker::make('end_date')
+                                ->label('окончание подписки')
+                                ->required(),
                             Forms\Components\Select::make('period_id')
                                 ->relationship('period', 'length')
                                 ->label('период подписки, дней(не обязательно)')
@@ -158,21 +164,27 @@ class SubscriptionResource extends Resource
                                         $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength)->toDateTimeString());
                                     }
                                 })
-                                ->reactive()
-                                ->visible(fn (string $context) => $context === 'create'),
+                                ->reactive(),
+                        ])->columnSpan(1)
+                            ->visible(fn (string $context) => $context === 'create'),
+                        Forms\Components\Card::make([
                             Forms\Components\Placeholder::make('created_at')
                                 ->content(fn (?Subscription $record) => $record->created_at)
                                 ->label('создана')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
-                            Forms\Components\Placeholder::make('price_to_pay')
+                            Forms\Components\Placeholder::make('total_price')
+                                ->content(fn (?Subscription $record) => self::coinsToRoubles($record->total_price) ?? 0)
+                                ->label('цена')
+                                ->visible(fn ($context) => $context === 'edit')
+                                ->disabled(),Forms\Components\Placeholder::make('price_to_pay')
                                 ->content(fn (?Subscription $record) => self::coinsToRoubles($record->price_to_pay) ?? 0)
-                                ->label('оплачено')
+                                ->label('оплачено рублями')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
                             Forms\Components\Placeholder::make('points')
                                 ->content(fn (?Subscription $record) => self::coinsToRoubles($record->points) ?? 0)
-                                ->label('бэбикоинами')
+                                ->label('оплачено бэбикоинами')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
                             Forms\Components\Placeholder::make('lectures_count')
@@ -180,13 +192,9 @@ class SubscriptionResource extends Resource
                                 ->label('куплено лекций')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
-                            Forms\Components\DateTimePicker::make('start_date')
-                                ->label('начало подписки')
-                                ->required(),
-                            Forms\Components\DateTimePicker::make('end_date')
-                                ->label('окончание подписки')
-                                ->required(),
+
                         ])->columnSpan(1)
+                            ->visible(fn (string $context) => $context === 'edit'),
                     ]),
             ]);
     }
@@ -225,16 +233,23 @@ class SubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('total_price')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->label('цена')
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price_to_pay')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
-                    ->label('оплачено')
+                    ->label('рублями')
+                    ->toggleable()
                     ->sortable(),
-                TextColumn::make('points')->label('бебикоинами')
+                TextColumn::make('points')
+                    ->label('бебикоинами')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
+                    ->toggleable(),
+                TextColumn::make('lectures_count')
+                    ->label('лекций')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
                     ->limit(16)
+                    ->tooltip(fn (?Model $record): ?string => $record?->description)
                     ->label('описание'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('начало подписки')

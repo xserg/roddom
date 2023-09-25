@@ -99,7 +99,6 @@ class BuyPromoController extends Controller
             Promo::class,
             1,
             $price,
-            $price,
             Lecture::promo()->count(),
             $periodLength,
             $refPointsToSpend

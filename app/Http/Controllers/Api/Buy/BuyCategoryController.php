@@ -101,7 +101,6 @@ class BuyCategoryController extends Controller
             auth()->id(),
             Category::class,
             $categoryId,
-            $categoryPurchase->getInitialPrice(),
             $categoryPurchase->getPriceToPay(),
             $categoryPurchase->getLecturesBoughtCount(),
             $period,
