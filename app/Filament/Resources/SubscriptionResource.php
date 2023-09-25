@@ -164,9 +164,9 @@ class SubscriptionResource extends Resource
                                         $set('end_date', Carbon::createFromDate($get('start_date'))->addDays($periodLength)->toDateTimeString());
                                     }
                                 })
+                                ->visible(fn (string $context) => $context === 'create')
                                 ->reactive(),
-                        ])->columnSpan(1)
-                            ->visible(fn (string $context) => $context === 'create'),
+                        ])->columnSpan(1),
                         Forms\Components\Card::make([
                             Forms\Components\Placeholder::make('created_at')
                                 ->content(fn (?Subscription $record) => $record->created_at)
