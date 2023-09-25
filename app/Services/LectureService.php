@@ -38,7 +38,7 @@ class LectureService
     {
         $purchasedLecturesIds = $this->lectureRepository->getPurchasedLectures();
 
-        return $purchasedLecturesIds->contains($lectureId);
+        return $purchasedLecturesIds->contains('id', $lectureId);
     }
 
     public function formAllLecturePrices(): array
