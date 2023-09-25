@@ -45,6 +45,6 @@ class CategoryResource extends JsonResource
 
     private function resolvePrices(): array
     {
-        return app(CategoryService::class)->getCategoryPricesResource($this, $this->isMain());
+        return app(CategoryService::class)->getCategoryPricesResource($this);
     }
 }

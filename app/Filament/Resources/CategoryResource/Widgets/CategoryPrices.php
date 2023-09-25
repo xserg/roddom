@@ -16,10 +16,10 @@ class CategoryPrices extends Widget
     {
         if ($this->record->isSub()) {
             $lecturesCount = $this->record->lectures()->count();
-            $form = app(CategoryService::class)->formSubCategoryPrices($this->record);
+            $form = app(CategoryService::class)->getCategoryPricesResource($this->record);
         } else {
             $lecturesCount = $this->record->childrenCategories()->withCount('lectures')->get()->sum('lectures_count');
-            $form = app(CategoryService::class)->formMainCategoryPrices($this->record);
+            $form = app(CategoryService::class)->getCategoryPricesResource($this->record);
         }
 
         return [

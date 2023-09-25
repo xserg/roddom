@@ -75,12 +75,12 @@ class CategoryService
         return false;
     }
 
-    public function getCategoryPricesResource($category, bool $isMain, ?int $userId = null): array
+    public function getCategoryPricesResource($category, ?int $userId = null): array
     {
         $categoryPricesResource = [];
 
         foreach ($this->periods as $period) {
-            $categoryPriceDto = $isMain
+            $categoryPriceDto = $category->isMain()
                 ? $this->calculateMainCategoryPriceForPeriod($category, $period->id, $userId)
                 : $this->calculateSubCategoryPriceForPeriod($category, $period->id, $userId);
 
