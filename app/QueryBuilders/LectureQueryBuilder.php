@@ -77,9 +77,9 @@ class LectureQueryBuilder extends Builder
             return $this;
         }
 
-        $purchasedLecturesIds = app(LectureRepository::class)->getAllPurchasedLectureIdsForCurrentUser();
+        $purchasedLectures = app(LectureRepository::class)->getPurchasedLectures();
 
-        return $this->whereIn('id', $purchasedLecturesIds);
+        return $this->whereIn('id', $purchasedLectures->pluck('id'));
         //            ->orderByRaw("FIELD(id, $ids)");
     }
 

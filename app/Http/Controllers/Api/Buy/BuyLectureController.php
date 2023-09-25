@@ -7,6 +7,7 @@ use App\Exceptions\Custom\UserCannotBuyFreeLectureException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyLectureRequest;
 use App\Models\Lecture;
+use App\Models\Order;
 use App\Repositories\LectureRepository;
 use App\Services\LectureService;
 use App\Services\PaymentService;
@@ -88,7 +89,7 @@ class BuyLectureController extends Controller
         BuyLectureRequest $request,
         int               $lectureId,
         int               $period
-    ) {
+    ): Order {
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
         if ($lecture->isFree()) {

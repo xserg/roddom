@@ -43,7 +43,20 @@ class RetrieveAllCategoriesController
     {
         return response()->json(
             new CategoryCollection(
-                Category::mainCategories()->get()
+                Category::mainCategories()->withCount(['childrenCategoriesLectures'])
+                    ->with([
+                        'childrenCategories' => fn ($query) => $query->withCount('lectures'),
+                        'childrenCategories.categoryPrices.period',
+                        'childrenCategories.parentCategory',
+                        'childrenCategoriesLectures',
+                        'childrenCategories.lectures.category.categoryPrices',
+                        'childrenCategories.lectures.category.parentCategory.categoryPrices',
+                        'childrenCategories.lectures.pricesInPromoPacks',
+                        'childrenCategories.lectures.pricesForLectures',
+                        'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+                        'childrenCategories.lectures.paymentType',
+                        'childrenCategories.lectures.contentType',
+                    ])->get()
             ), Response::HTTP_OK
         );
     }

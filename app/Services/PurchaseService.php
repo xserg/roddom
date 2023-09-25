@@ -3,32 +3,40 @@
 namespace App\Services;
 
 use App\Models\Order;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class PurchaseService
 {
+    /**
+     * @param array $exclude Массив с айди лекций, которые при покупке нужно будет исключить из доступных
+     */
     public function resolveOrder(
-        int    $userId,
-        string $subscriptionableType,
-        int    $subscriptionableId,
-        int    $price,
-        int    $period,
-        int    $refPointsToSpend
-    ) {
-        $priceToPay = $this->calculatePriceToPay($price, $refPointsToSpend);
+        int                                 $userId,
+        string                              $subscriptionableType,
+        int                                 $subscriptionableId,
+        int                                 $initialPrice,
+        int                                 $priceToPay,
+        int                                 $period,
+        int                                 $refPointsToSpend,
+        array|Collection|EloquentCollection $exclude = []
+    ): Order {
+        $priceToPay = $this->calculatePriceToPay($priceToPay, $refPointsToSpend);
 
         if ($this->priceToPayLessThanOneRouble($priceToPay)) {
-            $refPointsToSpend = $price - 100;
+            $refPointsToSpend = $initialPrice - 100;
             $priceToPay = 100;
         }
 
         return Order::create([
             'user_id' => $userId,
-            'price' => $price,
+            'price' => $initialPrice,
             'price_to_pay' => $priceToPay,
             'points' => $refPointsToSpend,
             'subscriptionable_type' => $subscriptionableType,
             'subscriptionable_id' => $subscriptionableId,
             'period' => $period,
+            'exclude' => $exclude
         ]);
     }
 

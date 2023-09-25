@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Lecture;
 use App\Models\LecturePaymentType;
 use App\Models\Promo;
+use App\Services\CategoryService;
 use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Collection;
@@ -17,7 +18,8 @@ class PromoRepository
     use MoneyConversion;
 
     public function __construct(
-        private LectureService $lectureService
+        private LectureService  $lectureService,
+        private CategoryService $categoryService
     ) {
     }
 
@@ -78,8 +80,8 @@ class PromoRepository
         }
 
         foreach ($promoLectures as $promoLecture) {
-            $lecturePrices = $this->lectureService->calculatePromoLecturePricesPromoPack($promoLecture);
-            $lectureUsualPrices = $this->lectureService->calculateLecturePricesSubCategory($promoLecture);
+            $lecturePrices = $this->lectureService->getLecturePricesInCasePromoPack($promoLecture);
+            $lectureUsualPrices = $this->categoryService->getLecturePricesInCaseSubCategory($promoLecture);
 
             $lecturePriceForPeriod = Arr::where($lecturePrices, function ($value) use ($periodId) {
                 return $value['period_id'] == $periodId;

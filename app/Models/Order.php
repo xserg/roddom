@@ -12,6 +12,7 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $casts = ['exclude' => 'array'];
     protected $guarded = [];
 
     protected static function booted(): void

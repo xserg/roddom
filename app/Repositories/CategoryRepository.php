@@ -5,10 +5,8 @@ namespace App\Repositories;
 use App\Models\Category;
 use App\Models\Lector;
 use App\Models\Lecture;
-use App\Models\Period;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class CategoryRepository
@@ -31,12 +29,12 @@ class CategoryRepository
     {
         $relationships = ['userRate', 'averageRate'];
         $category = Category::query()
-            ->where('slug', '=', $slug)
+            ->where('slug', $slug)
             ->firstOrFail();
 
         if ($category->isMain()) {
             $subCategoriesIds = Category::subCategories()
-                ->where('parent_id', '=', $category->id)
+                ->where('parent_id', $category->id)
                 ->pluck('id');
 
             if ($subCategoriesIds->isEmpty()) {
@@ -86,5 +84,42 @@ class CategoryRepository
             ->with($relationships)
             ->orderBy('id')
             ->get();
+    }
+
+    public function getCategoryBySlug(string $slug, array $with = [], array $withCount = []): Category
+    {
+        $withMain = [
+            'childrenCategories' => fn ($query) => $query->withCount('lectures'),
+            'childrenCategories.categoryPrices.period',
+            'childrenCategories.parentCategory',
+            'childrenCategories.lectures.category.categoryPrices',
+            'childrenCategories.lectures.category.parentCategory.categoryPrices',
+            'childrenCategories.lectures.pricesInPromoPacks',
+            'childrenCategories.lectures.pricesForLectures',
+            'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+            'childrenCategories.lectures.paymentType',
+            'childrenCategories.lectures.contentType',
+        ];
+        $withSub = [
+            'categoryPrices.period',
+            'categoryPrices',
+            'parentCategory.categoryPrices',
+            'lectures.category.categoryPrices',
+            'lectures.pricesInPromoPacks',
+            'lectures.pricesForLectures',
+            'lectures.pricesPeriodsInPromoPacks',
+            'lectures.paymentType',
+            'lectures.contentType',
+        ];
+        $withCountMain = ['childrenCategoriesLectures'];
+        $withCountSub = ['lectures'];
+
+        $category = Category::query()
+            ->where('slug', $slug)
+            ->first();
+
+        return $category->isMain()
+            ? $category->load($withMain)->loadCount($withCountMain)
+            : $category->load($withSub)->loadCount($withCountSub);
     }
 }

@@ -9,8 +9,11 @@ trait MoneyConversion
         return $value * 100;
     }
 
-    public static function coinsToRoubles(string|int $value): string
+    public static function coinsToRoubles(null|string|int $value): ?string
     {
+        if (is_null($value)) {
+            return null;
+        }
         return number_format($value / 100, 2, thousands_separator: '');
     }
 }

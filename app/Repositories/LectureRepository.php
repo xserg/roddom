@@ -16,6 +16,10 @@ class LectureRepository
 {
     use MoneyConversion;
 
+    public function __construct(private UserRepository $userRepository)
+    {
+    }
+
     public function getLectureById($id): ?Lecture
     {
         $lecture = Lecture::query()
@@ -93,17 +97,20 @@ class LectureRepository
     }
 
     /**
-     * Возвращает массив типа [0 => 320, 1 => 252, 2 => 138],
+     * Возвращает коллекцию типа [0 => 320, 1 => 252, 2 => 138],
      * где values - lecture ids
      */
-    public function getAllPurchasedLectureIdsForCurrentUser(): array
+    public function getPurchasedLectures(?int $userId = null): \Illuminate\Support\Collection
     {
-        $subscriptions = auth()->user()->actualSubscriptions()->with('lectures')->get();
+        $user = is_null($userId)
+            ? auth()->user()
+            : $this->userRepository->getUserById($userId, ['actualSubscriptions.lectures']);
+
+        $subscriptions = $user->actualSubscriptions;
 
         return $subscriptions
-            ->map(fn ($subscription) => $subscription->lectures?->modelKeys())
+            ->map(fn ($subscription) => $subscription->lectures)
             ->flatten()
-            ->unique()
-            ->toArray();
+            ->unique();
     }
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Models\Lecture;
+use App\Services\CategoryService;
 use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Closure;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -15,6 +15,8 @@ use OpenApi\Attributes as OA;
     schema: 'LectureResource',
     title: 'LectureResource'
 )]
+
+/** @mixin \App\Models\Lecture */
 class LectureResource extends JsonResource
 {
     use MoneyConversion;
@@ -99,11 +101,9 @@ class LectureResource extends JsonResource
     private function setPrices(): Closure
     {
         return function () {
-            if ($this->isPromo()) {
-                return $this->convertPrices(app(LectureService::class)->calculatePromoLecturePricesPromoPack($this));
-            } else {
-                return $this->convertPrices(app(LectureService::class)->calculateLecturePricesSubCategory($this));
-            }
+            return $this->isPromo()
+                ? $this->convertPrices(app(LectureService::class)->getLecturePricesInCasePromoPack($this))
+                : $this->convertPrices(app(CategoryService::class)->getLecturePricesInCaseSubCategory($this));
         };
     }
 

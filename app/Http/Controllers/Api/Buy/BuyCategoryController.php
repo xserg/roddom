@@ -88,23 +88,24 @@ class BuyCategoryController extends Controller
 
     private function createOrder(BuyCategoryRequest $request, int $categoryId, int $period): Order
     {
-        $periodId = $this->periodRepository->getPeriodByLength($period)->id;
-        $isPurchased = $this->categoryService->isCategoryPurchased($categoryId);
-
-        if ($isPurchased) {
+        if ($this->categoryService->areAllCategoryLecturesPurchased($categoryId)) {
             throw new UserCannotBuyAlreadyBoughtCategoryException();
         }
 
-        $price = $this->categoryService->getCategoryPriceForPeriod($categoryId, $periodId);
         $refPointsToSpend = self::roublesToCoins($request->validated('ref_points', 0));
+        $periodId = $this->periodRepository->getPeriodByLength($period)->id;
+
+        $categoryPurchase = $this->categoryService->getCategoryPurchaseForPeriod($categoryId, $periodId, auth()->id());
 
         return $this->purchaseService->resolveOrder(
             auth()->id(),
             Category::class,
             $categoryId,
-            $price,
+            $categoryPurchase->getInitialPrice(),
+            $categoryPurchase->getPriceToPay(),
             $period,
-            $refPointsToSpend
+            $refPointsToSpend,
+            $categoryPurchase->getExcluded()
         );
     }
 }

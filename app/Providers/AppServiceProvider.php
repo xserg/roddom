@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Subscription;
 use App\Observers\SubscriptionObserver;
+use App\Services\CategoryService;
 use App\Services\LectureService;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
@@ -18,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(LectureService::class, LectureService::class);
+        $this->app->singleton(CategoryService::class, CategoryService::class);
     }
 
     public function boot(): void

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Category;
 use App\Http\Resources\CategoryCollection;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use App\Services\CategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -88,73 +89,27 @@ use OpenApi\Attributes as OA;
 #[OA\Response(response: 500, description: 'Server Error')]
 class RetrieveCategoryController
 {
-    public function __construct(
-        private CategoryService $categoryService
-    ) {
+    public function __construct(private CategoryRepository $categoryRepository)
+    {
     }
 
     public function __invoke(Request $request, string $slug): JsonResponse
     {
-        /**
-         * @var Category $mainCategory
-         */
-        $mainCategory = Category::query()
-            ->where('slug', '=', $slug)
-            ->where('parent_id', 0)
-            ->withCount(['childrenCategoriesLectures'])
-            ->with([
-                'childrenCategories' => fn ($query) => $query->withCount('lectures'),
-                'childrenCategories.categoryPrices.period',
-                'childrenCategories.parentCategory',
-                'childrenCategories.categoryPrices',
-                'childrenCategories.lectures.category.categoryPrices',
-                'childrenCategories.lectures.pricesInPromoPacks',
-                'childrenCategories.lectures.pricesForLectures',
-                'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-                'childrenCategories.lectures.paymentType',
-                'childrenCategories.lectures.contentType',
-            ])
-            ->first();
+        $category = $this->categoryRepository->getCategoryBySlug($slug);
+        $category->append('prices');
 
-        if (is_null($mainCategory)) {
-            $subCategory = Category::query()
-                ->where('slug', '=', $slug)
-                ->withCount(['lectures'])
-                ->with([
-                    'categoryPrices.period',
-                    'parentCategory',
-                    'categoryPrices',
-                    'lectures.category.categoryPrices',
-                    'lectures.pricesInPromoPacks',
-                    'lectures.pricesForLectures',
-                    'lectures.pricesPeriodsInPromoPacks',
-                    'lectures.paymentType',
-                    'lectures.contentType',
-                ])
-                ->first();
-            $prices = $this->categoryService->formSubCategoryPrices($subCategory);
-            $subCategory->prices = $prices;
-            return response()->json(
-                [
-                    'category' => new CategoryResource($subCategory),
-                    'data' => [],
-                ]
-            );
+        if ($category->isMain()) {
+            $category->childrenCategories->append('prices');
+
+            return response()->json([
+                'category' => new CategoryResource($category),
+                'data' => new CategoryCollection($category->childrenCategories)
+            ]);
         }
 
-        $prices = $this->categoryService->formMainCategoryPrices($mainCategory);
-        $mainCategory->prices = $prices;
-
-        foreach ($mainCategory->childrenCategories as $subCategory) {
-            $prices = $this->categoryService->formSubCategoryPrices($subCategory);
-            $subCategory->prices = $prices;
-        }
-
-        return response()->json(
-            [
-                'category' => new CategoryResource($mainCategory),
-                'data' => new CategoryCollection($mainCategory->childrenCategories),
-            ]
-        );
+        return response()->json([
+            'category' => new CategoryResource($category),
+            'data' => []
+        ]);
     }
 }

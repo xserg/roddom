@@ -38,7 +38,9 @@ class SubscriptionObserver
                 $subscription->lectures()->sync([$id]);
             } elseif ($type === Category::class) {
                 $categoryLectures = app(CategoryRepository::class)->getAllLecturesByCategory($id);
-                $subscription->lectures()->sync($categoryLectures);
+                $purchasedLectures = $categoryLectures->except($subscription->exclude);
+
+                $subscription->lectures()->sync($purchasedLectures);
             } elseif ($type === Promo::class) {
                 $promoLectures = Lecture::promo()->get('id');
                 $subscription->lectures()->sync($promoLectures);

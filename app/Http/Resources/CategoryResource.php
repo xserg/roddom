@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -10,6 +12,7 @@ use OpenApi\Attributes as OA;
     schema: 'CategoryResource',
     title: 'CategoryResource'
 )]
+/** @mixin Category */
 class CategoryResource extends JsonResource
 {
     #[OA\Property(property: 'id', description: 'id категории', type: 'integer')]
@@ -36,7 +39,12 @@ class CategoryResource extends JsonResource
             'lectures_count' => $this->isMain() ?
                 $this->whenCounted('childrenCategoriesLectures') :
                 $this->whenCounted('lectures'),
-            'prices' => $this->whenNotNull($this->prices),
+            'prices' => $this->whenAppended('prices', $this->resolvePrices()),
         ];
+    }
+
+    private function resolvePrices(): array
+    {
+        return app(CategoryService::class)->getCategoryPricesResource($this, $this->isMain());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Dto\DiscountsPriceDto;
 use App\Enums\PaymentStatusEnum;
 use App\Mail\PurchaseSuccess;
 use App\Models\AppInfo;
@@ -11,6 +12,7 @@ use App\Models\RefInfo;
 use App\Models\RefPointsPayments;
 use App\Models\Subscription;
 use App\Models\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -211,5 +213,39 @@ class PaymentService
 //                }
 //            });
 //        }
+    }
+
+    public function resolveDiscounts(
+        Collection $purchasedLectures,
+        Collection $lecturesToPurchase,
+        int        $initialPrice,
+        ?int       $initialPricePromo = null,
+    ): DiscountsPriceDto {
+
+        $purchasedIds = $purchasedLectures->pluck('id');
+        $toPurchasedIds = $lecturesToPurchase->pluck('id');
+
+        $lecturesToExcludeIds = $toPurchasedIds->intersect($purchasedIds);
+        $intersectCount = $lecturesToExcludeIds->count();
+
+        if ($intersectCount === 0) {
+            return new DiscountsPriceDto();
+        }
+
+        $categoryLecturesCount = $lecturesToPurchase->count();
+
+        $intersectPercent = $intersectCount * 100 / $categoryLecturesCount;
+
+        $decreasedOn = (int) ($initialPrice * ($intersectPercent / 100));
+        $decreasedOnPromo = (int) ($initialPricePromo * ($intersectPercent / 100));
+
+        return new DiscountsPriceDto(
+            true,
+            $intersectPercent,
+            $intersectCount,
+            $decreasedOn,
+            $decreasedOnPromo,
+            $lecturesToExcludeIds
+        );
     }
 }

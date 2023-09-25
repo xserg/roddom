@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Subscription extends Model
 {
+    protected $casts = ['exclude' => 'array'];
     protected $guarded = [];
 
     public function subscriptionable(): MorphTo
