@@ -205,6 +205,7 @@ class CategoryService
 
         return new CategoryPurchaseDto(
             $categoryToPurchase,
+            $lecturesToPurchase->count() - $decreased->getDecreasedCount(),
             $initialPrice,
             $initialPricePromo,
             $priceToPay,

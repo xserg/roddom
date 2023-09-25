@@ -175,6 +175,11 @@ class SubscriptionResource extends Resource
                                 ->label('бэбикоинами')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
+                            Forms\Components\Placeholder::make('lectures_count')
+                                ->content(fn (?Subscription $record) => $record->lectures_count)
+                                ->label('куплено лекций')
+                                ->visible(fn ($context) => $context === 'edit')
+                                ->disabled(),
                             Forms\Components\DateTimePicker::make('start_date')
                                 ->label('начало подписки')
                                 ->required(),
@@ -229,7 +234,7 @@ class SubscriptionResource extends Resource
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->limit(35)
+                    ->limit(16)
                     ->label('описание'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('начало подписки')

@@ -103,6 +103,7 @@ class BuyCategoryController extends Controller
             $categoryId,
             $categoryPurchase->getInitialPrice(),
             $categoryPurchase->getPriceToPay(),
+            $categoryPurchase->getLecturesBoughtCount(),
             $period,
             $refPointsToSpend,
             $categoryPurchase->getExcluded()

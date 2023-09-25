@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Buy;
 use App\Exceptions\Custom\UserCannotBuyAlreadyBoughtPromoPackException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Buy\BuyPromoRequest;
+use App\Models\Lecture;
 use App\Models\Order;
 use App\Models\Promo;
 use App\Repositories\PeriodRepository;
@@ -99,6 +100,7 @@ class BuyPromoController extends Controller
             1,
             $price,
             $price,
+            Lecture::promo()->count(),
             $periodLength,
             $refPointsToSpend
         );

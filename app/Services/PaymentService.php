@@ -110,6 +110,7 @@ class PaymentService
             'user_id' => $order->user_id,
             'subscriptionable_type' => $order->subscriptionable_type,
             'subscriptionable_id' => $order->subscriptionable_id,
+            'lectures_count' => $order->lectures_count,
             'period_id' => $period->id,
             'total_price' => $order->price,
             'price_to_pay' => $order->price_to_pay,

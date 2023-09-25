@@ -17,6 +17,7 @@ class PurchaseService
         int                                 $subscriptionableId,
         int                                 $initialPrice,
         int                                 $priceWithDiscounts,
+        int                                 $lecturesBoughtCount,
         int                                 $period,
         int                                 $refPointsToSpend,
         array|Collection|EloquentCollection $exclude = []
@@ -35,18 +36,23 @@ class PurchaseService
             'points' => $refPointsToSpend,
             'subscriptionable_type' => $subscriptionableType,
             'subscriptionable_id' => $subscriptionableId,
+            'lectures_count' => $lecturesBoughtCount,
             'period' => $period,
             'exclude' => $exclude
         ]);
     }
 
-    private function priceToPayLessThanOneRouble(int $priceToPay): bool
-    {
+    private
+    function priceToPayLessThanOneRouble(
+        int $priceToPay
+    ): bool {
         return $priceToPay < 100;
     }
 
-    private function calculatePriceToPay(int $price, int $refPointsToSpend): int
-    {
+    private
+    function calculatePriceToPay(
+        int $price, int $refPointsToSpend
+    ): int {
         return $refPointsToSpend > 0 ?
             $price - $refPointsToSpend :
             $price;

@@ -111,6 +111,7 @@ class BuyLectureController extends Controller
             $lectureId,
             $price,
             $price,
+            1,
             $period,
             $refPointsToSpend,
         );

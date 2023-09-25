@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Requests\Buy\BuyAllLecturesRequest;
 use App\Models\EverythingPack;
+use App\Models\FullCatalogPrices;
+use App\Models\Lecture;
 use App\Models\Order;
 use App\Services\LectureService;
 use App\Services\PaymentService;
@@ -57,6 +59,7 @@ class BuyAllLecturesController
             1,
             $price,
             $price,
+            Lecture::count(),
             $periodLength,
             $refPointsToSpend
         );

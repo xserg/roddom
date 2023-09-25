@@ -21,6 +21,7 @@ class CategoryPurchaseDto
      */
     public function __construct(
         private                                     $category,
+        private ?int                                $lecturesBoughtCount = null,
         private ?int                                $initialPrice = null,
         private ?int                                $initialPromoPrice = null,
         private ?int                                $usualPriceToPay = null,
@@ -96,5 +97,10 @@ class CategoryPurchaseDto
     public function getPromoPriceToPay(): ?int
     {
         return $this->promoPriceToPay;
+    }
+
+    public function getLecturesBoughtCount(): ?int
+    {
+        return $this->lecturesBoughtCount;
     }
 }
