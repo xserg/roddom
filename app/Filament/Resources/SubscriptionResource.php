@@ -118,9 +118,10 @@ class SubscriptionResource extends Resource
                                     $type = $get('subscriptionable_type');
                                     return match ($type) {
                                         Category::class => Category::orderBy('parent_id')->get()->mapWithKeys(fn (Category $category) => [
-                                            $category->id => $category->title . ' (' . ($category->isMain() ? 'основная) '
-                                                    . $category->childrenCategories()->withCount('lectures')->get()->sum('lectures_count')
-                                                    : 'подкатегория) ' . 'всего ' . $category->lectures()->count()) . ' лекций'
+                                            $category->id => $category->title . ' (' . ($category->isMain()
+                                                    ? 'основная) всего ' . $category->childrenCategories()->withCount('lectures')->get()->sum('lectures_count')
+                                                    : 'подкатегория) всего ' . $category->lectures()->count())
+                                                . ' лекций'
                                         ]),
                                         Lecture::class => Lecture::orderBy('title')->get()->mapWithKeys(fn (Lecture $lecture) => [
                                             $lecture->id => Str::limit($lecture->title, 60) . ' (' . Str::limit($lecture->category->title, 25) . ')'
