@@ -164,6 +164,11 @@ class SubscriptionResource extends Resource
                                 ->label('создана')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
+                            Forms\Components\Placeholder::make('created_at')
+                                ->content(fn (?Subscription $record) => $record->created_at)
+                                ->label('создана')
+                                ->visible(fn ($context) => $context === 'edit')
+                                ->disabled(),
                             Forms\Components\DateTimePicker::make('start_date')
                                 ->label('начало подписки')
                                 ->required(),
@@ -212,7 +217,7 @@ class SubscriptionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('price_to_pay')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
-                    ->label('оплачено реальной валютой')
+                    ->label('оплачено')
                     ->sortable(),
                 TextColumn::make('points')->label('бебикоинов потрачено')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))

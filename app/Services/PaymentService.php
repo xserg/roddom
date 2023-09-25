@@ -116,6 +116,7 @@ class PaymentService
             'points' => $order->points,
             'start_date' => now(),
             'end_date' => now()->addDays($period->length),
+            'exclude' => $order->exclude
         ];
     }
 
