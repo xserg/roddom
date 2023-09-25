@@ -56,6 +56,7 @@ class BuyAllLecturesController
             EverythingPack::class,
             1,
             $price,
+            $price,
             $periodLength,
             $refPointsToSpend
         );

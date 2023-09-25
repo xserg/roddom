@@ -16,12 +16,12 @@ class PurchaseService
         string                              $subscriptionableType,
         int                                 $subscriptionableId,
         int                                 $initialPrice,
-        int                                 $priceToPay,
+        int                                 $priceWithDiscounts,
         int                                 $period,
         int                                 $refPointsToSpend,
         array|Collection|EloquentCollection $exclude = []
     ): Order {
-        $priceToPay = $this->calculatePriceToPay($priceToPay, $refPointsToSpend);
+        $priceToPay = $this->calculatePriceToPay($priceWithDiscounts, $refPointsToSpend);
 
         if ($this->priceToPayLessThanOneRouble($priceToPay)) {
             $refPointsToSpend = $initialPrice - 100;
