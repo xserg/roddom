@@ -120,7 +120,7 @@ class SubscriptionResource extends Resource
                                         Category::class => Category::orderBy('parent_id')->get()->mapWithKeys(fn (Category $category) => [
                                             $category->id => $category->title . ' (' . ($category->isMain() ? 'основная) '
                                                     . $category->childrenCategories()->withCount('lectures')->get()->sum('lectures_count')
-                                                    : 'подкатегория) ' . $category->lectures()->count()) . ' лекций'
+                                                    : 'подкатегория) ' . 'всего ' . $category->lectures()->count()) . ' лекций'
                                         ]),
                                         Lecture::class => Lecture::orderBy('title')->get()->mapWithKeys(fn (Lecture $lecture) => [
                                             $lecture->id => Str::limit($lecture->title, 60) . ' (' . Str::limit($lecture->category->title, 25) . ')'
@@ -164,9 +164,14 @@ class SubscriptionResource extends Resource
                                 ->label('создана')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
-                            Forms\Components\Placeholder::make('created_at')
-                                ->content(fn (?Subscription $record) => $record->created_at)
-                                ->label('создана')
+                            Forms\Components\Placeholder::make('price_to_pay')
+                                ->content(fn (?Subscription $record) => self::coinsToRoubles($record->price_to_pay) ?? 0)
+                                ->label('оплачено')
+                                ->visible(fn ($context) => $context === 'edit')
+                                ->disabled(),
+                            Forms\Components\Placeholder::make('points')
+                                ->content(fn (?Subscription $record) => self::coinsToRoubles($record->points) ?? 0)
+                                ->label('бэбикоинами')
                                 ->visible(fn ($context) => $context === 'edit')
                                 ->disabled(),
                             Forms\Components\DateTimePicker::make('start_date')
@@ -219,7 +224,7 @@ class SubscriptionResource extends Resource
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->label('оплачено')
                     ->sortable(),
-                TextColumn::make('points')->label('бебикоинов потрачено')
+                TextColumn::make('points')->label('бебикоинами')
                     ->formatStateUsing(fn (?string $state) => self::coinsToRoubles($state ?? 0))
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
