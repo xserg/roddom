@@ -42,20 +42,16 @@ class TinkoffPaymentController extends Controller
             $orderId = (string) $request->id;
             $order = Order::query()->firstWhere(['code' => $orderId]);
 
-            if (is_null($order)) {
+            if (
+                is_null($order)
+                || $order->isConfirmed()
+                || ! $request->order_amount
+            ) {
                 return;
             }
 
-            if ($order->isConfirmed()) {
-                return;
-            }
-
-            if (! $request->order_amount) {
-                return;
-            }
-
-            $orderAmountInCoins = (int)($request->order_amount * 100);
-            if ($order->price !== $orderAmountInCoins) {
+            $orderAmountInCoins = (int) ($request->order_amount * 100);
+            if ($order->price_to_pay !== $orderAmountInCoins) {
                 $order->status = PaymentStatusEnum::FAILED;
                 $order->description = 'Сумма заказа не совпадает с суммой кредита ' . "$orderAmountInCoins и $order->price";
                 $order->save();
