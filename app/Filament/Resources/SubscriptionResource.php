@@ -21,6 +21,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Layout;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -279,7 +280,7 @@ class SubscriptionResource extends Resource
                         return $options;
                     })
                     ->label('По пользователю'),
-            ])
+            ], layout: Layout::AboveContent)
             ->headerActions([
                 FilamentExportHeaderAction::make('Export'),
             ])

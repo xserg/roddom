@@ -23,4 +23,9 @@ class ListSubscriptions extends ListRecords
     {
         return [25, 50, 100];
     }
+
+    protected function getTableFiltersFormColumns(): int
+    {
+        return 2;
+    }
 }
