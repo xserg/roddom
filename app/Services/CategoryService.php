@@ -200,21 +200,21 @@ class CategoryService
             $initialPrice,
             $initialPricePromo);
 
-        $priceToPay = $initialPrice - $decreased->getDecreasedCurrency() ?: 0;
-        $priceToPayPromo = $initialPricePromo - $decreased->getDecreasedCurrencyPromo() ?: 0;
+        $priceToPay = $initialPrice - $decreased->getDiscountedCurrency() ?: 0;
+        $priceToPayPromo = $initialPricePromo - $decreased->getDiscountedCurrencyPromo() ?: 0;
 
         return new CategoryPurchaseDto(
             $categoryToPurchase,
-            $lecturesToPurchase->count() - $decreased->getDecreasedCount(),
+            $lecturesToPurchase->count() - $decreased->getExcludedCount(),
             $initialPrice,
             $initialPricePromo,
             $priceToPay,
             $priceToPayPromo,
             $decreased->getStatus(),
-            $decreased->getDecreasedPercent(),
-            $decreased->getDecreasedCount(),
-            $decreased->getDecreasedCurrency(),
-            $decreased->getDecreasedCurrencyPromo(),
+            $decreased->getExcludedPercent(),
+            $decreased->getExcludedCount(),
+            $decreased->getDiscountedCurrency(),
+            $decreased->getDiscountedCurrencyPromo(),
             $decreased->getExcluded()
         );
     }
@@ -317,7 +317,7 @@ class CategoryService
             'initial_price_for_category_promo' => self::coinsToRoubles($categoryPriceDto->getInitialPromoPrice()),
             'discount' => [
                 'status' => $categoryPriceDto->isDiscounted(),
-                'percent' => $categoryPriceDto->getPercent(),
+                'percent' => $categoryPriceDto->getIntersectPercent(),
                 'already_purchased_count' => $categoryPriceDto->getIntersectCount(),
                 'discount_on' => self::coinsToRoubles($categoryPriceDto->getDiscountOn()),
                 'discount_on_promo' => self::coinsToRoubles($categoryPriceDto->getDiscountOnPromo())

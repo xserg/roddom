@@ -16,7 +16,7 @@ class AllLecturesPricesController
     public function __invoke()
     {
         return response()->json(
-            $this->lectureService->formAllLecturePrices(),
+            $this->lectureService->getEverythingPackPricesResource(),
             Response::HTTP_OK
         );
     }

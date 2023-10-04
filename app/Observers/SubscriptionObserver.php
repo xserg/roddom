@@ -60,8 +60,12 @@ class SubscriptionObserver
             $promoLectures = Lecture::promo()->get('id');
             $subscription->lectures()->sync($promoLectures);
         } elseif ($type === EverythingPack::class) {
+
             $lectures = Lecture::all('id');
-            $subscription->lectures()->sync($lectures);
+            $purchasedLectures = $lectures
+                ->when($isCreated, fn (Collection $collection) => $collection->except($subscription->exclude));
+
+            $subscription->lectures()->sync($purchasedLectures);
         }
     }
 

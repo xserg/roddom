@@ -5,12 +5,15 @@ namespace App\Dto;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
-class CategoryPurchaseDto
+class EverythingPackPurchaseDto
 {
     /**
-     * @param $category
+     * @param bool $isPromo
+     * @param int|null $lecturesBoughtCount
      * @param int|null $initialPrice
      * @param int|null $initialPromoPrice
+     * @param int|null $usualPriceToPay
+     * @param int|null $promoPriceToPay
      * @param bool $is_discounted
      * @param float|null $intersectPercent какой процент составляет пересечение
      *                            лекций из активной подписки и тех, которые собираемся купить
@@ -20,7 +23,7 @@ class CategoryPurchaseDto
      * @param array|Collection|EloquentCollection $excluded
      */
     public function __construct(
-        private                                     $category,
+        private bool                                $isPromo,
         private ?int                                $lecturesBoughtCount = null,
         private ?int                                $initialPrice = null,
         private ?int                                $initialPromoPrice = null,
@@ -47,7 +50,7 @@ class CategoryPurchaseDto
 
     public function getInitialPrice(): ?int
     {
-        return $this->category->isPromo() ?
+        return $this->isPromo ?
             $this->getInitialPromoPrice() :
             $this->getInitialUsualPrice();
     }
@@ -84,7 +87,7 @@ class CategoryPurchaseDto
 
     public function getPriceToPay(): ?int
     {
-        return $this->category->isPromo() ?
+        return $this->isPromo ?
             $this->getPromoPriceToPay() :
             $this->getUsualPriceToPay();
     }
@@ -102,5 +105,10 @@ class CategoryPurchaseDto
     public function getLecturesBoughtCount(): ?int
     {
         return $this->lecturesBoughtCount;
+    }
+
+    public function isPromo(): bool
+    {
+        return $this->isPromo;
     }
 }

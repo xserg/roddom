@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\Buy;
 
 use App\Http\Requests\Buy\BuyAllLecturesRequest;
 use App\Models\EverythingPack;
-use App\Models\FullCatalogPrices;
-use App\Models\Lecture;
 use App\Models\Order;
 use App\Services\LectureService;
 use App\Services\PaymentService;
@@ -27,7 +25,7 @@ class BuyAllLecturesController
         BuyAllLecturesRequest $request,
         int                   $periodLength
     ) {
-        $order = $this->resolveOrder($request, $periodLength);
+        $order = $this->createOrder($request, $periodLength);
 
         $link = $this->paymentService->createPayment(
             self::coinsToRoubles($order->price_to_pay),
@@ -41,26 +39,27 @@ class BuyAllLecturesController
         BuyAllLecturesRequest $request,
         int                   $periodLength
     ) {
-        $order = $this->resolveOrder($request, $periodLength);
+        $order = $this->createOrder($request, $periodLength);
 
         return response()->json([$order->code]);
     }
 
-    private function resolveOrder(
+    private function createOrder(
         BuyAllLecturesRequest $request,
         int                   $periodLength
     ): Order {
-        $price = $this->lectureService->getEverythingPriceForPeriod($periodLength);
+        $dto = $this->lectureService->getEverythingPriceForPeriod($periodLength);
         $refPointsToSpend = self::roublesToCoins($request->validated('ref_points', 0));
 
         return $this->purchaseService->resolveOrder(
             auth()->id(),
             EverythingPack::class,
             1,
-            $price,
-            Lecture::count(),
+            $dto->getPriceToPay(),
+            $dto->getLecturesBoughtCount(),
             $periodLength,
-            $refPointsToSpend
+            $refPointsToSpend,
+            $dto->getExcluded()
         );
     }
 }

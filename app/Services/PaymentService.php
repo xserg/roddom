@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Dto\DiscountsPriceDto;
+use App\Dto\DiscountsDto;
 use App\Enums\PaymentStatusEnum;
 use App\Mail\PurchaseSuccess;
 use App\Models\AppInfo;
@@ -222,7 +222,7 @@ class PaymentService
         Collection $lecturesToPurchase,
         int        $initialPrice,
         ?int       $initialPricePromo = null,
-    ): DiscountsPriceDto {
+    ): DiscountsDto {
 
         $purchasedIds = $purchasedLectures->pluck('id');
         $toPurchasedIds = $lecturesToPurchase->pluck('id');
@@ -231,22 +231,22 @@ class PaymentService
         $intersectCount = $lecturesToExcludeIds->count();
 
         if ($intersectCount === 0) {
-            return new DiscountsPriceDto();
+            return new DiscountsDto();
         }
 
         $categoryLecturesCount = $lecturesToPurchase->count();
 
         $intersectPercent = $intersectCount * 100 / $categoryLecturesCount;
 
-        $decreasedOn = (int) ($initialPrice * ($intersectPercent / 100));
-        $decreasedOnPromo = (int) ($initialPricePromo * ($intersectPercent / 100));
+        $discountedOn = (int) ($initialPrice * ($intersectPercent / 100));
+        $discountedOnPromo = (int) ($initialPricePromo * ($intersectPercent / 100));
 
-        return new DiscountsPriceDto(
+        return new DiscountsDto(
             true,
             $intersectPercent,
             $intersectCount,
-            $decreasedOn,
-            $decreasedOnPromo,
+            $discountedOn,
+            $discountedOnPromo,
             $lecturesToExcludeIds
         );
     }

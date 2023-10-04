@@ -23,4 +23,9 @@ class FullCatalogPrices extends Model
     {
         return $this->belongsTo(Period::class);
     }
+
+    public function isPromo()
+    {
+        return $this->is_promo;
+    }
 }
