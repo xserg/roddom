@@ -67,7 +67,7 @@ class LectureService
         $priceForOneLecture = $fullCatalogPricesForPeriod->price_for_one_lecture;
         $priceForOneLecturePromo = $fullCatalogPricesForPeriod->price_for_one_lecture_promo;
 
-        $lecturesToPurchase = Lecture::payed()->get();
+        $lecturesToPurchase = Lecture::all();
         $lecturesCount = $lecturesToPurchase->count();
         $initialPrice = $lecturesCount * $priceForOneLecture;
         $initialPricePromo = $lecturesCount * $priceForOneLecturePromo;
