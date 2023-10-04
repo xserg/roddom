@@ -23,6 +23,11 @@ class Subscription extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function userEmail(): string
+    {
+        return $this->user->email;
+    }
+
     public function period(): BelongsTo
     {
         return $this->belongsTo(Period::class);

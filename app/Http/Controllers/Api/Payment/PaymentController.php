@@ -89,9 +89,7 @@ class PaymentController extends Controller
                 return;
             }
 
-            $period = $this->periodRepository->getPeriodByLength($order->period);
-
-            $this->paymentService->confirmOrder($order, $period, 'Покупка | Юкасса');
+            $this->paymentService->confirmOrder($order, 'Покупка | Юкасса');
         }
     }
 }

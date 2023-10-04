@@ -38,4 +38,9 @@ class Order extends Model
     {
         return $this->status === PaymentStatusEnum::CONFIRMED->value;
     }
+
+    public function getPeriod(): Period
+    {
+        return Period::firstWhere('length', $this->period);
+    }
 }

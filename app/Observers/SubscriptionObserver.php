@@ -29,7 +29,7 @@ class SubscriptionObserver
         $subscription->entity_title = $entityTitle;
     }
 
-    public function saved(Subscription $subscription): void
+    public function updated(Subscription $subscription): void
     {
         $this->syncPurchasedLectures($subscription);
     }
@@ -51,12 +51,14 @@ class SubscriptionObserver
         if ($type === Lecture::class) {
             $subscription->lectures()->sync([$id]);
         } elseif ($type === Category::class) {
+
             $categoryLectures = app(CategoryRepository::class)->getAllLecturesByCategory($id);
             $purchasedLectures = $categoryLectures
                 ->when($isCreated, fn (Collection $collection) => $collection->except($subscription->exclude));
 
             $subscription->lectures()->sync($purchasedLectures);
         } elseif ($type === Promo::class) {
+
             $promoLectures = Lecture::promo()->get('id');
             $subscription->lectures()->sync($promoLectures);
         } elseif ($type === EverythingPack::class) {
@@ -68,6 +70,4 @@ class SubscriptionObserver
             $subscription->lectures()->sync($purchasedLectures);
         }
     }
-
-
 }

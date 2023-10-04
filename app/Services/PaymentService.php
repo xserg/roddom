@@ -14,12 +14,19 @@ use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use YooKassa\Client;
 
 class PaymentService
 {
+    public function __construct(
+        private readonly SubscriptionService $subscriptionService
+    )
+    {
+    }
+
     public function getClient()
     {
         $client = new Client();
@@ -49,21 +56,13 @@ class PaymentService
         return $client->getConfirmation()->getConfirmationUrl();
     }
 
-    public function confirmOrder(Order $order, Period $period, ?string $description = null): void
+    public function confirmOrder(Order $order, ?string $description = null): void
     {
-        $subscriptionAttributes = $this->getSubscriptionAttributes(
-            $order, $period
-        );
-
-        $subscription = new Subscription($subscriptionAttributes);
-
         DB::transaction(function () use (
             $order,
-            $subscription,
             $description
         ) {
             $order->status = PaymentStatusEnum::CONFIRMED;
-            $subscription->description = $description;
             /**
              * @var User $orderedUser
              */
@@ -78,48 +77,13 @@ class PaymentService
                 ]);
             }
             $order->save();
-            $subscription->save();
+            $this->subscriptionService->createSubscription($order, ['description' => $description]);
         });
 
         $this->rewardReferrersForBuying($order, $order->user);
-        $appInfo = AppInfo::first();
-        $successfulPurchaseText = $appInfo?->successful_purchase_text ?? 'Спасибо за покупку';
-        $email = $order->userEmail();
-        $image = Storage::url($appInfo->successful_purchase_image);
-        $appLink = $appInfo?->app_link_share_link ?? config('app.frontend_url');
-        $appName = $appInfo?->app_title ?? config('app.name');
-
-        Mail::to($email)
-            ->send((new PurchaseSuccess(
-                'Успешная покупка',
-                $appLink,
-                $appName,
-                $successfulPurchaseText,
-                $subscription->entity_title,
-                $subscription->start_date->isoFormat('HH:mm DD.MM.YYYY'),
-                $subscription->end_date->isoFormat('HH:mm DD.MM.YYYY'),
-                $image
-            )));
     }
 
-    private function getSubscriptionAttributes(
-        Order  $order,
-        Period $period,
-    ): array {
-        return [
-            'user_id' => $order->user_id,
-            'subscriptionable_type' => $order->subscriptionable_type,
-            'subscriptionable_id' => $order->subscriptionable_id,
-            'lectures_count' => $order->lectures_count,
-            'period_id' => $period->id,
-            'total_price' => $order->price,
-            'price_to_pay' => $order->price_to_pay,
-            'points' => $order->points,
-            'start_date' => now(),
-            'end_date' => now()->addDays($period->length),
-            'exclude' => $order->exclude
-        ];
-    }
+
 
     public function rewardReferrersForBuying(Order $order, User $buyer): void
     {
