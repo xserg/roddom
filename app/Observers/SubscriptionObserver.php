@@ -8,24 +8,22 @@ use App\Models\Lecture;
 use App\Models\Promo;
 use App\Models\Subscription;
 use App\Repositories\CategoryRepository;
+use App\Services\PurchaseService;
 use Illuminate\Database\Eloquent\Collection;
 
 class SubscriptionObserver
 {
+    public function __construct(
+        private readonly PurchaseService $purchaseService
+    ) {
+    }
+
     public function saving(Subscription $subscription): void
     {
-        if ($subscription->subscriptionable_type === Lecture::class) {
-            $entityTitle = 'Лекция: ' . Lecture::query()->find($subscription->subscriptionable_id)->title;
-        } elseif ($subscription->subscriptionable_type === Category::class) {
-            $entityTitle = 'Категория: ' . Category::query()->find($subscription->subscriptionable_id)->title;
-        } elseif ($subscription->subscriptionable_type === Promo::class) {
-            $entityTitle = 'Промопак лекций';
-        } elseif ($subscription->subscriptionable_type === EverythingPack::class) {
-            $entityTitle = 'Все лекции';
-        } else {
-            $entityTitle = 'Заголовок лекции не определён';
-        }
-
+        $entityTitle = $this->purchaseService->resolveEntityTitle(
+            $subscription->subscriptionable_type,
+            $subscription->subscriptionable_id
+        );
         $subscription->entity_title = $entityTitle;
     }
 

@@ -29,7 +29,15 @@ class BuyAllLecturesController
 
         $link = $this->paymentService->createPayment(
             self::coinsToRoubles($order->price_to_pay),
-            ['order_id' => $order->id]
+            [
+                'order_id' => $order->id,
+                'buyer_email' => $order->userEmail(),
+                'description' => $this->purchaseService->resolveEntityTitle(
+                    $order->subscriptionable_type,
+                    $order->subscriptionable_id),
+                'amount' => ['value' => self::coinsToRoubles($order->price_to_pay), 'currency' => 'RUB'],
+                'quantity' => 1,
+            ]
         );
 
         return response()->json(['link' => $link]);

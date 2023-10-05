@@ -2,7 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Category;
+use App\Models\EverythingPack;
+use App\Models\Lecture;
 use App\Models\Order;
+use App\Models\Promo;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
@@ -41,19 +45,30 @@ class PurchaseService
         ]);
     }
 
-    private
-    function priceToPayLessThanOneRouble(
-        int $priceToPay
-    ): bool {
+    private function priceToPayLessThanOneRouble(int $priceToPay): bool
+    {
         return $priceToPay < 100;
     }
 
-    private
-    function calculatePriceToPay(
-        int $price, int $refPointsToSpend
-    ): int {
+    private function calculatePriceToPay(int $price, int $refPointsToSpend): int
+    {
         return $refPointsToSpend > 0 ?
             $price - $refPointsToSpend :
             $price;
+    }
+
+    public function resolveEntityTitle(string $subscriptionable_type, int $subscriptionable_id): string
+    {
+        if ($subscriptionable_type === Lecture::class) {
+            return 'Лекция: ' . Lecture::query()->find($subscriptionable_id)->title;
+        } elseif ($subscriptionable_type === Category::class) {
+            return 'Категория: ' . Category::query()->find($subscriptionable_id)->title;
+        } elseif ($subscriptionable_type === Promo::class) {
+            return 'Промопак лекций';
+        } elseif ($subscriptionable_type === EverythingPack::class) {
+            return 'Все лекции';
+        } else {
+            return 'Заголовок лекции не определён';
+        }
     }
 }

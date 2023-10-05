@@ -23,8 +23,7 @@ class PaymentService
 {
     public function __construct(
         private readonly SubscriptionService $subscriptionService
-    )
-    {
+    ) {
     }
 
     public function getClient()
@@ -35,7 +34,7 @@ class PaymentService
         return $client;
     }
 
-    public function createPayment(float $amount, array $options = [])
+    public function createPayment(float $amount, array $options = []): string
     {
         $client = $this->getClient()
             ->createPayment([
@@ -51,6 +50,19 @@ class PaymentService
                 'metadata' => [
                     'order_id' => $options['order_id'],
                 ],
+                'receipt' => [
+                    'customer' => [
+                        'email' => $options['buyer_email']
+                    ],
+                    'items' => [
+                        [
+                            'description' => $options['description'], // название товара
+                            'amount' => $options['amount'], // цена товара
+                            'vat_code' => 2, // ндс ставка, код варианта https://yookassa.ru/developers/payment-acceptance/receipts/54fz/parameters-values#vat-codes
+                            'quantity' => $options['quantity'], // количество
+                        ]
+                    ]
+                ]
             ], uniqid('', true));
 
         return $client->getConfirmation()->getConfirmationUrl();
@@ -82,7 +94,6 @@ class PaymentService
 
         $this->rewardReferrersForBuying($order, $order->user);
     }
-
 
 
     public function rewardReferrersForBuying(Order $order, User $buyer): void
