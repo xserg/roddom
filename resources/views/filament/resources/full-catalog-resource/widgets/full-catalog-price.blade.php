@@ -1,6 +1,6 @@
 <x-filament::widget>
     <x-filament::card>
-        <x-filament::card.heading><span class="font-sans">количество платных лекций:</span> {{ $lectures_count }}
+        <x-filament::card.heading><span class="font-sans">всего лекций: {{ $all_lectures_count }}, платных:</span> {{ $payed_lectures_count }}
         </x-filament::card.heading>
         <x-filament::hr/>
         <div class="relative overflow-x-auto">

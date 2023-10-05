@@ -23,7 +23,7 @@ class CustomNotificationResource extends Resource
     protected static ?string $modelLabel = 'Уведомления';
     protected static ?string $pluralModelLabel = 'Уведомления';
     protected static ?int $navigationSort = 1;
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
     public static function form(Form $form): Form
     {

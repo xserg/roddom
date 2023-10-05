@@ -26,10 +26,11 @@ class ThreadResource extends Resource
     protected static ?string $model = Thread::class;
 
     protected static ?string $slug = 'threads';
-    protected static ?string $modelLabel = 'Беседа';
-    protected static ?string $pluralModelLabel = 'Беседы';
+    protected static ?string $modelLabel = 'Обращение';
+    protected static ?string $pluralModelLabel = 'Обращения';
     protected static ?string $recordTitleAttribute = 'id';
     protected static ?string $navigationGroup = 'Уведомления и обращения';
+    protected static ?int $navigationSort = 2;
     protected static ?string $navigationIcon = 'heroicon-o-inbox';
 
     public static function getEloquentQuery(): Builder
@@ -64,11 +65,11 @@ class ThreadResource extends Resource
                         })->label('Беседа с пользователем'),
                     Placeholder::make('created_at')
                         ->label('Создана')
-                        ->content(fn (?Thread $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+                        ->content(fn (?Thread $record): string => $record?->created_at . ' (' . $record?->created_at?->diffForHumans() . ')' ?? '-'),
 
                     Placeholder::make('updated_at')
                         ->label('Обновлена')
-                        ->content(fn (?Thread $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                        ->content(fn (?Thread $record): string => $record?->created_at . ' (' . $record?->created_at?->diffForHumans() . ')' ?? '-'),
                 ])->visible(fn (?Thread $record) => ! is_null($record))
             ]);
     }
@@ -106,11 +107,11 @@ class ThreadResource extends Resource
                     ->label('Непрочитанные сообщения')
             ])
             ->filters([
-                Filter::make('Октрытые')
+                Filter::make('opened')
                     ->query(fn (Builder $query): Builder => $query->orWhere('status', ThreadStatusEnum::OPEN))
-                    ->label('Октрытые')
+                    ->label('Открытые')
                     ->default(),
-                Filter::make('Закрытые')
+                Filter::make('closed')
                     ->query(fn (Builder $query): Builder => $query->orWhere('status', ThreadStatusEnum::CLOSED))
                     ->label('Закрытые'),
 //                Filter::make('Есть непрочитанные сообщения')

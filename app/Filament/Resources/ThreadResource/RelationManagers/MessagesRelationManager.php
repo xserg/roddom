@@ -10,7 +10,6 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use FilamentTiptapEditor\TiptapEditor;
-use Illuminate\Support\Carbon;
 
 class MessagesRelationManager extends RelationManager
 {
@@ -48,11 +47,13 @@ class MessagesRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('message')->label('Текст сообщения')
                     ->limit(75)
-                    ->tooltip(fn (?Message $record): string => $record->message),
+                    ->tooltip(fn (?Message $record): string => strip_tags($record->message))
+                    ->formatStateUsing(fn (?Message $record): string => strip_tags($record->message)),
                 TextColumn::make('updated_at')
                     ->label('Обновлено')
-                    ->limit(10)
-                    ->formatStateUsing(fn (?string $state) => Carbon::parse($state)->diffForHumans()),
+                    ->dateTime()
+//                    ->limit(10)
+//                    ->formatStateUsing(fn (?string $state) => Carbon::parse($state)->diffForHumans()),
             ])
             ->filters([
                 //
