@@ -89,6 +89,7 @@ class PaymentController extends Controller
                 return;
             }
 
+            $order->code_succeeded = $payment->getId();
             $this->paymentService->confirmOrder($order, 'Покупка | Юкасса');
         }
     }
