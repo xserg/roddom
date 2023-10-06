@@ -31,8 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
-use Livewire\Features\Placeholder;
-use PhpParser\Node\Expr\AssignOp\Mod;
+use Webbingbrasil\FilamentCopyActions\Forms\Actions\CopyAction;
 
 class UserResource extends Resource
 {
@@ -180,11 +179,20 @@ class UserResource extends Resource
                         })
                         ->columnSpan(2)
                         ->visible(fn (string $context) => $context === 'edit'),
-                    Forms\Components\Placeholder::make('ref_link')
+//                    Forms\Components\Placeholder::make('ref_link')
+//                        ->label('Реф ссылка')
+//                        ->content(function (?Model $record) {
+//                            return config('app.frontend_url') . "/register?ref=" . $record->ref_token;
+//                        })
+//                        ->columnSpan(2)
+//                        ->visible(fn (string $context) => $context === 'edit'),
+                    Forms\Components\TextInput::make('ref_link')
                         ->label('Реф ссылка')
-                        ->content(function (?Model $record) {
+                        ->formatStateUsing(function (?Model $record) {
                             return config('app.frontend_url') . "/register?ref=" . $record->ref_token;
                         })
+                        ->disabled()
+                        ->prefixAction(CopyAction::make())
                         ->columnSpan(2)
                         ->visible(fn (string $context) => $context === 'edit'),
                 ])->columns(2)->columnSpan(1),
