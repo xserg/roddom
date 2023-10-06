@@ -180,6 +180,13 @@ class UserResource extends Resource
                         })
                         ->columnSpan(2)
                         ->visible(fn (string $context) => $context === 'edit'),
+                    Forms\Components\Placeholder::make('ref_link')
+                        ->label('Реф ссылка')
+                        ->content(function (?Model $record) {
+                            return config('app.frontend_url') . "/register?ref=" . $record->ref_token;
+                        })
+                        ->columnSpan(2)
+                        ->visible(fn (string $context) => $context === 'edit'),
                 ])->columns(2)->columnSpan(1),
 
                 Forms\Components\Card::make([

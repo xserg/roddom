@@ -57,8 +57,8 @@ class PaymentService
                     'items' => [
                         [
                             'description' => $options['description'], // название товара
-                            'amount' => $options['amount'], // цена товара
-                            'vat_code' => 2, // ндс ставка, код варианта https://yookassa.ru/developers/payment-acceptance/receipts/54fz/parameters-values#vat-codes
+                            'amount' => $options['amount'],     // цена товара
+                            'vat_code' => 1,                    // ндс ставка, код варианта https://yookassa.ru/developers/payment-acceptance/receipts/54fz/parameters-values#vat-codes
                             'quantity' => $options['quantity'], // количество
                         ]
                     ]
