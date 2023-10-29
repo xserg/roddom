@@ -184,6 +184,8 @@ class RetrieveAllLecturesController
             $relations = [
                 'category.parentCategory',
                 'category.categoryPrices',
+                'category.lectures.category.categoryPrices',
+                'category.lectures.pricesForLectures',
                 'contentType',
                 'paymentType',
                 'pricesPeriodsInPromoPacks',

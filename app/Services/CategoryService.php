@@ -259,7 +259,7 @@ class CategoryService
 
         foreach ($this->periods as $period) {
             $priceCommon = $categoryCommonPrices->firstWhere('period_id', $period->id);
-            $priceCustom = $lectureCustomPrices->firstWhere('period_id', $period->id);
+            $priceCustom = $lectureCustomPrices->firstWhere('pivot.period_id', $period->id);
 
             //общие цены всегда находятся, по идее в priceCommon всегда будет указана цена
             $commonPriceForOneLecture =
