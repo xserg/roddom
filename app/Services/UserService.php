@@ -31,7 +31,8 @@ class UserService
 {
     public function __construct(
         private LectureService    $lectureService,
-        private LectureRepository $lectureRepository
+        private LectureRepository $lectureRepository,
+        private ImageManager      $imageManager
     ) {
     }
 
@@ -130,11 +131,10 @@ class UserService
      */
     public function saveUsersPhoto(
         Authenticatable|User $user,
-        UploadedFile         $file
+        UploadedFile         $file,
     ): array {
-        $manager = new ImageManager(['driver' => 'imagick']);
-        $image = $manager->make($file)->fit(300, 300);
-        $imageSmall = $manager->make($file)->fit(150, 150);
+        $image = $this->imageManager->make($file)->fit(300, 300);
+        $imageSmall = $this->imageManager->make($file)->fit(150, 150);
 
         $dirCreated = Storage::makeDirectory('images/users/');
 

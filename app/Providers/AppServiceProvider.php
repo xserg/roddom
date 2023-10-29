@@ -10,9 +10,9 @@ use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Intervention\Image\ImageManager;
+use Illuminate\Contracts\Foundation\Application;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(LectureService::class, LectureService::class);
         $this->app->singleton(CategoryService::class, CategoryService::class);
+        $this->app->bind(ImageManager::class, function (Application $app) {
+            return new ImageManager(['driver' => 'imagick']);
+        });
     }
 
     public function boot(): void
