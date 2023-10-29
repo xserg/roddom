@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\CategoryService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -154,5 +155,12 @@ class Category extends Model
     public function isPromo(): bool
     {
         return $this->is_promo;
+    }
+
+    protected function prices(): Attribute
+    {
+        return new Attribute(
+            get: fn () => app(CategoryService::class)->getCategoryPricesResource($this)
+        );
     }
 }

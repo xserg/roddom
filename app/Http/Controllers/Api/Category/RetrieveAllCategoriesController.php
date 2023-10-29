@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Category;
 use App\Http\Resources\CategoryCollection;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 use OpenApi\Attributes as OA;
 
 #[OA\Get(
@@ -41,23 +41,27 @@ class RetrieveAllCategoriesController
 {
     public function __invoke(): JsonResponse
     {
+        $mainCategories = Category::mainCategories()
+            ->withCount(['childrenCategoriesLectures'])
+            ->with([
+                'childrenCategories' => fn ($query) => $query->withCount('lectures'),
+                'childrenCategories.categoryPrices.period',
+                'childrenCategories.parentCategory',
+                'childrenCategoriesLectures',
+                'childrenCategories.lectures.category.categoryPrices',
+                'childrenCategories.lectures.category.parentCategory.categoryPrices',
+                'childrenCategories.lectures.pricesInPromoPacks',
+                'childrenCategories.lectures.pricesForLectures',
+                'childrenCategories.lectures.pricesPeriodsInPromoPacks',
+                'childrenCategories.lectures.paymentType',
+                'childrenCategories.lectures.contentType',
+            ])->get();
+
+        $mainCategories->append('prices');
+
         return response()->json(
-            new CategoryCollection(
-                Category::mainCategories()->withCount(['childrenCategoriesLectures'])
-                    ->with([
-                        'childrenCategories' => fn ($query) => $query->withCount('lectures'),
-                        'childrenCategories.categoryPrices.period',
-                        'childrenCategories.parentCategory',
-                        'childrenCategoriesLectures',
-                        'childrenCategories.lectures.category.categoryPrices',
-                        'childrenCategories.lectures.category.parentCategory.categoryPrices',
-                        'childrenCategories.lectures.pricesInPromoPacks',
-                        'childrenCategories.lectures.pricesForLectures',
-                        'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-                        'childrenCategories.lectures.paymentType',
-                        'childrenCategories.lectures.contentType',
-                    ])->get()
-            ), Response::HTTP_OK
+            new CategoryCollection($mainCategories),
+            Response::HTTP_OK
         );
     }
 }

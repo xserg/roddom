@@ -39,12 +39,7 @@ class CategoryResource extends JsonResource
             'lectures_count' => $this->isMain() ?
                 $this->whenCounted('childrenCategoriesLectures') :
                 $this->whenCounted('lectures'),
-            'prices' => $this->whenAppended('prices', $this->resolvePrices()),
+            'prices' => $this->whenAppended('prices'),
         ];
-    }
-
-    private function resolvePrices(): array
-    {
-        return app(CategoryService::class)->getCategoryPricesResource($this);
     }
 }
