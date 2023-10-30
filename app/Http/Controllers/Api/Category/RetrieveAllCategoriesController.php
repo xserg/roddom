@@ -47,7 +47,6 @@ class RetrieveAllCategoriesController
                 'childrenCategories' => fn ($query) => $query->withCount('lectures'),
                 'childrenCategories.categoryPrices.period',
                 'childrenCategories.parentCategory',
-                'childrenCategoriesLectures',
                 'childrenCategories.lectures.category.categoryPrices',
                 'childrenCategories.lectures.category.parentCategory.categoryPrices',
                 'childrenCategories.lectures.pricesInPromoPacks',

@@ -184,8 +184,6 @@ class RetrieveAllLecturesController
             $relations = [
                 'category.parentCategory',
                 'category.categoryPrices',
-                'category.lectures.category.categoryPrices',
-                'category.lectures.pricesForLectures',
                 'contentType',
                 'paymentType',
                 'pricesPeriodsInPromoPacks',
@@ -193,7 +191,7 @@ class RetrieveAllLecturesController
                 'rates',
                 'averageRate',
                 'userRate',
-                'actualSubscriptionItemsForCurrentUser.lectures',
+                'actualSubscriptionItemsForCurrentUser',
                 'watchedUsers',
                 'savedUsers',
                 'listWatchedUsers'
@@ -201,12 +199,13 @@ class RetrieveAllLecturesController
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);
             $builder = $this->lectureRepository->addFiltersToQuery($builder);
-            $lectures = $builder->get()->append(['prices', 'purchase_info']);
+//            $lectures = $builder->get()->append(['prices', 'purchase_info']);
             $lectures = $this->lectureRepository->paginate(
-                $lectures,
+                $builder,
                 (int) ($request->per_page ?? 15),
                 (int) $request->page,
             );
+            $lectures->each(fn ($lecture) => $lecture->append(['prices', 'purchase_info']));
         } catch (NotFoundHttpException $exception) {
             return response()->json(
                 ['message' => $exception->getMessage()],
