@@ -162,6 +162,8 @@ class UserResource extends Resource
                                 RefTypeEnum::HORIZONTAL->value => 'горизонтальный'
                             ];
                         })
+                        ->default(RefTypeEnum::VERTICAL->value)
+                        ->required()
                         ->disablePlaceholderSelection()
                         ->label('Тип'),
 
@@ -189,7 +191,7 @@ class UserResource extends Resource
                     Forms\Components\TextInput::make('ref_link')
                         ->label('Реф ссылка')
                         ->formatStateUsing(function (?Model $record) {
-                            return config('app.frontend_url') . "/register?ref=" . $record->ref_token;
+                            return config('app.frontend_url') . "/register?ref=" . $record?->ref_token;
                         })
                         ->disabled()
                         ->prefixAction(CopyAction::make())
