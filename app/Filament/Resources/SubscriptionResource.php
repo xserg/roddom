@@ -211,6 +211,7 @@ class SubscriptionResource extends Resource
                     ->url(function (Subscription $record): string {
                         return UserResource::getUrl('edit', ['record' => $record->user_id]);
                     })
+                    ->formatStateUsing(fn (?string $state, Subscription $record) => $state ?? $record->userEmail())
                     ->searchable(),
                 Tables\Columns\TextColumn::make('entity_title')
                     ->label('подписка на')
