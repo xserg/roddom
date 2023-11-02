@@ -34,20 +34,26 @@ class SubscriptionObserver
 
     public function created(Subscription $subscription): void
     {
-        $this->syncPurchasedLectures($subscription, true);
+        $count = $this->syncPurchasedLectures($subscription, true);
+
+        if ($subscription->lectures_count == 0) {
+            $subscription->lectures_count = $count;
+            $subscription->save();
+        }
     }
 
-    private function syncPurchasedLectures(Subscription $subscription, bool $isCreated = false): void
+    private function syncPurchasedLectures(Subscription $subscription, bool $isCreated = false): int
     {
         $type = $subscription->subscriptionable_type;
         $id = $subscription->subscriptionable_id;
 
         if (! $subscription->isDirty(['subscriptionable_type', 'subscriptionable_id'])) {
-            return;
+            return 0;
         }
 
         if ($type === Lecture::class) {
             $subscription->lectures()->sync([$id]);
+            return 1;
         } elseif ($type === Category::class) {
 
             $categoryLectures = app(CategoryRepository::class)->getAllLecturesByCategory($id);
@@ -55,10 +61,12 @@ class SubscriptionObserver
                 ->when($isCreated, fn (Collection $collection) => $collection->except($subscription->exclude));
 
             $subscription->lectures()->sync($purchasedLectures);
+            return $purchasedLectures->count();
         } elseif ($type === Promo::class) {
 
             $promoLectures = Lecture::promo()->get('id');
             $subscription->lectures()->sync($promoLectures);
+            return $promoLectures->count();
         } elseif ($type === EverythingPack::class) {
 
             $lectures = Lecture::all('id');
@@ -66,6 +74,9 @@ class SubscriptionObserver
                 ->when($isCreated, fn (Collection $collection) => $collection->except($subscription->exclude));
 
             $subscription->lectures()->sync($purchasedLectures);
+            return $purchasedLectures->count();
         }
+
+        return 0;
     }
 }
