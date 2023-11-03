@@ -27,8 +27,15 @@ class ReferralsOfUserWidget extends Widget
             ...$this->record->referralsFifthLevel->pluck('id')->toArray(),
         ];
 
-        return User::query()
+        $query = User::query()
             ->whereIn('users.id', $allLevelsReferralsId);
+
+        if (count($allLevelsReferralsId) > 0) {
+            $ids = implode(',', $allLevelsReferralsId);
+            $query->orderByRaw("FIELD(id, $ids)");
+        }
+
+        return $query;
     }
 
     protected function getTableColumns(): array

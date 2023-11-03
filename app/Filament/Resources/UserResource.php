@@ -167,6 +167,16 @@ class UserResource extends Resource
                         ->disablePlaceholderSelection()
                         ->label('Тип'),
 
+                    Forms\Components\Placeholder::make('referer_link')
+                        ->content(function (?Model $record) {
+                            $name = $record->referrer?->name ?? $record->referrer?->email;
+                            $classes = 'text-primary-600 transition hover:underline hover:text-primary-500 focus:underline focus:text-primary-500';
+                            $href = UserResource::getUrl('edit', ['record' => $record->referrer?->id]);
+                            return new HtmlString("<a class=$classes href=\"$href\">$name</a>");
+                        })
+                        ->label('Страница реферера')
+                        ->visible(fn(string $context, ?Model $record) => $context === 'edit' && $record->hasReferrer()),
+
                     Forms\Components\Placeholder::make('descendants_count')
                         ->label('Количество рефералов')
                         ->content(function (?Model $record) {
