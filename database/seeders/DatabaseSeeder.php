@@ -38,6 +38,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $subs = Subscription::all();
+
+        $subs->each(function (Subscription $subscription) {
+            if ($subscription->lectures_count == 0) {
+                $subscription->lectures_count = $subscription->lectures();
+                $subscription->save();
+            }
+        });
 //        Lector::factory(25)->create();
 //        Diploma::factory(50)->create();
 //        $this->call(SubscriptionPeriodSeeder::class);
@@ -59,32 +67,28 @@ class DatabaseSeeder extends Seeder
 //        $this->createAnotherUser();
 //        $this->createUsers(1000);
 //        $this->setRecommendedLectures(20);
-        Subscription::all()->each(function (Subscription $subscription) {
-            if ($subscription->subscriptionable_type == Lecture::class) {
-                if (is_null(Lecture::find($subscription->subscriptionable_id))) return;
-                $subscription->lectures()->sync([$subscription->subscriptionable_id]);
-            } elseif ($subscription->subscriptionable_type == Category::class) {
-                $categoryLectures = app()->make(CategoryRepository::class)->getAllLecturesByCategory($subscription->subscriptionable_id);
-                $subscription->lectures()->sync($categoryLectures);
-            } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
-                $lectureIds = Lecture::all(['id']);
-                $subscription->lectures()->sync($lectureIds);
-            }
-        });
+//        Subscription::all()->each(function (Subscription $subscription) {
+//            if ($subscription->subscriptionable_type == Lecture::class) {
+//                if (is_null(Lecture::find($subscription->subscriptionable_id))) return;
+//                $subscription->lectures()->sync([$subscription->subscriptionable_id]);
+//            } elseif ($subscription->subscriptionable_type == Category::class) {
+//                $categoryLectures = app()->make(CategoryRepository::class)->getAllLecturesByCategory($subscription->subscriptionable_id);
+//                $subscription->lectures()->sync($categoryLectures);
+//            } elseif ($subscription->subscriptionable_type == EverythingPack::class) {
+//                $lectureIds = Lecture::all(['id']);
+//                $subscription->lectures()->sync($lectureIds);
+//            }
+//        });
     }
 
-    private
-    function createUsers(
-        int $users
-    ) {
+    private function createUsers(int $users)
+    {
         User::factory($users)
             ->create();
     }
 
-    private
-    function createSubscriptionsForUser(
-        $user
-    ) {
+    private function createSubscriptionsForUser($user)
+    {
         $periodDay = Period::query()->firstWhere('title', '=', 'day');
         $periodWeek = Period::query()->firstWhere('title', '=', 'week');
         $periodMonth = Period::query()->firstWhere('title', '=', 'month');
@@ -135,8 +139,7 @@ class DatabaseSeeder extends Seeder
         $subscription->save();
     }
 
-    private
-    function createFirstTestUser()
+    private function createFirstTestUser()
     {
         $photo = fake()->randomElement($this->previewPictures);
         $user = [
@@ -168,8 +171,7 @@ class DatabaseSeeder extends Seeder
         $this->createSubscriptionsForUser($user);
     }
 
-    private
-    function createSecondTestUser()
+    private function createSecondTestUser()
     {
         $photo = fake()->randomElement($this->previewPictures);
         $user = [
@@ -202,8 +204,7 @@ class DatabaseSeeder extends Seeder
         $this->createSubscriptionsForUser($user);
     }
 
-    private
-    function createAnotherUser()
+    private function createAnotherUser()
     {
         $user = [
             'name' => 'admin',
@@ -216,20 +217,16 @@ class DatabaseSeeder extends Seeder
         DB::table('users')->insert($user);
     }
 
-    private
-    function setRecommendedLectures(
-        int $num
-    ) {
+    private function setRecommendedLectures(int $num)
+    {
         Lecture::all()->random($num)->each(function ($lecture) {
             $lecture->setRecommended();
             $lecture->save();
         });
     }
 
-    private
-    function setDiffLectureTypes(
-        $user
-    ) {
+    private function setDiffLectureTypes($user)
+    {
         $lectures = Lecture::all()
             ->random(150);
 
