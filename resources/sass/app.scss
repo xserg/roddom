@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato');
+@import "bootstrap/scss/bootstrap";
+@import "variables";
+@import "admin/style";
+
+body, html {
+    box-sizing: border-box;
+    min-height: 100%;
+}
+
+.content {
+    padding: 15px;
+}
+
+div {
+    padding: 0;
+}
+
+.main {
+    min-height: calc(100% - 57px);
+}
+
+.card.card-bigger {
+    flex-basis: 75%;
+}
+
+.card.card-smaller {
+    flex-basis: 25%;
+}
+
+.heart-wrapper {
+    max-height: 24px;
+}

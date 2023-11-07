@@ -10,12 +10,12 @@
 
     init: function () {
         this.collapsed = this.collapsedAll
-        
+
         $watch('collapsedAll', (value, oldValue) => {
             this.toggleCollapsed()
         })
     },
-    
+
     toggleCollapsed: function () {
         this.collapsed = !this.collapsed
     },
@@ -25,7 +25,7 @@
             key = el.target.getAttribute('data-parent-key')
             this.treeOptions.forEach((checkboxLabel) => {
                 checkbox = checkboxLabel.querySelector('input[type=checkbox]')
-    
+
                 if (key && checkbox.value == key) {
                     console.log(checkbox.value, key)
                     checkbox.checked = true
@@ -42,7 +42,7 @@
             <x-heroicon-o-plus class="text-gray-400 w-4 h-4 border" x-show="collapsed" />
         </button>
         <label class="filament-forms-tree-component-option-label flex items-center space-x-3 rtl:space-x-reverse">
-            <input 
+            <input
                 data-parent-key="{{ $parent }}"
                 x-on:click="toggleParentCheckbox"
                 x-on:change="checkIfAllCheckboxesAreChecked()"

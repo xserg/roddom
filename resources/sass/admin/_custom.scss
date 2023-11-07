@@ -1,0 +1,18 @@
+// Here you can add other styles
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.text-decoration-dotted {
+    text-decoration-style: dotted;
+}
+
+.sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.active-sort {
+    color: #47a3ff !important;
+}
