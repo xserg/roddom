@@ -35,7 +35,7 @@ class LoginCodeService
             ]);
 
             Mail::to($loginCode->email)
-                ->send((new SendLoginCode($code))->afterCommit());
+                ->send(new SendLoginCode($loginCode->code));
 
             Log::warning("создали, послали для $loginCode->email код $loginCode->code");
         });

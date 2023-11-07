@@ -5,14 +5,16 @@ namespace App\Mail;
 use Duijker\LaravelTransactionalMails\TransactionalMailable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SendLoginCode extends TransactionalMailable implements ShouldQueue
+class SendLoginCode extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public $afterCommit = true;
     /**
      * Create a new message instance.
      */
