@@ -11,6 +11,8 @@ class LoginCode extends Model
 
     protected $keyType = 'string';
 
+    public $incrementing = false;
+
     public $timestamps = false;
 
     protected $table = 'login_codes';
@@ -30,7 +32,7 @@ class LoginCode extends Model
         $instance->fill($attributes);
         $instance->setCreatedAt(now());
         if (! $instance->save()) {
-            throw new Exception('Could not save instance of '.__CLASS__.'to table'.$instance->table);
+            throw new Exception('Could not save instance of ' . __CLASS__ . 'to table' . $instance->table);
         }
 
         return $instance;

@@ -6,7 +6,6 @@ use App\Exceptions\Custom\LoginCodeExpiredException;
 use App\Mail\SendLoginCode;
 use App\Models\LoginCode;
 use App\Repositories\LoginCodeRepository;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -28,17 +27,15 @@ class LoginCodeService
     {
         $code = mt_rand(100000, 999999);
 
-        DB::transaction(function () use ($email, $code) {
-            $loginCode = LoginCode::create([
-                'email' => $email,
-                'code' => $code,
-            ]);
+        $loginCode = LoginCode::create([
+            'email' => $email,
+            'code' => $code,
+        ]);
 
-            Mail::to($loginCode->email)
-                ->send(new SendLoginCode($loginCode->code));
+        Mail::to($loginCode->email)
+            ->send(new SendLoginCode($loginCode->code));
 
-            Log::warning("создали, послали для $loginCode->email код $loginCode->code");
-        });
+        Log::warning("послали код $loginCode->code для юзера с почтой $loginCode->email");
     }
 
     /**
