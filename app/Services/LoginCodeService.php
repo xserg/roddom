@@ -29,15 +29,15 @@ class LoginCodeService
         $code = mt_rand(100000, 999999);
 
         DB::transaction(function () use ($email, $code) {
-            LoginCode::create([
+            $loginCode = LoginCode::create([
                 'email' => $email,
                 'code' => $code,
             ]);
 
-            Mail::to($email)
-                ->send(new SendLoginCode($code));
+            Mail::to($loginCode->email)
+                ->send((new SendLoginCode($code))->afterCommit());
 
-            Log::warning("создали, послали для $email код $code");
+            Log::warning("создали, послали для $loginCode->email код $loginCode->code");
         });
     }
 
