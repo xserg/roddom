@@ -94,12 +94,12 @@ class UserService
         $lecture = $this->lectureRepository->getLectureById($lectureId);
 
         if ($this->lectureService->isLecturePurchased($lectureId)) {
-            AddLectureToWatchHistory::dispatch($user, $lectureId);
+            AddLectureToWatchHistory::dispatch($user, $lectureId, now());
             return $lecture->content;
 
         } elseif ($lecture->isFree()) {
             if ($this->isFreeLectureAvailable($lectureId, $user)) {
-                AddLectureToWatchHistory::dispatch($user, $lectureId);
+                AddLectureToWatchHistory::dispatch($user, $lectureId, now());
                 return $lecture->content;
             }
 
@@ -114,7 +114,7 @@ class UserService
                     throw new FailedSaveUserException();
                 }
 
-                AddLectureToWatchHistory::dispatch($user, $lectureId);
+                AddLectureToWatchHistory::dispatch($user, $lectureId, now());
                 return $lecture->content;
             }
 
