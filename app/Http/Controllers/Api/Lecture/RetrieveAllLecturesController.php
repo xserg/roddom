@@ -191,7 +191,7 @@ class RetrieveAllLecturesController
                 'rates',
                 'averageRate',
                 'userRate',
-                'actualSubscriptionItemsForCurrentUser',
+                'actualSubscriptionItemsForCurrentUser.lectures',
                 'watchedUsers',
                 'savedUsers',
                 'listWatchedUsers'
