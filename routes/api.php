@@ -58,7 +58,6 @@ Route::prefix('v1')
         Route::get('/app/agreement', AppAgreementController::class)
             ->name('app.agreement');
 
-        // start
         Route::post('/user/register', RegisterController::class)
             ->name('register');
         Route::post('/user/login', LoginController::class)
@@ -74,8 +73,6 @@ Route::prefix('v1')
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);
         Route::post('password/reset', ResetPasswordController::class);
-        // finish
-        // поставить mw, которое запретит зареганому юзеру кидать запросы на эти эндпоинты
 
         //payments notifications listener
         Route::post('/listen', PaymentController::class)
@@ -89,145 +86,110 @@ Route::prefix('v1')
 
             Route::delete('/user', DeleteUserController::class)
                 ->name('delete');
-            // запрет для гостя
             Route::get('/user/profile', ProfileRetrieveController::class)
                 ->name('profile.retrieve');
-            // запрет
             Route::put('/user/profile', ProfileUpdateController::class)
                 ->name('profile.update');
-            // запрет для гостя
             Route::put('/user/photo', PhotoController::class)
                 ->name('photo');
-            // запрет для гостя
             Route::delete('/user/photo', PhotoDeleteController::class)
                 ->name('photo.delete');
-            // запрет для гостя
             Route::delete('/user/logout', LogoutController::class)
                 ->name('logout');
-            // запрет для гостя
 
             Route::get('/lectors', RetrieveAllLectorsController::class)
                 ->name('lectors');
-            // можно, ничего не переписывать
             Route::get('/lector/{id}', RetrieveLectorController::class)
                 ->name('lector');
-            // можно, ничего не переписывать
-
             Route::post('/lector/{id}/rate', RateLectorController::class)
                 ->name('lector.rate');
-            // запрет для гостя
             Route::get('/lectors/category/{slug}', RetrieveLectorsByCategoryController::class)
                 ->name('lector.by.category');
-            // можно, ничего не переписывать
 
             Route::get('/lectures', RetrieveAllLecturesController::class)
                 ->name('lectures');
-            // можно - переписать методы скоупов лекций, сервисов - везде где встречается юзер
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->middleware(['throttle:1,0.015'])
                 ->name('lecture');
-            // можно - образование цен переделать в сервисах придется если юзер - гость
-
             Route::post('/lecture/{id}/rate', RateLectureController::class)
                 ->name('lecture.rate');
-            // запрет для гостя
             Route::post('/lecture/{id}/watch', WatchLectureController::class)
                 ->name('lecture.watch');
-            // запрет для гостя
             Route::post('/lecture/{id}/feedback', FeedbackLectureController::class)
                 ->name('lecture.feedback');
-            // запрет для гостя
 
             Route::put('/lecture/{id}/save', SaveLectureController::class)
                 ->name('lecture.save');
-            // запрет для гостя
             Route::delete('/lecture/{id}/save', UnsaveLectureController::class)
                 ->name('lecture.unsave');
-            // запрет для гостя
 
             Route::put('/lecture/{id}/list-watch', AddToListWatchedLectureController::class)
                 ->name('lecture.list-watch');
-            // запрет для гостя
             Route::delete('/lecture/{id}/list-watch', RemoveFromListWatchedLectureController::class)
                 ->name('lecture.list-unwatch');
-            // запрет для гостя
 
             Route::post('/lecture/{id}/buy/{period}', BuyLectureController::class)
                 ->name('lecture.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
             Route::post('/lecture/{id}/buy/{period}/order', [BuyLectureController::class, 'prepareOrderForTinkoff'])
                 ->name('lecture.buy.order')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
 
             Route::post('/lecture/all/buy/{period}', BuyAllLecturesController::class)
                 ->name('lecture.buy.all')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
             Route::post('/lecture/all/buy/{period}/order', [BuyAllLecturesController::class, 'prepareOrderForTinkoff'])
                 ->name('lecture.buy.all.order')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
 
             Route::get('/lecture/all/prices', AllLecturesPricesController::class)
                 ->name('lecture.all.price');
-            // можно - образование цен переделать в сервисах придется если юзер - гость
 
             Route::get('/categories', RetrieveAllCategoriesController::class)
                 ->name('categories');
-            // можно - образование цен переделать в сервисах придется если юзер - гость
             Route::get('/category/{slug}', RetrieveCategoryController::class)
                 ->name('subcategories');
-            // можно - образование цен переделать в сервисах придется если юзер - гость
-            // вроде переделывать только метод getPurchasedLectures, и прокидывать соответсвующий userId, везде где он используется
 
             Route::post('/category/{id}/buy/{period}', BuyCategoryController::class)
                 ->name('category.buy')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
             Route::post('/category/{id}/buy/{period}/order', [BuyCategoryController::class, 'prepareOrderForTinkoff'])
                 ->name('category.buy.order')
                 ->where('id', '[0-9]+')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
 
             Route::post('/promopack/buy/{period}', BuyPromoController::class)
                 ->name('promopack.buy')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
             Route::post('/promopack/buy/{period}/order', [BuyPromoController::class, 'prepareOrderForTinkoff'])
                 ->name('promopack.buy.order')
                 ->where('period', '[0-9]+');
-            // запрет для гостя
 
 
             Route::get('/promopack', RetrieveAllPromoLecturesController::class)
                 ->name('promopack');
-            // пока опустим, тут вроде не используется пересчет цен для юзера
 
-            Route::get('/pregnancy-plan-form', WizardControllerRetrieve::class); // можно для гостя
-            Route::post('/pregnancy-plan-form', WizardEmailController::class); // можно для гостя, добавить в тело запроса
-            // email, который вручную потребуется вводить, брать будем не от текущего зареганного юзера, а из тела запроса
+            Route::get('/pregnancy-plan-form', WizardControllerRetrieve::class);
+            Route::post('/pregnancy-plan-form', WizardEmailController::class);
 
             Route::get('/notifications', RetrieveNotificationsController::class)
-                ->name('notifications.index'); // узнавать хотим ли мы кидать нотификации гостям и как отслеживать, то что они прочитаны
+                ->name('notifications.index');
             Route::put('/notifications/read', MarkNotificationReadController::class)
-                ->name('notifications.read'); // запрет для гостей, потому что мы меняем значение в записи юзера
+                ->name('notifications.read');
 
             Route::get('/threads/{thread}', RetrieveThreadController::class)
-                ->name('threads.exact.retrieve');  // запрет для гостя
+                ->name('threads.exact.retrieve');
             Route::get('/threads', RetrieveAllThreadsController::class)
-                ->name('threads.retrieve'); // запрет для гостя
+                ->name('threads.retrieve');
             Route::post('/threads', CreateThreadController::class)
-                ->name('threads.create'); // запрет для гостя
+                ->name('threads.create');
             Route::put('/threads/{thread}', SendMessageThreadController::class)
-                ->name('threads.send-message'); // запрет для гостя
+                ->name('threads.send-message');
             Route::delete('/threads/{thread}', CloseThreadController::class)
-                ->name('threads.close'); // запрет для гостя
+                ->name('threads.close');
         });
     });
 
