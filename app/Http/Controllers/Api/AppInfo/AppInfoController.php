@@ -13,7 +13,6 @@ use OpenApi\Attributes as OA;
     OA\Get(
         path: '/app/info',
         summary: 'Получение данных приложения',
-        security: [['bearerAuth' => []]],
         tags: ['app'])
 ]
 #[OA\Response(response: 200, description: 'OK',

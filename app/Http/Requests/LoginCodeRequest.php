@@ -5,8 +5,15 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
+#[OA\Schema(
+    schema: 'LoginCodeRequest',
+    title: 'LoginCodeRequest',
+    required: ['user_id', 'lector_id', 'content']
+)]
 class LoginCodeRequest extends FormRequest
 {
+    #[OA\Property(property: 'code', description: 'email пользователя', type: 'string')]
+    #[OA\Property(property: 'device_name', description: 'пароль пользователя', type: 'string')]
     public function rules(): array
     {
         return [

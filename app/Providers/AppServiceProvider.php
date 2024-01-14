@@ -28,7 +28,26 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Subscription::observe(SubscriptionObserver::class);
-
+//        Queue::before(function (JobProcessing $event) {
+//            // $event->connectionName
+//            Log::info(sprintf('Queue job before handle: %d', $event->job->getJobId()));
+//            $jobInstance = unserialize($event->job->payload()['data']['command']);
+//
+//            Log::info(sprintf('user id is %s', $jobInstance?->user?->id));
+//
+//            //                 Log::info(sprintf('User\'s id is %d', $event->job->payload()['user']->id));
+//            // $event->job->payload()
+//        });
+//
+//        Queue::after(function (JobProcessed $event) {
+//            // $event->connectionName
+//            Log::info(sprintf('Queue job after handle: %d', $event->job->getJobId()));
+//            if ($event->job->hasFailed()) {
+//                Log::warning(sprintf('Queue job failed: %d', $event->job->getJobId()));
+//            }
+//            // $event->job
+//            // $event->job->payload()
+//        });
 //                DB::listen(function ($query) {
 //                    $bindings = implode(", ", $query->bindings); // format the bindings as string
 //

@@ -55,7 +55,8 @@ Route::prefix('v1')
 
         Route::get('/app/info', AppInfoController::class)
             ->name('app.info');
-        Route::get('/app/agreement', AppAgreementController::class);
+        Route::get('/app/agreement', AppAgreementController::class)
+            ->name('app.agreement');
 
         Route::post('/user/register', RegisterController::class)
             ->name('register');
