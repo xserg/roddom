@@ -160,7 +160,8 @@ class Category extends Model
     protected function prices(): Attribute
     {
         return new Attribute(
-            get: fn () => app(CategoryService::class)->getCategoryPricesResource($this)
+            // тут придется прокидывать user-id
+            get: fn () => app(CategoryService::class)->getCategoryPricesResource($this, auth()->id())
         );
     }
 }

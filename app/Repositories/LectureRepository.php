@@ -99,9 +99,14 @@ class LectureRepository
     /**
      * Возвращает коллекцию типа [0 => 320, 1 => 252, 2 => 138],
      * где values - lecture ids
+     *
+     * раньше было, если налл - то берем текущего юзера, а если не налл то дергаем юзера по айди(никогда короче не прокидывали айди)
+     * сейчас надо будет - если налл - то возвращаем пустую коллекцию(т.е. это гость будет), и везде где вызывается этот метод -
+     * надо прокидывать юзер айди
      */
     public function getPurchasedLectures(?int $userId = null): \Illuminate\Support\Collection
     {
+        // если null - т.е. гость то пустую коллекцию, если не налл то конкретного юзера лекции берем
         $user = is_null($userId)
             ? auth()->user()
             : $this->userRepository->getUserById($userId, ['actualSubscriptions.lectures']);

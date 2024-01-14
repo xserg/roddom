@@ -269,6 +269,7 @@ class UserService
         $user->listWatchedLectures()->detach($lectureId);
     }
 
+    // переделать на юзер = null
     public function appendLectureCountersToUser(User $user): User
     {
         return $user
