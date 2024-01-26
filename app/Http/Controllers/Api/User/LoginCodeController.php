@@ -65,16 +65,18 @@ class LoginCodeController extends Controller
         $this->loginCodeService->deleteRecordsWithCode($code);
 
         $deviceName = $request->validated('device_name', 'default_device');
-        $token = $this->userService->createToken($user, $deviceName);
+        $accessToken = $this->userService->createAccessToken($user, $deviceName);
+        $refreshToken = $this->userService->createRefreshToken($accessToken);
 
         $user = $this->userService->appendLectureCountersToUser($user);
         $user->load(['participants.thread.messages']);
 
-        Log::error("залогинили юзера $user->email, код был $code");
+        Log::info("залогинили юзера $user->email, код был $code");
 
         return response()->json([
             'user' => new UserResource($user),
-            'access_token' => $token,
+            'access_token' => $accessToken->plainTextToken,
+            'refresh_token' => $refreshToken->token,
             'token_type' => 'Bearer',
         ]);
     }

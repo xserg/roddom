@@ -43,6 +43,7 @@ use App\Http\Controllers\Api\User\PhotoController;
 use App\Http\Controllers\Api\User\PhotoDeleteController;
 use App\Http\Controllers\Api\User\ProfileRetrieveController;
 use App\Http\Controllers\Api\User\ProfileUpdateController;
+use App\Http\Controllers\Api\User\RefreshController;
 use App\Http\Controllers\Api\User\RegisterController;
 use App\Http\Controllers\Api\User\ResendLoginCodeController;
 use App\Http\Controllers\Api\Wizard\WizardControllerRetrieve;
@@ -69,6 +70,9 @@ Route::prefix('v1')
         Route::post('/user/resend-login-code', ResendLoginCodeController::class)
             ->name('resend.login.code')
             ->middleware('throttle:1,1,resend-login-code');
+
+        Route::post('/user/login/refresh', RefreshController::class)
+            ->name('login.refresh');
 
         Route::post('password/forgot', ForgotPasswordController::class);
         Route::post('password/check', CodeCheckController::class);

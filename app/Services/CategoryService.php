@@ -14,6 +14,7 @@ use App\Traits\MoneyConversion;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Facades\Schema;
 
 class CategoryService
 {
@@ -27,7 +28,9 @@ class CategoryService
         private LectureRepository  $lectureRepository,
         private PaymentService     $paymentService,
     ) {
-        $this->periods = Period::all();
+        if (Schema::hasTable('periods')) {
+            $this->periods = Period::all();
+        }
     }
 
     public function isCategoryPurchased(int $categoryId): bool

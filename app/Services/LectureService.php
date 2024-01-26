@@ -16,6 +16,8 @@ use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class LectureService
 {
@@ -31,11 +33,14 @@ class LectureService
         private CategoryService    $categoryService,
         private PaymentService     $paymentService
     ) {
-        $this->periods = Period::all();
-        $this->promoCommonPrices = Promo::query()
-            ->with(['subscriptionPeriodsForPromoPack'])
-            ->first()
-            ->subscriptionPeriodsForPromoPack;
+        if (Schema::hasTable('periods') &&
+            Schema::hasTable('promos')) {
+            $this->periods = Period::all();
+            $this->promoCommonPrices = Promo::query()
+                ->with(['subscriptionPeriodsForPromoPack'])
+                ->first()
+                ->subscriptionPeriodsForPromoPack;
+        }
     }
 
     public function isLecturePurchased(int $lectureId): bool

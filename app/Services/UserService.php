@@ -10,10 +10,9 @@ use App\Exceptions\Custom\UserCannotWatchPaidLectureException;
 use App\Jobs\AddLectureToWatchHistory;
 use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
-use App\Models\Order;
-use App\Models\RefInfo;
 use App\Models\RefPointsGainOnce;
 use App\Models\RefPointsPayments;
+use App\Models\RefreshToken;
 use App\Models\User;
 use App\Repositories\LectureRepository;
 use Exception;
@@ -25,6 +24,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
+use Laravel\Sanctum\NewAccessToken;
+use Laravel\Sanctum\PersonalAccessToken;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserService
@@ -276,7 +277,7 @@ class UserService
             ->append('purchasedLecturesCounter');
     }
 
-    public function createToken(Model|User $user, ?string $deviceName = 'default_device')
+    public function createAccessToken(Model|User $user, ?string $deviceName = 'default_device'): NewAccessToken
     {
         $token = $user->tokens()->firstWhere('name', $deviceName);
 
@@ -287,7 +288,13 @@ class UserService
         }
 
         $token?->delete();
-        return $user->createToken($deviceName)->plainTextToken;
+        return $user->createToken($deviceName);
+    }
+
+    public function createRefreshToken(NewAccessToken $accessToken): RefreshToken
+    {
+        $token = PersonalAccessToken::firstWhere('token', $accessToken->accessToken->token);
+        return RefreshToken::factory()->withAccessToken($token->id)->create();
     }
 
     /**
