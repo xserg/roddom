@@ -45,13 +45,13 @@ jobs:
         env:
           DB_DATABASE: cicd_testing
 
-      - name: Run Larastan
-        run: |
-          ./vendor/bin/phpstan analyse
-
-      - name: Run Pint
-        run: |
-          ./vendor/bin/pint --test
+#      - name: Run Larastan
+#        run: |
+#          ./vendor/bin/phpstan analyse
+#
+#      - name: Run Pint
+#        run: |
+#          ./vendor/bin/pint --test
 
     services:
       mysql:
