@@ -27,8 +27,6 @@ class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens, HasFactory, Notifiable, HasRelationships, HasTableAlias;
 
-    protected $with = ['actualSubscriptions.lectures'];
-
     protected $fillable = [
         'email',
         'password',

@@ -28,9 +28,7 @@ class CategoryService
         private LectureRepository  $lectureRepository,
         private PaymentService     $paymentService,
     ) {
-        if (Schema::hasTable('periods')) {
-            $this->periods = Period::all();
-        }
+        $this->periods = Period::all();
     }
 
     public function isCategoryPurchased(int $categoryId): bool

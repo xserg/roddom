@@ -215,4 +215,30 @@ class Lecture extends Model
     {
         $this->is_recommended = true;
     }
+
+    protected function purchaseInfo(?int $userId = null): Attribute
+    {
+        $user = is_null($userId)
+            ? auth()->user()
+            : User::with(['actualSubscriptions.lectures'])->find($userId);
+
+        $isPurchased = false;
+        $endDate = null;
+
+        foreach ($user->actualSubscriptions as $sub) {
+            if ($sub->lectures?->contains($this->id)) {
+                $isPurchased = true;
+            }
+            if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
+                $endDate = $sub->end_date;
+            }
+        }
+
+        return new Attribute(
+            get: fn () => [
+                'is_purchased' => $isPurchased,
+                'end_date' => $endDate,
+            ]
+        );
+    }
 }

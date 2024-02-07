@@ -191,10 +191,9 @@ class RetrieveAllLecturesController
                 'rates',
                 'averageRate',
                 'userRate',
-                'actualSubscriptionItemsForCurrentUser.lectures',
-                'watchedUsers',
-                'savedUsers',
-                'listWatchedUsers'
+                'watchedUsers:id',
+                'savedUsers:id',
+                'listWatchedUsers:id'
             ];
 
             $builder = $this->lectureRepository->getAllQueryWith($relations);

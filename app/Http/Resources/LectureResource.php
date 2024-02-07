@@ -15,7 +15,6 @@ use OpenApi\Attributes as OA;
     schema: 'LectureResource',
     title: 'LectureResource'
 )]
-
 /** @mixin \App\Models\Lecture */
 class LectureResource extends JsonResource
 {
@@ -84,7 +83,7 @@ class LectureResource extends JsonResource
             'list_watched' => $this->whenNotNull($this->list_watched),
             'is_promo' => $this->isPromo(),
             'is_watched' => $this->whenNotNull($this->is_watched),
-            'purchase_info' => $this->whenAppended('purchase_info', $this->setPurchaseInfo()),
+            'purchase_info' => $this->whenAppended('purchase_info'),
             'prices' => $this->whenAppended('prices', $this->setPrices()),
             'rates' => [
                 'rate_avg' => $this->averageRate?->rating,
@@ -119,31 +118,5 @@ class LectureResource extends JsonResource
         }
 
         return $prices;
-    }
-
-    private function setPurchaseInfo(): array
-    {
-        /**
-         * @var Lecture $this
-         */
-        $isPurchased = false;
-        $endDate = null;
-
-        //подписки, актуальные, принадлежащие текущему юзеру
-        $subs = $this->actualSubscriptionItemsForCurrentUser;
-
-        foreach ($subs as $sub) {
-            if ($sub->lectures?->contains($this->id)) {
-                $isPurchased = true;
-            }
-            if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
-                $endDate = $sub->end_date;
-            }
-        }
-
-        return [
-            'is_purchased' => $isPurchased,
-            'end_date' => $endDate,
-        ];
     }
 }

@@ -33,14 +33,11 @@ class LectureService
         private CategoryService    $categoryService,
         private PaymentService     $paymentService
     ) {
-        if (Schema::hasTable('periods') &&
-            Schema::hasTable('promos')) {
-            $this->periods = Period::all();
-            $this->promoCommonPrices = Promo::query()
-                ->with(['subscriptionPeriodsForPromoPack'])
-                ->first()
-                ->subscriptionPeriodsForPromoPack;
-        }
+        $this->periods = Period::all();
+        $this->promoCommonPrices = Promo::query()
+            ->with(['subscriptionPeriodsForPromoPack'])
+            ->first()
+            ?->subscriptionPeriodsForPromoPack;
     }
 
     public function isLecturePurchased(int $lectureId): bool
