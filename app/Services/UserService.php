@@ -294,7 +294,11 @@ class UserService
     public function createRefreshToken(NewAccessToken $accessToken): RefreshToken
     {
         $token = PersonalAccessToken::firstWhere('token', $accessToken->accessToken->token);
-        return RefreshToken::factory()->withAccessToken($token->id)->create();
+        return RefreshToken::create([
+            'access_token_id' => $token->id,
+            'token' => Str::random(64),
+            'expires_at' => now()->addYear(),
+        ]);
     }
 
     /**
