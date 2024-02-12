@@ -7,9 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabaseState;
 
 trait DatabaseMigrations
 {
-    use \Illuminate\Foundation\Testing\DatabaseMigrations {
-        runDatabaseMigrations as runMigrations;
-    }
+    use \Illuminate\Foundation\Testing\DatabaseMigrations;
 
     /**
      * Define hooks to migrate the database before and after each test.
