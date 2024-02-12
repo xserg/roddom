@@ -23,6 +23,10 @@ class LoginCode extends Model
         'created_at',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime'
+    ];
+
     /**
      * @throws Exception
      */

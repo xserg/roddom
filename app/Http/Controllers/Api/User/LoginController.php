@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\LoginRequest;
-use App\Services\LoginCodeService;
+use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/user/login',
-    description: 'Логин юзера с помощью почты и пароля',
+    description: 'Логин юзера с помощью почты и пароля. Удаляется предыдущий код логина, создаётся новый и посылается
+    на мыло юзеру.',
     summary: 'Логин юзера',
     tags: ['user'])
 ]
@@ -25,26 +25,23 @@ use OpenApi\Attributes as OA;
 )]
 #[OA\Response(response: Response::HTTP_OK, description: 'OK')]
 #[OA\Response(
-    response: Response::HTTP_UNPROCESSABLE_ENTITY,
+    response: Response::HTTP_UNAUTHORIZED,
     description: 'Validation exception',
-    content: [
-        new OA\MediaType(
-            mediaType: 'application/json',
-            schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors'))],
+    content: [new OA\MediaType(
+        mediaType: 'application/json',
+        schema: new OA\Schema(ref: '#/components/schemas/ValidationErrors')),],
 )]
 #[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class LoginController
 {
     public function __construct(
-        private LoginCodeService $loginCodeService
+        private readonly UserService $userService
     ) {
     }
 
     public function __invoke(LoginRequest $request): JsonResponse
     {
-        $authenticated = Auth::attempt(
-            $request->only(['email', 'password'])
-        );
+        $authenticated = $this->userService->login($request->getDto());
 
         if (! $authenticated) {
             $errors = [
@@ -55,19 +52,9 @@ class LoginController
                 ],
             ];
 
-            return response()->json(
-                $errors,
-                Response::HTTP_UNAUTHORIZED
-            );
+            return response()->json($errors, Response::HTTP_UNAUTHORIZED);
         }
 
-        $email = $request->validated('email');
-        $this->loginCodeService->deleteWhereEmail($email);
-
-        $this->loginCodeService->createAndSendEmail($email);
-
-        return response()->json([
-            'message' => 'Код отослан на ваш email',
-        ], Response::HTTP_OK);
+        return response()->json(['message' => 'Код отослан на ваш email'], Response::HTTP_OK);
     }
 }

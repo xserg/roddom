@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Dto\User\LoginDto;
 use Illuminate\Foundation\Http\FormRequest;
 use OpenApi\Attributes as OA;
 
@@ -20,5 +21,10 @@ class LoginRequest extends FormRequest
             'email' => 'required|email',
             'password' => 'required|max:255',
         ];
+    }
+
+    public function getDto(): LoginDto
+    {
+        return new LoginDto($this->get('email'), $this->get('password'));
     }
 }

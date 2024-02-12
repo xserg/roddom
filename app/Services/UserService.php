@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
+use App\Dto\User\LoginCodeDto;
+use App\Dto\User\LoginDto;
 use App\Exceptions\Custom\FailedSaveUserException;
 use App\Exceptions\Custom\UserCannotRemoveLectureFromListException;
 use App\Exceptions\Custom\UserCannotSaveLectureException;
 use App\Exceptions\Custom\UserCannotWatchFreeLectureException;
 use App\Exceptions\Custom\UserCannotWatchPaidLectureException;
+use App\Http\Resources\UserResource;
 use App\Jobs\AddLectureToWatchHistory;
 use App\Jobs\UserDeletionRequest;
 use App\Models\AppInfo;
+use App\Models\LoginCode;
 use App\Models\RefPointsGainOnce;
 use App\Models\RefPointsPayments;
 use App\Models\RefreshToken;
@@ -20,7 +24,9 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\ImageManager;
@@ -33,8 +39,55 @@ class UserService
     public function __construct(
         private LectureService    $lectureService,
         private LectureRepository $lectureRepository,
-        private ImageManager      $imageManager
+        private ImageManager      $imageManager,
+        private LoginCodeService  $loginCodeService,
     ) {
+    }
+
+    public function login(LoginDto $loginDto): bool
+    {
+        $authenticated = Auth::attempt(
+            ['email' => $loginDto->getEmail(), 'password' => $loginDto->getPassword()]);
+
+        if (! $authenticated) {
+            return false;
+        }
+
+        $this->loginCodeService->deleteWhereEmail($loginDto->getEmail());
+        $this->loginCodeService->createAndSendEmail($loginDto->getEmail());
+
+        return true;
+    }
+
+    public function loginCodeHandle(LoginCodeDto $loginCodeDto): array
+    {
+        $this->loginCodeService->throwIfExpired($loginCodeDto->getCode());
+
+        $loginCode = LoginCode::latest()->firstWhere('code', $loginCodeDto->getCode());
+
+        $user = User::query()
+            ->with(['referrer.refPoints', 'refPoints'])
+            ->firstWhere('email', $loginCode->email);
+
+        $this->rewardForRefLinkRegistration($user);
+
+        $this->loginCodeService->deleteRecordsWithCode($loginCodeDto->getCode());
+
+        $deviceName = $loginCodeDto->getDeviceName() ?? 'default_device';
+        $accessToken = $this->createAccessToken($user, $deviceName);
+        $refreshToken = $this->createRefreshToken($accessToken);
+
+        $user = $this->appendLectureCountersToUser($user);
+        $user->load(['participants.thread.messages']);
+
+        Log::info("залогинили юзера $user->email, код был $loginCode->code");
+
+        return [
+            'user' => new UserResource($user),
+            'access_token' => $accessToken->plainTextToken,
+            'refresh_token' => $refreshToken->token,
+            'token_type' => 'Bearer',
+        ];
     }
 
     public function getUserByEmail($email): User
