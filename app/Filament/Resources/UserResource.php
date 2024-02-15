@@ -175,7 +175,7 @@ class UserResource extends Resource
                             return new HtmlString("<a class=$classes href=\"$href\">$name</a>");
                         })
                         ->label('Страница реферера')
-                        ->visible(fn(string $context, ?Model $record) => $context === 'edit' && $record->hasReferrer()),
+                        ->visible(fn (string $context, ?Model $record) => $context === 'edit' && $record->hasReferrer()),
 
                     Forms\Components\Placeholder::make('descendants_count')
                         ->label('Количество рефералов')
@@ -348,8 +348,7 @@ class UserResource extends Resource
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('phone')->label('телефон')->toggleable(),
                 Tables\Columns\TextColumn::make('refPoints.points')->label('бебикоины')->toggleable()
-                    ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: ''))
-                    ->sortable(),
+                    ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: '')),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
                 Tables\Columns\TextColumn::make('created_at')->label('дата создания')->sortable()->toggleable(),
