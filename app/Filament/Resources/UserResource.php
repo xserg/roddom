@@ -347,7 +347,10 @@ class UserResource extends Resource
                     ->label('дата рождения')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('phone')->label('телефон')->toggleable(),
-                Tables\Columns\TextColumn::make('refPoints.points')->label('бебикоины')->toggleable()
+                Tables\Columns\TextColumn::make('refPoints.points')
+                    ->sortable()
+                    ->label('бебикоины')
+                    ->toggleable()
                     ->formatStateUsing(fn (?string $state) => number_format($state / 100, 2, thousands_separator: '')),
                 Tables\Columns\IconColumn::make('is_mother')->label('родился ли ребёнок')->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('pregnancy_start')->label('дата начала беременности')->sortable()->date()->toggleable(),
