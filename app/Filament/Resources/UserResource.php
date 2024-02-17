@@ -58,7 +58,8 @@ class UserResource extends Resource
                 'watchedLecturesHistory',
                 'watchedLecturesToday',
                 'watchedLectures',
-                'watchedLecturesHistoryToday'
+                'watchedLecturesHistoryToday',
+                'participants.thread'
             ]);
     }
 

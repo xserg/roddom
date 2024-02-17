@@ -140,15 +140,15 @@ class ThreadResource extends Resource
 
     protected static function getNavigationBadge(): ?string
     {
-        $threads = static::getModel()::all();
+        $threads = static::getModel()::query()
+            ->with('participants', 'messages')
+            ->get();
 
         //compare users read_at and thread read_at, count it
         $count = 0;
         $threads->each(function (Thread $thread) use (&$count) {
-            $participant = $thread->participantForUser(auth()->id());
-
-            $adminIsNotParticipant = is_null($participant);
-            $threadHasMessages = $thread->messages->isNotEmpty();
+            $adminIsNotParticipant = $thread->userIsNotParticipant();
+            $threadHasMessages = $thread->hasMessages();
 
             if (
                 $threadHasMessages &&

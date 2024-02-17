@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use App\Models\User;
+use App\Models\RefPoints;
 use Filament\Pages\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Contracts\View\View;
@@ -22,9 +22,10 @@ class ListUsers extends ListRecords
     public function __construct($id = null)
     {
         parent::__construct($id);
-        $this->data_list['common_babycoins'] = User::where('is_admin', '!=', 1)
-            ->with('refPoints')->get()
-            ->sum(fn ($user) => $user->refPoints?->points);
+
+        $this->data_list['common_babycoins'] = RefPoints::query()
+            ->whereHas('user', fn ($query) => $query->where('is_admin', false))
+            ->sum('points');
     }
 
     protected function getActions(): array

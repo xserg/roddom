@@ -4,6 +4,7 @@ namespace App\Models\Threads;
 
 use App\Enums\ThreadStatusEnum;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,13 @@ class Thread extends Model
     public function participants(): HasMany
     {
         return $this->hasMany(Participant::class);
+    }
+
+    public function participantsForUser(Builder $query, ?int $userId = null): HasMany
+    {
+        return $this
+            ->participants()
+            ->where('user_id', $userId);
     }
 
     public function openedParticipant(): HasOne
@@ -67,7 +75,17 @@ class Thread extends Model
     {
         $participant = $this->participantForUser($userId);
 
-        return $this->messages->isNotEmpty() &&
+        return $this->hasMessages() &&
             ($this->messages->max('updated_at') > $participant?->read_at);
+    }
+
+    public function userIsNotParticipant(?int $userId = null): bool
+    {
+        return $this->participants->doesntContain('user_id', $userId ?? auth()->id());
+    }
+
+    public function hasMessages(): bool
+    {
+        return $this->messages->isNotEmpty();
     }
 }
