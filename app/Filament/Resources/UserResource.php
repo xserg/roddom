@@ -22,12 +22,12 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Form;
-use Filament\Resources\RelationManagers\RelationGroup;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -129,24 +129,21 @@ class UserResource extends Resource
                 Forms\Components\Card::make([
                     Forms\Components\Select::make('referrer_id')
                         ->options(function (string $context, ?Model $record) {
-                            if ($context === 'edit') {
-                                $allLevelsReferralsAndSelfIds = [
-                                    ...$record->referrals->pluck('id')->toArray(),
+                            $allLevelsReferralsAndSelfIds = $context === 'edit' ?
+                                [...$record->referrals->pluck('id')->toArray(),
                                     ...$record->referralsSecondLevel->pluck('id')->toArray(),
                                     ...$record->referralsThirdLevel->pluck('id')->toArray(),
                                     ...$record->referralsFourthLevel->pluck('id')->toArray(),
                                     ...$record->referralsFifthLevel->pluck('id')->toArray(),
                                     $record->id
-                                ];
-                                $users = User::select(['name', 'email', 'id'])
-                                    ->where('is_admin', 0)
-                                    ->whereNotIn('id', $allLevelsReferralsAndSelfIds)
-                                    ->get();
-                            } elseif ($context === 'create') {
-                                $users = User::select(['name', 'email', 'id'])
-                                    ->where('is_admin', 0)
-                                    ->get();
-                            }
+                                ] : [];
+
+                            $users = DB::table('users')
+                                ->select('name', 'email', 'id')
+                                ->when($context === 'edit',
+                                    fn ($query) => $query->whereNotIn('id', $allLevelsReferralsAndSelfIds))
+                                ->where('is_admin', 0)
+                                ->get();
 
                             $options = [];
                             foreach ($users as $user) {
