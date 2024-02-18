@@ -143,11 +143,13 @@ class UserResource extends Resource
                                 ->when($context === 'edit',
                                     fn ($query) => $query->whereNotIn('id', $allLevelsReferralsAndSelfIds))
                                 ->where('is_admin', 0)
+                                ->orderByRaw('name IS NULL, name')
+                                ->orderBy('email')
                                 ->get();
 
                             $options = [];
                             foreach ($users as $user) {
-                                $options[$user->id] = $user->name ?? $user->email;
+                                $options[$user->id] = $user->name ? "$user->name: $user->email" : $user->email;
                             }
                             return $options;
                         })
