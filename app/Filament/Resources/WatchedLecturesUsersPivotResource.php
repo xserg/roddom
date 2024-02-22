@@ -53,8 +53,14 @@ class WatchedLecturesUsersPivotResource extends Resource
                     ->label('пользователь'),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->limit(35)
-                    ->tooltip(fn (?Model $record): string => $record->lecture->title)
-                    ->url(function (?Model $record): string {
+                    ->formatStateUsing(function (?Model $record) {
+                        return $record->lecture?->title ?? 'Лекция была удалена';
+                    })
+                    ->tooltip(fn (?Model $record): string => $record->lecture?->title ?? '')
+                    ->url(function (?Model $record): ?string {
+                        if (is_null($record->lecture)) {
+                            return null;
+                        }
                         return route('filament.resources.lectures.edit', ['record' => $record->lecture]);
                     })
                     ->searchable(isIndividual: true)
@@ -100,6 +106,4 @@ class WatchedLecturesUsersPivotResource extends Resource
     {
         return 'success';
     }
-
-
 }
