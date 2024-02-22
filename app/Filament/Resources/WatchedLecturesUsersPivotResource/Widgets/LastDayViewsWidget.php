@@ -15,11 +15,6 @@ class LastDayViewsWidget extends BaseWidget
 {
     protected static ?string $heading = 'Просмотров за последние 24 часа';
 
-    protected function getTableRecordsPerPage(): int
-    {
-        return 5;
-    }
-
     protected function getTableQuery(): Builder
     {
         return WatchedLecturesUsersPivot::query()->select(
@@ -53,6 +48,6 @@ class LastDayViewsWidget extends BaseWidget
 
     protected function getTableRecordsPerPageSelectOptions(): array
     {
-        return [5, 10, -1];
+        return [5, 10, 25];
     }
 }
