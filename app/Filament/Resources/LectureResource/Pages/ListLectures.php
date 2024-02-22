@@ -21,9 +21,7 @@ class ListLectures extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        return Lecture::query()
-            ->with(['rates', 'lector', 'category'])
-            ->withoutGlobalScopes();
+        return static::getResource()::getEloquentQuery()->with(['rates', 'lector', 'category']);
     }
 
     protected function getTableFiltersFormColumns(): int

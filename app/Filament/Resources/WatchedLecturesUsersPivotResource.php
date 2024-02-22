@@ -59,10 +59,7 @@ class WatchedLecturesUsersPivotResource extends Resource
                     ->label('пользователь'),
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->limit(35)
-                    ->formatStateUsing(function (?Model $record) {
-                        return $record->lecture?->title ?? 'Лекция была не опубликована';
-                    })
-                    ->tooltip(fn (?Model $record): string => $record->lecture?->title ?? '')
+                    ->tooltip(fn (?Model $record): string => $record->lecture->title)
                     ->url(function (?Model $record): ?string {
                         return route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
                     })
