@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Tables\Filters\Layout;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
@@ -22,6 +23,11 @@ class WatchedLecturesUsersPivotResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-eye';
     protected static ?string $navigationGroup = 'Лекции';
     protected static ?int $navigationSort = 5;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
+    }
 
     public static function form(Form $form): Form
     {
@@ -54,14 +60,11 @@ class WatchedLecturesUsersPivotResource extends Resource
                 Tables\Columns\TextColumn::make('lecture.title')
                     ->limit(35)
                     ->formatStateUsing(function (?Model $record) {
-                        return $record->lecture?->title ?? 'Лекция была удалена';
+                        return $record->lecture?->title ?? 'Лекция была не опубликована';
                     })
                     ->tooltip(fn (?Model $record): string => $record->lecture?->title ?? '')
                     ->url(function (?Model $record): ?string {
-                        if (is_null($record->lecture)) {
-                            return null;
-                        }
-                        return route('filament.resources.lectures.edit', ['record' => $record->lecture]);
+                        return route('filament.resources.lectures.edit', ['record' => $record->lecture_id]);
                     })
                     ->searchable(isIndividual: true)
                     ->label('лекция'),
