@@ -373,11 +373,11 @@ class LectureResource extends Resource
             ->filters([
                 SelectFilter::make('category_id')
                     ->multiple()
-                    ->options(Category::subCategories()->orderBy('title')->pluck('title', 'id'))
+                    ->options(fn () => Category::subCategories()->orderBy('title')->pluck('title', 'id'))
                     ->label('По подкатегории'),
                 SelectFilter::make('lector_id')
                     ->multiple()
-                    ->options(Lector::orderBy('name')->pluck('name', 'id'))
+                    ->options(fn () => Lector::orderBy('name')->pluck('name', 'id'))
                     ->label('По лектору'),
                 Filter::make('free')
                     ->query(fn (Builder $query): Builder => $query->where('payment_type_id', LecturePaymentType::FREE))
