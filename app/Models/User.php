@@ -404,4 +404,9 @@ class User extends Authenticatable implements FilamentUser
             get: fn () => count($purchasedLecturesIds),
         );
     }
+
+    public function getName(): string
+    {
+        return $this->name ?? $this->email;
+    }
 }

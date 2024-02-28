@@ -4,14 +4,9 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginCodeRequest;
-use App\Http\Resources\UserResource;
-use App\Repositories\LoginCodeRepository;
-use App\Repositories\UserRepository;
-use App\Services\LoginCodeService;
 use App\Services\UserService;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
 #[OA\Post(
     path: '/user/login/code',
@@ -35,49 +30,18 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'access_token', type: 'string', example: '2|bNyLNAS0eqriGpH3O2z9bViYtBOtBk1bQKDIEifD'),
         new OA\Property(property: 'token_type', type: 'string', example: 'Bearer'),
     ]))]
+#[OA\Response(response: Response::HTTP_FOUND, description: 'Not Found')]
 class LoginCodeController extends Controller
 {
     public function __construct(
-        private LoginCodeRepository $loginCodeRepository,
-        private LoginCodeService    $loginCodeService,
-        private UserRepository      $userRepository,
-        private UserService         $userService
+        private readonly UserService $userService
     ) {
     }
 
     public function __invoke(LoginCodeRequest $request)
     {
-        $code = $request->validated('code');
+        $response = $this->userService->loginCodeHandle($request->getDto());
 
-        $this->loginCodeService->throwIfExpired($code);
-
-        $loginCode = $this->loginCodeRepository
-            ->latestWhereCode($code);
-
-        $user = $this->userRepository
-            ->findByEmail(
-                $loginCode->email,
-                ['referrer.refPoints', 'refPoints']
-            );
-
-        $this->userService->rewardForRefLinkRegistration($user);
-
-        $this->loginCodeService->deleteRecordsWithCode($code);
-
-        $deviceName = $request->validated('device_name', 'default_device');
-        $accessToken = $this->userService->createAccessToken($user, $deviceName);
-        $refreshToken = $this->userService->createRefreshToken($accessToken);
-
-        $user = $this->userService->appendLectureCountersToUser($user);
-        $user->load(['participants.thread.messages']);
-
-        Log::info("залогинили юзера $user->email, код был $code");
-
-        return response()->json([
-            'user' => new UserResource($user),
-            'access_token' => $accessToken->plainTextToken,
-            'refresh_token' => $refreshToken->token,
-            'token_type' => 'Bearer',
-        ]);
+        return response()->json($response, Response::HTTP_OK);
     }
 }

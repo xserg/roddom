@@ -11,16 +11,14 @@ class RetrieveNotificationsController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $latest = $request->query('p');
-
-        if ($latest === 'latest') {
+        if ($request->query('p') === 'latest') {
             $latestNotification = CustomNotification::latest()->firstOrFail();
 
-            return response()->json(['data' => CustomNotificationResource::make($latestNotification)]);
+            return CustomNotificationResource::make($latestNotification);
         }
 
         $notifications = CustomNotification::latest()->get();
 
-        return response()->json(['data' => CustomNotificationResource::collection($notifications)]);
+        return CustomNotificationResource::collection($notifications);
     }
 }

@@ -4,20 +4,34 @@ namespace App\Http\Controllers\Api\Wizard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PregnancyFormRequest;
-use App\Http\Resources\WizardResource;
 use App\Models\AppInfo;
-use App\Models\Wizard;
-use App\Models\WizardInfo;
 use App\Notifications\PregnancyFormEmailNotification;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
+use OpenApi\Attributes as OA;
 
+#[OA\Post(
+    path: '/pregnancy-plan-form',
+    description: 'Принимаем html разметку - заполненую юзером форму с вопросами и ответами,
+     засовываем в email и посылаем её юзеру на почту, на которую он зарегал свой аккаунт, а не ту,
+     что он указывает в ответе на один из вопросов формы',
+    summary: 'Принимаем разметку, засовываем в email и посылаем её юзеру',
+    security: [['bearerAuth' => []]],
+    tags: ['wizard'])
+]
+#[OA\Response(response: Response::HTTP_OK, description: 'OK',
+    content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'message',
+            type: 'string',
+            example: 'email sent successfully')])
+)]
+#[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthorized',
+    content: new OA\JsonContent(properties: [
+        new OA\Property(property: 'message', type: 'string', example: 'Unauthorized')
+    ])
+)]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class WizardEmailController extends Controller
 {
-    public function __construct()
-    {
-    }
-
     public function __invoke(PregnancyFormRequest $request)
     {
         $user = auth()->user();
