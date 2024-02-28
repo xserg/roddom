@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Post(
     path: '/threads',
-    description: 'Юзер создает обращение',
+    description: 'Юзер создает обращение, получаем айди обращения',
     summary: 'Создание обращения',
     security: [['bearerAuth' => []]],
     tags: ['threads'])
@@ -32,6 +32,6 @@ class CreateThreadController extends Controller
         $thread = Thread::create();
         auth()->user()->participants()->updateOrCreate(['thread_id' => $thread->id], ['opened' => true]);
 
-        return response()->json(['id' => $thread->id], 201);
+        return response()->json(['id' => $thread->id], Response::HTTP_CREATED);
     }
 }

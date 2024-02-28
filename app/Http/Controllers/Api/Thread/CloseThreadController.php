@@ -16,10 +16,7 @@ use OpenApi\Attributes as OA;
     tags: ['threads'])
 ]
 #[OA\Response(response: Response::HTTP_NO_CONTENT, description: 'No content')]
-#[OA\Response(
-    response: Response::HTTP_FORBIDDEN,
-    description: 'Forbidden'
-)]
+#[OA\Response(response: Response::HTTP_FORBIDDEN, description: 'Forbidden')]
 #[OA\Response(response: Response::HTTP_UNAUTHORIZED, description: 'Unauthorized',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'message', type: 'string', example: 'Unauthorized')

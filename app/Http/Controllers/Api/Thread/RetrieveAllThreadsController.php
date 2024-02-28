@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
 
 #[OA\Get(
     path: '/threads',
-    description: 'Массив всех обращений',
+    description: 'Массив всех обращений, в которых участвовал юзер',
     summary: 'Получение всех обращений',
     security: [['bearerAuth' => []]],
     tags: ['threads'])

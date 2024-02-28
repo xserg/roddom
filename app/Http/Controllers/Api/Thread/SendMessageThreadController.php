@@ -42,6 +42,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'message', type: 'string', example: 'Unauthorized')
     ])
 )]
+#[OA\Response(response: Response::HTTP_FORBIDDEN, description: 'Forbidden')]
 #[OA\Response(
     response: Response::HTTP_NOT_FOUND,
     description: 'Not Found',
