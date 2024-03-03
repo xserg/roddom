@@ -55,20 +55,13 @@ class RetrieveLectureController
     ) {
     }
 
-    public function __invoke(Request $request, int $id): JsonResponse
+    public function __invoke(Request $request, int $id)
     {
-        $builder = $this->lectureRepository->getLectureByIdQuery($id, ['lector', 'lector.diplomas']);
+        $builder = $this->lectureRepository->getLectureByIdQuery($id,
+            ['lector', 'lector.diplomas', 'contentType', 'paymentType']);
         $lecture = $builder->firstOrFail()->append(['prices', 'purchase_info']);
 
-        if (is_null($lecture)) {
-            return response()->json([
-                'message' => 'Lecture with id ' . $id . ' was not found',
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        return response()->json(
-            new LectureResource($lecture),
-            Response::HTTP_OK
-        );
+        LectureResource::withoutWrapping();
+        return LectureResource::make($lecture);
     }
 }
