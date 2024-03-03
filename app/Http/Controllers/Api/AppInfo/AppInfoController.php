@@ -8,14 +8,19 @@ use App\Models\RefInfo;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
 
-#[
-    OA\Get(
-        path: '/app/info',
-        summary: 'Получение данных приложения',
-        tags: ['app'])
+#[OA\Get(
+    path: '/app/info',
+    description: 'Получение динамических данных приложения, которые указываются в админке.
+    Поля: app_help_page, app_info, app_periods, ref_info.
+    app_help_page - инфа о странице помощи, текст вопроса: текст ответа,
+    ref_info - инфа уровни реф программы: процент начислений
+    с суммы покупки в реальной валюте',
+    summary: 'Получение данных приложения',
+    tags: ['app'])
 ]
-#[OA\Response(response: 200, description: 'OK',
+#[OA\Response(response: Response::HTTP_OK, description: 'OK',
     content: new OA\JsonContent(properties: [
         new OA\Property(property: 'data', example: [
             'app_help_page' => [
@@ -53,9 +58,32 @@ use OpenApi\Attributes as OA;
                 'app_show_qr_title' => 'Показать QR-код',
                 'app_show_qr_link' => 'https://api.мамы.online/storage/images/app/qr.jpeg',
             ],
+            'app_periods' => [
+                1,
+                14,
+                30
+            ],
+            'ref_info' => [
+                [
+                    'depth_level' => 1,
+                    'percent' => 0.25
+                ],
+                [
+                    'depth_level' => 2,
+                    'percent' => 0.5
+                ],
+                [
+                    'depth_level' => 3,
+                    'percent' => 0.75
+                ],
+                [
+                    'depth_level' => 4,
+                    'percent' => 1
+                ]
+            ]
         ]),
     ]))]
-#[OA\Response(response: 500, description: 'Server Error')]
+#[OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')]
 class AppInfoController extends Controller
 {
     public function __invoke(): JsonResponse

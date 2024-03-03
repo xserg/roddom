@@ -9,17 +9,14 @@ use App\Repositories\LectureRepository;
 use App\Repositories\PromoRepository;
 use App\Services\LectureService;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Response;
 
-#[
-    OA\Get(
-        path: '/promopack',
-        description: 'Получение всех акционных лекций, с пагинацией',
-        summary: 'Получение всех акционных лекций',
-        security: [['bearerAuth' => []]],
-        tags: ['promo'])
+#[OA\Get(path: '/promopack',
+    description: 'Получение всех акционных лекций, с пагинацией',
+    summary: 'Получение всех акционных лекций',
+    security: [['bearerAuth' => []]],
+    tags: ['promo'])
 ]
 #[OA\Parameter(
     name: 'per_page',
