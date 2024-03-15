@@ -181,7 +181,7 @@ class UserService
     }
 
     /**
-     * @throws Exception
+     * @throws FailedSaveUserException
      */
     public function saveUsersPhoto(
         Authenticatable|User $user,
@@ -190,29 +190,22 @@ class UserService
         $image = $this->imageManager->make($file)->fit(300, 300);
         $imageSmall = $this->imageManager->make($file)->fit(150, 150);
 
-        $dirCreated = Storage::makeDirectory('images/users/');
+        Storage::makeDirectory('images/users/');
 
-        if (! $dirCreated) {
-            throw new Exception('Directory could not be created');
-        }
-
-        if (
-            ! $image->save(storage_path('app/public/images/users/' . $user->id . '.jpg')) ||
-            ! $imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'))
-        ) {
-            throw new Exception('Could not upload image');
-        }
+        $image->save(storage_path('app/public/images/users/' . $user->id . '.jpg'));
+        $imageSmall->save(storage_path('app/public/images/users/' . $user->id . '-small' . '.jpg'));
 
         $user->photo = 'images/users/' . $user->id . '.jpg';
         $user->photo_small = 'images/users/' . $user->id . '-small' . '.jpg';
 
-        if (! $user->save()) {
-            throw new Exception('Could not save user in database');
-        }
+        $this->saveUserGuard($user);
 
         return [$user->photo, $user->photo_small];
     }
 
+    /**
+     * @throws FailedSaveUserException
+     */
     public function deletePhoto(int $userId): void
     {
         $user = User::findOrFail($userId);

@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Requests\ProfilePhotoRequest;
 use App\Services\UserService;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 #[OA\Put(
     path: '/user/photo',
-    description: 'Обновление фото юзера. Максимум 10 мб, форматы: jpeg,jpg,png',
+    description: 'Обновление фото юзера. Максимум 10 мб, форматы: jpeg, jpg, png',
     summary: 'Загрузить фото юзера',
     security: [['bearerAuth' => []]],
     tags: ['user'])
@@ -19,12 +19,9 @@ use OpenApi\Attributes as OA;
 #[OA\RequestBody(
     description: 'Photo file',
     required: true,
-    content: [
-        new OA\MediaType(
-            mediaType: 'multipart/form-data',
-            schema: new OA\Schema(title: 'photo', type: 'string', format: 'binary')
-        ),
-    ],
+    content: [new OA\MediaType(
+        mediaType: 'multipart/form-data',
+        schema: new OA\Schema(title: 'photo', type: 'string', format: 'binary'))],
 )]
 #[OA\Response(
     response: Response::HTTP_OK,
@@ -32,12 +29,13 @@ use OpenApi\Attributes as OA;
     content: new OA\JsonContent(properties: [
         new OA\Property(
             property: 'data',
-            description: 'массив с двумя url: на маленькую и большую фото пользователя',
+            description: 'массив с двумя url: на маленькую и большую фото пользователя. Добавить "https://api-url/storage/"
+            для перед возвращенными путями к фото',
             type: 'object',
             example: [
                 'data' => [
-                    'http://url/storage/images/users/2/2.jpg',
-                    'http://url/storage/images/users/2/2-small.jpg',
+                    'images/users/2/2.jpg',
+                    'images/users/2/2-small.jpg',
                 ],
                 'message' => 'Photo updated successfully',
             ]
@@ -67,17 +65,23 @@ use OpenApi\Attributes as OA;
 class PhotoController
 {
     public function __construct(
-        private UserService $service
+        private readonly UserService $service
     ) {
     }
 
-    public function __invoke(
-        ProfilePhotoRequest $request
-    ): JsonResponse {
-        $paths = $this->service->saveUsersPhoto(
-            auth()->user(),
-            $request->validated('photo')
-        );
+    public function __invoke(ProfilePhotoRequest $request): JsonResponse
+    {
+        try {
+            $paths = $this->service->saveUsersPhoto(
+                auth()->user(),
+                $request->validated('photo')
+            );
+        } catch (Throwable) {
+            return response()->json([
+                'data' => [],
+                'message' => 'Не удалось загрузить фото',
+            ]);
+        }
 
         return response()->json([
             'data' => $paths,
