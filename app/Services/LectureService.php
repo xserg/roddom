@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Dto\CategoryPurchaseDto;
 use App\Dto\EverythingPackPurchaseDto;
 use App\Http\Resources\LectureResource;
 use App\Models\FullCatalogPrices;
@@ -11,33 +10,25 @@ use App\Models\Period;
 use App\Models\Promo;
 use App\Repositories\CategoryRepository;
 use App\Repositories\LectureRepository;
+use App\Repositories\PeriodRepository;
 use App\Repositories\UserRepository;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 class LectureService
 {
     use MoneyConversion;
-
-    private $periods;
-    private $promoCommonPrices;
 
     public function __construct(
         private LectureRepository  $lectureRepository,
         private UserRepository     $userRepository,
         private CategoryRepository $categoryRepository,
         private CategoryService    $categoryService,
-        private PaymentService     $paymentService
+        private PaymentService     $paymentService,
+        private PeriodRepository   $periodRepository
     ) {
-        $this->periods = Period::all();
-        $this->promoCommonPrices = Promo::query()
-            ->with(['subscriptionPeriodsForPromoPack'])
-            ->first()
-            ?->subscriptionPeriodsForPromoPack;
     }
 
     public function isLecturePurchased(int $lectureId): bool
@@ -50,10 +41,11 @@ class LectureService
     public function getEverythingPackPricesResource(?int $userId = null): array
     {
         $prices = [];
+        $periods = $this->periodRepository->getAll();
 
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
 
-        foreach ($this->periods as $period) {
+        foreach ($periods as $period) {
             $categoryPriceDto = $this->calculateEverythingPriceForPeriod($fullCatalogPrices, $period->id, $userId);
             $prices[] = $this->getEverythingPackPriceResourceForPeriod($categoryPriceDto, $period);
         }
@@ -144,11 +136,15 @@ class LectureService
     public function getLecturePricesInCasePromoPack(Lecture|LectureResource $lecture): array
     {
         $prices = [];
+        $periods = $this->periodRepository->getAll();
 
-        $commonPromoPrices = $this->promoCommonPrices;
+        $commonPromoPrices = Promo::query()
+            ->with(['subscriptionPeriodsForPromoPack'])
+            ->first()
+            ?->subscriptionPeriodsForPromoPack;
         $customPromoPrices = $lecture->pricesPeriodsInPromoPacks;
 
-        foreach ($this->periods as $period) {
+        foreach ($periods as $period) {
             //общие цены всегда находятся, по идее в commonPrice всегда будет указана цена
             $commonPrice = $commonPromoPrices->firstWhere('length', $period->length);
             $customPrice = $customPromoPrices->firstWhere('length', $period->length);
@@ -178,7 +174,8 @@ class LectureService
 
     public function getEverythingPriceForPeriod(int $periodLength, ?int $userId = null): EverythingPackPurchaseDto
     {
-        $period = $this->periods->firstWhere('length', $periodLength);
+        $periods = $this->periodRepository->getAll();
+        $period = $periods->firstWhere('length', $periodLength);
         $fullCatalogPrices = FullCatalogPrices::with('period')->get();
 
         return $this->calculateEverythingPriceForPeriod($fullCatalogPrices, $period->id, $userId);

@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Period;
 use App\Models\Subscription;
+use App\Observers\PeriodObserver;
 use App\Observers\SubscriptionObserver;
-use App\Services\CategoryService;
-use App\Services\LectureService;
+use App\Repositories\PeriodRepository;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -18,8 +19,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(LectureService::class, LectureService::class);
-        $this->app->singleton(CategoryService::class, CategoryService::class);
+        $this->app->singleton(PeriodRepository::class);
         $this->app->bind(ImageManager::class, function (Application $app) {
             return new ImageManager(['driver' => 'imagick']);
         });
@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Subscription::observe(SubscriptionObserver::class);
+        Period::observe(PeriodObserver::class);
+
 //        Queue::before(function (JobProcessing $event) {
 //            // $event->connectionName
 //            Log::info(sprintf('Queue job before handle: %d', $event->job->getJobId()));

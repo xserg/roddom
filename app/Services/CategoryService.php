@@ -6,29 +6,26 @@ use App\Dto\CategoryPurchaseDto;
 use App\Http\Resources\LectureResource;
 use App\Models\Category;
 use App\Models\Lecture;
-use App\Models\Period;
 use App\Repositories\CategoryRepository;
 use App\Repositories\LectureRepository;
+use App\Repositories\PeriodRepository;
 use App\Repositories\UserRepository;
 use App\Traits\MoneyConversion;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\Schema;
 
 class CategoryService
 {
     use MoneyConversion;
-
-    private EloquentCollection $periods;
 
     public function __construct(
         private UserRepository     $userRepository,
         private CategoryRepository $categoryRepository,
         private LectureRepository  $lectureRepository,
         private PaymentService     $paymentService,
+        private PeriodRepository   $periodRepository
     ) {
-        $this->periods = Period::all();
     }
 
     public function isCategoryPurchased(int $categoryId): bool
@@ -78,17 +75,17 @@ class CategoryService
 
     public function getCategoryPricesResource($category, ?int $userId = null): array
     {
-        $categoryPricesResource = [];
+            $periods = $this->periodRepository->getAll();
 
-        foreach ($this->periods as $period) {
-            $categoryPriceDto = $category->isMain()
-                ? $this->calculateMainCategoryPriceForPeriod($category, $period->id, $userId)
-                : $this->calculateSubCategoryPriceForPeriod($category, $period->id, $userId);
+            foreach ($periods as $period) {
+                $categoryPriceDto = $category->isMain()
+                    ? $this->calculateMainCategoryPriceForPeriod($category, $period->id, $userId)
+                    : $this->calculateSubCategoryPriceForPeriod($category, $period->id, $userId);
 
-            $categoryPricesResource[] = $this->getCategoryPriceResourceForPeriod($categoryPriceDto, $period);
-        }
+                $categoryPricesResource[] = $this->getCategoryPriceResourceForPeriod($categoryPriceDto, $period);
+            }
 
-        return $categoryPricesResource;
+            return $categoryPricesResource;
     }
 
     public function getCategoryPurchaseForPeriod(int $categoryId, int $periodId, ?int $userId = null): CategoryPurchaseDto
@@ -258,7 +255,9 @@ class CategoryService
     ): array {
         $prices = [];
 
-        foreach ($this->periods as $period) {
+        $periods = $this->periodRepository->getAll();
+
+        foreach ($periods as $period) {
             $priceCommon = $categoryCommonPrices->firstWhere('period_id', $period->id);
             $priceCustom = $lectureCustomPrices->firstWhere('pivot.period_id', $period->id);
 
