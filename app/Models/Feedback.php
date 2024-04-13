@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\PublishedScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -29,6 +30,7 @@ class Feedback extends Model
 
     public function lecture(): HasOne
     {
-        return $this->hasOne(Lecture::class, 'id', 'lecture_id');
+        return $this->hasOne(Lecture::class, 'id', 'lecture_id')
+            ->withoutGlobalScope(PublishedScope::class);
     }
 }
