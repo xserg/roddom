@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Models\Scopes\PublishedScope;
 use App\QueryBuilders\LectureQueryBuilder;
+use App\Services\CategoryService;
+use App\Services\LectureService;
 use App\Traits\MoneyConversion;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\Log;
 
 class Lecture extends Model
 {
@@ -240,5 +241,30 @@ class Lecture extends Model
                 'end_date' => $endDate,
             ]
         );
+    }
+
+    public function prices(): Attribute
+    {
+            $prices =  $this->isPromo()
+                ? $this->convertPrices(app(LectureService::class)->getLecturePricesInCasePromoPack($this))
+                : $this->convertPrices(app(CategoryService::class)->getLecturePricesInCaseSubCategory($this));
+
+        return new Attribute(
+            get: fn () => $prices
+        );
+    }
+
+    private function convertPrices(array $prices): array
+    {
+        foreach ($prices as &$priceForOnePeriod) {
+            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
+                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
+            }
+            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
+                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
+            }
+        }
+
+        return $prices;
     }
 }

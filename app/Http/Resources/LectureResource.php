@@ -2,11 +2,7 @@
 
 namespace App\Http\Resources;
 
-use App\Models\Lecture;
-use App\Services\CategoryService;
-use App\Services\LectureService;
 use App\Traits\MoneyConversion;
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -89,7 +85,7 @@ class LectureResource extends JsonResource
             'is_promo' => $this->isPromo(),
             'is_watched' => $this->is_watched,
             'purchase_info' => $this->whenAppended('purchase_info'),
-            'prices' => $this->whenAppended('prices', $this->setPrices()),
+            'prices' => $this->whenAppended('prices'),
             'rates' => [
                 'rate_avg' => $this->averageRate?->rating,
                 'rate_user' => $this->userRate?->rating,
@@ -100,28 +96,5 @@ class LectureResource extends JsonResource
             'show_tariff_2' => $this->show_tariff_2,
             'show_tariff_3' => $this->show_tariff_3,
         ];
-    }
-
-    private function setPrices(): Closure
-    {
-        return function () {
-            return $this->isPromo()
-                ? $this->convertPrices(app(LectureService::class)->getLecturePricesInCasePromoPack($this))
-                : $this->convertPrices(app(CategoryService::class)->getLecturePricesInCaseSubCategory($this));
-        };
-    }
-
-    private function convertPrices(array $prices): array
-    {
-        foreach ($prices as &$priceForOnePeriod) {
-            if (! is_null($priceForOnePeriod['custom_price_for_one_lecture'])) {
-                $priceForOnePeriod['custom_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['custom_price_for_one_lecture']);
-            }
-            if (! is_null($priceForOnePeriod['common_price_for_one_lecture'])) {
-                $priceForOnePeriod['common_price_for_one_lecture'] = self::coinsToRoubles($priceForOnePeriod['common_price_for_one_lecture']);
-            }
-        }
-
-        return $prices;
     }
 }
