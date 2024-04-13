@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
-use App\Filament\Resources\CategoryResource\Widgets\MainCategoryPrice;
 use App\Filament\Resources\CategoryResource\Widgets\CategoryPrices;
 use App\Models\Category;
 use Closure;
@@ -129,21 +128,16 @@ class CategoryResource extends Resource
                 'categoryPrices.period',
                 'lectures.category.categoryPrices.period',
                 'lectures.category.parentCategory',
-                'lectures.category.categoryPrices',
-                'lectures.contentType',
-                'lectures.paymentType',
                 'lectures.pricesPeriodsInPromoPacks',
                 'lectures.pricesForLectures',
-                'childrenCategoriesLectures.category.categoryPrices',
-                'childrenCategoriesLectures.pricesForLectures',
+//                'childrenCategoriesLectures.category.categoryPrices.period',
+//                'childrenCategoriesLectures.pricesForLectures',
                 'childrenCategories.parentCategory',
-                'childrenCategories.categoryPrices.period',
-                'childrenCategories.lectures.category.categoryPrices.period',
+//                'childrenCategories.categoryPrices.period',
+//                'childrenCategories.lectures.category.categoryPrices.period',
                 'childrenCategories.lectures.category.parentCategory',
                 'childrenCategories.lectures.pricesForLectures',
                 'childrenCategories.lectures.pricesPeriodsInPromoPacks',
-                'childrenCategories.lectures.paymentType',
-                'childrenCategories.lectures.contentType',
             ]
         );
     }

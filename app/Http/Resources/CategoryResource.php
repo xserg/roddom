@@ -3,7 +3,6 @@
 namespace App\Http\Resources;
 
 use App\Models\Category;
-use App\Services\CategoryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CustomNotificationResource\Pages;
-use App\Filament\Resources\CustomNotificationResource\RelationManagers;
 use App\Models\CustomNotification;
 use App\Models\User;
 use Filament\Forms;
@@ -30,19 +29,6 @@ class CustomNotificationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Card::make([
-//                    Forms\Components\RichEditor::make('text')
-//                        ->label('Текст уведомления')
-//                        ->toolbarButtons([
-//                            'bold',
-//                            'h2',
-//                            'h3',
-//                            'italic',
-//                            'redo',
-//                            'strike',
-//                            'undo',
-//                            'preview',
-//                        ])
-//                        ->maxLength(65535),
                     TiptapEditor::make('text')
                         ->profile('barebone')
                         ->output(TiptapEditor::OUTPUT_HTML),
@@ -56,7 +42,7 @@ class CustomNotificationResource extends Resource
             ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('text')
-                    ->formatStateUsing(fn(string $state) => strip_tags($state))
+                    ->formatStateUsing(fn (string $state) => strip_tags($state))
                     ->label('Текст уведомления')
                     ->sortable()
                     ->searchable(),
@@ -75,7 +61,7 @@ class CustomNotificationResource extends Resource
                     ->action(function () {
                         User::all()->each(fn (User $user) => $user->markNotificationUnread());
                     })
-                    ->visible(fn (?Model $record) => CustomNotification::latest()->first()->id === $record->id),
+                    ->visible(fn (?Model $record) => CustomNotification::latest()->value('id') === $record->id),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
