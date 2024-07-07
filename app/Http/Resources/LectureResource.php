@@ -72,7 +72,7 @@ class LectureResource extends JsonResource
             'parent_category_slug' => $this->category->parentCategory->slug,
             'title' => $this->title,
             'description' => $this->description,
-            'preview_picture' => $this->preview_picture,
+            'preview_picture' => env('APP_URL') . '/' . $this->preview_picture,
             'lector' => new LectorResource($this->whenLoaded('lector')),
             $this->mergeWhen($loadCategory, [
                 'category' => new CategoryResource($this->category),

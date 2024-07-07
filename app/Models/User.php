@@ -43,7 +43,8 @@ class User extends Authenticatable implements FilamentUser
         'can_get_referrers_bonus',
         'next_free_lecture_available',
         'is_notification_read',
-        'ref_type'
+        'ref_type',
+        'polis'
     ];
 
     protected $hidden = [

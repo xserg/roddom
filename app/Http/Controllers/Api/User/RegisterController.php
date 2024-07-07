@@ -44,6 +44,8 @@ class RegisterController
     public function __invoke(RegisterRequest $request): JsonResponse
     {
         $email = $request->validated('email');
+        //$polis = $request->validated('polis');
+        $polis = $request->polis;
         $password = $request->validated('password');
         $ref = $request->validated('ref');
 
@@ -51,6 +53,7 @@ class RegisterController
 
         $referer = User::withRefToken($ref)->first();
         $this->userService->create([
+            'polis' => $polis,
             'email' => $email,
             'password' => $password,
             'referrer_id' => $referer?->id

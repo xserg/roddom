@@ -7,7 +7,7 @@
 /public/vendor
 /storage/*.key
 /storage/debugbar
-/vendor
+
 .env
 .env.backup
 .env.production

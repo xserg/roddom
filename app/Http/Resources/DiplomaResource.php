@@ -18,7 +18,7 @@ class DiplomaResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'preview_picture' => $this->preview_picture,
+            'preview_picture' => env('APP_URL') . '/' . $this->preview_picture,
         ];
     }
 }

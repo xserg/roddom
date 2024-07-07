@@ -82,6 +82,11 @@ class UserResource extends Resource
                         ->imageCropAspectRatio('1:1')
                         ->imageResizeTargetWidth('300')
                         ->imageResizeTargetHeight('300'),
+                    Forms\Components\TextInput::make('polis')
+                        //->tel()
+                        ->required()
+                        ->maxLength(16)
+                        ->label('Полис'),
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
@@ -340,6 +345,7 @@ class UserResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('имя')->sortable()->searchable(),
+                Tables\Columns\TextColumn::make('polis')->label('Полис')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->label('email')->sortable()->searchable(),
                 Tables\Columns\ImageColumn::make('photo')->label('фото')->toggleable(),
                 Tables\Columns\TextColumn::make('birthdate')

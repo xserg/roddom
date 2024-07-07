@@ -33,7 +33,7 @@ class CategoryResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'info' => $this->info,
-            'preview_picture' => $this->preview_picture,
+            'preview_picture' => env('APP_URL') . '/' . $this->preview_picture,
             'is_promo' => $this->is_promo,
             'lectures_count' => $this->isMain() ?
                 $this->whenCounted('childrenCategoriesLectures') :

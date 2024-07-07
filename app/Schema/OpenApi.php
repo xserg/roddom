@@ -15,7 +15,8 @@ use OpenApi\Attributes as OA;
     email: 'vladimir.balin@bboom.pro'
 )]
 #[OA\Server(
-    url: 'https://api.roddom1.vip/v1/',
+    //url: 'https://api.roddom1.vip/v1/',
+    url: 'http://roddom1.test/v1/',
     description: "Mother's school API Server",
 )]
 #[OA\SecurityScheme(
