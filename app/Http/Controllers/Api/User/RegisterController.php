@@ -61,7 +61,7 @@ class RegisterController
             'email' => $email,
             'password' => $password,
             'referrer_id' => $referer?->id,
-            'name' => $registry->name,
+            'name' => $registry->lastname . ' ' . $registry->name . ' ' . $registry->fathername,
         ]);
 
         $this->loginCodeService->createAndSendEmail($email);
