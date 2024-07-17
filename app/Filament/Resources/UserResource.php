@@ -85,7 +85,7 @@ class UserResource extends Resource
                     Forms\Components\TextInput::make('polis')
                         //->tel()
                         ->required()
-                        ->maxLength(16)
+                        ->rules(['digits:16'])
                         ->label('Полис'),
                     Forms\Components\TextInput::make('email')
                         ->email()

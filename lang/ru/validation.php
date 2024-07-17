@@ -31,7 +31,7 @@ return [
     'declined' => 'Поле :attribute должно быть отклонено.',
     'declined_if' => 'Поле :attribute должно быть отклонено, когда :other равно :value.',
     'different' => 'Значения полей :attribute и :other должны различаться.',
-    'digits' => 'Количество символов в поле :attribute должно быть равным :digits.',
+    'digits' => 'Количество цифр в поле :attribute должно быть равным :digits.',
     'digits_between' => 'Количество символов в поле :attribute должно быть между :min и :max.',
     'dimensions' => 'Изображение, указанное в поле :attribute, имеет недопустимые размеры.',
     'distinct' => 'Значения поля :attribute не должны повторяться.',
