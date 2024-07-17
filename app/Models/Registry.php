@@ -12,6 +12,6 @@ class Registry extends Model
 
     protected $connection = 'gk101';
     //public $timestamps = false;
-
+    protected $table = 'registry';
 
 }
