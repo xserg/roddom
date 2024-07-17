@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Registry;
 
 #[OA\Post(
     path: '/user/register',
@@ -44,19 +45,23 @@ class RegisterController
     public function __invoke(RegisterRequest $request): JsonResponse
     {
         $email = $request->validated('email');
-        //$polis = $request->validated('polis');
-        $polis = $request->polis;
+        $polis = $request->validated('polis');
         $password = $request->validated('password');
         $ref = $request->validated('ref');
 
         $this->loginCodeService->deleteWhereEmail($email);
 
         $referer = User::withRefToken($ref)->first();
+
+        $registry = Registry::where('polis', $polis)->first();
+        //->where('email')->first();
+
         $this->userService->create([
             'polis' => $polis,
             'email' => $email,
             'password' => $password,
-            'referrer_id' => $referer?->id
+            'referrer_id' => $referer?->id,
+            'name' => $registry->name,
         ]);
 
         $this->loginCodeService->createAndSendEmail($email);
