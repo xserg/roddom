@@ -34,7 +34,7 @@ class LectorResource extends JsonResource
             'position' => $this->position,
             'description' => $this->description,
             'career_start' => $this->career_start,
-            'photo' => env('APP_URL') . '/' . $this->photo,
+            'photo' => env('APP_URL') . '/storage/' . $this->photo,
             'diplomas' => DiplomaCollection::make($this->whenLoaded('diplomas')),
             'rates' => [
                 'rate_user' => $this->userRate?->rating,
