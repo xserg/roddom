@@ -83,7 +83,7 @@ class UserResource extends Resource
                         ->imageResizeTargetWidth('300')
                         ->imageResizeTargetHeight('300'),
                     Forms\Components\TextInput::make('polis')
-                        //->tel()
+                        ->disabled()
                         ->required()
                         ->rules(['digits:16'])
                         ->label('Полис'),
