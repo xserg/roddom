@@ -44,7 +44,7 @@ class User extends Authenticatable implements FilamentUser
         'next_free_lecture_available',
         'is_notification_read',
         'ref_type',
-        'polis',
+        //'polis',
         'pregnancy_start',
     ];
 
