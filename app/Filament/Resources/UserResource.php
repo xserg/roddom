@@ -82,13 +82,13 @@ class UserResource extends Resource
                         ->imageCropAspectRatio('1:1')
                         ->imageResizeTargetWidth('300')
                         ->imageResizeTargetHeight('300'),
-                    /*
+
                     Forms\Components\TextInput::make('polis')
-                        ->disabled()
+                        //->disabled()
                         ->required()
                         ->rules(['digits:16'])
                         ->label('Полис'),
-                    */    
+
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
