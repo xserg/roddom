@@ -225,13 +225,14 @@ class Lecture extends Model
 
         $isPurchased = false;
         $endDate = null;
-
-        foreach ($user->actualSubscriptions as $sub) {
-            if ($sub->lectures?->contains($this->id)) {
-                $isPurchased = true;
-            }
-            if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
-                $endDate = $sub->end_date;
+        if ($user) {
+            foreach ($user->actualSubscriptions as $sub) {
+                if ($sub->lectures?->contains($this->id)) {
+                    $isPurchased = true;
+                }
+                if ($isPurchased && ($sub->end_date > $endDate || is_null($endDate))) {
+                    $endDate = $sub->end_date;
+                }
             }
         }
 

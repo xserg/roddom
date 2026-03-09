@@ -86,6 +86,24 @@ Route::prefix('v1')
 //            ->middleware('tinkoff-verify-ip')
             ->name('tinkoff-payments.listener');
 
+        Route::get('/lectures', RetrieveAllLecturesController::class)
+                ->name('lectures');
+
+        Route::get('/lectors', RetrieveAllLectorsController::class)
+                ->name('lectors');
+        Route::get('/lector/{id}', RetrieveLectorController::class)
+                ->name('lector');
+        Route::get('/lectors/category/{slug}', RetrieveLectorsByCategoryController::class)
+                ->name('lector.by.category');        
+        Route::get('/categories', RetrieveAllCategoriesController::class)
+                ->name('categories');
+        Route::get('/category/{slug}', RetrieveCategoryController::class)
+                ->name('subcategories');
+        Route::get('/promopack', RetrieveAllPromoLecturesController::class)
+                ->name('promopack');
+        //Route::get('/lecture/all/prices', AllLecturesPricesController::class)
+                //->name('lecture.all.price');
+
         Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::delete('/user', DeleteUserController::class)
@@ -101,17 +119,17 @@ Route::prefix('v1')
             Route::delete('/user/logout', LogoutController::class)
                 ->name('logout');
 
-            Route::get('/lectors', RetrieveAllLectorsController::class)
-                ->name('lectors');
-            Route::get('/lector/{id}', RetrieveLectorController::class)
-                ->name('lector');
+            //Route::get('/lectors', RetrieveAllLectorsController::class)
+                //->name('lectors');
+            //Route::get('/lector/{id}', RetrieveLectorController::class)
+                //->name('lector');
             Route::post('/lector/{id}/rate', RateLectorController::class)
                 ->name('lector.rate');
-            Route::get('/lectors/category/{slug}', RetrieveLectorsByCategoryController::class)
-                ->name('lector.by.category');
+            //Route::get('/lectors/category/{slug}', RetrieveLectorsByCategoryController::class)
+                //->name('lector.by.category');
 
-            Route::get('/lectures', RetrieveAllLecturesController::class)
-                ->name('lectures');
+            Route::get('/lectures-saved', RetrieveAllLecturesController::class)
+                ->name('lectures-saved');
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->middleware(['throttle:1,0.015'])
                 ->name('lecture');
@@ -150,11 +168,10 @@ Route::prefix('v1')
 
             Route::get('/lecture/all/prices', AllLecturesPricesController::class)
                 ->name('lecture.all.price');
-
-            Route::get('/categories', RetrieveAllCategoriesController::class)
-                ->name('categories');
-            Route::get('/category/{slug}', RetrieveCategoryController::class)
-                ->name('subcategories');
+            //Route::get('/categories', RetrieveAllCategoriesController::class)
+                //->name('categories');
+            //Route::get('/category/{slug}', RetrieveCategoryController::class)
+                //->name('subcategories');
 
             Route::post('/category/{id}/buy/{period}', BuyCategoryController::class)
                 ->name('category.buy')
@@ -173,8 +190,8 @@ Route::prefix('v1')
                 ->where('period', '[0-9]+');
 
 
-            Route::get('/promopack', RetrieveAllPromoLecturesController::class)
-                ->name('promopack');
+            //Route::get('/promopack', RetrieveAllPromoLecturesController::class)
+                //->name('promopack');
 
             Route::get('/pregnancy-plan-form', WizardControllerRetrieve::class);
             Route::post('/pregnancy-plan-form', WizardEmailController::class);
