@@ -130,6 +130,9 @@ Route::prefix('v1')
 
             Route::get('/lectures-saved', RetrieveAllLecturesController::class)
                 ->name('lectures-saved');
+             Route::get('/lectures-viewed', RetrieveAllLecturesController::class)
+                ->name('lectures-viewed');
+
             Route::get('/lecture/{id}', RetrieveLectureController::class)
                 ->middleware(['throttle:1,0.015'])
                 ->name('lecture');
