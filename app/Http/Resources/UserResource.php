@@ -59,7 +59,7 @@ class UserResource extends JsonResource
             'pregnancy_start' => $this->pregnancy_start,
             'baby_born' => $this->baby_born,
             'photo' => $this->photo ? env('APP_URL') . '/storage/' . $this->photo : '',
-            'photo_small' => $this->photo_small ? env('APP_URL'). '/' . $this->photo_small : '',
+            'photo_small' => $this->photo_small ? env('APP_URL'). '/storage/' . $this->photo_small : '',
             'next_free_lecture_available' => $this->next_free_lecture_available,
             'ref' => [
                 'points_available' => self::coinsToRoubles($this->refPoints?->points ?? 0),
