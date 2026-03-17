@@ -85,7 +85,7 @@ class UserResource extends Resource
 
                     Forms\Components\TextInput::make('polis')
                         //->disabled()
-                        ->required()
+                        //->required()
                         ->rules(['digits:16'])
                         ->label('Полис'),
 
