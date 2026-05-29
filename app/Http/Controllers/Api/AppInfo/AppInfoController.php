@@ -96,6 +96,10 @@ class AppInfoController extends Controller
                 'app_info' => DB::table('app_info')
                     ->select('*')
                     ->get(),
+                 'app_policy' => DB::table('app_policy')
+                    ->select('*')
+                    ->where('is_active', '=', 1)
+                    ->get(),                      
                 'app_periods' => Period::all()->pluck('length'),
                 'ref_info' => RefInfo::all(['depth_level', 'percent'])
             ],
